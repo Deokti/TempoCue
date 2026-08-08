@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "id": "top.urgot-vs-sett.prototype",
+  "name": "Urgot vs Sett — прототип",
+  "patch": "example-only",
+  "rules": [
+    {
+      "id": "urgot-sett-early-lane",
+      "playerChampion": "Urgot",
+      "opponentChampion": "Sett",
+      "minimumLevel": 1,
+      "maximumLevel": 8,
+      "requiredItemIds": [],
+      "excludedItemIds": [],
+      "powerState": "dangerous",
+      "priority": 80,
+      "title": "Ранняя линия требует осторожности",
+      "message": "В тестовом сценарии Sett сильнее в затяжном прямом сражении. Сохрани здоровье и не начинай бой без понятного преимущества.",
+      "source": "Прототип правила — требует проверки мейнером и привязки к патчу."
+    },
+    {
+      "id": "urgot-sett-level-nine-waiting-item",
+      "playerChampion": "Urgot",
+      "opponentChampion": "Sett",
+      "minimumLevel": 9,
+      "requiredItemIds": [],
+      "excludedItemIds": [3071],
+      "powerState": "cautious",
+      "priority": 85,
+      "title": "Уровень силы вырос, но предмет ещё не готов",
+      "message": "Девятый уровень улучшает ситуацию, однако условие тестового power spike ещё не выполнено. Продолжай оценивать здоровье, волну и позицию.",
+      "source": "Прототип правила — требует проверки мейнером и привязки к патчу."
+    },
+    {
+      "id": "urgot-sett-level-nine-black-cleaver",
+      "playerChampion": "Urgot",
+      "opponentChampion": "Sett",
+      "minimumLevel": 9,
+      "requiredItemIds": [3071],
+      "excludedItemIds": [],
+      "powerState": "playable",
+      "priority": 100,
+      "title": "Матчап стал заметно лучше",
+      "message": "Достигнут тестовый power spike: девятый уровень и Black Cleaver. Полноценное сражение можно рассматривать, но результат всё ещё зависит от здоровья, волны и позиции.",
+      "source": "Прототип правила — требует проверки мейнером и привязки к патчу."
+    }
+  ]
+}

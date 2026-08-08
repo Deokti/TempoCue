@@ -1,0 +1,11 @@
+bin/
+obj/
+.vs/
+.idea/
+.vscode/
+.dotnet-cli/
+.codex-temp/
+TestResults/
+*.user
+*.suo
+*.log
