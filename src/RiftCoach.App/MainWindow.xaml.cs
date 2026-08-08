@@ -6,25 +6,35 @@ using RiftCoach.Core;
 
 namespace RiftCoach.App;
 
+/// <summary>
+/// Главное окно технического симулятора RiftCoach.
+/// Оно собирает введённое состояние матча, передаёт его движку и показывает совет.
+/// </summary>
 public partial class MainWindow : Window
 {
+    // Riot использует числовые ID для предметов. ID Black Cleaver — 3071.
     private const int BlackCleaverItemId = 3071;
 
+    // Движок создаётся один раз при открытии окна и затем используется повторно.
     private readonly MatchupCoach _coach;
 
     public MainWindow()
     {
+        // Метод создаётся WPF автоматически из разметки MainWindow.xaml.
         InitializeComponent();
 
+        // AppContext.BaseDirectory указывает на папку, из которой запущено приложение.
         var packPath = Path.Combine(
             AppContext.BaseDirectory,
             "Assets",
             "CoachPacks",
             "urgot-vs-sett.json");
 
+        // Загружаем правила из JSON и передаём их движку матчапов.
         var pack = CoachPackLoader.LoadFromFile(packPath);
         _coach = new MatchupCoach(pack.Rules);
 
+        // После полной загрузки окна сразу показываем совет для стартового состояния.
         Loaded += (_, _) => EvaluateCurrentState("Стартовый сценарий");
     }
 
@@ -57,12 +67,15 @@ public partial class MainWindow : Window
 
     private void EvaluateCurrentState(string eventName)
     {
+        // HashSet хранит каждый ID только один раз и быстро проверяет наличие предмета.
         var itemIds = new HashSet<int>();
         if (BlackCleaverCheckBox.IsChecked == true)
         {
             itemIds.Add(BlackCleaverItemId);
         }
 
+        // Сейчас состояние собирается из элементов интерфейса. В рабочей версии
+        // эту часть заменит поставщик данных активного матча.
         var state = new GameState
         {
             PlayerChampion = GetSelectedChampion(PlayerChampionComboBox),
@@ -71,6 +84,7 @@ public partial class MainWindow : Window
             PlayerItemIds = itemIds
         };
 
+        // Интерфейс не выбирает совет самостоятельно — он передаёт данные ядру.
         var advice = _coach.GetBestAdvice(state);
         ShowAdvice(advice);
         AppendLog(eventName, state, advice);
@@ -78,6 +92,7 @@ public partial class MainWindow : Window
 
     private void ShowAdvice(CoachAdvice? advice)
     {
+        // Знак ? в CoachAdvice? означает, что подходящий совет может отсутствовать.
         if (advice is null)
         {
             AdviceTitleTextBlock.Text = "Подходящее правило не найдено";
@@ -93,6 +108,7 @@ public partial class MainWindow : Window
         AdviceSourceTextBlock.Text = advice.Source;
         RuleIdTextBlock.Text = $"RULE: {advice.RuleId} · PRIORITY: {advice.Priority}";
 
+        // Для каждой оценки силы задаём отдельные текст и цвет индикатора.
         switch (advice.PowerState)
         {
             case PowerState.Dangerous:
@@ -121,6 +137,7 @@ public partial class MainWindow : Window
 
     private void AppendLog(string eventName, GameState state, CoachAdvice? advice)
     {
+        // Тернарный оператор выбирает одно из двух текстовых значений по условию.
         var items = state.PlayerItemIds.Count == 0
             ? "без предмета"
             : "Black Cleaver";
@@ -133,6 +150,8 @@ public partial class MainWindow : Window
 
     private static string GetSelectedChampion(ComboBox comboBox)
     {
+        // SelectedItem обычно содержит ComboBoxItem. Запасная ветка позволяет
+        // позднее передавать в ComboBox и обычные строки.
         return comboBox.SelectedItem is ComboBoxItem item
             ? item.Content?.ToString() ?? string.Empty
             : comboBox.SelectedItem?.ToString() ?? string.Empty;

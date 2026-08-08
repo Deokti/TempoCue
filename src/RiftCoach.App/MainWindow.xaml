@@ -10,6 +10,7 @@
         Background="#0B1220"
         FontFamily="Segoe UI">
     <Window.Resources>
+        <!-- Общие стили позволяют менять оформление однотипных элементов в одном месте. -->
         <Style x:Key="PanelBorder" TargetType="Border">
             <Setter Property="Background" Value="#121C2F" />
             <Setter Property="BorderBrush" Value="#263750" />
@@ -67,6 +68,7 @@
         </Style>
     </Window.Resources>
 
+    <!-- Главная сетка делит окно на заголовок и рабочую область. -->
     <Grid Margin="28">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -110,6 +112,7 @@
             </Border>
         </Grid>
 
+        <!-- Рабочая область: параметры матча слева, совет и журнал справа. -->
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="390" />
@@ -117,6 +120,7 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
+            <!-- Временная панель ручного ввода будет заменена данными активного матча. -->
             <Border Grid.Column="0" Style="{StaticResource PanelBorder}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
@@ -196,6 +200,7 @@
                 </ScrollViewer>
             </Border>
 
+            <!-- Правая колонка показывает результат работы движка правил. -->
             <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />

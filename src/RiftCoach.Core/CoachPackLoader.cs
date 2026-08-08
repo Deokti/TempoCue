@@ -3,13 +3,19 @@ using System.Text.Json.Serialization;
 
 namespace RiftCoach.Core;
 
+/// <summary>
+/// Загружает Coach Pack из JSON и не пропускает в движок некорректные правила.
+/// </summary>
 public static class CoachPackLoader
 {
+    // Web-настройки связывают JSON-имена вида playerChampion со свойствами
+    // C# вида PlayerChampion. Конвертер читает enum как текст, например "dangerous".
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web)
     {
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
 
+    /// <summary>Открывает Coach Pack по указанному пути и загружает его.</summary>
     public static CoachPack LoadFromFile(string path)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
@@ -18,13 +24,20 @@ public static class CoachPackLoader
         return Load(stream);
     }
 
+    /// <summary>
+    /// Загружает Coach Pack из потока. Отдельный метод с потоком упрощает тестирование:
+    /// тест может передать JSON из памяти, не создавая временный файл.
+    /// </summary>
     public static CoachPack Load(Stream jsonStream)
     {
         ArgumentNullException.ThrowIfNull(jsonStream);
 
+        // Deserialize превращает текст JSON в типизированный объект CoachPack.
         var pack = JsonSerializer.Deserialize<CoachPack>(jsonStream, SerializerOptions)
             ?? throw new InvalidDataException("Coach Pack is empty.");
 
+        // Проверяем данные один раз на границе системы. После этого движок может
+        // считать, что получил правильно сформированный набор правил.
         Validate(pack);
         return pack;
     }
@@ -51,6 +64,7 @@ public static class CoachPackLoader
             throw new InvalidDataException("Coach Pack must contain at least one rule.");
         }
 
+        // Группируем правила по ID и ищем первую группу, в которой больше одного элемента.
         var duplicateRule = pack.Rules
             .GroupBy(rule => rule.Id, StringComparer.OrdinalIgnoreCase)
             .FirstOrDefault(group => group.Count() > 1);
@@ -60,6 +74,7 @@ public static class CoachPackLoader
             throw new InvalidDataException($"Duplicate rule id: {duplicateRule.Key}.");
         }
 
+        // Помимо проверки самого набора отдельно проверяем каждое его правило.
         foreach (var rule in pack.Rules)
         {
             ValidateRule(rule);

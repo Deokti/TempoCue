@@ -2,6 +2,10 @@ using System.Text;
 
 namespace RiftCoach.Core.Tests;
 
+/// <summary>
+/// Автоматические проверки движка матчапов. Каждый тест создаёт известное состояние
+/// и сравнивает полученный результат с ожидаемым.
+/// </summary>
 public sealed class MatchupCoachTests
 {
     private const int BlackCleaverItemId = 3071;
@@ -9,10 +13,13 @@ public sealed class MatchupCoachTests
     [Fact]
     public void GetBestAdvice_ReturnsDangerousAdvice_ForEarlyLane()
     {
+        // Arrange: подготавливаем движок и его правила.
         var coach = CreateCoach();
 
+        // Act: запрашиваем совет для первого уровня.
         var advice = coach.GetBestAdvice(CreateState(level: 1));
 
+        // Assert: проверяем, что движок выбрал ожидаемое правило.
         Assert.NotNull(advice);
         Assert.Equal(PowerState.Dangerous, advice.PowerState);
         Assert.Equal("early", advice.RuleId);
@@ -87,6 +94,8 @@ public sealed class MatchupCoachTests
 
     private static MatchupCoach CreateCoach()
     {
+        // В тестах правила создаются прямо в C#, чтобы проверять только движок,
+        // независимо от файловой системы и интерфейса приложения.
         var rules = new[]
         {
             CreateRule(
