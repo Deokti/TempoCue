@@ -1,4 +1,4 @@
-# RiftCoach
+# TempoCue
 
 Рабочее название локального AI-ассистента для League of Legends.
 
@@ -25,17 +25,17 @@
 ```powershell
 dotnet restore
 dotnet test
-dotnet run --project src/RiftCoach.App
+dotnet run --project src/TempoCue.App
 ```
 
 ## Структура
 
 ```text
-src/RiftCoach.App        WPF-интерфейс и симулятор
-src/RiftCoach.Core       состояние, Coach Packs и движок правил
-src/RiftCoach.Riot       подключение к Live Client Data API и преобразование JSON
-tests/RiftCoach.Core.Tests
-tests/RiftCoach.Riot.Tests
+src/TempoCue.App        WPF-интерфейс и симулятор
+src/TempoCue.Core       состояние, Coach Packs и движок правил
+src/TempoCue.Riot       подключение к Live Client Data API и преобразование JSON
+tests/TempoCue.Core.Tests
+tests/TempoCue.Riot.Tests
 docs/first-version.md    границы первой версии и следующий этап
 ```
 

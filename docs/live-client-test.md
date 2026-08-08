@@ -1,6 +1,6 @@
 # Проверка подключения к активному матчу
 
-RiftCoach обращается к локальному endpoint League of Legends:
+TempoCue обращается к локальному endpoint League of Legends:
 
 ```text
 https://127.0.0.1:2999/liveclientdata/allgamedata
@@ -10,10 +10,10 @@ https://127.0.0.1:2999/liveclientdata/allgamedata
 
 ## Подготовка
 
-1. Запустить RiftCoach командой:
+1. Запустить TempoCue командой:
 
    ```powershell
-   dotnet run --project src/RiftCoach.App
+   dotnet run --project src/TempoCue.App
    ```
 
 2. Убедиться, что в правой верхней части окна отображается статус `ОЖИДАНИЕ МАТЧА`.
