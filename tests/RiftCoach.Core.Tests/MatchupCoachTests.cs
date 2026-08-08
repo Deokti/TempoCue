@@ -92,6 +92,23 @@ public sealed class MatchupCoachTests
         Assert.Throws<InvalidDataException>(() => CoachPackLoader.Load(stream));
     }
 
+    [Fact]
+    public void CoachPackLoader_LoadsActualUrgotVersusSettPack()
+    {
+        // Этот тест открывает тот же JSON, который использует WPF-приложение.
+        var packPath = Path.Combine(
+            AppContext.BaseDirectory,
+            "Assets",
+            "CoachPacks",
+            "urgot-vs-sett.json");
+
+        var pack = CoachPackLoader.LoadFromFile(packPath);
+
+        Assert.Equal("top.urgot-vs-sett.prototype", pack.Id);
+        Assert.Equal(3, pack.Rules.Count);
+        Assert.All(pack.Rules, rule => Assert.Contains("GoliathGames", rule.Source));
+    }
+
     private static MatchupCoach CreateCoach()
     {
         // В тестах правила создаются прямо в C#, чтобы проверять только движок,
