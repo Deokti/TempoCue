@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RiftCoach.Core\RiftCoach.Core.csproj" />
+    <ProjectReference Include="..\RiftCoach.Riot\RiftCoach.Riot.csproj" />
   </ItemGroup>
 
   <ItemGroup>

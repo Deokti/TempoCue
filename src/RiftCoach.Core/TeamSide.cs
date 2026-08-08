@@ -6,6 +6,9 @@ namespace RiftCoach.Core;
 /// </summary>
 public enum TeamSide
 {
+    /// <summary>Источник данных пока не сообщил сторону участника.</summary>
+    Unknown,
+
     /// <summary>Синяя сторона карты.</summary>
     Order,
 

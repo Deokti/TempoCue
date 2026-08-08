@@ -20,21 +20,24 @@ public sealed record MatchState
     public PlayerState? GetActivePlayer()
     {
         return Players.FirstOrDefault(player =>
-            string.Equals(player.ParticipantId, ActivePlayerId, StringComparison.Ordinal));
+            string.Equals(player.ParticipantId, ActivePlayerId, StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>Возвращает союзников активного игрока, не включая его самого.</summary>
     public IReadOnlyList<PlayerState> GetAllies()
     {
         var activePlayer = GetActivePlayer();
-        if (activePlayer is null)
+        if (activePlayer is null || activePlayer.Team == TeamSide.Unknown)
         {
             return [];
         }
 
         return Players
             .Where(player => player.Team == activePlayer.Team
-                && !string.Equals(player.ParticipantId, activePlayer.ParticipantId, StringComparison.Ordinal))
+                && !string.Equals(
+                    player.ParticipantId,
+                    activePlayer.ParticipantId,
+                    StringComparison.OrdinalIgnoreCase))
             .ToArray();
     }
 
@@ -47,8 +50,14 @@ public sealed record MatchState
             return [];
         }
 
+        if (activePlayer.Team == TeamSide.Unknown)
+        {
+            return [];
+        }
+
         return Players
-            .Where(player => player.Team != activePlayer.Team)
+            .Where(player => player.Team != TeamSide.Unknown
+                && player.Team != activePlayer.Team)
             .ToArray();
     }
 }
