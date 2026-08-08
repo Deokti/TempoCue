@@ -10,7 +10,7 @@
   <data name="Header.CoachPackLoaded" xml:space="preserve"><value>COACH PACK ЗАГРУЖЕН</value></data>
   <data name="Language.Tooltip" xml:space="preserve"><value>Язык интерфейса</value></data>
   <data name="Connection.WaitingMatch" xml:space="preserve"><value>ОЖИДАНИЕ МАТЧА</value></data>
-  <data name="Connection.PollingEverySecond" xml:space="preserve"><value>Опрос Riot API каждые 1 с</value></data>
+  <data name="Connection.PollingEverySecond" xml:space="preserve"><value>Проверка Live Client Data каждую 1 с</value></data>
   <data name="Connection.NextPoll" xml:space="preserve"><value>Следующий запрос через 1 с</value></data>
   <data name="Connection.MatchConnected" xml:space="preserve"><value>МАТЧ ПОДКЛЮЧЕН</value></data>
   <data name="Connection.ActivePlayerMissing" xml:space="preserve"><value>{0} · активный игрок не найден</value></data>
@@ -72,4 +72,45 @@
   <data name="Count.Item.One" xml:space="preserve"><value>{0} предмет</value></data>
   <data name="Count.Item.Few" xml:space="preserve"><value>{0} предмета</value></data>
   <data name="Count.Item.Many" xml:space="preserve"><value>{0} предметов</value></data>
+  <data name="Nav.Home" xml:space="preserve"><value>Главная</value></data>
+  <data name="Nav.CurrentMatch" xml:space="preserve"><value>Текущий матч</value></data>
+  <data name="Nav.Coaching" xml:space="preserve"><value>Коучинг</value></data>
+  <data name="Nav.History" xml:space="preserve"><value>История матчей</value></data>
+  <data name="Nav.Settings" xml:space="preserve"><value>Настройки</value></data>
+  <data name="Nav.Soon" xml:space="preserve"><value>СКОРО</value></data>
+  <data name="Nav.BackHome" xml:space="preserve"><value>← Главная</value></data>
+  <data name="Nav.Collapse" xml:space="preserve"><value>Свернуть меню</value></data>
+  <data name="Home.Engine" xml:space="preserve"><value>Движок анализа</value></data>
+  <data name="Home.Engine.Waiting" xml:space="preserve"><value>Ожидает матч</value></data>
+  <data name="Home.Engine.Connected" xml:space="preserve"><value>Получает данные</value></data>
+  <data name="Home.Engine.Error" xml:space="preserve"><value>Ошибка данных</value></data>
+  <data name="Home.GameTime" xml:space="preserve"><value>Время</value></data>
+  <data name="Home.Waiting.Title" xml:space="preserve"><value>Ожидаем активный матч</value></data>
+  <data name="Home.Waiting.Description" xml:space="preserve"><value>Запусти тренировочную или обычную игру. TempoCue подключится автоматически после загрузки на карту.</value></data>
+  <data name="Home.Connected.Title" xml:space="preserve"><value>Матч обнаружен</value></data>
+  <data name="Home.Connected.Description" xml:space="preserve"><value>Поступают реальные данные для {0}. Для анализа матчапа доступно: {1}.</value></data>
+  <data name="Home.Error.Title" xml:space="preserve"><value>Не удалось прочитать данные матча</value></data>
+  <data name="Home.Error.Description" xml:space="preserve"><value>TempoCue продолжит автоматические попытки. Подробности: {0}</value></data>
+  <data name="Home.CheckAgain" xml:space="preserve"><value>Проверить снова</value></data>
+  <data name="Home.OpenMatch" xml:space="preserve"><value>Открыть текущий матч</value></data>
+  <data name="Home.Readiness.Title" xml:space="preserve"><value>Готовность системы</value></data>
+  <data name="Home.Readiness.Refresh" xml:space="preserve"><value>Обновление данных</value></data>
+  <data name="Home.Readiness.Match" xml:space="preserve"><value>Активный матч</value></data>
+  <data name="Home.Readiness.Hint" xml:space="preserve"><value>Ничего нажимать не нужно: локальный адрес проверяется каждую секунду.</value></data>
+  <data name="Home.Status.Waiting" xml:space="preserve"><value>ожидание</value></data>
+  <data name="Home.Status.Connected" xml:space="preserve"><value>подключено</value></data>
+  <data name="Home.Status.Error" xml:space="preserve"><value>ошибка</value></data>
+  <data name="Home.Status.NotFound" xml:space="preserve"><value>не найден</value></data>
+  <data name="Home.Status.Active" xml:space="preserve"><value>идёт</value></data>
+  <data name="Home.Pack.Title" xml:space="preserve"><value>Активный набор советов</value></data>
+  <data name="Home.Pack.Rules" xml:space="preserve"><value>Загружены 3 фазы матчапа</value></data>
+  <data name="Home.Pack.PatchWarning" xml:space="preserve"><value>Требует проверки на актуальном патче</value></data>
+  <data name="Home.Pack.Test" xml:space="preserve"><value>Открыть симулятор</value></data>
+  <data name="Home.Available.Title" xml:space="preserve"><value>Что работает сейчас</value></data>
+  <data name="Home.Available.LiveData" xml:space="preserve"><value>Подключение к Live Client Data</value></data>
+  <data name="Home.Available.Participants" xml:space="preserve"><value>Все участники матча</value></data>
+  <data name="Home.Available.Matchup" xml:space="preserve"><value>Определение матчапа на линии</value></data>
+  <data name="Home.Available.Advice" xml:space="preserve"><value>Советы Urgot против Sett</value></data>
+  <data name="Home.Available.Json" xml:space="preserve"><value>Исходный JSON матча</value></data>
+  <data name="Home.Available.Future" xml:space="preserve"><value>Анализ карты, история, отчёты и оверлей появятся в следующих версиях.</value></data>
 </root>

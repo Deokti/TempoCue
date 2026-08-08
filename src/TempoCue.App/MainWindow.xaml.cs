@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using TempoCue.App.Localization;
 using TempoCue.App.Settings;
@@ -76,6 +77,7 @@ public partial class MainWindow : Window
 
         // После загрузки сохраняем ручной симулятор и параллельно начинаем искать матч.
         Loaded += MainWindow_Loaded;
+        StateChanged += MainWindow_StateChanged;
         Closed += MainWindow_Closed;
     }
 
@@ -86,6 +88,79 @@ public partial class MainWindow : Window
         // Опрос работает в фоне жизненного цикла окна. Все ожидаемые ошибки
         // обрабатываются внутри метода, поэтому приложение продолжает ждать матч.
         _livePollingTask ??= PollLiveMatchAsync(_livePollingCancellation.Token);
+    }
+
+    /// <summary>
+    /// В первой UI-итерации страницы переключаются внутри одного окна. Технический
+    /// экран остаётся доступным, пока его собственный дизайн ещё не перенесён.
+    /// </summary>
+    private void OpenHomeButton_Click(object sender, RoutedEventArgs e)
+    {
+        HomePage.Visibility = Visibility.Visible;
+        MatchPage.Visibility = Visibility.Collapsed;
+        UpdateTitleBarContext();
+    }
+
+    private void OpenCurrentMatchButton_Click(object sender, RoutedEventArgs e)
+    {
+        HomePage.Visibility = Visibility.Collapsed;
+        MatchPage.Visibility = Visibility.Visible;
+        UpdateTitleBarContext();
+    }
+
+    private async void HomeCheckButton_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            await RequestLiveSnapshotAsync(_livePollingCancellation.Token);
+        }
+        catch (OperationCanceledException) when (_livePollingCancellation.IsCancellationRequested)
+        {
+            // Закрытие окна может отменить ручную проверку одновременно с фоновым опросом.
+        }
+    }
+
+    private void WindowTitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ClickCount == 2)
+        {
+            ToggleWindowState();
+            return;
+        }
+
+        if (e.LeftButton == MouseButtonState.Pressed)
+        {
+            DragMove();
+        }
+    }
+
+    private void MinimizeWindowButton_Click(object sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState.Minimized;
+    }
+
+    private void MaximizeRestoreWindowButton_Click(object sender, RoutedEventArgs e)
+    {
+        ToggleWindowState();
+    }
+
+    private void MainWindow_StateChanged(object? sender, EventArgs e)
+    {
+        var isMaximized = WindowState == WindowState.Maximized;
+        MaximizeWindowGlyph.Visibility = isMaximized ? Visibility.Collapsed : Visibility.Visible;
+        RestoreWindowGlyph.Visibility = isMaximized ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private void ToggleWindowState()
+    {
+        WindowState = WindowState == WindowState.Maximized
+            ? WindowState.Normal
+            : WindowState.Maximized;
+    }
+
+    private void CloseWindowButton_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
     }
 
     private void ShowInitialWaitingAdvice()
@@ -206,6 +281,8 @@ public partial class MainWindow : Window
                 ShowAdvice(_coach.GetBestAdvice(_lastAdviceMatch));
             }
         }
+
+        UpdateTitleBarContext();
     }
 
     private void EvaluateCurrentState(string eventName)
@@ -371,6 +448,7 @@ public partial class MainWindow : Window
             "#F3C969");
 
         LiveJsonInfoTextBlock.Text = _localization.Format("Json.LastRequestError", message);
+        RenderHomeError(message);
     }
 
     private void RenderWaitingConnection()
@@ -380,6 +458,8 @@ public partial class MainWindow : Window
             _localization.Get("Connection.NextPoll"),
             "#243550",
             "#AFC0D4");
+
+        RenderHomeWaiting();
     }
 
     private void RenderLiveSnapshot(LiveClientSnapshot snapshot)
@@ -409,7 +489,91 @@ public partial class MainWindow : Window
             "#19362F",
             "#76D7A8");
 
+        RenderHomeConnected(activePlayer, gameTimeText, playersText);
         ShowAdvice(_coach.GetBestAdvice(match));
+    }
+
+    private void RenderHomeWaiting()
+    {
+        HomeConnectionTitleTextBlock.Text = _localization.Get("Connection.WaitingMatch");
+        HomeConnectionDetailsTextBlock.Text = _localization.Get("Connection.PollingEverySecond");
+        HomeHeroTitleTextBlock.Text = _localization.Get("Home.Waiting.Title");
+        HomeHeroDescriptionTextBlock.Text = _localization.Get("Home.Waiting.Description");
+        HomeLiveDataValueTextBlock.Text = _localization.Get("Home.Status.Waiting");
+        HomeMatchStatusValueTextBlock.Text = _localization.Get("Home.Status.NotFound");
+        HomeEngineStatusTextBlock.Text = _localization.Get("Home.Engine.Waiting");
+        HomeMatchNavBadgeTextBlock.Text = "—";
+        HomeGameTimePanel.Visibility = Visibility.Collapsed;
+        ApplyHomeConnectionColors("#1E2E45", "#8393A8", "#B5C5D8", "#D6B766");
+        UpdateTitleBarContext();
+    }
+
+    private void RenderHomeConnected(
+        PlayerState? activePlayer,
+        string gameTimeText,
+        string playersText)
+    {
+        HomeConnectionTitleTextBlock.Text = _localization.Get("Connection.MatchConnected");
+        HomeConnectionDetailsTextBlock.Text = activePlayer is null
+            ? _localization.Format("Connection.ActivePlayerMissing", gameTimeText)
+            : _localization.Format("Connection.PlayerSummary", activePlayer.ChampionName, gameTimeText, playersText);
+        HomeHeroTitleTextBlock.Text = _localization.Get("Home.Connected.Title");
+        HomeHeroDescriptionTextBlock.Text = _localization.Format(
+            "Home.Connected.Description",
+            activePlayer?.ChampionName ?? "—",
+            playersText);
+        HomeLiveDataValueTextBlock.Text = _localization.Get("Home.Status.Connected");
+        HomeMatchStatusValueTextBlock.Text = _localization.Get("Home.Status.Active");
+        HomeEngineStatusTextBlock.Text = _localization.Get("Home.Engine.Connected");
+        HomeMatchNavBadgeTextBlock.Text = "LIVE";
+        HomeGameTimeTextBlock.Text = gameTimeText;
+        HomeGameTimePanel.Visibility = Visibility.Visible;
+        ApplyHomeConnectionColors("#17342D", "#64D5A4", "#87E1BB", "#67CDA4");
+        UpdateTitleBarContext(gameTimeText);
+    }
+
+    private void RenderHomeError(string message)
+    {
+        HomeConnectionTitleTextBlock.Text = _localization.Get("Connection.DataError");
+        HomeConnectionDetailsTextBlock.Text = message;
+        HomeHeroTitleTextBlock.Text = _localization.Get("Home.Error.Title");
+        HomeHeroDescriptionTextBlock.Text = _localization.Format("Home.Error.Description", message);
+        HomeLiveDataValueTextBlock.Text = _localization.Get("Home.Status.Error");
+        HomeMatchStatusValueTextBlock.Text = _localization.Get("Home.Status.NotFound");
+        HomeEngineStatusTextBlock.Text = _localization.Get("Home.Engine.Error");
+        HomeMatchNavBadgeTextBlock.Text = "—";
+        HomeGameTimePanel.Visibility = Visibility.Collapsed;
+        ApplyHomeConnectionColors("#3A3020", "#E8BB58", "#F0CC7A", "#E8BB58");
+        UpdateTitleBarContext();
+    }
+
+    private void ApplyHomeConnectionColors(
+        string badgeBackground,
+        string statusDot,
+        string statusText,
+        string valueText)
+    {
+        HomeConnectionBadgeBorder.Background = ToBrush(badgeBackground);
+        HomeConnectionDot.Fill = ToBrush(statusDot);
+        HomeEngineStatusDot.Fill = ToBrush(statusDot);
+        HomeConnectionTitleTextBlock.Foreground = ToBrush(statusText);
+        HomeLiveDataValueTextBlock.Foreground = ToBrush(valueText);
+    }
+
+    private void UpdateTitleBarContext(string? gameTimeText = null)
+    {
+        var pageName = HomePage.Visibility == Visibility.Visible
+            ? _localization.Get("Nav.Home")
+            : _localization.Get("Nav.CurrentMatch");
+
+        TitleBarContextTextBlock.Text = gameTimeText is null
+            ? $"— {pageName}"
+            : $"— {pageName} · {gameTimeText}";
+    }
+
+    private static SolidColorBrush ToBrush(string color)
+    {
+        return new SolidColorBrush((Color)ColorConverter.ConvertFromString(color));
     }
 
     private void SetLiveConnectionState(

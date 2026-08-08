@@ -10,7 +10,7 @@
   <data name="Header.CoachPackLoaded" xml:space="preserve"><value>COACH PACK LOADED</value></data>
   <data name="Language.Tooltip" xml:space="preserve"><value>Interface language</value></data>
   <data name="Connection.WaitingMatch" xml:space="preserve"><value>WAITING FOR MATCH</value></data>
-  <data name="Connection.PollingEverySecond" xml:space="preserve"><value>Polling Riot API every 1 s</value></data>
+  <data name="Connection.PollingEverySecond" xml:space="preserve"><value>Checking Live Client Data every 1 s</value></data>
   <data name="Connection.NextPoll" xml:space="preserve"><value>Next request in 1 s</value></data>
   <data name="Connection.MatchConnected" xml:space="preserve"><value>MATCH CONNECTED</value></data>
   <data name="Connection.ActivePlayerMissing" xml:space="preserve"><value>{0} · active player not found</value></data>
@@ -70,4 +70,45 @@
   <data name="Count.Player.Other" xml:space="preserve"><value>{0} players</value></data>
   <data name="Count.Item.One" xml:space="preserve"><value>{0} item</value></data>
   <data name="Count.Item.Other" xml:space="preserve"><value>{0} items</value></data>
+  <data name="Nav.Home" xml:space="preserve"><value>Home</value></data>
+  <data name="Nav.CurrentMatch" xml:space="preserve"><value>Current match</value></data>
+  <data name="Nav.Coaching" xml:space="preserve"><value>Coaching</value></data>
+  <data name="Nav.History" xml:space="preserve"><value>Match history</value></data>
+  <data name="Nav.Settings" xml:space="preserve"><value>Settings</value></data>
+  <data name="Nav.Soon" xml:space="preserve"><value>SOON</value></data>
+  <data name="Nav.BackHome" xml:space="preserve"><value>← Home</value></data>
+  <data name="Nav.Collapse" xml:space="preserve"><value>Collapse menu</value></data>
+  <data name="Home.Engine" xml:space="preserve"><value>Analysis engine</value></data>
+  <data name="Home.Engine.Waiting" xml:space="preserve"><value>Waiting for match</value></data>
+  <data name="Home.Engine.Connected" xml:space="preserve"><value>Live data received</value></data>
+  <data name="Home.Engine.Error" xml:space="preserve"><value>Data error</value></data>
+  <data name="Home.GameTime" xml:space="preserve"><value>Time</value></data>
+  <data name="Home.Waiting.Title" xml:space="preserve"><value>Waiting for an active match</value></data>
+  <data name="Home.Waiting.Description" xml:space="preserve"><value>Start a practice game or a regular match. TempoCue will connect automatically after the map loads.</value></data>
+  <data name="Home.Connected.Title" xml:space="preserve"><value>Match detected</value></data>
+  <data name="Home.Connected.Description" xml:space="preserve"><value>Live data is arriving for {0}. {1} are available for matchup analysis.</value></data>
+  <data name="Home.Error.Title" xml:space="preserve"><value>Could not read match data</value></data>
+  <data name="Home.Error.Description" xml:space="preserve"><value>TempoCue will keep retrying automatically. Details: {0}</value></data>
+  <data name="Home.CheckAgain" xml:space="preserve"><value>Check again</value></data>
+  <data name="Home.OpenMatch" xml:space="preserve"><value>Open current match</value></data>
+  <data name="Home.Readiness.Title" xml:space="preserve"><value>System readiness</value></data>
+  <data name="Home.Readiness.Refresh" xml:space="preserve"><value>Data refresh</value></data>
+  <data name="Home.Readiness.Match" xml:space="preserve"><value>Active match</value></data>
+  <data name="Home.Readiness.Hint" xml:space="preserve"><value>No action is required: the local endpoint is checked every second.</value></data>
+  <data name="Home.Status.Waiting" xml:space="preserve"><value>waiting</value></data>
+  <data name="Home.Status.Connected" xml:space="preserve"><value>connected</value></data>
+  <data name="Home.Status.Error" xml:space="preserve"><value>error</value></data>
+  <data name="Home.Status.NotFound" xml:space="preserve"><value>not found</value></data>
+  <data name="Home.Status.Active" xml:space="preserve"><value>active</value></data>
+  <data name="Home.Pack.Title" xml:space="preserve"><value>Active Coach Pack</value></data>
+  <data name="Home.Pack.Rules" xml:space="preserve"><value>3 matchup phases are loaded</value></data>
+  <data name="Home.Pack.PatchWarning" xml:space="preserve"><value>Requires verification on the current patch</value></data>
+  <data name="Home.Pack.Test" xml:space="preserve"><value>Open simulator</value></data>
+  <data name="Home.Available.Title" xml:space="preserve"><value>Available now</value></data>
+  <data name="Home.Available.LiveData" xml:space="preserve"><value>Live Client Data connection</value></data>
+  <data name="Home.Available.Participants" xml:space="preserve"><value>All match participants</value></data>
+  <data name="Home.Available.Matchup" xml:space="preserve"><value>Lane matchup detection</value></data>
+  <data name="Home.Available.Advice" xml:space="preserve"><value>Urgot vs Sett advice</value></data>
+  <data name="Home.Available.Json" xml:space="preserve"><value>Raw match JSON</value></data>
+  <data name="Home.Available.Future" xml:space="preserve"><value>Map analysis, history, reports, and overlay will be added in later versions.</value></data>
 </root>

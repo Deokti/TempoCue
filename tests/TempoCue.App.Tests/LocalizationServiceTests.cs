@@ -1,4 +1,5 @@
 using System.Runtime.ExceptionServices;
+using System.Windows;
 using System.Windows.Threading;
 using TempoCue.App.Localization;
 
@@ -20,6 +21,10 @@ public sealed class LocalizationServiceTests
 
                 var window = new MainWindow();
                 Assert.Equal("TempoCue — ассистент для League of Legends", window.Title);
+                Assert.Equal(1280, window.Width);
+                Assert.Equal(720, window.Height);
+                Assert.Equal(ResizeMode.NoResize, window.ResizeMode);
+                Assert.Equal(WindowStyle.None, window.WindowStyle);
 
                 localization.SetLanguage("en-US");
                 Dispatcher.CurrentDispatcher.Invoke(
@@ -56,12 +61,16 @@ public sealed class LocalizationServiceTests
             localization.SetLanguage("en-US");
 
             Assert.Equal("Game state simulator", localization.Get("Header.Title"));
+            Assert.Equal("Home", localization.Get("Nav.Home"));
+            Assert.Equal("Available now", localization.Get("Home.Available.Title"));
             Assert.Equal("1 player", localization.Plural("Count.Player", 1));
             Assert.Equal("10 players", localization.Plural("Count.Player", 10));
 
             localization.SetLanguage("ru-RU");
 
             Assert.Equal("Симулятор игрового состояния", localization.Get("Header.Title"));
+            Assert.Equal("Главная", localization.Get("Nav.Home"));
+            Assert.Equal("Что работает сейчас", localization.Get("Home.Available.Title"));
             Assert.Equal("1 игрок", localization.Plural("Count.Player", 1));
             Assert.Equal("2 игрока", localization.Plural("Count.Player", 2));
             Assert.Equal("10 игроков", localization.Plural("Count.Player", 10));
