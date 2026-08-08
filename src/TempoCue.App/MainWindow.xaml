@@ -11,6 +11,12 @@
         Background="#080D14"
         FontFamily="Segoe UI">
     <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles/SettingsControls.xaml" />
+                <ResourceDictionary Source="Styles/ShellControls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
         <!-- Общие стили позволяют менять оформление однотипных элементов в одном месте. -->
         <Style x:Key="PanelBorder" TargetType="Border">
             <Setter Property="Background" Value="#121C2F" />
@@ -46,124 +52,6 @@
             <Setter Property="Foreground" Value="#132238" />
             <Setter Property="Background" Value="#F3F6FA" />
             <Setter Property="Padding" Value="8,5" />
-        </Style>
-
-        <Style x:Key="SettingsLanguageComboBoxItem" TargetType="ComboBoxItem">
-            <Setter Property="Foreground" Value="#DCEAF7" />
-            <Setter Property="Background" Value="#0C1420" />
-            <Setter Property="Padding" Value="12,8" />
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ComboBoxItem">
-                        <Border x:Name="ItemBorder"
-                                Background="{TemplateBinding Background}"
-                                Padding="{TemplateBinding Padding}"
-                                CornerRadius="7">
-                            <ContentPresenter VerticalAlignment="Center" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsHighlighted" Value="True">
-                                <Setter TargetName="ItemBorder" Property="Background" Value="#162235" />
-                                <Setter Property="Foreground" Value="#F4F7FB" />
-                            </Trigger>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="ItemBorder" Property="Background" Value="#1B2A42" />
-                                <Setter Property="Foreground" Value="#6FC4EF" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="SettingsLanguageComboBox" TargetType="ComboBox">
-            <Setter Property="Height" Value="38" />
-            <Setter Property="Foreground" Value="#DCEAF7" />
-            <Setter Property="Background" Value="#0C1420" />
-            <Setter Property="BorderBrush" Value="#263750" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="FontSize" Value="13" />
-            <Setter Property="ItemContainerStyle" Value="{StaticResource SettingsLanguageComboBoxItem}" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ComboBox">
-                        <Grid>
-                            <ToggleButton x:Name="DropDownToggle"
-                                          Focusable="False"
-                                          ClickMode="Press"
-                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
-                                          Content="{TemplateBinding SelectionBoxItem}"
-                                          ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}">
-                                <ToggleButton.Template>
-                                    <ControlTemplate TargetType="ToggleButton">
-                                        <Border x:Name="ToggleBorder"
-                                                Background="#0C1420"
-                                                BorderBrush="#263750"
-                                                BorderThickness="1"
-                                                CornerRadius="10"
-                                                Padding="12,0">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
-                                                <ContentPresenter VerticalAlignment="Center"
-                                                                  Content="{TemplateBinding Content}"
-                                                                  ContentTemplate="{TemplateBinding ContentTemplate}"
-                                                                  TextElement.Foreground="#DCEAF7" />
-                                                <Path Grid.Column="1"
-                                                      Width="8"
-                                                      Height="4"
-                                                      Margin="12,0,2,0"
-                                                      Data="M 0,0 L 4,4 L 8,0"
-                                                      Stroke="#7F93AF"
-                                                      StrokeThickness="1.25"
-                                                      StrokeStartLineCap="Round"
-                                                      StrokeEndLineCap="Round"
-                                                      StrokeLineJoin="Round" />
-                                            </Grid>
-                                        </Border>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter TargetName="ToggleBorder" Property="BorderBrush" Value="#3A5878" />
-                                            </Trigger>
-                                            <Trigger Property="IsChecked" Value="True">
-                                                <Setter TargetName="ToggleBorder" Property="BorderBrush" Value="#4FAAE8" />
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </ToggleButton.Template>
-                            </ToggleButton>
-
-                            <Popup x:Name="PART_Popup"
-                                   Placement="Bottom"
-                                   IsOpen="{TemplateBinding IsDropDownOpen}"
-                                   AllowsTransparency="True"
-                                   PopupAnimation="Fade"
-                                   Focusable="False">
-                                <Border Width="{Binding ActualWidth, ElementName=DropDownToggle}"
-                                        Margin="0,4,0,0"
-                                        Background="#0C1420"
-                                        BorderBrush="#263750"
-                                        BorderThickness="1"
-                                        CornerRadius="10"
-                                        ClipToBounds="True">
-                                    <ScrollViewer MaxHeight="240"
-                                                  VerticalScrollBarVisibility="Auto">
-                                        <ItemsPresenter />
-                                    </ScrollViewer>
-                                </Border>
-                            </Popup>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Opacity" Value="0.45" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
         </Style>
 
         <Style TargetType="CheckBox">
@@ -262,122 +150,7 @@
         </Style>
 
         <!-- Кнопки управления окном повторяют размеры и состояния из дизайн-макета. -->
-        <Style x:Key="WindowControlButton" TargetType="Button">
-            <Setter Property="Width" Value="44" />
-            <Setter Property="Height" Value="32" />
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Foreground" Value="#91A4BD" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Focusable" Value="False" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="WindowButtonBorder"
-                                Background="{TemplateBinding Background}"
-                                CornerRadius="6">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#162235" />
-                                <Setter Property="Foreground" Value="#F4F7FB" />
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#1B2A40" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="WindowCloseButton" TargetType="Button">
-            <Setter Property="Width" Value="44" />
-            <Setter Property="Height" Value="32" />
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Foreground" Value="#91A4BD" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Focusable" Value="False" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="WindowButtonBorder"
-                                Background="{TemplateBinding Background}"
-                                CornerRadius="6">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#FF7185" />
-                                <Setter Property="Foreground" Value="#071019" />
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#E95F75" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- Стили оболочки главной страницы повторяют дизайн-систему Claude. -->
-        <Style x:Key="ShellCard" TargetType="Border">
-            <Setter Property="Background" Value="#101827" />
-            <Setter Property="BorderBrush" Value="#263750" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="14" />
-            <Setter Property="Padding" Value="16" />
-        </Style>
-
-        <Style x:Key="ShellCaption" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#778BA7" />
-            <Setter Property="FontSize" Value="13" />
-            <Setter Property="LineHeight" Value="18" />
-        </Style>
-
-        <Style x:Key="ShellNavButton" TargetType="Button">
-            <Setter Property="Height" Value="40" />
-            <Setter Property="Margin" Value="0,0,0,4" />
-            <Setter Property="Padding" Value="12,0" />
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-            <Setter Property="Foreground" Value="#7F93AF" />
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="NavBorder"
-                                Background="{TemplateBinding Background}"
-                                CornerRadius="10"
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                              VerticalAlignment="Center" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="NavBorder" Property="Background" Value="#162235" />
-                                <Setter Property="Foreground" Value="#DCE7F5" />
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Opacity" Value="0.48" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="ShellNavButtonActive"
-               TargetType="Button"
-               BasedOn="{StaticResource ShellNavButton}">
-            <Setter Property="Foreground" Value="#F1F6FC" />
-            <Setter Property="Background" Value="#162235" />
-        </Style>
+        </ResourceDictionary>
     </Window.Resources>
 
     <Border BorderBrush="#263750" BorderThickness="1" Background="#080D14">
