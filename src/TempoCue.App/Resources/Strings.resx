@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Window.Title" xml:space="preserve"><value>TempoCue — League of Legends assistant</value></data>
+  <data name="Header.Title" xml:space="preserve"><value>Game state simulator</value></data>
+  <data name="Header.Subtitle" xml:space="preserve"><value>Technical build · simulator and live match connection</value></data>
+  <data name="Header.CoachPackLoaded" xml:space="preserve"><value>COACH PACK LOADED</value></data>
+  <data name="Language.Tooltip" xml:space="preserve"><value>Interface language</value></data>
+  <data name="Connection.WaitingMatch" xml:space="preserve"><value>WAITING FOR MATCH</value></data>
+  <data name="Connection.PollingEverySecond" xml:space="preserve"><value>Polling Riot API every 1 s</value></data>
+  <data name="Connection.NextPoll" xml:space="preserve"><value>Next request in 1 s</value></data>
+  <data name="Connection.MatchConnected" xml:space="preserve"><value>MATCH CONNECTED</value></data>
+  <data name="Connection.ActivePlayerMissing" xml:space="preserve"><value>{0} · active player not found</value></data>
+  <data name="Connection.PlayerSummary" xml:space="preserve"><value>{0} · {1} · {2}</value></data>
+  <data name="Connection.DataError" xml:space="preserve"><value>DATA ERROR</value></data>
+  <data name="MatchState.Title" xml:space="preserve"><value>Match state</value></data>
+  <data name="MatchState.PlayerChampion" xml:space="preserve"><value>YOUR CHAMPION</value></data>
+  <data name="MatchState.LaneOpponent" xml:space="preserve"><value>LANE OPPONENT</value></data>
+  <data name="MatchState.Level" xml:space="preserve"><value>LEVEL</value></data>
+  <data name="MatchState.Items" xml:space="preserve"><value>ITEMS</value></data>
+  <data name="Item.BlackCleaver" xml:space="preserve"><value>Black Cleaver · ID 3071</value></data>
+  <data name="Action.CheckSimulation" xml:space="preserve"><value>Check simulation</value></data>
+  <data name="Action.CheckLiveMatch" xml:space="preserve"><value>Check live match</value></data>
+  <data name="Preset.EarlyLane" xml:space="preserve"><value>Early lane</value></data>
+  <data name="Preset.PowerSpike" xml:space="preserve"><value>Power spike</value></data>
+  <data name="Guide.Disclaimer" xml:space="preserve"><value>Advice is based on the GoliathGames guide and must be verified for the current patch.</value></data>
+  <data name="Advice.Active" xml:space="preserve"><value>Active advice</value></data>
+  <data name="Advice.SelectState" xml:space="preserve"><value>Select a match state</value></data>
+  <data name="Advice.EngineReady" xml:space="preserve"><value>The engine loaded the Coach Pack and is ready to check the first matchup rule.</value></data>
+  <data name="Advice.Waiting.Title" xml:space="preserve"><value>Waiting for an active match</value></data>
+  <data name="Advice.Waiting.Message" xml:space="preserve"><value>TempoCue polls the local Riot API every second. Once the map loads, advice for the actual game state will appear here.</value></data>
+  <data name="Advice.Waiting.Source" xml:space="preserve"><value>The manual simulator on the left remains available for testing the Coach Pack without a match.</value></data>
+  <data name="Advice.NoRule.Title" xml:space="preserve"><value>No matching rule found</value></data>
+  <data name="Advice.NoRule.Message" xml:space="preserve"><value>The loaded Coach Pack has no advice for the selected state yet.</value></data>
+  <data name="Advice.NoRule.Source" xml:space="preserve"><value>More matchups will be added in a separate stage.</value></data>
+  <data name="Power.Waiting" xml:space="preserve"><value>WAITING</value></data>
+  <data name="Power.NoRule" xml:space="preserve"><value>NO RULE</value></data>
+  <data name="Power.Dangerous" xml:space="preserve"><value>DANGER</value></data>
+  <data name="Power.Cautious" xml:space="preserve"><value>CAUTION</value></data>
+  <data name="Power.Playable" xml:space="preserve"><value>PLAYABLE</value></data>
+  <data name="Power.Favorable" xml:space="preserve"><value>ADVANTAGE</value></data>
+  <data name="Diagnostics.LogTab" xml:space="preserve"><value>LOG</value></data>
+  <data name="Diagnostics.EventLog" xml:space="preserve"><value>Event log</value></data>
+  <data name="Diagnostics.ActiveJsonTab" xml:space="preserve"><value>LIVE MATCH JSON</value></data>
+  <data name="Diagnostics.JsonWaiting" xml:space="preserve"><value>Waiting for an active match · request every 1 s</value></data>
+  <data name="Diagnostics.CopyJson" xml:space="preserve"><value>Copy JSON</value></data>
+  <data name="Diagnostics.JsonPlaceholder" xml:space="preserve"><value>JSON will appear after connecting to an active match.</value></data>
+  <data name="Diagnostics.JsonCopied" xml:space="preserve"><value>JSON copied to clipboard</value></data>
+  <data name="Diagnostics.RuleEmpty" xml:space="preserve"><value>RULE: —</value></data>
+  <data name="Diagnostics.RuleLine" xml:space="preserve"><value>RULE: {0} · PRIORITY: {1}</value></data>
+  <data name="Json.Updated" xml:space="preserve"><value>Updated {0} · {1} · interval 1 s</value></data>
+  <data name="Json.MatchUnavailable" xml:space="preserve"><value>Active match unavailable · the last successful JSON is kept below</value></data>
+  <data name="Json.LastRequestError" xml:space="preserve"><value>Last request error · {0}</value></data>
+  <data name="Error.Timeout" xml:space="preserve"><value>Riot API did not respond within 3 seconds</value></data>
+  <data name="Error.JsonRead" xml:space="preserve"><value>Could not read JSON: {0}</value></data>
+  <data name="Error.InvalidData" xml:space="preserve"><value>The active match data is incomplete</value></data>
+  <data name="Event.ManualRiotCheck" xml:space="preserve"><value>Manual Riot API check</value></data>
+  <data name="Event.ManualCheck" xml:space="preserve"><value>Manual check</value></data>
+  <data name="Event.PresetEarlyLane" xml:space="preserve"><value>Preset: early lane</value></data>
+  <data name="Event.PresetPowerSpike" xml:space="preserve"><value>Preset: power spike</value></data>
+  <data name="Log.MatchEnded" xml:space="preserve"><value>{0}  Riot API · active match ended or connection was lost</value></data>
+  <data name="Log.MatchupUnknown" xml:space="preserve"><value>{0}  {1} · matchup not resolved</value></data>
+  <data name="Log.Entry" xml:space="preserve"><value>{0}  {1} · {2} vs {3} · lvl {4} · {5} → {6}</value></data>
+  <data name="Log.NoItems" xml:space="preserve"><value>no items</value></data>
+  <data name="Log.NoRule" xml:space="preserve"><value>no rule</value></data>
+  <data name="Count.Player.One" xml:space="preserve"><value>{0} player</value></data>
+  <data name="Count.Player.Other" xml:space="preserve"><value>{0} players</value></data>
+  <data name="Count.Item.One" xml:space="preserve"><value>{0} item</value></data>
+  <data name="Count.Item.Other" xml:space="preserve"><value>{0} items</value></data>
+</root>

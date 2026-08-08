@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Window.Title" xml:space="preserve"><value>TempoCue — ассистент для League of Legends</value></data>
+  <data name="Header.Title" xml:space="preserve"><value>Симулятор игрового состояния</value></data>
+  <data name="Header.Subtitle" xml:space="preserve"><value>Техническая версия · симулятор и подключение к активному матчу</value></data>
+  <data name="Header.CoachPackLoaded" xml:space="preserve"><value>COACH PACK ЗАГРУЖЕН</value></data>
+  <data name="Language.Tooltip" xml:space="preserve"><value>Язык интерфейса</value></data>
+  <data name="Connection.WaitingMatch" xml:space="preserve"><value>ОЖИДАНИЕ МАТЧА</value></data>
+  <data name="Connection.PollingEverySecond" xml:space="preserve"><value>Опрос Riot API каждые 1 с</value></data>
+  <data name="Connection.NextPoll" xml:space="preserve"><value>Следующий запрос через 1 с</value></data>
+  <data name="Connection.MatchConnected" xml:space="preserve"><value>МАТЧ ПОДКЛЮЧЕН</value></data>
+  <data name="Connection.ActivePlayerMissing" xml:space="preserve"><value>{0} · активный игрок не найден</value></data>
+  <data name="Connection.PlayerSummary" xml:space="preserve"><value>{0} · {1} · {2}</value></data>
+  <data name="Connection.DataError" xml:space="preserve"><value>ОШИБКА ДАННЫХ</value></data>
+  <data name="MatchState.Title" xml:space="preserve"><value>Состояние матча</value></data>
+  <data name="MatchState.PlayerChampion" xml:space="preserve"><value>ВАШ ЧЕМПИОН</value></data>
+  <data name="MatchState.LaneOpponent" xml:space="preserve"><value>ПРОТИВНИК НА ЛИНИИ</value></data>
+  <data name="MatchState.Level" xml:space="preserve"><value>УРОВЕНЬ</value></data>
+  <data name="MatchState.Items" xml:space="preserve"><value>ПРЕДМЕТЫ</value></data>
+  <data name="Item.BlackCleaver" xml:space="preserve"><value>Чёрная секира · ID 3071</value></data>
+  <data name="Action.CheckSimulation" xml:space="preserve"><value>Проверить симуляцию</value></data>
+  <data name="Action.CheckLiveMatch" xml:space="preserve"><value>Проверить активный матч</value></data>
+  <data name="Preset.EarlyLane" xml:space="preserve"><value>Начало линии</value></data>
+  <data name="Preset.PowerSpike" xml:space="preserve"><value>Пик силы</value></data>
+  <data name="Guide.Disclaimer" xml:space="preserve"><value>Советы основаны на гайде GoliathGames и требуют проверки на актуальном патче.</value></data>
+  <data name="Advice.Active" xml:space="preserve"><value>Активный совет</value></data>
+  <data name="Advice.SelectState" xml:space="preserve"><value>Выберите состояние матча</value></data>
+  <data name="Advice.EngineReady" xml:space="preserve"><value>Движок загрузил Coach Pack и готов проверить первое матчап-правило.</value></data>
+  <data name="Advice.Waiting.Title" xml:space="preserve"><value>Ожидание активного матча</value></data>
+  <data name="Advice.Waiting.Message" xml:space="preserve"><value>TempoCue опрашивает локальный Riot API каждую секунду. После загрузки на карту здесь появится совет для фактического состояния игры.</value></data>
+  <data name="Advice.Waiting.Source" xml:space="preserve"><value>Ручной симулятор слева остаётся доступен для проверки Coach Pack без матча.</value></data>
+  <data name="Advice.NoRule.Title" xml:space="preserve"><value>Подходящее правило не найдено</value></data>
+  <data name="Advice.NoRule.Message" xml:space="preserve"><value>В загруженном Coach Pack пока нет совета для выбранного состояния.</value></data>
+  <data name="Advice.NoRule.Source" xml:space="preserve"><value>Добавление новых матчапов станет отдельным этапом.</value></data>
+  <data name="Power.Waiting" xml:space="preserve"><value>ОЖИДАНИЕ</value></data>
+  <data name="Power.NoRule" xml:space="preserve"><value>НЕТ ПРАВИЛА</value></data>
+  <data name="Power.Dangerous" xml:space="preserve"><value>ОПАСНО</value></data>
+  <data name="Power.Cautious" xml:space="preserve"><value>ОСТОРОЖНО</value></data>
+  <data name="Power.Playable" xml:space="preserve"><value>МОЖНО ИГРАТЬ</value></data>
+  <data name="Power.Favorable" xml:space="preserve"><value>ПРЕИМУЩЕСТВО</value></data>
+  <data name="Diagnostics.LogTab" xml:space="preserve"><value>ЖУРНАЛ</value></data>
+  <data name="Diagnostics.EventLog" xml:space="preserve"><value>Журнал событий</value></data>
+  <data name="Diagnostics.ActiveJsonTab" xml:space="preserve"><value>JSON АКТИВНОГО МАТЧА</value></data>
+  <data name="Diagnostics.JsonWaiting" xml:space="preserve"><value>Ожидание активного матча · запрос каждые 1 с</value></data>
+  <data name="Diagnostics.CopyJson" xml:space="preserve"><value>Копировать JSON</value></data>
+  <data name="Diagnostics.JsonPlaceholder" xml:space="preserve"><value>JSON появится после подключения к активному матчу.</value></data>
+  <data name="Diagnostics.JsonCopied" xml:space="preserve"><value>JSON скопирован в буфер обмена</value></data>
+  <data name="Diagnostics.RuleEmpty" xml:space="preserve"><value>ПРАВИЛО: —</value></data>
+  <data name="Diagnostics.RuleLine" xml:space="preserve"><value>ПРАВИЛО: {0} · ПРИОРИТЕТ: {1}</value></data>
+  <data name="Json.Updated" xml:space="preserve"><value>Обновлено {0} · {1} · период 1 с</value></data>
+  <data name="Json.MatchUnavailable" xml:space="preserve"><value>Активный матч недоступен · ниже сохранён последний успешный JSON</value></data>
+  <data name="Json.LastRequestError" xml:space="preserve"><value>Ошибка последнего запроса · {0}</value></data>
+  <data name="Error.Timeout" xml:space="preserve"><value>Riot API не ответил за 3 секунды</value></data>
+  <data name="Error.JsonRead" xml:space="preserve"><value>Не удалось прочитать JSON: {0}</value></data>
+  <data name="Error.InvalidData" xml:space="preserve"><value>Данные активного матча неполны</value></data>
+  <data name="Event.ManualRiotCheck" xml:space="preserve"><value>Ручная проверка Riot API</value></data>
+  <data name="Event.ManualCheck" xml:space="preserve"><value>Ручная проверка</value></data>
+  <data name="Event.PresetEarlyLane" xml:space="preserve"><value>Пресет: начало линии</value></data>
+  <data name="Event.PresetPowerSpike" xml:space="preserve"><value>Пресет: пик силы</value></data>
+  <data name="Log.MatchEnded" xml:space="preserve"><value>{0}  Riot API · активный матч завершён или соединение потеряно</value></data>
+  <data name="Log.MatchupUnknown" xml:space="preserve"><value>{0}  {1} · матчап не определён</value></data>
+  <data name="Log.Entry" xml:space="preserve"><value>{0}  {1} · {2} vs {3} · ур. {4} · {5} → {6}</value></data>
+  <data name="Log.NoItems" xml:space="preserve"><value>без предметов</value></data>
+  <data name="Log.NoRule" xml:space="preserve"><value>нет правила</value></data>
+  <data name="Count.Player.One" xml:space="preserve"><value>{0} игрок</value></data>
+  <data name="Count.Player.Few" xml:space="preserve"><value>{0} игрока</value></data>
+  <data name="Count.Player.Many" xml:space="preserve"><value>{0} игроков</value></data>
+  <data name="Count.Item.One" xml:space="preserve"><value>{0} предмет</value></data>
+  <data name="Count.Item.Few" xml:space="preserve"><value>{0} предмета</value></data>
+  <data name="Count.Item.Many" xml:space="preserve"><value>{0} предметов</value></data>
+</root>

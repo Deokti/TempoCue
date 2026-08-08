@@ -4,6 +4,8 @@ using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using TempoCue.App.Localization;
+using TempoCue.App.Settings;
 using TempoCue.Core;
 using TempoCue.Riot;
 
@@ -15,6 +17,13 @@ namespace TempoCue.App;
 /// </summary>
 public partial class MainWindow : Window
 {
+    private enum ConnectionDisplayMode
+    {
+        Waiting,
+        Connected,
+        Error
+    }
+
     // Одного запроса в секунду достаточно для уровня, предметов и состояния матча.
     private static readonly TimeSpan LiveDataPollingInterval = TimeSpan.FromSeconds(1);
 
@@ -27,15 +36,22 @@ public partial class MainWindow : Window
 
     // Движок создаётся один раз при открытии окна и затем используется повторно.
     private readonly MatchupCoach _coach;
+    private readonly LocalizationService _localization = LocalizationService.Instance;
 
     // Клиент работает только с локальным API запущенной League of Legends.
     private readonly LiveClientDataClient _liveClientDataClient = new();
     private readonly CancellationTokenSource _livePollingCancellation = new();
 
     private bool _isLiveMatchConnected;
+    private bool _isWindowInitialized;
     private string? _lastLiveAdviceRuleId;
+    private string? _connectionErrorKey;
+    private object?[] _connectionErrorArguments = [];
     private Task? _livePollingTask;
     private MatchState? _latestLiveMatch;
+    private MatchState? _lastAdviceMatch;
+    private LiveClientSnapshot? _latestLiveSnapshot;
+    private ConnectionDisplayMode _connectionDisplayMode = ConnectionDisplayMode.Waiting;
 
     public MainWindow()
     {
@@ -52,6 +68,11 @@ public partial class MainWindow : Window
         // Загружаем правила из JSON и передаём их движку матчапов.
         var pack = CoachPackLoader.LoadFromFile(packPath);
         _coach = new MatchupCoach(pack.Rules);
+
+        // Названия языков показаны на самих языках: «Русский» и «English».
+        // Поэтому эти два элемента не требуют отдельного перевода.
+        LanguageComboBox.SelectedValue = _localization.CurrentLanguageCode;
+        _isWindowInitialized = true;
 
         // После загрузки сохраняем ручной симулятор и параллельно начинаем искать матч.
         Loaded += MainWindow_Loaded;
@@ -70,14 +91,11 @@ public partial class MainWindow : Window
     private void ShowInitialWaitingAdvice()
     {
         SetManualSimulationEnabled(isEnabled: true);
-        AdviceTitleTextBlock.Text = "Ожидание активного матча";
-        AdviceMessageTextBlock.Text =
-            "TempoCue опрашивает локальный Riot API каждую секунду. "
-            + "После загрузки на карту здесь появится совет для фактического состояния игры.";
-        AdviceSourceTextBlock.Text =
-            "Ручной симулятор слева остаётся доступен для проверки Coach Pack без матча.";
-        RuleIdTextBlock.Text = "RULE: —";
-        ApplyPowerState("ОЖИДАНИЕ", "#243550", "#AFC0D4");
+        AdviceTitleTextBlock.Text = _localization.Get("Advice.Waiting.Title");
+        AdviceMessageTextBlock.Text = _localization.Get("Advice.Waiting.Message");
+        AdviceSourceTextBlock.Text = _localization.Get("Advice.Waiting.Source");
+        RuleIdTextBlock.Text = _localization.Get("Diagnostics.RuleEmpty");
+        ApplyPowerState(_localization.Get("Power.Waiting"), "#243550", "#AFC0D4");
     }
 
     private async void MainWindow_Closed(object? sender, EventArgs e)
@@ -106,25 +124,25 @@ public partial class MainWindow : Window
         {
             var liveAdvice = _coach.GetBestAdvice(_latestLiveMatch);
             ShowAdvice(liveAdvice);
-            AppendLog("Ручная проверка Riot API", _latestLiveMatch, liveAdvice);
+            AppendLog(_localization.Get("Event.ManualRiotCheck"), _latestLiveMatch, liveAdvice);
             return;
         }
 
-        EvaluateCurrentState("Ручная проверка");
+        EvaluateCurrentState(_localization.Get("Event.ManualCheck"));
     }
 
     private void EarlyLaneButton_Click(object sender, RoutedEventArgs e)
     {
         LevelSlider.Value = 1;
         BlackCleaverCheckBox.IsChecked = false;
-        EvaluateCurrentState("Пресет: начало линии");
+        EvaluateCurrentState(_localization.Get("Event.PresetEarlyLane"));
     }
 
     private void PowerSpikeButton_Click(object sender, RoutedEventArgs e)
     {
         LevelSlider.Value = 9;
         BlackCleaverCheckBox.IsChecked = true;
-        EvaluateCurrentState("Пресет: power spike");
+        EvaluateCurrentState(_localization.Get("Event.PresetPowerSpike"));
     }
 
     private void CopyRawJsonButton_Click(object sender, RoutedEventArgs e)
@@ -132,7 +150,7 @@ public partial class MainWindow : Window
         if (!string.IsNullOrWhiteSpace(RawJsonTextBox.Text))
         {
             Clipboard.SetText(RawJsonTextBox.Text);
-            LiveJsonInfoTextBlock.Text = "JSON скопирован в буфер обмена";
+            LiveJsonInfoTextBlock.Text = _localization.Get("Diagnostics.JsonCopied");
         }
     }
 
@@ -141,6 +159,52 @@ public partial class MainWindow : Window
         if (LevelTextBlock is not null)
         {
             LevelTextBlock.Text = ((int)e.NewValue).ToString();
+        }
+    }
+
+    private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!_isWindowInitialized || LanguageComboBox.SelectedValue is not string languageCode)
+        {
+            return;
+        }
+
+        _localization.SetLanguage(languageCode);
+        AppSettingsService.SaveLanguage(languageCode);
+        RefreshLocalizedContent();
+    }
+
+    /// <summary>
+    /// Статические подписи обновляются Binding-ами автоматически. Этот метод
+    /// повторно формирует строки, в которые подставляются данные текущего матча.
+    /// </summary>
+    private void RefreshLocalizedContent()
+    {
+        SetManualSimulationEnabled(isEnabled: !_isLiveMatchConnected);
+
+        switch (_connectionDisplayMode)
+        {
+            case ConnectionDisplayMode.Connected when _latestLiveSnapshot is not null:
+                RenderLiveSnapshot(_latestLiveSnapshot);
+                break;
+            case ConnectionDisplayMode.Error:
+                RenderConnectionProblem();
+                break;
+            default:
+                RenderWaitingConnection();
+                break;
+        }
+
+        if (_connectionDisplayMode != ConnectionDisplayMode.Connected)
+        {
+            if (_lastAdviceMatch is null)
+            {
+                ShowInitialWaitingAdvice();
+            }
+            else
+            {
+                ShowAdvice(_coach.GetBestAdvice(_lastAdviceMatch));
+            }
         }
     }
 
@@ -184,6 +248,7 @@ public partial class MainWindow : Window
 
         // Интерфейс не выбирает совет самостоятельно — он передаёт данные ядру.
         var advice = _coach.GetBestAdvice(match);
+        _lastAdviceMatch = match;
         ShowAdvice(advice);
         AppendLog(eventName, match, advice);
     }
@@ -217,7 +282,7 @@ public partial class MainWindow : Window
         }
         catch (TaskCanceledException)
         {
-            ShowLiveConnectionProblem("Riot API не ответил за 3 секунды");
+            ShowLiveConnectionProblem("Error.Timeout");
         }
         catch (HttpRequestException)
         {
@@ -226,44 +291,35 @@ public partial class MainWindow : Window
         }
         catch (JsonException exception)
         {
-            ShowLiveConnectionProblem($"Не удалось прочитать JSON: {exception.Message}");
+            ShowLiveConnectionProblem("Error.JsonRead", exception.Message);
         }
-        catch (InvalidDataException exception)
+        catch (InvalidDataException)
         {
-            ShowLiveConnectionProblem(exception.Message);
+            ShowLiveConnectionProblem("Error.InvalidData");
         }
     }
 
     private void ApplyLiveSnapshot(LiveClientSnapshot snapshot)
     {
         var match = snapshot.Match;
-        var activePlayer = match.GetActivePlayer();
-        var gameTime = TimeSpan.FromSeconds(Math.Max(0, match.GameTimeSeconds));
 
         _isLiveMatchConnected = true;
         _latestLiveMatch = match;
+        _latestLiveSnapshot = snapshot;
+        _lastAdviceMatch = match;
+        _connectionDisplayMode = ConnectionDisplayMode.Connected;
+        _connectionErrorKey = null;
+        _connectionErrorArguments = [];
         SynchronizeLiveStateControls(match);
         var previousVerticalOffset = RawJsonTextBox.VerticalOffset;
         var previousHorizontalOffset = RawJsonTextBox.HorizontalOffset;
         RawJsonTextBox.Text = snapshot.RawJson;
         RawJsonTextBox.ScrollToVerticalOffset(previousVerticalOffset);
         RawJsonTextBox.ScrollToHorizontalOffset(previousHorizontalOffset);
-        LiveJsonInfoTextBlock.Text =
-            $"Обновлено {snapshot.ReceivedAtUtc.ToLocalTime():HH:mm:ss} · "
-            + $"{match.Players.Count} участников · период 1 с";
-
-        SetLiveConnectionState(
-            "МАТЧ ПОДКЛЮЧЕН",
-            activePlayer is null
-                ? $"{gameTime.Minutes:00}:{gameTime.Seconds:00} · активный игрок не найден"
-                : $"{activePlayer.ChampionName} · {gameTime.Minutes:00}:{gameTime.Seconds:00} · {match.Players.Count} игроков",
-            "#19362F",
-            "#76D7A8");
-
-        var advice = _coach.GetBestAdvice(match);
-        ShowAdvice(advice);
+        RenderLiveSnapshot(snapshot);
 
         // В журнал попадает только смена правила, хотя JSON обновляется каждую секунду.
+        var advice = _coach.GetBestAdvice(match);
         var currentRuleId = advice?.RuleId ?? "no-rule";
         if (!string.Equals(currentRuleId, _lastLiveAdviceRuleId, StringComparison.Ordinal))
         {
@@ -278,33 +334,82 @@ public partial class MainWindow : Window
         {
             EventLogListBox.Items.Insert(
                 0,
-                $"{DateTime.Now:HH:mm:ss}  Riot API · активный матч завершён или соединение потеряно");
+                _localization.Format("Log.MatchEnded", DateTime.Now.ToString("HH:mm:ss")));
 
-            LiveJsonInfoTextBlock.Text =
-                "Активный матч недоступен · ниже сохранён последний успешный JSON";
+            LiveJsonInfoTextBlock.Text = _localization.Get("Json.MatchUnavailable");
         }
 
         _isLiveMatchConnected = false;
         _latestLiveMatch = null;
+        _latestLiveSnapshot = null;
         _lastLiveAdviceRuleId = null;
+        _connectionDisplayMode = ConnectionDisplayMode.Waiting;
+        _connectionErrorKey = null;
+        _connectionErrorArguments = [];
         SetManualSimulationEnabled(isEnabled: true);
-
-        SetLiveConnectionState(
-            "ОЖИДАНИЕ МАТЧА",
-            "Следующий запрос через 1 с",
-            "#243550",
-            "#AFC0D4");
+        RenderWaitingConnection();
     }
 
-    private void ShowLiveConnectionProblem(string message)
+    private void ShowLiveConnectionProblem(string messageKey, params object?[] arguments)
     {
+        _connectionDisplayMode = ConnectionDisplayMode.Error;
+        _connectionErrorKey = messageKey;
+        _connectionErrorArguments = arguments;
+        RenderConnectionProblem();
+    }
+
+    private void RenderConnectionProblem()
+    {
+        var message = _connectionErrorKey is null
+            ? _localization.Get("Error.InvalidData")
+            : _localization.Format(_connectionErrorKey, _connectionErrorArguments);
+
         SetLiveConnectionState(
-            "ОШИБКА ДАННЫХ",
+            _localization.Get("Connection.DataError"),
             message,
             "#3B3421",
             "#F3C969");
 
-        LiveJsonInfoTextBlock.Text = $"Ошибка последнего запроса · {message}";
+        LiveJsonInfoTextBlock.Text = _localization.Format("Json.LastRequestError", message);
+    }
+
+    private void RenderWaitingConnection()
+    {
+        SetLiveConnectionState(
+            _localization.Get("Connection.WaitingMatch"),
+            _localization.Get("Connection.NextPoll"),
+            "#243550",
+            "#AFC0D4");
+    }
+
+    private void RenderLiveSnapshot(LiveClientSnapshot snapshot)
+    {
+        var match = snapshot.Match;
+        var activePlayer = match.GetActivePlayer();
+        var gameTime = TimeSpan.FromSeconds(Math.Max(0, match.GameTimeSeconds));
+        var gameTimeText = $"{gameTime.Minutes:00}:{gameTime.Seconds:00}";
+        var playersText = _localization.Plural("Count.Player", match.Players.Count);
+
+        LiveJsonInfoTextBlock.Text = _localization.Format(
+            "Json.Updated",
+            snapshot.ReceivedAtUtc.ToLocalTime().ToString("HH:mm:ss"),
+            playersText);
+
+        var details = activePlayer is null
+            ? _localization.Format("Connection.ActivePlayerMissing", gameTimeText)
+            : _localization.Format(
+                "Connection.PlayerSummary",
+                activePlayer.ChampionName,
+                gameTimeText,
+                playersText);
+
+        SetLiveConnectionState(
+            _localization.Get("Connection.MatchConnected"),
+            details,
+            "#19362F",
+            "#76D7A8");
+
+        ShowAdvice(_coach.GetBestAdvice(match));
     }
 
     private void SetLiveConnectionState(
@@ -351,8 +456,8 @@ public partial class MainWindow : Window
         EarlyLaneButton.IsEnabled = isEnabled;
         PowerSpikeButton.IsEnabled = isEnabled;
         EvaluateButton.Content = isEnabled
-            ? "Проверить симуляцию"
-            : "Проверить активный матч";
+            ? _localization.Get("Action.CheckSimulation")
+            : _localization.Get("Action.CheckLiveMatch");
     }
 
     private void ShowAdvice(CoachAdvice? advice)
@@ -360,33 +465,36 @@ public partial class MainWindow : Window
         // Знак ? в CoachAdvice? означает, что подходящий совет может отсутствовать.
         if (advice is null)
         {
-            AdviceTitleTextBlock.Text = "Подходящее правило не найдено";
-            AdviceMessageTextBlock.Text = "В загруженном Coach Pack пока нет совета для выбранного состояния.";
-            AdviceSourceTextBlock.Text = "Добавление новых матчапов станет отдельным этапом.";
-            RuleIdTextBlock.Text = "RULE: —";
-            ApplyPowerState("НЕТ ПРАВИЛА", "#243550", "#AFC0D4");
+            AdviceTitleTextBlock.Text = _localization.Get("Advice.NoRule.Title");
+            AdviceMessageTextBlock.Text = _localization.Get("Advice.NoRule.Message");
+            AdviceSourceTextBlock.Text = _localization.Get("Advice.NoRule.Source");
+            RuleIdTextBlock.Text = _localization.Get("Diagnostics.RuleEmpty");
+            ApplyPowerState(_localization.Get("Power.NoRule"), "#243550", "#AFC0D4");
             return;
         }
 
         AdviceTitleTextBlock.Text = advice.Title;
         AdviceMessageTextBlock.Text = advice.Message;
         AdviceSourceTextBlock.Text = advice.Source;
-        RuleIdTextBlock.Text = $"RULE: {advice.RuleId} · PRIORITY: {advice.Priority}";
+        RuleIdTextBlock.Text = _localization.Format(
+            "Diagnostics.RuleLine",
+            advice.RuleId,
+            advice.Priority);
 
         // Для каждой оценки силы задаём отдельные текст и цвет индикатора.
         switch (advice.PowerState)
         {
             case PowerState.Dangerous:
-                ApplyPowerState("ОПАСНО", "#3B2630", "#FF8E9D");
+                ApplyPowerState(_localization.Get("Power.Dangerous"), "#3B2630", "#FF8E9D");
                 break;
             case PowerState.Cautious:
-                ApplyPowerState("ОСТОРОЖНО", "#3B3421", "#F3C969");
+                ApplyPowerState(_localization.Get("Power.Cautious"), "#3B3421", "#F3C969");
                 break;
             case PowerState.Playable:
-                ApplyPowerState("МОЖНО ИГРАТЬ", "#19362F", "#76D7A8");
+                ApplyPowerState(_localization.Get("Power.Playable"), "#19362F", "#76D7A8");
                 break;
             case PowerState.Favorable:
-                ApplyPowerState("ПРЕИМУЩЕСТВО", "#173548", "#76C9F0");
+                ApplyPowerState(_localization.Get("Power.Favorable"), "#173548", "#76C9F0");
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -405,22 +513,46 @@ public partial class MainWindow : Window
         var matchup = MatchupResolver.Resolve(match);
         if (matchup is null)
         {
-            EventLogListBox.Items.Insert(0, $"{DateTime.Now:HH:mm:ss}  {eventName} · матчап не определён");
+            EventLogListBox.Items.Insert(
+                0,
+                _localization.Format(
+                    "Log.MatchupUnknown",
+                    DateTime.Now.ToString("HH:mm:ss"),
+                    eventName));
             return;
         }
 
         var items = matchup.Player.ItemIds.Count switch
         {
-            0 => "без предметов",
+            0 => _localization.Get("Log.NoItems"),
             _ when matchup.Player.ItemIds.Contains(BlackCleaverItemId) => "Black Cleaver",
-            _ => $"предметов: {matchup.Player.ItemIds.Count}"
+            _ => _localization.Plural("Count.Item", matchup.Player.ItemIds.Count)
         };
 
-        var result = advice is null ? "нет правила" : advice.PowerState.ToString();
+        var result = advice is null
+            ? _localization.Get("Log.NoRule")
+            : GetPowerStateLabel(advice.PowerState);
         EventLogListBox.Items.Insert(
             0,
-            $"{DateTime.Now:HH:mm:ss}  {eventName} · {matchup.Player.ChampionName} vs {matchup.Opponent.ChampionName} · lvl {matchup.Player.Level} · {items} → {result}");
+            _localization.Format(
+                "Log.Entry",
+                DateTime.Now.ToString("HH:mm:ss"),
+                eventName,
+                matchup.Player.ChampionName,
+                matchup.Opponent.ChampionName,
+                matchup.Player.Level,
+                items,
+                result));
     }
+
+    private string GetPowerStateLabel(PowerState powerState) => powerState switch
+    {
+        PowerState.Dangerous => _localization.Get("Power.Dangerous"),
+        PowerState.Cautious => _localization.Get("Power.Cautious"),
+        PowerState.Playable => _localization.Get("Power.Playable"),
+        PowerState.Favorable => _localization.Get("Power.Favorable"),
+        _ => throw new ArgumentOutOfRangeException(nameof(powerState), powerState, null)
+    };
 
     private static string GetSelectedChampion(ComboBox comboBox)
     {
