@@ -78,6 +78,11 @@
   <data name="Nav.Soon" xml:space="preserve"><value>SOON</value></data>
   <data name="Nav.BackHome" xml:space="preserve"><value>← Home</value></data>
   <data name="Nav.Collapse" xml:space="preserve"><value>Collapse menu</value></data>
+  <data name="Settings.Title" xml:space="preserve"><value>Settings</value></data>
+  <data name="Settings.Subtitle" xml:space="preserve"><value>All data is processed locally. Nothing is sent outside.</value></data>
+  <data name="Settings.Language.Section" xml:space="preserve"><value>Language</value></data>
+  <data name="Settings.Language.Label" xml:space="preserve"><value>Interface language</value></data>
+  <data name="Settings.Language.Description" xml:space="preserve"><value>Switches the whole interface and system labels. Advice packs remain in the author's language.</value></data>
   <data name="Home.Engine" xml:space="preserve"><value>Analysis engine</value></data>
   <data name="Home.Engine.Waiting" xml:space="preserve"><value>Waiting for match</value></data>
   <data name="Home.Engine.Connected" xml:space="preserve"><value>Live data received</value></data>

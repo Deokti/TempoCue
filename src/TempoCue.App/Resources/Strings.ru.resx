@@ -80,6 +80,11 @@
   <data name="Nav.Soon" xml:space="preserve"><value>СКОРО</value></data>
   <data name="Nav.BackHome" xml:space="preserve"><value>← Главная</value></data>
   <data name="Nav.Collapse" xml:space="preserve"><value>Свернуть меню</value></data>
+  <data name="Settings.Title" xml:space="preserve"><value>Настройки</value></data>
+  <data name="Settings.Subtitle" xml:space="preserve"><value>Все данные обрабатываются локально. Ничего не отправляется наружу.</value></data>
+  <data name="Settings.Language.Section" xml:space="preserve"><value>Язык</value></data>
+  <data name="Settings.Language.Label" xml:space="preserve"><value>Язык интерфейса</value></data>
+  <data name="Settings.Language.Description" xml:space="preserve"><value>Переключает интерфейс и системные подписи целиком. Наборы советов остаются на языке автора.</value></data>
   <data name="Home.Engine" xml:space="preserve"><value>Движок анализа</value></data>
   <data name="Home.Engine.Waiting" xml:space="preserve"><value>Ожидает матч</value></data>
   <data name="Home.Engine.Connected" xml:space="preserve"><value>Получает данные</value></data>

@@ -48,6 +48,124 @@
             <Setter Property="Padding" Value="8,5" />
         </Style>
 
+        <Style x:Key="SettingsLanguageComboBoxItem" TargetType="ComboBoxItem">
+            <Setter Property="Foreground" Value="#DCEAF7" />
+            <Setter Property="Background" Value="#0C1420" />
+            <Setter Property="Padding" Value="12,8" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="ItemBorder"
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}"
+                                CornerRadius="7">
+                            <ContentPresenter VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="#162235" />
+                                <Setter Property="Foreground" Value="#F4F7FB" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="#1B2A42" />
+                                <Setter Property="Foreground" Value="#6FC4EF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SettingsLanguageComboBox" TargetType="ComboBox">
+            <Setter Property="Height" Value="38" />
+            <Setter Property="Foreground" Value="#DCEAF7" />
+            <Setter Property="Background" Value="#0C1420" />
+            <Setter Property="BorderBrush" Value="#263750" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="ItemContainerStyle" Value="{StaticResource SettingsLanguageComboBoxItem}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton x:Name="DropDownToggle"
+                                          Focusable="False"
+                                          ClickMode="Press"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          Content="{TemplateBinding SelectionBoxItem}"
+                                          ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border x:Name="ToggleBorder"
+                                                Background="#0C1420"
+                                                BorderBrush="#263750"
+                                                BorderThickness="1"
+                                                CornerRadius="10"
+                                                Padding="12,0">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <ContentPresenter VerticalAlignment="Center"
+                                                                  Content="{TemplateBinding Content}"
+                                                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                                  TextElement.Foreground="#DCEAF7" />
+                                                <Path Grid.Column="1"
+                                                      Width="8"
+                                                      Height="4"
+                                                      Margin="12,0,2,0"
+                                                      Data="M 0,0 L 4,4 L 8,0"
+                                                      Stroke="#7F93AF"
+                                                      StrokeThickness="1.25"
+                                                      StrokeStartLineCap="Round"
+                                                      StrokeEndLineCap="Round"
+                                                      StrokeLineJoin="Round" />
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="ToggleBorder" Property="BorderBrush" Value="#3A5878" />
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter TargetName="ToggleBorder" Property="BorderBrush" Value="#4FAAE8" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+
+                            <Popup x:Name="PART_Popup"
+                                   Placement="Bottom"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   AllowsTransparency="True"
+                                   PopupAnimation="Fade"
+                                   Focusable="False">
+                                <Border Width="{Binding ActualWidth, ElementName=DropDownToggle}"
+                                        Margin="0,4,0,0"
+                                        Background="#0C1420"
+                                        BorderBrush="#263750"
+                                        BorderThickness="1"
+                                        CornerRadius="10"
+                                        ClipToBounds="True">
+                                    <ScrollViewer MaxHeight="240"
+                                                  VerticalScrollBarVisibility="Auto">
+                                        <ItemsPresenter />
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.45" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style TargetType="CheckBox">
             <Setter Property="Foreground" Value="#D8E2EF" />
             <Setter Property="FontSize" Value="14" />
@@ -363,15 +481,18 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <StackPanel>
-                            <Button Style="{StaticResource ShellNavButtonActive}"
+                            <Button x:Name="HomeNavigationButton"
+                                    Style="{StaticResource ShellNavButtonActive}"
                                     Click="OpenHomeButton_Click">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="24" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="▦" Foreground="#50B7ED" FontSize="16" />
-                                    <TextBlock Grid.Column="1" Text="{localization:Loc Nav.Home}"
+                                    <TextBlock x:Name="HomeNavigationIcon"
+                                               Text="▦" Foreground="#50B7ED" FontSize="16" />
+                                    <TextBlock x:Name="HomeNavigationTextBlock"
+                                               Grid.Column="1" Text="{localization:Loc Nav.Home}"
                                                FontSize="14" FontWeight="SemiBold" />
                                 </Grid>
                             </Button>
@@ -419,18 +540,19 @@
                                                FontSize="11" />
                                 </Grid>
                             </Button>
-                            <Button Style="{StaticResource ShellNavButton}" IsEnabled="False">
+                            <Button x:Name="SettingsNavigationButton"
+                                    Style="{StaticResource ShellNavButton}"
+                                    Click="OpenSettingsButton_Click">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="24" />
                                         <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="☷" FontSize="16" />
-                                    <TextBlock Grid.Column="1" Text="{localization:Loc Nav.Settings}"
+                                    <TextBlock x:Name="SettingsNavigationIcon"
+                                               Text="☷" FontSize="16" />
+                                    <TextBlock x:Name="SettingsNavigationTextBlock"
+                                               Grid.Column="1" Text="{localization:Loc Nav.Settings}"
                                                FontSize="14" />
-                                    <TextBlock Grid.Column="2" Text="{localization:Loc Nav.Soon}"
-                                               FontSize="11" />
                                 </Grid>
                             </Button>
                         </StackPanel>
@@ -466,14 +588,6 @@
                                                Margin="0,8,0,0" />
                                 </StackPanel>
                             </Border>
-                            <ComboBox x:Name="LanguageComboBox"
-                                      Visibility="Collapsed"
-                                      SelectedValuePath="Tag"
-                                      ToolTip="{localization:Loc Language.Tooltip}"
-                                      SelectionChanged="LanguageComboBox_SelectionChanged">
-                                <ComboBoxItem Content="Русский" Tag="ru-RU" />
-                                <ComboBoxItem Content="English" Tag="en-US" />
-                            </ComboBox>
                         </StackPanel>
                     </Grid>
                 </Border>
@@ -524,7 +638,7 @@
                         </Grid>
                     </Border>
 
-                    <Grid Grid.Row="1" Margin="24">
+                    <Grid x:Name="HomeContentPage" Grid.Row="1" Margin="24">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="16" />
@@ -697,6 +811,62 @@
                                 </StackPanel>
                             </Border>
                         </Grid>
+                    </Grid>
+
+                    <!-- Пока на странице настроек доступно только переключение языка интерфейса. -->
+                    <Grid x:Name="SettingsContentPage"
+                          Grid.Row="1"
+                          Margin="24"
+                          Visibility="Collapsed">
+                        <StackPanel HorizontalAlignment="Left" MaxWidth="760">
+                            <TextBlock x:Name="SettingsTitleTextBlock"
+                                       Text="{localization:Loc Settings.Title}"
+                                       Foreground="#F4F7FB"
+                                       FontSize="20"
+                                       FontWeight="SemiBold" />
+                            <TextBlock Text="{localization:Loc Settings.Subtitle}"
+                                       Style="{StaticResource ShellCaption}"
+                                       Margin="0,5,0,0" />
+
+                            <Border Style="{StaticResource ShellCard}"
+                                    Width="760"
+                                    Margin="0,16,0,0">
+                                <StackPanel>
+                                    <TextBlock Text="{localization:Loc Settings.Language.Section}"
+                                               Foreground="#91A4BD"
+                                               FontSize="13"
+                                               FontWeight="SemiBold"
+                                               Margin="0,0,0,16" />
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="240" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel VerticalAlignment="Center" Margin="0,0,28,0">
+                                            <TextBlock Text="{localization:Loc Settings.Language.Label}"
+                                                       Foreground="#F4F7FB"
+                                                       FontSize="14" />
+                                            <TextBlock Text="{localization:Loc Settings.Language.Description}"
+                                                       Style="{StaticResource ShellCaption}"
+                                                       TextWrapping="Wrap"
+                                                       LineHeight="18"
+                                                       Margin="0,4,0,0" />
+                                        </StackPanel>
+                                        <ComboBox x:Name="LanguageComboBox"
+                                                  Grid.Column="1"
+                                                  Style="{StaticResource SettingsLanguageComboBox}"
+                                                  Width="240"
+                                                  VerticalAlignment="Center"
+                                                  SelectedValuePath="Tag"
+                                                  ToolTip="{localization:Loc Language.Tooltip}"
+                                                  SelectionChanged="LanguageComboBox_SelectionChanged">
+                                            <ComboBoxItem Content="Русский" Tag="ru-RU" />
+                                            <ComboBoxItem Content="English" Tag="en-US" />
+                                        </ComboBox>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
                     </Grid>
                 </Grid>
             </Grid>

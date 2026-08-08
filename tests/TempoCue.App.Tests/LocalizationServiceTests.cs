@@ -1,5 +1,6 @@
 using System.Runtime.ExceptionServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Threading;
 using TempoCue.App.Localization;
 
@@ -25,6 +26,14 @@ public sealed class LocalizationServiceTests
                 Assert.Equal(720, window.Height);
                 Assert.Equal(ResizeMode.NoResize, window.ResizeMode);
                 Assert.Equal(WindowStyle.None, window.WindowStyle);
+                var settingsPage = Assert.IsType<Grid>(window.FindName("SettingsContentPage"));
+                var settingsButton = Assert.IsType<Button>(window.FindName("SettingsNavigationButton"));
+                var settingsTitle = Assert.IsType<TextBlock>(window.FindName("SettingsTitleTextBlock"));
+                Assert.NotNull(window.FindName("LanguageComboBox"));
+
+                settingsButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                Assert.Equal(Visibility.Visible, settingsPage.Visibility);
+                Assert.Equal("Настройки", settingsTitle.Text);
 
                 localization.SetLanguage("en-US");
                 Dispatcher.CurrentDispatcher.Invoke(
@@ -32,6 +41,7 @@ public sealed class LocalizationServiceTests
                     DispatcherPriority.DataBind);
 
                 Assert.Equal("TempoCue — League of Legends assistant", window.Title);
+                Assert.Equal("Settings", settingsTitle.Text);
                 window.Close();
             }
             catch (Exception exception)
@@ -62,6 +72,8 @@ public sealed class LocalizationServiceTests
 
             Assert.Equal("Game state simulator", localization.Get("Header.Title"));
             Assert.Equal("Home", localization.Get("Nav.Home"));
+            Assert.Equal("Settings", localization.Get("Settings.Title"));
+            Assert.Equal("Interface language", localization.Get("Settings.Language.Label"));
             Assert.Equal("Available now", localization.Get("Home.Available.Title"));
             Assert.Equal("1 player", localization.Plural("Count.Player", 1));
             Assert.Equal("10 players", localization.Plural("Count.Player", 10));
@@ -70,6 +82,8 @@ public sealed class LocalizationServiceTests
 
             Assert.Equal("Симулятор игрового состояния", localization.Get("Header.Title"));
             Assert.Equal("Главная", localization.Get("Nav.Home"));
+            Assert.Equal("Настройки", localization.Get("Settings.Title"));
+            Assert.Equal("Язык интерфейса", localization.Get("Settings.Language.Label"));
             Assert.Equal("Что работает сейчас", localization.Get("Home.Available.Title"));
             Assert.Equal("1 игрок", localization.Plural("Count.Player", 1));
             Assert.Equal("2 игрока", localization.Plural("Count.Player", 2));

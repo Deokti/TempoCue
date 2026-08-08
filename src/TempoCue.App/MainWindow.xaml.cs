@@ -98,6 +98,9 @@ public partial class MainWindow : Window
     {
         HomePage.Visibility = Visibility.Visible;
         MatchPage.Visibility = Visibility.Collapsed;
+        HomeContentPage.Visibility = Visibility.Visible;
+        SettingsContentPage.Visibility = Visibility.Collapsed;
+        UpdateShellNavigation();
         UpdateTitleBarContext();
     }
 
@@ -105,6 +108,16 @@ public partial class MainWindow : Window
     {
         HomePage.Visibility = Visibility.Collapsed;
         MatchPage.Visibility = Visibility.Visible;
+        UpdateTitleBarContext();
+    }
+
+    private void OpenSettingsButton_Click(object sender, RoutedEventArgs e)
+    {
+        HomePage.Visibility = Visibility.Visible;
+        MatchPage.Visibility = Visibility.Collapsed;
+        HomeContentPage.Visibility = Visibility.Collapsed;
+        SettingsContentPage.Visibility = Visibility.Visible;
+        UpdateShellNavigation();
         UpdateTitleBarContext();
     }
 
@@ -562,13 +575,30 @@ public partial class MainWindow : Window
 
     private void UpdateTitleBarContext(string? gameTimeText = null)
     {
-        var pageName = HomePage.Visibility == Visibility.Visible
-            ? _localization.Get("Nav.Home")
-            : _localization.Get("Nav.CurrentMatch");
+        var pageName = MatchPage.Visibility == Visibility.Visible
+            ? _localization.Get("Nav.CurrentMatch")
+            : SettingsContentPage.Visibility == Visibility.Visible
+                ? _localization.Get("Nav.Settings")
+                : _localization.Get("Nav.Home");
 
         TitleBarContextTextBlock.Text = gameTimeText is null
             ? $"— {pageName}"
             : $"— {pageName} · {gameTimeText}";
+    }
+
+    private void UpdateShellNavigation()
+    {
+        var settingsAreOpen = SettingsContentPage.Visibility == Visibility.Visible;
+
+        HomeNavigationButton.Style = (Style)FindResource(
+            settingsAreOpen ? "ShellNavButton" : "ShellNavButtonActive");
+        SettingsNavigationButton.Style = (Style)FindResource(
+            settingsAreOpen ? "ShellNavButtonActive" : "ShellNavButton");
+
+        HomeNavigationIcon.Foreground = ToBrush(settingsAreOpen ? "#7F93AF" : "#50B7ED");
+        SettingsNavigationIcon.Foreground = ToBrush(settingsAreOpen ? "#50B7ED" : "#7F93AF");
+        HomeNavigationTextBlock.FontWeight = settingsAreOpen ? FontWeights.Normal : FontWeights.SemiBold;
+        SettingsNavigationTextBlock.FontWeight = settingsAreOpen ? FontWeights.SemiBold : FontWeights.Normal;
     }
 
     private static SolidColorBrush ToBrush(string color)
