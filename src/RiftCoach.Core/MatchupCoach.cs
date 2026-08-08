@@ -17,16 +17,29 @@ public sealed class MatchupCoach
     }
 
     /// <summary>
-    /// Находит самое приоритетное правило, соответствующее состоянию матча.
-    /// Возвращает null, если подходящего правила нет.
+    /// Находит матчап активного игрока внутри общего состояния матча, после чего
+    /// выбирает самое приоритетное подходящее правило.
+    /// Возвращает null, если противника или подходящего правила определить не удалось.
     /// </summary>
-    public CoachAdvice? GetBestAdvice(GameState state)
+    public CoachAdvice? GetBestAdvice(MatchState match)
     {
-        ArgumentNullException.ThrowIfNull(state);
+        ArgumentNullException.ThrowIfNull(match);
+
+        var matchup = MatchupResolver.Resolve(match);
+        return matchup is null ? null : GetBestAdvice(matchup);
+    }
+
+    /// <summary>
+    /// Выбирает совет для уже определённого противостояния двух участников.
+    /// Такой метод удобно использовать в тестах отдельных матчапов.
+    /// </summary>
+    public CoachAdvice? GetBestAdvice(MatchupContext matchup)
+    {
+        ArgumentNullException.ThrowIfNull(matchup);
 
         var rule = _rules
             // Оставляем только правила, все условия которых выполнены.
-            .Where(candidate => Matches(candidate, state))
+            .Where(candidate => Matches(candidate, matchup))
             // Если совпало несколько правил, сначала выбираем наибольший приоритет.
             .OrderByDescending(candidate => candidate.Priority)
             // ID обеспечивает стабильный результат при одинаковом приоритете.
@@ -46,28 +59,28 @@ public sealed class MatchupCoach
                 rule.Source);
     }
 
-    private static bool Matches(CoachRuleDefinition rule, GameState state)
+    private static bool Matches(CoachRuleDefinition rule, MatchupContext matchup)
     {
         // Сравниваем имена без учёта регистра: "Urgot" и "urgot" считаются равными.
-        if (!string.Equals(rule.PlayerChampion, state.PlayerChampion, StringComparison.OrdinalIgnoreCase)
-            || !string.Equals(rule.OpponentChampion, state.OpponentChampion, StringComparison.OrdinalIgnoreCase))
+        if (!string.Equals(rule.PlayerChampion, matchup.Player.ChampionName, StringComparison.OrdinalIgnoreCase)
+            || !string.Equals(rule.OpponentChampion, matchup.Opponent.ChampionName, StringComparison.OrdinalIgnoreCase))
         {
             return false;
         }
 
-        if (state.PlayerLevel < rule.MinimumLevel
-            || rule.MaximumLevel is not null && state.PlayerLevel > rule.MaximumLevel)
+        if (matchup.Player.Level < rule.MinimumLevel
+            || rule.MaximumLevel is not null && matchup.Player.Level > rule.MaximumLevel)
         {
             return false;
         }
 
         // Any здесь отвечает на вопрос: отсутствует ли хотя бы один обязательный предмет?
-        if (rule.RequiredItemIds.Any(itemId => !state.PlayerItemIds.Contains(itemId)))
+        if (rule.RequiredItemIds.Any(itemId => !matchup.Player.ItemIds.Contains(itemId)))
         {
             return false;
         }
 
         // Все запрещённые предметы должны отсутствовать у игрока.
-        return rule.ExcludedItemIds.All(itemId => !state.PlayerItemIds.Contains(itemId));
+        return rule.ExcludedItemIds.All(itemId => !matchup.Player.ItemIds.Contains(itemId));
     }
 }

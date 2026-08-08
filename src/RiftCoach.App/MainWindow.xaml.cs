@@ -15,6 +15,10 @@ public partial class MainWindow : Window
     // Riot использует числовые ID для предметов. ID Black Cleaver — 3071.
     private const int BlackCleaverItemId = 3071;
 
+    // Стабильные ID нужны, чтобы общее состояние матча могло отличить участников.
+    private const string SimulatedPlayerId = "simulated-player";
+    private const string SimulatedOpponentId = "simulated-opponent";
+
     // Движок создаётся один раз при открытии окна и затем используется повторно.
     private readonly MatchupCoach _coach;
 
@@ -74,20 +78,39 @@ public partial class MainWindow : Window
             itemIds.Add(BlackCleaverItemId);
         }
 
-        // Сейчас состояние собирается из элементов интерфейса. В рабочей версии
-        // эту часть заменит поставщик данных активного матча.
-        var state = new GameState
+        // Симулятор создаёт тот же PlayerState, который позднее будет приходить из Riot API.
+        var player = new PlayerState
         {
-            PlayerChampion = GetSelectedChampion(PlayerChampionComboBox),
-            OpponentChampion = GetSelectedChampion(OpponentChampionComboBox),
-            PlayerLevel = (int)LevelSlider.Value,
-            PlayerItemIds = itemIds
+            ParticipantId = SimulatedPlayerId,
+            ChampionName = GetSelectedChampion(PlayerChampionComboBox),
+            Team = TeamSide.Order,
+            Position = PlayerPosition.Top,
+            Level = (int)LevelSlider.Value,
+            ItemIds = itemIds
+        };
+
+        var opponent = new PlayerState
+        {
+            ParticipantId = SimulatedOpponentId,
+            ChampionName = GetSelectedChampion(OpponentChampionComboBox),
+            Team = TeamSide.Chaos,
+            Position = PlayerPosition.Top,
+            Level = (int)LevelSlider.Value
+        };
+
+        // Сейчас тестовый матч содержит двух участников. Архитектура уже допускает
+        // передачу полного списка из десяти игроков без изменения движка советов.
+        var match = new MatchState
+        {
+            GameTimeSeconds = 0,
+            ActivePlayerId = SimulatedPlayerId,
+            Players = [player, opponent]
         };
 
         // Интерфейс не выбирает совет самостоятельно — он передаёт данные ядру.
-        var advice = _coach.GetBestAdvice(state);
+        var advice = _coach.GetBestAdvice(match);
         ShowAdvice(advice);
-        AppendLog(eventName, state, advice);
+        AppendLog(eventName, match, advice);
     }
 
     private void ShowAdvice(CoachAdvice? advice)
@@ -135,17 +158,24 @@ public partial class MainWindow : Window
         PowerStateTextBlock.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(foreground));
     }
 
-    private void AppendLog(string eventName, GameState state, CoachAdvice? advice)
+    private void AppendLog(string eventName, MatchState match, CoachAdvice? advice)
     {
+        var matchup = MatchupResolver.Resolve(match);
+        if (matchup is null)
+        {
+            EventLogListBox.Items.Insert(0, $"{DateTime.Now:HH:mm:ss}  {eventName} · матчап не определён");
+            return;
+        }
+
         // Тернарный оператор выбирает одно из двух текстовых значений по условию.
-        var items = state.PlayerItemIds.Count == 0
+        var items = matchup.Player.ItemIds.Count == 0
             ? "без предмета"
             : "Black Cleaver";
 
         var result = advice is null ? "нет правила" : advice.PowerState.ToString();
         EventLogListBox.Items.Insert(
             0,
-            $"{DateTime.Now:HH:mm:ss}  {eventName} · {state.PlayerChampion} vs {state.OpponentChampion} · lvl {state.PlayerLevel} · {items} → {result}");
+            $"{DateTime.Now:HH:mm:ss}  {eventName} · {matchup.Player.ChampionName} vs {matchup.Opponent.ChampionName} · lvl {matchup.Player.Level} · {items} → {result}");
     }
 
     private static string GetSelectedChampion(ComboBox comboBox)

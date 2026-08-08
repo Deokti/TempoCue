@@ -17,7 +17,7 @@ public sealed class MatchupCoachTests
         var coach = CreateCoach();
 
         // Act: запрашиваем совет для первого уровня.
-        var advice = coach.GetBestAdvice(CreateState(level: 1));
+        var advice = coach.GetBestAdvice(CreateMatch(level: 1));
 
         // Assert: проверяем, что движок выбрал ожидаемое правило.
         Assert.NotNull(advice);
@@ -30,7 +30,7 @@ public sealed class MatchupCoachTests
     {
         var coach = CreateCoach();
 
-        var advice = coach.GetBestAdvice(CreateState(level: 9));
+        var advice = coach.GetBestAdvice(CreateMatch(level: 9));
 
         Assert.NotNull(advice);
         Assert.Equal(PowerState.Cautious, advice.PowerState);
@@ -42,7 +42,7 @@ public sealed class MatchupCoachTests
     {
         var coach = CreateCoach();
 
-        var advice = coach.GetBestAdvice(CreateState(level: 9, BlackCleaverItemId));
+        var advice = coach.GetBestAdvice(CreateMatch(level: 9, itemIds: [BlackCleaverItemId]));
 
         Assert.NotNull(advice);
         Assert.Equal(PowerState.Playable, advice.PowerState);
@@ -53,9 +53,9 @@ public sealed class MatchupCoachTests
     public void GetBestAdvice_ReturnsNull_ForUnknownMatchup()
     {
         var coach = CreateCoach();
-        var state = CreateState(level: 1) with { OpponentChampion = "Garen" };
+        var match = CreateMatch(level: 1, opponentChampion: "Garen");
 
-        var advice = coach.GetBestAdvice(state);
+        var advice = coach.GetBestAdvice(match);
 
         Assert.Null(advice);
     }
@@ -107,6 +107,85 @@ public sealed class MatchupCoachTests
         Assert.Equal("top.urgot-vs-sett.prototype", pack.Id);
         Assert.Equal(3, pack.Rules.Count);
         Assert.All(pack.Rules, rule => Assert.Contains("GoliathGames", rule.Source));
+    }
+
+    [Fact]
+    public void MatchState_ReturnsAlliesAndEnemies_ForFullTeamComposition()
+    {
+        var match = CreateFullMatch(level: 1);
+
+        var activePlayer = match.GetActivePlayer();
+        var allies = match.GetAllies();
+        var enemies = match.GetEnemies();
+
+        Assert.NotNull(activePlayer);
+        Assert.Equal("Urgot", activePlayer.ChampionName);
+        Assert.Equal(4, allies.Count);
+        Assert.Equal(5, enemies.Count);
+        Assert.All(allies, ally => Assert.Equal(TeamSide.Order, ally.Team));
+        Assert.All(enemies, enemy => Assert.Equal(TeamSide.Chaos, enemy.Team));
+    }
+
+    [Fact]
+    public void MatchupResolver_SelectsEnemyOnSamePosition()
+    {
+        var match = CreateFullMatch(level: 1);
+
+        var matchup = MatchupResolver.Resolve(match);
+
+        Assert.NotNull(matchup);
+        Assert.Equal("Urgot", matchup.Player.ChampionName);
+        Assert.Equal("Sett", matchup.Opponent.ChampionName);
+        Assert.Equal(PlayerPosition.Top, matchup.Opponent.Position);
+    }
+
+    [Fact]
+    public void GetBestAdvice_UsesAllParticipantsAndSelectsTopMatchup()
+    {
+        var coach = CreateCoach();
+        var match = CreateFullMatch(level: 9, itemIds: [BlackCleaverItemId]);
+
+        var advice = coach.GetBestAdvice(match);
+
+        Assert.NotNull(advice);
+        Assert.Equal(PowerState.Playable, advice.PowerState);
+        Assert.Equal("power-spike", advice.RuleId);
+    }
+
+    [Fact]
+    public void MatchupResolver_UsesOnlyEnemyInOneVersusOneWithoutPosition()
+    {
+        var match = CreateMatch(level: 1);
+        match = match with
+        {
+            Players = match.Players
+                .Select(player => player with { Position = PlayerPosition.Unknown })
+                .ToArray()
+        };
+
+        var matchup = MatchupResolver.Resolve(match);
+
+        Assert.NotNull(matchup);
+        Assert.Equal("Sett", matchup.Opponent.ChampionName);
+    }
+
+    [Fact]
+    public void MatchupResolver_DoesNotGuessAmongSeveralEnemiesWithoutMatchingPosition()
+    {
+        var match = CreateFullMatch(level: 1);
+        match = match with
+        {
+            Players = match.Players
+                .Select(player => player.Team == TeamSide.Chaos
+                    ? player with { Position = PlayerPosition.Unknown }
+                    : player)
+                .ToArray()
+        };
+
+        var matchup = MatchupResolver.Resolve(match);
+
+        // Лучше честно не выдать совет, чем назначить случайного врага оппонентом на линии.
+        Assert.Null(matchup);
     }
 
     private static MatchupCoach CreateCoach()
@@ -164,14 +243,76 @@ public sealed class MatchupCoachTests
         };
     }
 
-    private static GameState CreateState(int level, params int[] itemIds)
+    private static MatchState CreateMatch(
+        int level,
+        string opponentChampion = "Sett",
+        params int[] itemIds)
     {
-        return new GameState
+        var player = CreatePlayer(
+            id: "active-player",
+            champion: "Urgot",
+            team: TeamSide.Order,
+            position: PlayerPosition.Top,
+            level: level,
+            itemIds: itemIds);
+
+        var opponent = CreatePlayer(
+            id: "enemy-top",
+            champion: opponentChampion,
+            team: TeamSide.Chaos,
+            position: PlayerPosition.Top,
+            level: level);
+
+        return new MatchState
         {
-            PlayerChampion = "Urgot",
-            OpponentChampion = "Sett",
-            PlayerLevel = level,
-            PlayerItemIds = itemIds.ToHashSet()
+            GameTimeSeconds = 90,
+            ActivePlayerId = player.ParticipantId,
+            Players = [player, opponent]
+        };
+    }
+
+    private static MatchState CreateFullMatch(int level, params int[] itemIds)
+    {
+        // Состав специально содержит десять участников и по одному игроку
+        // каждой позиции в обеих командах, как в обычном матче 5×5.
+        var players = new PlayerState[]
+        {
+            CreatePlayer("active-player", "Urgot", TeamSide.Order, PlayerPosition.Top, level, itemIds),
+            CreatePlayer("ally-jungle", "Amumu", TeamSide.Order, PlayerPosition.Jungle, level),
+            CreatePlayer("ally-middle", "Ahri", TeamSide.Order, PlayerPosition.Middle, level),
+            CreatePlayer("ally-bottom", "Jinx", TeamSide.Order, PlayerPosition.Bottom, level),
+            CreatePlayer("ally-support", "Thresh", TeamSide.Order, PlayerPosition.Support, level),
+            CreatePlayer("enemy-top", "Sett", TeamSide.Chaos, PlayerPosition.Top, level),
+            CreatePlayer("enemy-jungle", "LeeSin", TeamSide.Chaos, PlayerPosition.Jungle, level),
+            CreatePlayer("enemy-middle", "Syndra", TeamSide.Chaos, PlayerPosition.Middle, level),
+            CreatePlayer("enemy-bottom", "Caitlyn", TeamSide.Chaos, PlayerPosition.Bottom, level),
+            CreatePlayer("enemy-support", "Leona", TeamSide.Chaos, PlayerPosition.Support, level)
+        };
+
+        return new MatchState
+        {
+            GameTimeSeconds = 90,
+            ActivePlayerId = "active-player",
+            Players = players
+        };
+    }
+
+    private static PlayerState CreatePlayer(
+        string id,
+        string champion,
+        TeamSide team,
+        PlayerPosition position,
+        int level,
+        params int[] itemIds)
+    {
+        return new PlayerState
+        {
+            ParticipantId = id,
+            ChampionName = champion,
+            Team = team,
+            Position = position,
+            Level = level,
+            ItemIds = itemIds.ToHashSet()
         };
     }
 }
