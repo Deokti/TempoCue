@@ -16,16 +16,19 @@ public partial class MainWindow : Window
     public MainWindow(
         CurrentMatchViewModel currentMatchViewModel,
         HomeViewModel homeViewModel,
-        SettingsViewModel settingsViewModel)
+        SettingsViewModel settingsViewModel,
+        CoachingViewModel coachingViewModel)
     {
         ArgumentNullException.ThrowIfNull(currentMatchViewModel);
         ArgumentNullException.ThrowIfNull(homeViewModel);
         ArgumentNullException.ThrowIfNull(settingsViewModel);
+        ArgumentNullException.ThrowIfNull(coachingViewModel);
         _currentMatchViewModel = currentMatchViewModel;
 
         InitializeComponent();
         HomeContentPage.DataContext = homeViewModel;
         SettingsContentPage.DataContext = settingsViewModel;
+        CoachingContentPage.DataContext = coachingViewModel;
         CurrentMatchContentPage.DataContext = _currentMatchViewModel;
         HomeContentPage.OpenCurrentMatchRequested += HomeContentPage_OpenCurrentMatchRequested;
 

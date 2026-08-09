@@ -1,6 +1,8 @@
 using System.Runtime.ExceptionServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 using System.Windows.Threading;
 using TempoCue.App.Localization;
 using TempoCue.App.Settings;
@@ -34,10 +36,14 @@ public sealed class LocalizationServiceTests
                 using var settingsViewModel = new SettingsViewModel(
                     localization,
                     new AppSettingsService());
+                using var coachingViewModel = new CoachingViewModel(
+                    CreateCoachPack(),
+                    localization);
                 var window = new MainWindow(
                     currentMatchViewModel,
                     homeViewModel,
-                    settingsViewModel);
+                    settingsViewModel,
+                    coachingViewModel);
                 window.Show();
                 Dispatcher.CurrentDispatcher.Invoke(
                     static () => { },
@@ -49,17 +55,92 @@ public sealed class LocalizationServiceTests
                 Assert.Equal(WindowStyle.None, window.WindowStyle);
                 var currentMatchPage = Assert.IsType<TempoCue.App.Views.CurrentMatchView>(
                     window.FindName("CurrentMatchContentPage"));
+                Assert.Contains(
+                    currentMatchPage.Resources.MergedDictionaries,
+                    dictionary => dictionary.Contains("ShellScrollBar"));
+                var currentMatchScrollBarStyle = Assert.IsType<Style>(
+                    currentMatchPage.FindResource(typeof(ScrollBar)));
+                Assert.NotNull(currentMatchScrollBarStyle.BasedOn);
                 var currentMatchButton = Assert.IsType<Button>(
                     window.FindName("CurrentMatchNavigationButton"));
                 var settingsPage = Assert.IsType<TempoCue.App.Views.SettingsView>(
                     window.FindName("SettingsContentPage"));
                 var settingsButton = Assert.IsType<Button>(window.FindName("SettingsNavigationButton"));
+                var coachingPage = Assert.IsType<TempoCue.App.Views.CoachingView>(
+                    window.FindName("CoachingContentPage"));
+                var coachingButton = Assert.IsType<Button>(
+                    window.FindName("CoachingNavigationButton"));
                 var settingsTitle = Assert.IsType<TextBlock>(
                     settingsPage.FindName("SettingsTitleTextBlock"));
                 Assert.NotNull(settingsPage.FindName("LanguageComboBox"));
 
                 currentMatchButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
                 Assert.Equal(Visibility.Visible, currentMatchPage.Visibility);
+                window.UpdateLayout();
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.Render);
+                var currentMatchScrollBar = Assert.Single(
+                    FindVisualDescendants<ScrollBar>(currentMatchPage),
+                    scrollBar => scrollBar.Orientation == Orientation.Vertical
+                        && scrollBar.IsVisible);
+                Assert.Equal(4d, currentMatchScrollBar.ActualWidth);
+                var currentMatchTabs = Assert.IsType<TabControl>(
+                    currentMatchPage.FindName("CurrentSectionsTabControl"));
+                Assert.Equal(3, currentMatchTabs.Items.Count);
+                Assert.Equal(new Thickness(1), currentMatchTabs.BorderThickness);
+                Assert.Equal(306d, currentMatchTabs.MinHeight);
+
+                coachingButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                Assert.Equal(Visibility.Visible, coachingPage.Visibility);
+                window.UpdateLayout();
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.Render);
+                var coachingTabs = Assert.IsType<TabControl>(
+                    coachingPage.FindName("CoachingSectionsTabControl"));
+                Assert.Equal(3, coachingTabs.Items.Count);
+                Assert.False(Assert.IsType<Button>(
+                    coachingPage.FindName("CreatePackButton")).IsEnabled);
+                Assert.True(coachingPage.ActualWidth > 900);
+                Assert.True(coachingPage.ActualHeight > 500);
+                var rulesScrollViewer = Assert.IsType<ScrollViewer>(
+                    coachingPage.FindName("CoachingRulesScrollViewer"));
+                Assert.Equal(
+                    ScrollBarVisibility.Auto,
+                    rulesScrollViewer.VerticalScrollBarVisibility);
+                var scrollBarStyle = Assert.IsType<Style>(
+                    rulesScrollViewer.FindResource("ShellScrollBar"));
+                var widthSetter = Assert.Single(
+                    scrollBarStyle.Setters.OfType<Setter>(),
+                    setter => setter.Property == FrameworkElement.WidthProperty);
+                Assert.Equal(4d, widthSetter.Value);
+                var ruleCardStyle = Assert.IsType<Style>(
+                    coachingPage.FindResource("CoachingRuleCard"));
+                var ruleCardMargin = Assert.Single(
+                    ruleCardStyle.Setters.OfType<Setter>(),
+                    setter => setter.Property == FrameworkElement.MarginProperty);
+                Assert.Equal(new Thickness(0, 0, 8, 10), ruleCardMargin.Value);
+                var coachingTabStyle = Assert.IsType<Style>(
+                    coachingPage.FindResource("CoachingTab"));
+                var coachingTabFontSize = Assert.Single(
+                    coachingTabStyle.Setters.OfType<Setter>(),
+                    setter => setter.Property == Control.FontSizeProperty);
+                Assert.Equal(14d, coachingTabFontSize.Value);
+
+                coachingTabs.SelectedIndex = 1;
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.Render);
+                Assert.True(Assert.IsType<Border>(
+                    coachingPage.FindName("MapControlEmptyState")).IsVisible);
+
+                coachingTabs.SelectedIndex = 2;
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.Render);
+                Assert.True(Assert.IsType<Border>(
+                    coachingPage.FindName("MyPacksEmptyState")).IsVisible);
 
                 settingsButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
                 Assert.Equal(Visibility.Visible, settingsPage.Visibility);
@@ -103,6 +184,8 @@ public sealed class LocalizationServiceTests
             Assert.Equal("Game state simulator", localization.Get("Header.Title"));
             Assert.Equal("Home", localization.Get("Nav.Home"));
             Assert.Equal("Settings", localization.Get("Settings.Title"));
+            Assert.Equal("Coaching", localization.Get("Coaching.Title"));
+            Assert.Equal("Map control", localization.Get("Coaching.Tab.MapControl"));
             Assert.Equal("Interface language", localization.Get("Settings.Language.Label"));
             Assert.Equal("Available now", localization.Get("Home.Available.Title"));
             Assert.Equal("v0.2.0", AppVersion.Display);
@@ -114,6 +197,8 @@ public sealed class LocalizationServiceTests
             Assert.Equal("Симулятор игрового состояния", localization.Get("Header.Title"));
             Assert.Equal("Главная", localization.Get("Nav.Home"));
             Assert.Equal("Настройки", localization.Get("Settings.Title"));
+            Assert.Equal("Коучинг", localization.Get("Coaching.Title"));
+            Assert.Equal("Контроль карты", localization.Get("Coaching.Tab.MapControl"));
             Assert.Equal("Язык интерфейса", localization.Get("Settings.Language.Label"));
             Assert.Equal("Что работает сейчас", localization.Get("Home.Available.Title"));
             Assert.Equal("1 игрок", localization.Plural("Count.Player", 1));
@@ -145,5 +230,47 @@ public sealed class LocalizationServiceTests
         public Task<MatchSnapshotReadResult> ReadAsync(
             CancellationToken cancellationToken = default) =>
             Task.FromResult(MatchSnapshotReadResult.NoActiveMatch());
+    }
+
+    private static CoachPack CreateCoachPack() => new()
+    {
+        SchemaVersion = 1,
+        Id = "test.urgot-vs-sett",
+        Name = "Urgot vs Sett",
+        Patch = "test",
+        Rules =
+        [
+            new CoachRuleDefinition
+            {
+                Id = "early",
+                PlayerChampion = "Urgot",
+                OpponentChampion = "Sett",
+                MinimumLevel = 1,
+                MaximumLevel = 8,
+                PowerState = PowerState.Dangerous,
+                Priority = 1,
+                Title = "Test title",
+                Message = "Test message",
+                Source = "Test source"
+            }
+        ]
+    };
+
+    private static IEnumerable<T> FindVisualDescendants<T>(DependencyObject parent)
+        where T : DependencyObject
+    {
+        for (var index = 0; index < VisualTreeHelper.GetChildrenCount(parent); index++)
+        {
+            var child = VisualTreeHelper.GetChild(parent, index);
+            if (child is T match)
+            {
+                yield return match;
+            }
+
+            foreach (var descendant in FindVisualDescendants<T>(child))
+            {
+                yield return descendant;
+            }
+        }
     }
 }

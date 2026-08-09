@@ -11,6 +11,7 @@ public partial class MainWindow
     {
         Home,
         CurrentMatch,
+        Coaching,
         Settings
     }
 
@@ -21,6 +22,9 @@ public partial class MainWindow
 
     private void OpenCurrentMatchButton_Click(object sender, RoutedEventArgs e) =>
         NavigateTo(AppPage.CurrentMatch);
+
+    private void OpenCoachingButton_Click(object sender, RoutedEventArgs e) =>
+        NavigateTo(AppPage.Coaching);
 
     private void OpenSettingsButton_Click(object sender, RoutedEventArgs e) =>
         NavigateTo(AppPage.Settings);
@@ -36,6 +40,9 @@ public partial class MainWindow
         HomePage.Visibility = Visibility.Visible;
         HomeContentPage.Visibility = page == AppPage.Home ? Visibility.Visible : Visibility.Collapsed;
         CurrentMatchContentPage.Visibility = page == AppPage.CurrentMatch
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+        CoachingContentPage.Visibility = page == AppPage.Coaching
             ? Visibility.Visible
             : Visibility.Collapsed;
         SettingsContentPage.Visibility = page == AppPage.Settings ? Visibility.Visible : Visibility.Collapsed;
@@ -85,6 +92,7 @@ public partial class MainWindow
         var pageNameKey = _currentPage switch
         {
             AppPage.CurrentMatch => "Nav.CurrentMatch",
+            AppPage.Coaching => "Nav.Coaching",
             AppPage.Settings => "Nav.Settings",
             _ => "Nav.Home"
         };
@@ -99,20 +107,27 @@ public partial class MainWindow
     {
         var homeIsOpen = _currentPage == AppPage.Home;
         var matchIsOpen = _currentPage == AppPage.CurrentMatch;
+        var coachingIsOpen = _currentPage == AppPage.Coaching;
         var settingsAreOpen = _currentPage == AppPage.Settings;
 
         HomeNavigationButton.Style = (Style)FindResource(
             homeIsOpen ? "ShellNavButtonActive" : "ShellNavButton");
         CurrentMatchNavigationButton.Style = (Style)FindResource(
             matchIsOpen ? "ShellNavButtonActive" : "ShellNavButton");
+        CoachingNavigationButton.Style = (Style)FindResource(
+            coachingIsOpen ? "ShellNavButtonActive" : "ShellNavButton");
         SettingsNavigationButton.Style = (Style)FindResource(
             settingsAreOpen ? "ShellNavButtonActive" : "ShellNavButton");
 
         HomeNavigationIcon.Foreground = ToBrush(homeIsOpen ? "#50B7ED" : "#7F93AF");
         CurrentMatchNavigationIcon.Foreground = ToBrush(matchIsOpen ? "#50B7ED" : "#7F93AF");
+        CoachingNavigationIcon.Foreground = ToBrush(coachingIsOpen ? "#50B7ED" : "#7F93AF");
         SettingsNavigationIcon.Foreground = ToBrush(settingsAreOpen ? "#50B7ED" : "#7F93AF");
         HomeNavigationTextBlock.FontWeight = homeIsOpen ? FontWeights.SemiBold : FontWeights.Normal;
         CurrentMatchNavigationTextBlock.FontWeight = matchIsOpen
+            ? FontWeights.SemiBold
+            : FontWeights.Normal;
+        CoachingNavigationTextBlock.FontWeight = coachingIsOpen
             ? FontWeights.SemiBold
             : FontWeights.Normal;
         SettingsNavigationTextBlock.FontWeight = settingsAreOpen ? FontWeights.SemiBold : FontWeights.Normal;

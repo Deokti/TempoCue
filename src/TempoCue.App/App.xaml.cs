@@ -18,6 +18,7 @@ public partial class App : System.Windows.Application
     private CurrentMatchViewModel? _currentMatchViewModel;
     private HomeViewModel? _homeViewModel;
     private SettingsViewModel? _settingsViewModel;
+    private CoachingViewModel? _coachingViewModel;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -51,16 +52,21 @@ public partial class App : System.Windows.Application
         _settingsViewModel = new SettingsViewModel(
             LocalizationService.Instance,
             settingsService);
+        _coachingViewModel = new CoachingViewModel(
+            pack,
+            LocalizationService.Instance);
 
         MainWindow = new MainWindow(
             _currentMatchViewModel,
             _homeViewModel,
-            _settingsViewModel);
+            _settingsViewModel,
+            _coachingViewModel);
         MainWindow.Show();
     }
 
     protected override void OnExit(ExitEventArgs e)
     {
+        _coachingViewModel?.Dispose();
         _settingsViewModel?.Dispose();
         _homeViewModel?.Dispose();
         _currentMatchViewModel?.Dispose();

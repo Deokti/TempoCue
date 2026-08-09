@@ -181,4 +181,33 @@
   <data name="Dragon.Hextech" xml:space="preserve"><value>Хекстековый</value></data>
   <data name="Dragon.Chemtech" xml:space="preserve"><value>Химтековый</value></data>
   <data name="Dragon.Elder" xml:space="preserve"><value>Старший</value></data>
+  <data name="Coaching.Title" xml:space="preserve"><value>Коучинг</value></data>
+  <data name="Coaching.Summary" xml:space="preserve"><value>1 набор советов · 1 включён · 0 созданы вами</value></data>
+  <data name="Coaching.Import" xml:space="preserve"><value>Импортировать файл</value></data>
+  <data name="Coaching.Create" xml:space="preserve"><value>Создать набор советов</value></data>
+  <data name="Coaching.PlannedTooltip" xml:space="preserve"><value>Импорт и редактор правил появятся в следующей итерации.</value></data>
+  <data name="Coaching.Tab.Matchups" xml:space="preserve"><value>Матчапы</value></data>
+  <data name="Coaching.Tab.MapControl" xml:space="preserve"><value>Контроль карты</value></data>
+  <data name="Coaching.Tab.MyPacks" xml:space="preserve"><value>Мои наборы</value></data>
+  <data name="Coaching.Update.WarningTitle" xml:space="preserve"><value>Набор требует проверки патча</value></data>
+  <data name="Coaching.Update.WarningDescription" xml:space="preserve"><value>Метаданные набора: {0}. До проверки советы считаются черновыми.</value></data>
+  <data name="Coaching.Matchups.LibraryTitle" xml:space="preserve"><value>Установленные матчапы</value></data>
+  <data name="Coaching.Pack.Rules" xml:space="preserve"><value>{0} правил</value></data>
+  <data name="Coaching.Pack.Patch" xml:space="preserve"><value>Патч: {0}</value></data>
+  <data name="Coaching.Pack.DetailsTitle" xml:space="preserve"><value>Правила набора</value></data>
+  <data name="Coaching.Pack.VerificationRequired" xml:space="preserve"><value>Требует проверки</value></data>
+  <data name="Coaching.Rule.LevelRange" xml:space="preserve"><value>ур. {0}–{1}</value></data>
+  <data name="Coaching.Rule.LevelFrom" xml:space="preserve"><value>ур. {0}+</value></data>
+  <data name="Coaching.Rule.Source" xml:space="preserve"><value>Источник: {0}</value></data>
+  <data name="Coaching.Power.Dangerous" xml:space="preserve"><value>Опасно</value></data>
+  <data name="Coaching.Power.Cautious" xml:space="preserve"><value>Осторожно</value></data>
+  <data name="Coaching.Power.Playable" xml:space="preserve"><value>Можно играть</value></data>
+  <data name="Coaching.Power.Favorable" xml:space="preserve"><value>Преимущество</value></data>
+  <data name="Coaching.Empty.MapControl.Title" xml:space="preserve"><value>Наборов контроля карты пока нет</value></data>
+  <data name="Coaching.Empty.MapControl.Description" xml:space="preserve"><value>Здесь будут общие правила: пропажа соперников, перемещения лесника, тайминги объектов и другие события карты.</value></data>
+  <data name="Coaching.Empty.MyPacks.Title" xml:space="preserve"><value>Вы ещё не создавали наборы</value></data>
+  <data name="Coaching.Empty.MyPacks.Description" xml:space="preserve"><value>В следующей итерации здесь появятся черновики и наборы, созданные через визуальный редактор без ручного JSON.</value></data>
+  <data name="Coaching.Sharing.Title" xml:space="preserve"><value>Как будут распространяться наборы сообщества</value></data>
+  <data name="Coaching.Sharing.Description" xml:space="preserve"><value>Сначала — через безопасный импорт и экспорт версионированного файла Coach Pack. Позже этот же формат сможет использовать каталог сообщества.</value></data>
+  <data name="Coaching.Sharing.CommunityPlacement" xml:space="preserve"><value>Установленные наборы других авторов появятся в «Матчапах» или «Контроле карты». В «Моих наборах» останутся только созданные вами.</value></data>
 </root>

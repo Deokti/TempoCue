@@ -165,18 +165,22 @@
                                     </TextBlock>
                                 </Grid>
                             </Button>
-                            <Button Style="{StaticResource ShellNavButton}" IsEnabled="False">
+                            <Button x:Name="CoachingNavigationButton"
+                                    Style="{StaticResource ShellNavButton}"
+                                    Click="OpenCoachingButton_Click">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="24" />
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="⊕" FontSize="16" />
-                                    <TextBlock Grid.Column="1" Text="{localization:Loc Nav.Coaching}"
+                                    <TextBlock x:Name="CoachingNavigationIcon"
+                                               Text="⊕" FontSize="16" />
+                                    <TextBlock x:Name="CoachingNavigationTextBlock"
+                                               Grid.Column="1" Text="{localization:Loc Nav.Coaching}"
                                                FontSize="14" />
-                                    <TextBlock Grid.Column="2" Text="{localization:Loc Nav.Soon}"
-                                               FontSize="11" />
+                                    <TextBlock Grid.Column="2" Text="1"
+                                               Foreground="#6FC4EF" FontSize="11" />
                                 </Grid>
                             </Button>
                             <Button Style="{StaticResource ShellNavButton}" IsEnabled="False">
@@ -297,6 +301,11 @@
                     <views:SettingsView x:Name="SettingsContentPage"
                                         Grid.Row="1"
                                         Visibility="Collapsed" />
+
+                    <views:CoachingView x:Name="CoachingContentPage"
+                                        Grid.Row="1"
+                                        Visibility="Collapsed" />
+
                     <views:CurrentMatchView x:Name="CurrentMatchContentPage"
                                             Grid.RowSpan="2"
                                             Visibility="Collapsed" />
