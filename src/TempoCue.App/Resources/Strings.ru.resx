@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Window.Title" xml:space="preserve"><value>TempoCue — ассистент для League of Legends</value></data>
+  <data name="Header.Title" xml:space="preserve"><value>Симулятор игрового состояния</value></data>
+  <data name="Header.Subtitle" xml:space="preserve"><value>Техническая версия · симулятор и подключение к активному матчу</value></data>
+  <data name="Header.CoachPackLoaded" xml:space="preserve"><value>COACH PACK ЗАГРУЖЕН</value></data>
+  <data name="Language.Tooltip" xml:space="preserve"><value>Язык интерфейса</value></data>
+  <data name="Connection.WaitingMatch" xml:space="preserve"><value>ОЖИДАНИЕ МАТЧА</value></data>
+  <data name="Connection.PollingEverySecond" xml:space="preserve"><value>Проверка Live Client Data каждую 1 с</value></data>
+  <data name="Connection.NextPoll" xml:space="preserve"><value>Следующий запрос через 1 с</value></data>
+  <data name="Connection.MatchConnected" xml:space="preserve"><value>МАТЧ ПОДКЛЮЧЕН</value></data>
+  <data name="Connection.ActivePlayerMissing" xml:space="preserve"><value>{0} · активный игрок не найден</value></data>
+  <data name="Connection.PlayerSummary" xml:space="preserve"><value>{0} · {1} · {2}</value></data>
+  <data name="Connection.DataError" xml:space="preserve"><value>ОШИБКА ДАННЫХ</value></data>
+  <data name="MatchState.Title" xml:space="preserve"><value>Состояние матча</value></data>
+  <data name="MatchState.PlayerChampion" xml:space="preserve"><value>ВАШ ЧЕМПИОН</value></data>
+  <data name="MatchState.LaneOpponent" xml:space="preserve"><value>ПРОТИВНИК НА ЛИНИИ</value></data>
+  <data name="MatchState.Level" xml:space="preserve"><value>УРОВЕНЬ</value></data>
+  <data name="MatchState.Items" xml:space="preserve"><value>ПРЕДМЕТЫ</value></data>
+  <data name="Item.BlackCleaver" xml:space="preserve"><value>Чёрная секира · ID 3071</value></data>
+  <data name="Action.CheckSimulation" xml:space="preserve"><value>Проверить симуляцию</value></data>
+  <data name="Action.CheckLiveMatch" xml:space="preserve"><value>Проверить активный матч</value></data>
+  <data name="Preset.EarlyLane" xml:space="preserve"><value>Начало линии</value></data>
+  <data name="Preset.PowerSpike" xml:space="preserve"><value>Пик силы</value></data>
+  <data name="Guide.Disclaimer" xml:space="preserve"><value>Советы основаны на гайде GoliathGames и требуют проверки на актуальном патче.</value></data>
+  <data name="Advice.Active" xml:space="preserve"><value>Активный совет</value></data>
+  <data name="Advice.SelectState" xml:space="preserve"><value>Выберите состояние матча</value></data>
+  <data name="Advice.EngineReady" xml:space="preserve"><value>Движок загрузил Coach Pack и готов проверить первое матчап-правило.</value></data>
+  <data name="Advice.Waiting.Title" xml:space="preserve"><value>Ожидание активного матча</value></data>
+  <data name="Advice.Waiting.Message" xml:space="preserve"><value>TempoCue опрашивает локальный Riot API каждую секунду. После загрузки на карту здесь появится совет для фактического состояния игры.</value></data>
+  <data name="Advice.Waiting.Source" xml:space="preserve"><value>Ручной симулятор слева остаётся доступен для проверки Coach Pack без матча.</value></data>
+  <data name="Advice.NoRule.Title" xml:space="preserve"><value>Подходящее правило не найдено</value></data>
+  <data name="Advice.NoRule.Message" xml:space="preserve"><value>В загруженном Coach Pack пока нет совета для выбранного состояния.</value></data>
+  <data name="Advice.NoRule.Source" xml:space="preserve"><value>Добавление новых матчапов станет отдельным этапом.</value></data>
+  <data name="Power.Waiting" xml:space="preserve"><value>ОЖИДАНИЕ</value></data>
+  <data name="Power.NoRule" xml:space="preserve"><value>НЕТ ПРАВИЛА</value></data>
+  <data name="Power.Dangerous" xml:space="preserve"><value>ОПАСНО</value></data>
+  <data name="Power.Cautious" xml:space="preserve"><value>ОСТОРОЖНО</value></data>
+  <data name="Power.Playable" xml:space="preserve"><value>МОЖНО ИГРАТЬ</value></data>
+  <data name="Power.Favorable" xml:space="preserve"><value>ПРЕИМУЩЕСТВО</value></data>
+  <data name="Diagnostics.LogTab" xml:space="preserve"><value>ЖУРНАЛ</value></data>
+  <data name="Diagnostics.EventLog" xml:space="preserve"><value>Журнал событий</value></data>
+  <data name="Diagnostics.ActiveJsonTab" xml:space="preserve"><value>JSON АКТИВНОГО МАТЧА</value></data>
+  <data name="Diagnostics.JsonWaiting" xml:space="preserve"><value>Ожидание активного матча · запрос каждые 1 с</value></data>
+  <data name="Diagnostics.CopyJson" xml:space="preserve"><value>Копировать JSON</value></data>
+  <data name="Diagnostics.JsonPlaceholder" xml:space="preserve"><value>JSON появится после подключения к активному матчу.</value></data>
+  <data name="Diagnostics.JsonCopied" xml:space="preserve"><value>JSON скопирован в буфер обмена</value></data>
+  <data name="Diagnostics.RuleEmpty" xml:space="preserve"><value>ПРАВИЛО: —</value></data>
+  <data name="Diagnostics.RuleLine" xml:space="preserve"><value>ПРАВИЛО: {0} · ПРИОРИТЕТ: {1}</value></data>
+  <data name="Json.Updated" xml:space="preserve"><value>Обновлено {0} · {1} · период 1 с</value></data>
+  <data name="Json.MatchUnavailable" xml:space="preserve"><value>Активный матч недоступен · ниже сохранён последний успешный JSON</value></data>
+  <data name="Json.LastRequestError" xml:space="preserve"><value>Ошибка последнего запроса · {0}</value></data>
+  <data name="Error.Timeout" xml:space="preserve"><value>Riot API не ответил за 3 секунды</value></data>
+  <data name="Error.JsonRead" xml:space="preserve"><value>Не удалось прочитать JSON: {0}</value></data>
+  <data name="Error.InvalidData" xml:space="preserve"><value>Данные активного матча неполны</value></data>
+  <data name="Event.ManualRiotCheck" xml:space="preserve"><value>Ручная проверка Riot API</value></data>
+  <data name="Event.ManualCheck" xml:space="preserve"><value>Ручная проверка</value></data>
+  <data name="Event.PresetEarlyLane" xml:space="preserve"><value>Пресет: начало линии</value></data>
+  <data name="Event.PresetPowerSpike" xml:space="preserve"><value>Пресет: пик силы</value></data>
+  <data name="Log.MatchEnded" xml:space="preserve"><value>{0}  Riot API · активный матч завершён или соединение потеряно</value></data>
+  <data name="Log.MatchupUnknown" xml:space="preserve"><value>{0}  {1} · матчап не определён</value></data>
+  <data name="Log.Entry" xml:space="preserve"><value>{0}  {1} · {2} vs {3} · ур. {4} · {5} → {6}</value></data>
+  <data name="Log.NoItems" xml:space="preserve"><value>без предметов</value></data>
+  <data name="Log.NoRule" xml:space="preserve"><value>нет правила</value></data>
+  <data name="Count.Player.One" xml:space="preserve"><value>{0} игрок</value></data>
+  <data name="Count.Player.Few" xml:space="preserve"><value>{0} игрока</value></data>
+  <data name="Count.Player.Many" xml:space="preserve"><value>{0} игроков</value></data>
+  <data name="Count.Item.One" xml:space="preserve"><value>{0} предмет</value></data>
+  <data name="Count.Item.Few" xml:space="preserve"><value>{0} предмета</value></data>
+  <data name="Count.Item.Many" xml:space="preserve"><value>{0} предметов</value></data>
+  <data name="Nav.Home" xml:space="preserve"><value>Главная</value></data>
+  <data name="Nav.CurrentMatch" xml:space="preserve"><value>Текущий матч</value></data>
+  <data name="Nav.Coaching" xml:space="preserve"><value>Коучинг</value></data>
+  <data name="Nav.History" xml:space="preserve"><value>История матчей</value></data>
+  <data name="Nav.Settings" xml:space="preserve"><value>Настройки</value></data>
+  <data name="Nav.Soon" xml:space="preserve"><value>СКОРО</value></data>
+  <data name="Nav.BackHome" xml:space="preserve"><value>← Главная</value></data>
+  <data name="Nav.Collapse" xml:space="preserve"><value>Свернуть меню</value></data>
+  <data name="Settings.Title" xml:space="preserve"><value>Настройки</value></data>
+  <data name="Settings.Subtitle" xml:space="preserve"><value>Все данные обрабатываются локально. Ничего не отправляется наружу.</value></data>
+  <data name="Settings.Language.Section" xml:space="preserve"><value>Язык</value></data>
+  <data name="Settings.Language.Label" xml:space="preserve"><value>Язык интерфейса</value></data>
+  <data name="Settings.Language.Description" xml:space="preserve"><value>Переключает интерфейс и системные подписи целиком. Наборы советов остаются на языке автора.</value></data>
+  <data name="Home.Engine" xml:space="preserve"><value>Движок анализа</value></data>
+  <data name="Home.Engine.Waiting" xml:space="preserve"><value>Ожидает матч</value></data>
+  <data name="Home.Engine.Loading" xml:space="preserve"><value>Загрузка матча</value></data>
+  <data name="Home.Engine.Connected" xml:space="preserve"><value>Получает данные</value></data>
+  <data name="Home.Engine.Error" xml:space="preserve"><value>Ошибка данных</value></data>
+  <data name="Home.GameTime" xml:space="preserve"><value>Время</value></data>
+  <data name="Home.Waiting.Title" xml:space="preserve"><value>Ожидаем активный матч</value></data>
+  <data name="Home.Waiting.Description" xml:space="preserve"><value>Запусти тренировочную или обычную игру. TempoCue подключится автоматически после загрузки на карту.</value></data>
+  <data name="Home.Connected.Title" xml:space="preserve"><value>Матч обнаружен</value></data>
+  <data name="Home.Connected.Description" xml:space="preserve"><value>Поступают реальные данные для {0}. Для анализа матчапа доступно: {1}.</value></data>
+  <data name="Home.Error.Title" xml:space="preserve"><value>Не удалось прочитать данные матча</value></data>
+  <data name="Home.Error.Description" xml:space="preserve"><value>TempoCue продолжит автоматические попытки. Подробности: {0}</value></data>
+  <data name="Home.CheckAgain" xml:space="preserve"><value>Проверить снова</value></data>
+  <data name="Home.OpenMatch" xml:space="preserve"><value>Открыть текущий матч</value></data>
+  <data name="Home.Readiness.Title" xml:space="preserve"><value>Готовность системы</value></data>
+  <data name="Home.Readiness.Refresh" xml:space="preserve"><value>Обновление данных</value></data>
+  <data name="Home.Readiness.Match" xml:space="preserve"><value>Активный матч</value></data>
+  <data name="Home.Readiness.Hint" xml:space="preserve"><value>Ничего нажимать не нужно: локальный адрес проверяется каждую секунду.</value></data>
+  <data name="Home.Status.Waiting" xml:space="preserve"><value>ожидание</value></data>
+  <data name="Home.Status.Connected" xml:space="preserve"><value>подключено</value></data>
+  <data name="Home.Status.Error" xml:space="preserve"><value>ошибка</value></data>
+  <data name="Home.Status.NotFound" xml:space="preserve"><value>не найден</value></data>
+  <data name="Home.Status.Active" xml:space="preserve"><value>идёт</value></data>
+  <data name="Home.Pack.Title" xml:space="preserve"><value>Активный набор советов</value></data>
+  <data name="Home.Pack.Rules" xml:space="preserve"><value>Загружены 3 фазы матчапа</value></data>
+  <data name="Home.Pack.PatchWarning" xml:space="preserve"><value>Требует проверки на актуальном патче</value></data>
+  <data name="Home.Pack.Test" xml:space="preserve"><value>Открыть текущий матч</value></data>
+  <data name="Home.Available.Title" xml:space="preserve"><value>Что работает сейчас</value></data>
+  <data name="Home.Available.LiveData" xml:space="preserve"><value>Подключение к Live Client Data</value></data>
+  <data name="Home.Available.Participants" xml:space="preserve"><value>Все участники матча</value></data>
+  <data name="Home.Available.Matchup" xml:space="preserve"><value>Определение матчапа на линии</value></data>
+  <data name="Home.Available.Advice" xml:space="preserve"><value>Советы Urgot против Sett</value></data>
+  <data name="Home.Available.Json" xml:space="preserve"><value>Исходный JSON матча</value></data>
+  <data name="Home.Available.Future" xml:space="preserve"><value>Анализ карты, история, отчёты и оверлей появятся в следующих версиях.</value></data>
+  <data name="Current.Status.Connected" xml:space="preserve"><value>ДАННЫЕ МАТЧА ПОЛУЧЕНЫ</value></data>
+  <data name="Current.Status.ConnectedDetails" xml:space="preserve"><value>Live Client Data подключён · {0}</value></data>
+  <data name="Current.Status.Waiting" xml:space="preserve"><value>ОЖИДАНИЕ МАТЧА</value></data>
+  <data name="Current.Status.Loading" xml:space="preserve"><value>ЗАГРУЗКА МАТЧА</value></data>
+  <data name="Current.Status.LoadingDetails" xml:space="preserve"><value>League of Legends запущена · ожидаем готовность Live Client Data</value></data>
+  <data name="Current.Status.Timeout" xml:space="preserve"><value>НЕТ ОТВЕТА</value></data>
+  <data name="Current.Status.InvalidData" xml:space="preserve"><value>ОШИБКА ДАННЫХ</value></data>
+  <data name="Current.Status.Error" xml:space="preserve"><value>ОШИБКА ПОДКЛЮЧЕНИЯ</value></data>
+  <data name="Current.Status.WaitingDetails" xml:space="preserve"><value>Проверяем Live Client Data каждую секунду</value></data>
+  <data name="Current.Header.Time" xml:space="preserve"><value>Время</value></data>
+  <data name="Current.Player.Level" xml:space="preserve"><value>{0} · {1} уровень</value></data>
+  <data name="Current.Player.Waiting" xml:space="preserve"><value>Ожидаем активного игрока</value></data>
+  <data name="Current.Player.Against" xml:space="preserve"><value>Против</value></data>
+  <data name="Current.Phase.Level" xml:space="preserve"><value>Уровень {0}</value></data>
+  <data name="Current.Phase.LevelWithoutCleaver" xml:space="preserve"><value>Уровень {0} без «Чёрной секиры»</value></data>
+  <data name="Current.Phase.LevelWithCleaver" xml:space="preserve"><value>Уровень {0} с «Чёрной секирой»</value></data>
+  <data name="Current.Advice.Matchup" xml:space="preserve"><value>Совет по матчапу</value></data>
+  <data name="Current.Advice.WhyNow" xml:space="preserve"><value>Почему сейчас</value></data>
+  <data name="Current.Advice.LevelReason" xml:space="preserve"><value>Совет выбран по реальному уровню {0} и предметам активного игрока.</value></data>
+  <data name="Current.Advice.WaitingReason" xml:space="preserve"><value>После подключения совет будет выбран по реальному уровню и предметам активного игрока.</value></data>
+  <data name="Current.Objective.Title" xml:space="preserve"><value>Ближайшая цель</value></data>
+  <data name="Current.Objective.Dragon" xml:space="preserve"><value>Дракон</value></data>
+  <data name="Current.Objective.Pending" xml:space="preserve"><value>Тип и таймер появятся после отдельной логики игровых объектов.</value></data>
+  <data name="Current.Events.AvailableFacts" xml:space="preserve"><value>Доступные факты</value></data>
+  <data name="Current.Events.AvailableFacts.Description" xml:space="preserve"><value>Смерти чемпионов и взятые драконы поступают напрямую из Riot Live Client Data.</value></data>
+  <data name="Current.Tab.Rosters" xml:space="preserve"><value>Составы</value></data>
+  <data name="Current.Tab.Events" xml:space="preserve"><value>События</value></data>
+  <data name="Current.Tab.Notifications" xml:space="preserve"><value>Уведомления</value></data>
+  <data name="Current.Team.Allies" xml:space="preserve"><value>Ваша команда</value></data>
+  <data name="Current.Team.Enemies" xml:space="preserve"><value>Противники</value></data>
+  <data name="Current.Rosters.Empty" xml:space="preserve"><value>Составы появятся после подключения к матчу.</value></data>
+  <data name="Current.Participant.Alive" xml:space="preserve"><value>жив</value></data>
+  <data name="Current.Participant.Dead" xml:space="preserve"><value>возрождение через {0} с</value></data>
+  <data name="Current.CreepScore.Approximate" xml:space="preserve"><value>≈{0} CS</value></data>
+  <data name="Current.Participant.You" xml:space="preserve"><value>вы · {0}</value></data>
+  <data name="Current.Participant.State" xml:space="preserve"><value>{0} · {1}</value></data>
+  <data name="Current.Events.Empty" xml:space="preserve"><value>Смерти и взятые драконы появятся здесь по ходу матча.</value></data>
+  <data name="Current.Event.Kill" xml:space="preserve"><value>{0} убил {1}</value></data>
+  <data name="Current.Event.Death" xml:space="preserve"><value>{0} погиб</value></data>
+  <data name="Current.Event.UnknownChampion" xml:space="preserve"><value>неизвестный чемпион</value></data>
+  <data name="Current.Event.Dragon.Allies" xml:space="preserve"><value>Ваша команда забрала дракона: {0}</value></data>
+  <data name="Current.Event.Dragon.Enemies" xml:space="preserve"><value>Противники забрали дракона: {0}</value></data>
+  <data name="Current.Event.Dragon.UnknownTeam" xml:space="preserve"><value>Убит дракон: {0}</value></data>
+  <data name="Current.Event.RiotFact" xml:space="preserve"><value>Факт · Riot Live Client Data</value></data>
+  <data name="Current.Notifications.Overlay" xml:space="preserve"><value>Игровой оверлей</value></data>
+  <data name="Current.Notifications.UrgentSound" xml:space="preserve"><value>Звук только для срочных событий</value></data>
+  <data name="Current.Notifications.Description" xml:space="preserve"><value>Настройки станут доступны вместе с первой рабочей версией оверлея. Сейчас элементы отключены, чтобы не обещать неработающее поведение.</value></data>
+  <data name="Current.Planned" xml:space="preserve"><value>в разработке</value></data>
+  <data name="Position.Top" xml:space="preserve"><value>Верхняя линия</value></data>
+  <data name="Position.Jungle" xml:space="preserve"><value>Лес</value></data>
+  <data name="Position.Middle" xml:space="preserve"><value>Центральная линия</value></data>
+  <data name="Position.Bottom" xml:space="preserve"><value>Нижняя линия</value></data>
+  <data name="Position.Support" xml:space="preserve"><value>Поддержка</value></data>
+  <data name="Position.Unknown" xml:space="preserve"><value>Позиция не определена</value></data>
+  <data name="Dragon.Unknown" xml:space="preserve"><value>неизвестный тип</value></data>
+  <data name="Dragon.Air" xml:space="preserve"><value>Облачный</value></data>
+  <data name="Dragon.Earth" xml:space="preserve"><value>Горный</value></data>
+  <data name="Dragon.Fire" xml:space="preserve"><value>Инфернальный</value></data>
+  <data name="Dragon.Water" xml:space="preserve"><value>Океанический</value></data>
+  <data name="Dragon.Hextech" xml:space="preserve"><value>Хекстековый</value></data>
+  <data name="Dragon.Chemtech" xml:space="preserve"><value>Химтековый</value></data>
+  <data name="Dragon.Elder" xml:space="preserve"><value>Старший</value></data>
+</root>
