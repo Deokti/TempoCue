@@ -14,6 +14,8 @@ internal sealed record LiveClientAllGameDataDto
     public IReadOnlyList<LiveClientPlayerDto> AllPlayers { get; init; } = [];
 
     public required LiveClientGameDataDto GameData { get; init; }
+
+    public LiveClientEventDataDto Events { get; init; } = new();
 }
 
 internal sealed record LiveClientActivePlayerDto
@@ -31,6 +33,8 @@ internal sealed record LiveClientGameDataDto
 internal sealed record LiveClientPlayerDto
 {
     public string? RiotId { get; init; }
+
+    public string? RiotIdGameName { get; init; }
 
     public string? SummonerName { get; init; }
 
@@ -55,6 +59,19 @@ internal sealed record LiveClientPlayerDto
     public double RespawnTimer { get; init; }
 
     public bool IsBot { get; init; }
+
+    public LiveClientScoresDto Scores { get; init; } = new();
+}
+
+internal sealed record LiveClientScoresDto
+{
+    public int Kills { get; init; }
+
+    public int Deaths { get; init; }
+
+    public int Assists { get; init; }
+
+    public int CreepScore { get; init; }
 }
 
 internal sealed record LiveClientItemDto
@@ -62,4 +79,26 @@ internal sealed record LiveClientItemDto
     // В JSON Riot используется написание itemID, поэтому имя задаётся явно.
     [JsonPropertyName("itemID")]
     public int ItemId { get; init; }
+}
+
+internal sealed record LiveClientEventDataDto
+{
+    public IReadOnlyList<LiveClientEventDto> Events { get; init; } = [];
+}
+
+internal sealed record LiveClientEventDto
+{
+    public int EventId { get; init; }
+
+    public required string EventName { get; init; }
+
+    public double EventTime { get; init; }
+
+    public string? KillerName { get; init; }
+
+    public string? VictimName { get; init; }
+
+    public IReadOnlyList<string> Assisters { get; init; } = [];
+
+    public string? DragonType { get; init; }
 }

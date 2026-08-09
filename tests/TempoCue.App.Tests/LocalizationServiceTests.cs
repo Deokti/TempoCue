@@ -3,6 +3,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using TempoCue.App.Localization;
+using TempoCue.App.ViewModels;
+using TempoCue.Application;
+using TempoCue.Core;
 
 namespace TempoCue.App.Tests;
 
@@ -20,16 +23,32 @@ public sealed class LocalizationServiceTests
                 var localization = LocalizationService.Instance;
                 localization.SetLanguage("ru-RU");
 
-                var window = new MainWindow();
+                var session = new ActiveMatchSession(
+                    new WaitingSnapshotSource(),
+                    new MatchupCoach([]),
+                    TimeSpan.FromSeconds(1));
+                var window = new MainWindow(
+                    new CurrentMatchViewModel(session, localization));
+                window.Show();
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.Loaded);
                 Assert.Equal("TempoCue — ассистент для League of Legends", window.Title);
                 Assert.Equal(1280, window.Width);
                 Assert.Equal(720, window.Height);
                 Assert.Equal(ResizeMode.NoResize, window.ResizeMode);
                 Assert.Equal(WindowStyle.None, window.WindowStyle);
+                var currentMatchPage = Assert.IsType<TempoCue.App.Views.CurrentMatchView>(
+                    window.FindName("CurrentMatchContentPage"));
+                var currentMatchButton = Assert.IsType<Button>(
+                    window.FindName("CurrentMatchNavigationButton"));
                 var settingsPage = Assert.IsType<Grid>(window.FindName("SettingsContentPage"));
                 var settingsButton = Assert.IsType<Button>(window.FindName("SettingsNavigationButton"));
                 var settingsTitle = Assert.IsType<TextBlock>(window.FindName("SettingsTitleTextBlock"));
                 Assert.NotNull(window.FindName("LanguageComboBox"));
+
+                currentMatchButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                Assert.Equal(Visibility.Visible, currentMatchPage.Visibility);
 
                 settingsButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
                 Assert.Equal(Visibility.Visible, settingsPage.Visibility);
@@ -107,5 +126,12 @@ public sealed class LocalizationServiceTests
         string expected)
     {
         Assert.Equal(expected, LocalizationService.NormalizeLanguageCode(languageCode));
+    }
+
+    private sealed class WaitingSnapshotSource : IMatchSnapshotSource
+    {
+        public Task<MatchSnapshotReadResult> ReadAsync(
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(MatchSnapshotReadResult.NoActiveMatch());
     }
 }

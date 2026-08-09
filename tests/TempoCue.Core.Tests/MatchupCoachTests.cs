@@ -35,6 +35,7 @@ public sealed class MatchupCoachTests
         Assert.NotNull(advice);
         Assert.Equal(PowerState.Cautious, advice.PowerState);
         Assert.Equal("waiting-item", advice.RuleId);
+        Assert.Contains(BlackCleaverItemId, advice.ExcludedItemIds);
     }
 
     [Fact]
@@ -47,6 +48,7 @@ public sealed class MatchupCoachTests
         Assert.NotNull(advice);
         Assert.Equal(PowerState.Playable, advice.PowerState);
         Assert.Equal("power-spike", advice.RuleId);
+        Assert.Contains(BlackCleaverItemId, advice.RequiredItemIds);
     }
 
     [Fact]
@@ -186,6 +188,34 @@ public sealed class MatchupCoachTests
 
         // Лучше честно не выдать совет, чем назначить случайного врага оппонентом на линии.
         Assert.Null(matchup);
+    }
+
+    [Fact]
+    public void MatchupResolver_InfersTopForOnlyUnknownTeammate()
+    {
+        var match = CreateFullMatch(level: 1);
+        match = match with
+        {
+            Players = match.Players
+                .Select(player => player.ParticipantId switch
+                {
+                    "active-player" => player with
+                    {
+                        ChampionName = "Anivia",
+                        Position = PlayerPosition.Unknown
+                    },
+                    "ally-support" => player with { Position = PlayerPosition.Bottom },
+                    "enemy-top" => player with { ChampionName = "Teemo" },
+                    _ => player
+                })
+                .ToArray()
+        };
+
+        var matchup = MatchupResolver.Resolve(match);
+
+        Assert.NotNull(matchup);
+        Assert.Equal(PlayerPosition.Top, matchup.Player.Position);
+        Assert.Equal("Teemo", matchup.Opponent.ChampionName);
     }
 
     private static MatchupCoach CreateCoach()

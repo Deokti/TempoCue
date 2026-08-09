@@ -36,10 +36,11 @@ public partial class MainWindow
     {
         _currentPage = page;
 
-        var shellIsVisible = page is AppPage.Home or AppPage.Settings;
-        HomePage.Visibility = shellIsVisible ? Visibility.Visible : Visibility.Collapsed;
-        MatchPage.Visibility = page == AppPage.CurrentMatch ? Visibility.Visible : Visibility.Collapsed;
+        HomePage.Visibility = Visibility.Visible;
         HomeContentPage.Visibility = page == AppPage.Home ? Visibility.Visible : Visibility.Collapsed;
+        CurrentMatchContentPage.Visibility = page == AppPage.CurrentMatch
+            ? Visibility.Visible
+            : Visibility.Collapsed;
         SettingsContentPage.Visibility = page == AppPage.Settings ? Visibility.Visible : Visibility.Collapsed;
 
         UpdateShellNavigation();
@@ -100,34 +101,7 @@ public partial class MainWindow
     /// </summary>
     private void RefreshLocalizedContent()
     {
-        SetManualSimulationEnabled(isEnabled: !_isLiveMatchConnected);
-
-        switch (_connectionDisplayMode)
-        {
-            case ConnectionDisplayMode.Connected when _latestLiveSnapshot is not null:
-                RenderLiveSnapshot(_latestLiveSnapshot);
-                break;
-            case ConnectionDisplayMode.Error:
-                RenderConnectionProblem();
-                break;
-            default:
-                RenderWaitingConnection();
-                break;
-        }
-
-        if (_connectionDisplayMode != ConnectionDisplayMode.Connected)
-        {
-            if (_lastAdviceMatch is null)
-            {
-                ShowInitialWaitingAdvice();
-            }
-            else
-            {
-                ShowAdvice(_coach.GetBestAdvice(_lastAdviceMatch));
-            }
-        }
-
-        UpdateTitleBarContext();
+        RenderHomeFromCurrentMatch();
     }
 
     private void UpdateTitleBarContext(string? gameTimeText = null)
@@ -147,16 +121,24 @@ public partial class MainWindow
 
     private void UpdateShellNavigation()
     {
+        var homeIsOpen = _currentPage == AppPage.Home;
+        var matchIsOpen = _currentPage == AppPage.CurrentMatch;
         var settingsAreOpen = _currentPage == AppPage.Settings;
 
         HomeNavigationButton.Style = (Style)FindResource(
-            settingsAreOpen ? "ShellNavButton" : "ShellNavButtonActive");
+            homeIsOpen ? "ShellNavButtonActive" : "ShellNavButton");
+        CurrentMatchNavigationButton.Style = (Style)FindResource(
+            matchIsOpen ? "ShellNavButtonActive" : "ShellNavButton");
         SettingsNavigationButton.Style = (Style)FindResource(
             settingsAreOpen ? "ShellNavButtonActive" : "ShellNavButton");
 
-        HomeNavigationIcon.Foreground = ToBrush(settingsAreOpen ? "#7F93AF" : "#50B7ED");
+        HomeNavigationIcon.Foreground = ToBrush(homeIsOpen ? "#50B7ED" : "#7F93AF");
+        CurrentMatchNavigationIcon.Foreground = ToBrush(matchIsOpen ? "#50B7ED" : "#7F93AF");
         SettingsNavigationIcon.Foreground = ToBrush(settingsAreOpen ? "#50B7ED" : "#7F93AF");
-        HomeNavigationTextBlock.FontWeight = settingsAreOpen ? FontWeights.Normal : FontWeights.SemiBold;
+        HomeNavigationTextBlock.FontWeight = homeIsOpen ? FontWeights.SemiBold : FontWeights.Normal;
+        CurrentMatchNavigationTextBlock.FontWeight = matchIsOpen
+            ? FontWeights.SemiBold
+            : FontWeights.Normal;
         SettingsNavigationTextBlock.FontWeight = settingsAreOpen ? FontWeights.SemiBold : FontWeights.Normal;
     }
 

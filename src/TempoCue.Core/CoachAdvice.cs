@@ -9,10 +9,14 @@ namespace TempoCue.Core;
 /// <param name="PowerState">Оценка текущей силы в матчапе.</param>
 /// <param name="Priority">Приоритет правила среди других подходящих правил.</param>
 /// <param name="Source">Источник и пояснение происхождения совета.</param>
+/// <param name="RequiredItemIds">Предметы, наличие которых потребовало сработавшее правило.</param>
+/// <param name="ExcludedItemIds">Предметы, отсутствие которых потребовало сработавшее правило.</param>
 public sealed record CoachAdvice(
     string RuleId,
     string Title,
     string Message,
     PowerState PowerState,
     int Priority,
-    string Source);
+    string Source,
+    IReadOnlyList<int> RequiredItemIds,
+    IReadOnlyList<int> ExcludedItemIds);

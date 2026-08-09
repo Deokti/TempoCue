@@ -87,6 +87,7 @@
   <data name="Settings.Language.Description" xml:space="preserve"><value>Переключает интерфейс и системные подписи целиком. Наборы советов остаются на языке автора.</value></data>
   <data name="Home.Engine" xml:space="preserve"><value>Движок анализа</value></data>
   <data name="Home.Engine.Waiting" xml:space="preserve"><value>Ожидает матч</value></data>
+  <data name="Home.Engine.Loading" xml:space="preserve"><value>Загрузка матча</value></data>
   <data name="Home.Engine.Connected" xml:space="preserve"><value>Получает данные</value></data>
   <data name="Home.Engine.Error" xml:space="preserve"><value>Ошибка данных</value></data>
   <data name="Home.GameTime" xml:space="preserve"><value>Время</value></data>
@@ -110,7 +111,7 @@
   <data name="Home.Pack.Title" xml:space="preserve"><value>Активный набор советов</value></data>
   <data name="Home.Pack.Rules" xml:space="preserve"><value>Загружены 3 фазы матчапа</value></data>
   <data name="Home.Pack.PatchWarning" xml:space="preserve"><value>Требует проверки на актуальном патче</value></data>
-  <data name="Home.Pack.Test" xml:space="preserve"><value>Открыть симулятор</value></data>
+  <data name="Home.Pack.Test" xml:space="preserve"><value>Открыть текущий матч</value></data>
   <data name="Home.Available.Title" xml:space="preserve"><value>Что работает сейчас</value></data>
   <data name="Home.Available.LiveData" xml:space="preserve"><value>Подключение к Live Client Data</value></data>
   <data name="Home.Available.Participants" xml:space="preserve"><value>Все участники матча</value></data>
@@ -118,4 +119,66 @@
   <data name="Home.Available.Advice" xml:space="preserve"><value>Советы Urgot против Sett</value></data>
   <data name="Home.Available.Json" xml:space="preserve"><value>Исходный JSON матча</value></data>
   <data name="Home.Available.Future" xml:space="preserve"><value>Анализ карты, история, отчёты и оверлей появятся в следующих версиях.</value></data>
+  <data name="Current.Status.Connected" xml:space="preserve"><value>ДАННЫЕ МАТЧА ПОЛУЧЕНЫ</value></data>
+  <data name="Current.Status.ConnectedDetails" xml:space="preserve"><value>Live Client Data подключён · {0}</value></data>
+  <data name="Current.Status.Waiting" xml:space="preserve"><value>ОЖИДАНИЕ МАТЧА</value></data>
+  <data name="Current.Status.Loading" xml:space="preserve"><value>ЗАГРУЗКА МАТЧА</value></data>
+  <data name="Current.Status.LoadingDetails" xml:space="preserve"><value>League of Legends запущена · ожидаем готовность Live Client Data</value></data>
+  <data name="Current.Status.Timeout" xml:space="preserve"><value>НЕТ ОТВЕТА</value></data>
+  <data name="Current.Status.InvalidData" xml:space="preserve"><value>ОШИБКА ДАННЫХ</value></data>
+  <data name="Current.Status.Error" xml:space="preserve"><value>ОШИБКА ПОДКЛЮЧЕНИЯ</value></data>
+  <data name="Current.Status.WaitingDetails" xml:space="preserve"><value>Проверяем Live Client Data каждую секунду</value></data>
+  <data name="Current.Header.Time" xml:space="preserve"><value>Время</value></data>
+  <data name="Current.Player.Level" xml:space="preserve"><value>{0} · {1} уровень</value></data>
+  <data name="Current.Player.Waiting" xml:space="preserve"><value>Ожидаем активного игрока</value></data>
+  <data name="Current.Player.Against" xml:space="preserve"><value>Против</value></data>
+  <data name="Current.Phase.Level" xml:space="preserve"><value>Уровень {0}</value></data>
+  <data name="Current.Phase.LevelWithoutCleaver" xml:space="preserve"><value>Уровень {0} без «Чёрной секиры»</value></data>
+  <data name="Current.Phase.LevelWithCleaver" xml:space="preserve"><value>Уровень {0} с «Чёрной секирой»</value></data>
+  <data name="Current.Advice.Matchup" xml:space="preserve"><value>Совет по матчапу</value></data>
+  <data name="Current.Advice.WhyNow" xml:space="preserve"><value>Почему сейчас</value></data>
+  <data name="Current.Advice.LevelReason" xml:space="preserve"><value>Совет выбран по реальному уровню {0} и предметам активного игрока.</value></data>
+  <data name="Current.Advice.WaitingReason" xml:space="preserve"><value>После подключения совет будет выбран по реальному уровню и предметам активного игрока.</value></data>
+  <data name="Current.Objective.Title" xml:space="preserve"><value>Ближайшая цель</value></data>
+  <data name="Current.Objective.Dragon" xml:space="preserve"><value>Дракон</value></data>
+  <data name="Current.Objective.Pending" xml:space="preserve"><value>Тип и таймер появятся после отдельной логики игровых объектов.</value></data>
+  <data name="Current.Events.AvailableFacts" xml:space="preserve"><value>Доступные факты</value></data>
+  <data name="Current.Events.AvailableFacts.Description" xml:space="preserve"><value>Смерти чемпионов и взятые драконы поступают напрямую из Riot Live Client Data.</value></data>
+  <data name="Current.Tab.Rosters" xml:space="preserve"><value>Составы</value></data>
+  <data name="Current.Tab.Events" xml:space="preserve"><value>События</value></data>
+  <data name="Current.Tab.Notifications" xml:space="preserve"><value>Уведомления</value></data>
+  <data name="Current.Team.Allies" xml:space="preserve"><value>Ваша команда</value></data>
+  <data name="Current.Team.Enemies" xml:space="preserve"><value>Противники</value></data>
+  <data name="Current.Rosters.Empty" xml:space="preserve"><value>Составы появятся после подключения к матчу.</value></data>
+  <data name="Current.Participant.Alive" xml:space="preserve"><value>жив</value></data>
+  <data name="Current.Participant.Dead" xml:space="preserve"><value>возрождение через {0} с</value></data>
+  <data name="Current.CreepScore.Approximate" xml:space="preserve"><value>≈{0} CS</value></data>
+  <data name="Current.Participant.You" xml:space="preserve"><value>вы · {0}</value></data>
+  <data name="Current.Participant.State" xml:space="preserve"><value>{0} · {1}</value></data>
+  <data name="Current.Events.Empty" xml:space="preserve"><value>Смерти и взятые драконы появятся здесь по ходу матча.</value></data>
+  <data name="Current.Event.Kill" xml:space="preserve"><value>{0} убил {1}</value></data>
+  <data name="Current.Event.Death" xml:space="preserve"><value>{0} погиб</value></data>
+  <data name="Current.Event.UnknownChampion" xml:space="preserve"><value>неизвестный чемпион</value></data>
+  <data name="Current.Event.Dragon.Allies" xml:space="preserve"><value>Ваша команда забрала дракона: {0}</value></data>
+  <data name="Current.Event.Dragon.Enemies" xml:space="preserve"><value>Противники забрали дракона: {0}</value></data>
+  <data name="Current.Event.Dragon.UnknownTeam" xml:space="preserve"><value>Убит дракон: {0}</value></data>
+  <data name="Current.Event.RiotFact" xml:space="preserve"><value>Факт · Riot Live Client Data</value></data>
+  <data name="Current.Notifications.Overlay" xml:space="preserve"><value>Игровой оверлей</value></data>
+  <data name="Current.Notifications.UrgentSound" xml:space="preserve"><value>Звук только для срочных событий</value></data>
+  <data name="Current.Notifications.Description" xml:space="preserve"><value>Настройки станут доступны вместе с первой рабочей версией оверлея. Сейчас элементы отключены, чтобы не обещать неработающее поведение.</value></data>
+  <data name="Current.Planned" xml:space="preserve"><value>в разработке</value></data>
+  <data name="Position.Top" xml:space="preserve"><value>Верхняя линия</value></data>
+  <data name="Position.Jungle" xml:space="preserve"><value>Лес</value></data>
+  <data name="Position.Middle" xml:space="preserve"><value>Центральная линия</value></data>
+  <data name="Position.Bottom" xml:space="preserve"><value>Нижняя линия</value></data>
+  <data name="Position.Support" xml:space="preserve"><value>Поддержка</value></data>
+  <data name="Position.Unknown" xml:space="preserve"><value>Позиция не определена</value></data>
+  <data name="Dragon.Unknown" xml:space="preserve"><value>неизвестный тип</value></data>
+  <data name="Dragon.Air" xml:space="preserve"><value>Облачный</value></data>
+  <data name="Dragon.Earth" xml:space="preserve"><value>Горный</value></data>
+  <data name="Dragon.Fire" xml:space="preserve"><value>Инфернальный</value></data>
+  <data name="Dragon.Water" xml:space="preserve"><value>Океанический</value></data>
+  <data name="Dragon.Hextech" xml:space="preserve"><value>Хекстековый</value></data>
+  <data name="Dragon.Chemtech" xml:space="preserve"><value>Химтековый</value></data>
+  <data name="Dragon.Elder" xml:space="preserve"><value>Старший</value></data>
 </root>

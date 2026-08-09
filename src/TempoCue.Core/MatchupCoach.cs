@@ -56,7 +56,9 @@ public sealed class MatchupCoach
                 rule.Message,
                 rule.PowerState,
                 rule.Priority,
-                rule.Source);
+                rule.Source,
+                rule.RequiredItemIds,
+                rule.ExcludedItemIds);
     }
 
     private static bool Matches(CoachRuleDefinition rule, MatchupContext matchup)

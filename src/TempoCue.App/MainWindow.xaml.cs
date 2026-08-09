@@ -1,7 +1,6 @@
-using System.IO;
 using System.Windows;
 using TempoCue.App.Localization;
-using TempoCue.Core;
+using TempoCue.App.ViewModels;
 
 namespace TempoCue.App;
 
@@ -11,21 +10,16 @@ namespace TempoCue.App;
 /// </summary>
 public partial class MainWindow : Window
 {
-    private readonly MatchupCoach _coach;
+    private readonly CurrentMatchViewModel _currentMatchViewModel;
     private readonly LocalizationService _localization = LocalizationService.Instance;
 
-    public MainWindow()
+    public MainWindow(CurrentMatchViewModel currentMatchViewModel)
     {
+        ArgumentNullException.ThrowIfNull(currentMatchViewModel);
+        _currentMatchViewModel = currentMatchViewModel;
+
         InitializeComponent();
-
-        var packPath = Path.Combine(
-            AppContext.BaseDirectory,
-            "Assets",
-            "CoachPacks",
-            "urgot-vs-sett.json");
-
-        var pack = CoachPackLoader.LoadFromFile(packPath);
-        _coach = new MatchupCoach(pack.Rules);
+        DataContext = _currentMatchViewModel;
 
         // Названия языков показаны на самих языках: «Русский» и «English».
         LanguageComboBox.SelectedValue = _localization.CurrentLanguageCode;
@@ -38,9 +32,8 @@ public partial class MainWindow : Window
 
     private void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
-        ShowInitialWaitingAdvice();
-
-        // Опрос живёт столько же, сколько окно, и штатно отменяется при закрытии.
-        _livePollingTask ??= PollLiveMatchAsync(_livePollingCancellation.Token);
+        _currentMatchViewModel.PropertyChanged += CurrentMatchViewModel_PropertyChanged;
+        _currentMatchViewModel.Start();
+        RenderHomeFromCurrentMatch();
     }
 }

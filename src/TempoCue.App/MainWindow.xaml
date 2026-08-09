@@ -2,6 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:localization="clr-namespace:TempoCue.App.Localization"
+        xmlns:views="clr-namespace:TempoCue.App.Views"
         Title="{localization:Loc Window.Title}"
         Width="1280"
         Height="720"
@@ -269,7 +270,8 @@
                                                FontSize="14" FontWeight="SemiBold" />
                                 </Grid>
                             </Button>
-                            <Button Style="{StaticResource ShellNavButton}"
+                            <Button x:Name="CurrentMatchNavigationButton"
+                                    Style="{StaticResource ShellNavButton}"
                                     Click="OpenCurrentMatchButton_Click">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -277,8 +279,10 @@
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="⊙" FontSize="16" />
-                                    <TextBlock Grid.Column="1" Text="{localization:Loc Nav.CurrentMatch}"
+                                    <TextBlock x:Name="CurrentMatchNavigationIcon"
+                                               Text="⊙" FontSize="16" />
+                                    <TextBlock x:Name="CurrentMatchNavigationTextBlock"
+                                               Grid.Column="1" Text="{localization:Loc Nav.CurrentMatch}"
                                                FontSize="14" />
                                     <TextBlock x:Name="HomeMatchNavBadgeTextBlock"
                                                Grid.Column="2" Text="—" Foreground="#5E7390"
@@ -641,309 +645,13 @@
                             </Border>
                         </StackPanel>
                     </Grid>
+
+                    <views:CurrentMatchView x:Name="CurrentMatchContentPage"
+                                            Grid.RowSpan="2"
+                                            Visibility="Collapsed" />
                 </Grid>
             </Grid>
 
-            <!-- Техническая страница сохраняется до отдельного переноса экрана матча. -->
-            <Grid x:Name="MatchPage" Grid.Row="1" Margin="28" Visibility="Collapsed">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="18" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
-            <StackPanel>
-                <TextBlock Text="TEMPOCUE"
-                           Foreground="#58A6E7"
-                           FontSize="12"
-                           FontWeight="Bold" />
-                <TextBlock Text="{localization:Loc Header.Title}"
-                           Foreground="#F6F9FC"
-                           FontSize="28"
-                           FontWeight="SemiBold"
-                           Margin="0,5,0,0" />
-                <TextBlock Text="{localization:Loc Header.Subtitle}"
-                           Foreground="#8195AE"
-                           FontSize="13"
-                           Margin="0,5,0,0" />
-            </StackPanel>
-
-            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
-                <Button Content="{localization:Loc Nav.BackHome}"
-                        Style="{StaticResource SecondaryButton}"
-                        Height="34"
-                        Margin="0,0,10,0"
-                        Click="OpenHomeButton_Click" />
-                <Border Background="#17263A"
-                        BorderBrush="#294969"
-                        BorderThickness="1"
-                        CornerRadius="20"
-                        Padding="14,7">
-                    <TextBlock Text="{localization:Loc Header.CoachPackLoaded}"
-                               Foreground="#76C7A1"
-                               FontSize="11"
-                               FontWeight="Bold" />
-                </Border>
-
-                <Border x:Name="LiveConnectionBorder"
-                        Background="#243550"
-                        BorderBrush="#344A68"
-                        BorderThickness="1"
-                        CornerRadius="12"
-                        Padding="14,7"
-                        Margin="10,0,0,0">
-                    <StackPanel>
-                        <TextBlock x:Name="LiveConnectionTextBlock"
-                                   Text="{localization:Loc Connection.WaitingMatch}"
-                                   Foreground="#AFC0D4"
-                                   FontSize="11"
-                                   FontWeight="Bold" />
-                        <TextBlock x:Name="LiveConnectionDetailsTextBlock"
-                                   Text="{localization:Loc Connection.PollingEverySecond}"
-                                   Foreground="#71849D"
-                                   FontSize="10"
-                                   Margin="0,2,0,0" />
-                    </StackPanel>
-                </Border>
-            </StackPanel>
-        </Grid>
-
-        <!-- Рабочая область: параметры матча слева, совет и журнал справа. -->
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="390" />
-                <ColumnDefinition Width="18" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <!-- Временная панель ручного ввода будет заменена данными активного матча. -->
-            <Border Grid.Column="0" Style="{StaticResource PanelBorder}">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel>
-                        <TextBlock Text="{localization:Loc MatchState.Title}" Style="{StaticResource SectionTitle}" />
-
-                        <TextBlock Text="{localization:Loc MatchState.PlayerChampion}" Style="{StaticResource FieldLabel}" />
-                        <ComboBox x:Name="PlayerChampionComboBox" Margin="0,0,0,16">
-                            <ComboBoxItem Content="Urgot" IsSelected="True" />
-                        </ComboBox>
-
-                        <TextBlock Text="{localization:Loc MatchState.LaneOpponent}" Style="{StaticResource FieldLabel}" />
-                        <ComboBox x:Name="OpponentChampionComboBox" Margin="0,0,0,16">
-                            <ComboBoxItem Content="Sett" IsSelected="True" />
-                            <ComboBoxItem Content="Garen" />
-                        </ComboBox>
-
-                        <Grid Margin="0,0,0,6">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="{localization:Loc MatchState.Level}" Style="{StaticResource FieldLabel}" />
-                            <TextBlock x:Name="LevelTextBlock"
-                                       Grid.Column="1"
-                                       Text="1"
-                                       Foreground="#58A6E7"
-                                       FontSize="18"
-                                       FontWeight="Bold" />
-                        </Grid>
-
-                        <Slider x:Name="LevelSlider"
-                                Minimum="1"
-                                Maximum="18"
-                                Value="1"
-                                TickFrequency="1"
-                                IsSnapToTickEnabled="True"
-                                ValueChanged="LevelSlider_ValueChanged"
-                                Margin="0,0,0,20" />
-
-                        <TextBlock Text="{localization:Loc MatchState.Items}" Style="{StaticResource FieldLabel}" />
-                        <Border Background="#0E1728"
-                                BorderBrush="#344A68"
-                                BorderThickness="1"
-                                CornerRadius="8"
-                                Padding="12"
-                                Margin="0,0,0,20">
-                            <CheckBox x:Name="BlackCleaverCheckBox"
-                                      Content="{localization:Loc Item.BlackCleaver}" />
-                        </Border>
-
-                        <Button x:Name="EvaluateButton"
-                                Content="{localization:Loc Action.CheckSimulation}"
-                                Style="{StaticResource PrimaryButton}"
-                                Click="EvaluateButton_Click"
-                                Margin="0,0,0,10" />
-
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="8" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Button x:Name="EarlyLaneButton"
-                                    Content="{localization:Loc Preset.EarlyLane}"
-                                    Style="{StaticResource SecondaryButton}"
-                                    Click="EarlyLaneButton_Click" />
-                            <Button x:Name="PowerSpikeButton"
-                                    Grid.Column="2"
-                                    Content="{localization:Loc Preset.PowerSpike}"
-                                    Style="{StaticResource SecondaryButton}"
-                                    Click="PowerSpikeButton_Click" />
-                        </Grid>
-
-                        <TextBlock Text="{localization:Loc Guide.Disclaimer}"
-                                   Foreground="#71849D"
-                                   FontSize="11"
-                                   TextWrapping="Wrap"
-                                   Margin="0,18,0,0" />
-                    </StackPanel>
-                </ScrollViewer>
-            </Border>
-
-            <!-- Правая колонка показывает результат работы движка правил. -->
-            <Grid Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="18" />
-                    <RowDefinition Height="250" />
-                </Grid.RowDefinitions>
-
-                <Border Grid.Row="0" Style="{StaticResource PanelBorder}">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-
-                        <Grid Grid.Row="0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="{localization:Loc Advice.Active}" Style="{StaticResource SectionTitle}" />
-                            <Border x:Name="PowerBadgeBorder"
-                                    Grid.Column="1"
-                                    Background="#3B2630"
-                                    CornerRadius="14"
-                                    Padding="12,5"
-                                    Margin="10,0,0,14">
-                                <TextBlock x:Name="PowerStateTextBlock"
-                                           Text="{localization:Loc Power.Dangerous}"
-                                           Foreground="#FF8E9D"
-                                           FontSize="11"
-                                           FontWeight="Bold" />
-                            </Border>
-                        </Grid>
-
-                        <TextBlock x:Name="AdviceTitleTextBlock"
-                                   Grid.Row="1"
-                                   Text="{localization:Loc Advice.SelectState}"
-                                   Foreground="#F5F8FC"
-                                   FontSize="24"
-                                   FontWeight="SemiBold"
-                                   TextWrapping="Wrap"
-                                   Margin="0,8,0,12" />
-
-                        <TextBlock x:Name="AdviceMessageTextBlock"
-                                   Grid.Row="2"
-                                   Text="{localization:Loc Advice.EngineReady}"
-                                   Foreground="#C7D4E3"
-                                   FontSize="16"
-                                   LineHeight="25"
-                                   TextWrapping="Wrap" />
-
-                        <StackPanel Grid.Row="3" Margin="0,18,0,0">
-                            <TextBlock x:Name="RuleIdTextBlock"
-                                       Text="{localization:Loc Diagnostics.RuleEmpty}"
-                                       Foreground="#5E7694"
-                                       FontSize="11"
-                                       FontWeight="SemiBold" />
-                            <TextBlock x:Name="AdviceSourceTextBlock"
-                                       Text=""
-                                       Foreground="#7E91A8"
-                                       FontSize="11"
-                                       TextWrapping="Wrap"
-                                       Margin="0,5,0,0" />
-                        </StackPanel>
-                    </Grid>
-                </Border>
-
-                <!-- Временные диагностические вкладки позволяют одновременно видеть
-                     решения движка и исходный ответ Riot во время первого теста. -->
-                <TabControl Grid.Row="2">
-                    <TabItem Header="{localization:Loc Diagnostics.LogTab}">
-                        <Grid Background="#121C2F" Margin="16">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-                            <TextBlock Text="{localization:Loc Diagnostics.EventLog}"
-                                       Foreground="#F4F7FB"
-                                       FontSize="16"
-                                       FontWeight="SemiBold"
-                                       Margin="0,0,0,10" />
-                            <ListBox x:Name="EventLogListBox"
-                                     Grid.Row="1"
-                                     Background="#0E1728"
-                                     Foreground="#AFC0D4"
-                                     BorderBrush="#263750"
-                                     FontFamily="Cascadia Mono, Consolas"
-                                     FontSize="12"
-                                     Padding="8" />
-                        </Grid>
-                    </TabItem>
-
-                    <TabItem Header="{localization:Loc Diagnostics.ActiveJsonTab}" IsSelected="True">
-                        <Grid Background="#121C2F" Margin="16">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-                            <Grid Margin="0,0,0,8">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock x:Name="LiveJsonInfoTextBlock"
-                                           Text="{localization:Loc Diagnostics.JsonWaiting}"
-                                           Foreground="#91A4BD"
-                                           FontSize="11"
-                                           VerticalAlignment="Center"
-                                           TextTrimming="CharacterEllipsis" />
-                                <Button Grid.Column="1"
-                                        Content="{localization:Loc Diagnostics.CopyJson}"
-                                        Style="{StaticResource CompactButton}"
-                                        Click="CopyRawJsonButton_Click"
-                                        Margin="10,0,0,0" />
-                            </Grid>
-                            <TextBox x:Name="RawJsonTextBox"
-                                     Grid.Row="1"
-                                     Text="{localization:Loc Diagnostics.JsonPlaceholder}"
-                                     IsReadOnly="True"
-                                     AcceptsReturn="True"
-                                     AcceptsTab="True"
-                                     TextWrapping="NoWrap"
-                                     VerticalScrollBarVisibility="Auto"
-                                     HorizontalScrollBarVisibility="Auto"
-                                     Background="#09111E"
-                                     Foreground="#B8C7D9"
-                                     BorderBrush="#263750"
-                                     FontFamily="Cascadia Mono, Consolas"
-                                     FontSize="11"
-                                     Padding="10" />
-                        </Grid>
-                    </TabItem>
-                </TabControl>
-            </Grid>
-                </Grid>
-            </Grid>
         </Grid>
     </Border>
 </Window>

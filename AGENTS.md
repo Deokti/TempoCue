@@ -18,7 +18,7 @@ TempoCue — локальный Windows-ассистент для League of Lege
 ## Архитектурные границы
 
 - `docs/architecture.md` — канонический документ архитектуры. Перед новой функцией определи владельца поведения, поток данных и допустимые зависимости по этому документу.
-- Текущее направление зависимостей: `TempoCue.App -> TempoCue.Riot -> TempoCue.Core`; `TempoCue.App` также напрямую использует `TempoCue.Core`. Целевое направление с `TempoCue.Application` и composition root описано в `docs/architecture.md`; переход выполняется постепенно.
+- Текущее направление зависимостей: `TempoCue.Application -> TempoCue.Core`, `TempoCue.Riot -> TempoCue.Application/TempoCue.Core`, `TempoCue.App -> TempoCue.Application/TempoCue.Riot/TempoCue.Core`. Граф объектов активного матча создаётся в `App.OnStartup`; остальные функции переходят к этой схеме постепенно по `docs/architecture.md`.
 - `TempoCue.Core` не должен зависеть от WPF, `TempoCue.App`, Riot DTO, HTTP или деталей отображения. Доменная логика должна работать без запущенной игры и интерфейса.
 - `TempoCue.Riot` не должен зависеть от WPF или `TempoCue.App`. Изолируй формат Riot API в DTO и преобразователях; не распространяй внешние DTO в Core и UI.
 - В `TempoCue.App` оставляй представление и координацию, специфичную для UI. Новые правила выбора советов, определения матчапа и интерпретации состояния размещай в Core, межсистемные сценарии — в целевом Application, а разбор Riot JSON — в Riot.

@@ -39,4 +39,16 @@ public sealed record PlayerState
 
     /// <summary>Показывает, управляется ли участник ботом.</summary>
     public bool IsBot { get; init; }
+
+    /// <summary>Количество убийств в текущем матче.</summary>
+    public int Kills { get; init; }
+
+    /// <summary>Количество смертей в текущем матче.</summary>
+    public int Deaths { get; init; }
+
+    /// <summary>Количество содействий в текущем матче.</summary>
+    public int Assists { get; init; }
+
+    /// <summary>Количество добитых существ.</summary>
+    public int CreepScore { get; init; }
 }

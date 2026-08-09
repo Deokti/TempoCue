@@ -1,5 +1,7 @@
 using System.Net;
+using System.Collections.Concurrent;
 using System.Text;
+using TempoCue.Application;
 using TempoCue.Core;
 
 namespace TempoCue.Riot.Tests;
@@ -30,6 +32,7 @@ public sealed class LiveClientDataClientTests
                   "items": [
                     { "itemID": 3071 }
                   ],
+                  "scores": { "kills": 2, "deaths": 1, "assists": 3, "creepScore": 91 },
                   "isDead": false,
                   "respawnTimer": 0,
                   "isBot": false
@@ -43,6 +46,7 @@ public sealed class LiveClientDataClientTests
                   "position": "UTILITY",
                   "level": 8,
                   "items": [],
+                  "scores": { "kills": 0, "deaths": 2, "assists": 5, "creepScore": 11 },
                   "isDead": false,
                   "respawnTimer": 0,
                   "isBot": false
@@ -56,6 +60,7 @@ public sealed class LiveClientDataClientTests
                   "position": "TOP",
                   "level": 9,
                   "items": [],
+                  "scores": { "kills": 1, "deaths": 2, "assists": 0, "creepScore": 80 },
                   "isDead": true,
                   "respawnTimer": 12.5,
                   "isBot": false
@@ -67,18 +72,45 @@ public sealed class LiveClientDataClientTests
                 "mapName": "Map11"
               },
               "events": {
-                "Events": []
+                "Events": [
+                  {
+                    "EventID": 7,
+                    "EventName": "ChampionKill",
+                    "EventTime": 612.5,
+                    "KillerName": "UrgotPlayer",
+                    "VictimName": "SettPlayer",
+                    "Assisters": ["AllySupport"]
+                  },
+                  {
+                    "EventID": 8,
+                    "EventName": "DragonKill",
+                    "EventTime": 620,
+                    "DragonType": "Earth",
+                    "KillerName": "UrgotPlayer"
+                  }
+                ]
               }
             }
             """;
 
-        var handler = new StubHttpMessageHandler(json);
+        var handler = new StubHttpMessageHandler(
+            json,
+            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["UrgotPlayer#TEST"] =
+                    """{"kills":2,"deaths":1,"assists":3,"creepScore":94}""",
+                ["AllySupport#TEST"] =
+                    """{"kills":0,"deaths":2,"assists":5,"creepScore":13}""",
+                ["SettPlayer#TEST"] =
+                    """{"kills":1,"deaths":2,"assists":0,"creepScore":84}"""
+            });
         using var httpClient = new HttpClient(handler);
         using var client = new LiveClientDataClient(httpClient);
 
         var snapshot = await client.GetSnapshotAsync();
 
-        Assert.Equal(LiveClientDataClient.AllGameDataEndpoint, handler.LastRequestUri);
+        Assert.Contains(LiveClientDataClient.AllGameDataEndpoint, handler.RequestedUris);
+        Assert.Equal(4, handler.RequestedUris.Count);
         Assert.Equal(645.25, snapshot.Match.GameTimeSeconds);
         Assert.Equal("UrgotPlayer#TEST", snapshot.Match.ActivePlayerId);
         Assert.Equal(3, snapshot.Match.Players.Count);
@@ -88,14 +120,32 @@ public sealed class LiveClientDataClientTests
         Assert.Equal("Urgot", activePlayer.ChampionName);
         Assert.Equal(PlayerPosition.Top, activePlayer.Position);
         Assert.Contains(3071, activePlayer.ItemIds);
+        Assert.Equal(2, activePlayer.Kills);
+        Assert.Equal(1, activePlayer.Deaths);
+        Assert.Equal(3, activePlayer.Assists);
+        Assert.Equal(94, activePlayer.CreepScore);
 
         var support = Assert.Single(snapshot.Match.GetAllies());
         Assert.Equal(PlayerPosition.Support, support.Position);
+        Assert.Equal(13, support.CreepScore);
 
         var sett = Assert.Single(snapshot.Match.GetEnemies());
         Assert.Equal("Sett", sett.ChampionName);
+        Assert.Equal(84, sett.CreepScore);
         Assert.True(sett.IsDead);
         Assert.Equal(12.5, sett.RespawnTimerSeconds);
+
+        Assert.Equal(2, snapshot.Events.Count);
+        var dragon = snapshot.Events[0];
+        Assert.Equal(MatchEventKind.DragonKill, dragon.Kind);
+        Assert.Equal(DragonType.Earth, dragon.DragonType);
+        Assert.Equal("UrgotPlayer#TEST", dragon.KillerParticipantId);
+
+        var championKill = snapshot.Events[1];
+        Assert.Equal(MatchEventKind.ChampionKill, championKill.Kind);
+        Assert.Equal("UrgotPlayer#TEST", championKill.KillerParticipantId);
+        Assert.Equal("SettPlayer#TEST", championKill.VictimParticipantId);
+        Assert.Equal(["AllySupport#TEST"], championKill.AssisterParticipantIds);
 
         Assert.Contains(Environment.NewLine, snapshot.RawJson);
         Assert.Contains("\"allPlayers\"", snapshot.RawJson);
@@ -143,21 +193,128 @@ public sealed class LiveClientDataClientTests
             () => client.GetSnapshotAsync());
 
         Assert.Contains("активного игрока", exception.Message);
+
+        var result = await client.ReadAsync();
+        Assert.Equal(MatchSnapshotReadStatus.InvalidData, result.Status);
+        Assert.Null(result.Snapshot);
     }
 
-    private sealed class StubHttpMessageHandler(string responseJson) : HttpMessageHandler
+    [Fact]
+    public async Task GetSnapshotAsync_UsesGeneralScoresWhenDetailedRequestIsUnavailable()
     {
-        public Uri? LastRequestUri { get; private set; }
+        const string json = """
+            {
+              "activePlayer": {
+                "riotId": "AatroxPlayer#TEST",
+                "summonerName": "AatroxPlayer"
+              },
+              "allPlayers": [
+                {
+                  "riotId": "AatroxPlayer#TEST",
+                  "summonerName": "AatroxPlayer",
+                  "championName": "Aatrox",
+                  "team": "ORDER",
+                  "position": "TOP",
+                  "level": 7,
+                  "scores": { "kills": 0, "deaths": 0, "assists": 0, "creepScore": 53 }
+                },
+                {
+                  "riotId": "TeemoBot#BOT",
+                  "summonerName": "TeemoBot",
+                  "championName": "Teemo",
+                  "team": "CHAOS",
+                  "position": "TOP",
+                  "level": 7,
+                  "scores": { "kills": 0, "deaths": 0, "assists": 0, "creepScore": 48 }
+                }
+              ],
+              "gameData": { "gameTime": 420 }
+            }
+            """;
+        var handler = new StubHttpMessageHandler(
+            json,
+            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["AatroxPlayer#TEST"] =
+                    """{"kills":0,"deaths":0,"assists":0,"creepScore":55}"""
+            });
+        using var httpClient = new HttpClient(handler);
+        using var client = new LiveClientDataClient(httpClient);
+
+        var snapshot = await client.GetSnapshotAsync();
+
+        Assert.Equal(55, snapshot.Match.GetActivePlayer()?.CreepScore);
+        Assert.Equal(48, Assert.Single(snapshot.Match.GetEnemies()).CreepScore);
+    }
+
+    [Fact]
+    public async Task ReadAsync_ReturnsGameLoadingWhenProcessIsRunning()
+    {
+        var handler = new StubHttpMessageHandler(
+            "{}",
+            allGameStatusCode: HttpStatusCode.ServiceUnavailable);
+        using var httpClient = new HttpClient(handler);
+        using var client = new LiveClientDataClient(httpClient, static () => true);
+
+        var result = await client.ReadAsync();
+
+        Assert.Equal(MatchSnapshotReadStatus.GameLoading, result.Status);
+        Assert.Null(result.Snapshot);
+    }
+
+    [Fact]
+    public async Task ReadAsync_ReturnsNoMatchWhenGameProcessIsAbsent()
+    {
+        var handler = new StubHttpMessageHandler(
+            "{}",
+            allGameStatusCode: HttpStatusCode.ServiceUnavailable);
+        using var httpClient = new HttpClient(handler);
+        using var client = new LiveClientDataClient(httpClient, static () => false);
+
+        var result = await client.ReadAsync();
+
+        Assert.Equal(MatchSnapshotReadStatus.NoActiveMatch, result.Status);
+        Assert.Null(result.Snapshot);
+    }
+
+    private sealed class StubHttpMessageHandler(
+        string responseJson,
+        IReadOnlyDictionary<string, string>? scoreResponses = null,
+        HttpStatusCode allGameStatusCode = HttpStatusCode.OK) : HttpMessageHandler
+    {
+        public ConcurrentBag<Uri> RequestedUris { get; } = [];
 
         protected override Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
-            LastRequestUri = request.RequestUri;
+            var requestUri = request.RequestUri
+                ?? throw new InvalidOperationException("Тестовый запрос не содержит URI.");
+            RequestedUris.Add(requestUri);
+
+            var content = responseJson;
+            var isPlayerScoresRequest = requestUri.AbsolutePath.EndsWith(
+                    "/playerscores",
+                    StringComparison.OrdinalIgnoreCase);
+            if (!isPlayerScoresRequest && allGameStatusCode != HttpStatusCode.OK)
+            {
+                return Task.FromResult(new HttpResponseMessage(allGameStatusCode));
+            }
+
+            if (isPlayerScoresRequest)
+            {
+                var encodedRiotId = requestUri.Query["?riotId=".Length..];
+                var riotId = Uri.UnescapeDataString(encodedRiotId);
+                if (scoreResponses is null
+                    || !scoreResponses.TryGetValue(riotId, out content))
+                {
+                    return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound));
+                }
+            }
 
             var response = new HttpResponseMessage(HttpStatusCode.OK)
             {
-                Content = new StringContent(responseJson, Encoding.UTF8, "application/json")
+                Content = new StringContent(content, Encoding.UTF8, "application/json")
             };
 
             return Task.FromResult(response);

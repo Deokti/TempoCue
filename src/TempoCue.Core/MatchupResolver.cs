@@ -21,16 +21,23 @@ public static class MatchupResolver
         }
 
         var enemies = match.GetEnemies();
+        var activePosition = PlayerPositionResolver.Resolve(match, activePlayer);
 
-        if (activePlayer.Position != PlayerPosition.Unknown)
+        if (activePosition != PlayerPosition.Unknown)
         {
             var enemiesOnSamePosition = enemies
-                .Where(enemy => enemy.Position == activePlayer.Position)
+                .Select(enemy => enemy with
+                {
+                    Position = PlayerPositionResolver.Resolve(match, enemy)
+                })
+                .Where(enemy => enemy.Position == activePosition)
                 .ToArray();
 
             if (enemiesOnSamePosition.Length == 1)
             {
-                return new MatchupContext(activePlayer, enemiesOnSamePosition[0]);
+                return new MatchupContext(
+                    activePlayer with { Position = activePosition },
+                    enemiesOnSamePosition[0]);
             }
         }
 
@@ -38,4 +45,5 @@ public static class MatchupResolver
             ? new MatchupContext(activePlayer, enemies[0])
             : null;
     }
+
 }
