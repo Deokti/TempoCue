@@ -5,6 +5,7 @@ using TempoCue.Core;
 
 namespace TempoCue.App.Tests;
 
+[Collection(LocalizationCollection.Name)]
 public sealed class CurrentMatchViewModelTests
 {
     [Fact]
@@ -89,10 +90,13 @@ public sealed class CurrentMatchViewModelTests
                 new SnapshotSource(snapshot),
                 coach,
                 TimeSpan.FromSeconds(1));
-            var viewModel = new CurrentMatchViewModel(session, localization);
+            using var viewModel = new CurrentMatchViewModel(session, localization);
+            var completedUpdates = 0;
+            viewModel.StateUpdated += (_, _) => completedUpdates++;
 
             await viewModel.RefreshAsync();
 
+            Assert.Equal(1, completedUpdates);
             Assert.Equal(MatchSnapshotReadStatus.Success, viewModel.Status);
             Assert.Equal("10:10", viewModel.GameTime);
             Assert.Equal("Urgot", viewModel.ActiveChampion);
@@ -155,7 +159,7 @@ public sealed class CurrentMatchViewModelTests
                 new SnapshotSource(snapshot),
                 new MatchupCoach([]),
                 TimeSpan.FromSeconds(1));
-            var viewModel = new CurrentMatchViewModel(session, localization);
+            using var viewModel = new CurrentMatchViewModel(session, localization);
 
             await viewModel.RefreshAsync();
 
@@ -202,7 +206,7 @@ public sealed class CurrentMatchViewModelTests
                 new SnapshotSource(snapshot),
                 new MatchupCoach([]),
                 TimeSpan.FromSeconds(1));
-            var viewModel = new CurrentMatchViewModel(session, localization);
+            using var viewModel = new CurrentMatchViewModel(session, localization);
 
             await viewModel.RefreshAsync();
 
@@ -234,7 +238,7 @@ public sealed class CurrentMatchViewModelTests
                 new ResultSource(MatchSnapshotReadResult.GameLoading()),
                 new MatchupCoach([]),
                 TimeSpan.FromSeconds(1));
-            var viewModel = new CurrentMatchViewModel(session, localization);
+            using var viewModel = new CurrentMatchViewModel(session, localization);
 
             await viewModel.RefreshAsync();
 
@@ -254,14 +258,14 @@ public sealed class CurrentMatchViewModelTests
         TeamSide team,
         PlayerPosition position,
         int creepScore = 0) => new()
-    {
-        ParticipantId = id,
-        ChampionName = champion,
-        Team = team,
-        Position = position,
-        Level = 1,
-        CreepScore = creepScore
-    };
+        {
+            ParticipantId = id,
+            ChampionName = champion,
+            Team = team,
+            Position = position,
+            Level = 1,
+            CreepScore = creepScore
+        };
 
     private sealed class SnapshotSource(MatchSnapshot snapshot) : IMatchSnapshotSource
     {

@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using TempoCue.App.Localization;
 using TempoCue.Application;
 using TempoCue.Core;
@@ -10,7 +11,7 @@ namespace TempoCue.App.ViewModels;
 /// Состояние экрана текущего матча. Получает готовые обновления Application,
 /// формирует представление и не знает о Riot DTO или WPF-контролах.
 /// </summary>
-public sealed class CurrentMatchViewModel : ObservableObject
+public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
 {
     private const int BlackCleaverItemId = 3071;
 
@@ -41,6 +42,7 @@ public sealed class CurrentMatchViewModel : ObservableObject
     private PowerState? _powerState;
     private bool _hasParticipants;
     private bool _hasEvents;
+    private bool _isDisposed;
 
     public CurrentMatchViewModel(
         ActiveMatchSession session,
@@ -57,6 +59,12 @@ public sealed class CurrentMatchViewModel : ObservableObject
     public ObservableCollection<ParticipantViewModel> Enemies { get; } = [];
 
     public ObservableCollection<MatchEventViewModel> Events { get; } = [];
+
+    /// <summary>
+    /// Сообщает оболочке, что очередной снимок полностью применён.
+    /// Обычные PropertyChanged продолжают обслуживать WPF binding самого экрана.
+    /// </summary>
+    public event EventHandler? StateUpdated;
 
     public MatchSnapshotReadStatus Status
     {
@@ -188,6 +196,7 @@ public sealed class CurrentMatchViewModel : ObservableObject
 
     public void Start()
     {
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         _watchTask ??= WatchAsync(_sessionCancellation.Token);
     }
 
@@ -201,6 +210,7 @@ public sealed class CurrentMatchViewModel : ObservableObject
 
     public async Task RefreshAsync()
     {
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         if (_sessionCancellation.IsCancellationRequested)
         {
             return;
@@ -208,6 +218,19 @@ public sealed class CurrentMatchViewModel : ObservableObject
 
         var update = await _session.RefreshAsync(_sessionCancellation.Token);
         ApplyUpdate(update);
+    }
+
+    public void Dispose()
+    {
+        if (_isDisposed)
+        {
+            return;
+        }
+
+        _isDisposed = true;
+        _localization.PropertyChanged -= Localization_PropertyChanged;
+        Stop();
+        _sessionCancellation.Dispose();
     }
 
     private async Task WatchAsync(CancellationToken cancellationToken)
@@ -223,6 +246,17 @@ public sealed class CurrentMatchViewModel : ObservableObject
         {
             // Закрытие приложения штатно завершает сессию наблюдения.
         }
+        catch (Exception exception)
+        {
+            Trace.TraceError(
+                "Цикл текущего матча завершился с ошибкой ({0}): {1}",
+                exception.GetType().Name,
+                exception.Message);
+            _lastUpdate = null;
+            Status = MatchSnapshotReadStatus.Failed;
+            RenderWaiting();
+            StateUpdated?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     private void ApplyUpdate(ActiveMatchUpdate update)
@@ -233,10 +267,13 @@ public sealed class CurrentMatchViewModel : ObservableObject
         if (update.Snapshot is null)
         {
             RenderWaiting();
-            return;
+        }
+        else
+        {
+            RenderSnapshot(update.Snapshot, update.Advice);
         }
 
-        RenderSnapshot(update.Snapshot, update.Advice);
+        StateUpdated?.Invoke(this, EventArgs.Empty);
     }
 
     private void RenderSnapshot(MatchSnapshot snapshot, CoachAdvice? advice)
@@ -504,6 +541,8 @@ public sealed class CurrentMatchViewModel : ObservableObject
         {
             RenderWaiting();
         }
+
+        StateUpdated?.Invoke(this, EventArgs.Empty);
     }
 
     private string GetPhaseLabel(PlayerState player, CoachAdvice? advice)

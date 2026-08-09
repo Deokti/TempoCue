@@ -92,16 +92,6 @@ public partial class MainWindow
 
         _localization.SetLanguage(languageCode);
         AppSettingsService.SaveLanguage(languageCode);
-        RefreshLocalizedContent();
-    }
-
-    /// <summary>
-    /// Статические подписи обновляются Binding-ами автоматически. Здесь повторно
-    /// формируются только строки, в которые подставлены данные текущего матча.
-    /// </summary>
-    private void RefreshLocalizedContent()
-    {
-        RenderHomeFromCurrentMatch();
     }
 
     private void UpdateTitleBarContext(string? gameTimeText = null)

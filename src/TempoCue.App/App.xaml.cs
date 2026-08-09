@@ -49,7 +49,7 @@ public partial class App : System.Windows.Application
 
     protected override void OnExit(ExitEventArgs e)
     {
-        _currentMatchViewModel?.Stop();
+        _currentMatchViewModel?.Dispose();
         _liveClientDataClient?.Dispose();
         base.OnExit(e);
     }

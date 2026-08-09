@@ -10,6 +10,7 @@ using TempoCue.Core;
 namespace TempoCue.App.Tests;
 
 /// <summary>Проверяет переводы интерфейса и формы слов для обоих языков.</summary>
+[Collection(LocalizationCollection.Name)]
 public sealed class LocalizationServiceTests
 {
     [Fact]

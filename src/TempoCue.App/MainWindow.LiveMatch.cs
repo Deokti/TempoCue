@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Windows;
 using TempoCue.Application;
 
@@ -24,13 +23,11 @@ public partial class MainWindow
 
     private void MainWindow_Closed(object? sender, EventArgs e)
     {
-        _currentMatchViewModel.PropertyChanged -= CurrentMatchViewModel_PropertyChanged;
-        _currentMatchViewModel.Stop();
+        _currentMatchViewModel.StateUpdated -= CurrentMatchViewModel_StateUpdated;
+        _currentMatchViewModel.Dispose();
     }
 
-    private void CurrentMatchViewModel_PropertyChanged(
-        object? sender,
-        PropertyChangedEventArgs e)
+    private void CurrentMatchViewModel_StateUpdated(object? sender, EventArgs e)
     {
         RenderHomeFromCurrentMatch();
     }

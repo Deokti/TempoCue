@@ -32,7 +32,7 @@ public partial class MainWindow : Window
 
     private void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
-        _currentMatchViewModel.PropertyChanged += CurrentMatchViewModel_PropertyChanged;
+        _currentMatchViewModel.StateUpdated += CurrentMatchViewModel_StateUpdated;
         _currentMatchViewModel.Start();
         RenderHomeFromCurrentMatch();
     }
