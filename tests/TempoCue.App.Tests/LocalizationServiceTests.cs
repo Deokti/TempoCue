@@ -118,6 +118,7 @@ public sealed class LocalizationServiceTests
                 using var coachingViewModel = new CoachingViewModel(
                     CreateCoachPack(),
                     localization,
+                    TestGamePatchCatalog.Ready(),
                     TestChampionCatalog.Ready());
                 var window = new MainWindow(
                     currentMatchViewModel,
@@ -176,13 +177,11 @@ public sealed class LocalizationServiceTests
                     matchupEditorPage.FindName("MatchupEditorSidebar"));
                 var championPickerDialog = Assert.IsType<TempoCue.App.Views.ChampionPickerDialogView>(
                     matchupEditorPage.FindName("ChampionPickerDialog"));
-                var sharedTextBoxPadding = new Thickness(8, 9, 8, 9);
+                var sharedTextBoxPadding = new Thickness(12, 0, 12, 0);
                 foreach (var textBoxName in new[]
                          {
                              "MatchupPackNameTextBox",
-                             "MatchupDescriptionTextBox",
                              "MatchupAuthorTextBox",
-                             "MatchupPatchTextBox",
                              "MatchupSourceUrlTextBox"
                          })
                 {
@@ -190,6 +189,18 @@ public sealed class LocalizationServiceTests
                         sharedTextBoxPadding,
                         Assert.IsType<TextBox>(matchupMainInformationPage.FindName(textBoxName)).Padding);
                 }
+                Assert.Equal(
+                    36d,
+                    Assert.IsType<TextBox>(
+                        matchupMainInformationPage.FindName("MatchupPackNameTextBox")).Height);
+                Assert.Equal(
+                    78d,
+                    Assert.IsType<TextBox>(
+                        matchupMainInformationPage.FindName("MatchupDescriptionTextBox")).Height);
+                Assert.Equal(
+                    new Thickness(12, 4, 12, 4),
+                    Assert.IsType<TextBox>(
+                        matchupMainInformationPage.FindName("MatchupDescriptionTextBox")).Padding);
                 var settingsTitle = Assert.IsType<TextBlock>(
                     settingsPage.FindName("SettingsTitleTextBlock"));
                 var languageComboBox = Assert.IsType<ComboBox>(
@@ -339,10 +350,18 @@ public sealed class LocalizationServiceTests
                 coachingViewModel.MatchupEditor.MainInformation.ShortDescription =
                     "Как пережить раннюю линию и найти момент для боя.";
                 coachingViewModel.MatchupEditor.MainInformation.Author = "TopLaneAuthor";
-                coachingViewModel.MatchupEditor.MainInformation.GamePatch = "26.15";
+                coachingViewModel.MatchupEditor.MainInformation
+                    .EnsureGamePatchCatalogLoadedAsync()
+                    .GetAwaiter()
+                    .GetResult();
                 Dispatcher.CurrentDispatcher.Invoke(
                     static () => { },
                     DispatcherPriority.DataBind);
+
+                var patchComboBox = Assert.IsType<ComboBox>(
+                    matchupMainInformationPage.FindName("MatchupPatchComboBox"));
+                Assert.Equal(36d, patchComboBox.Height);
+                Assert.Equal("26.15 — текущий", patchComboBox.Text);
 
                 Assert.Equal(
                     "Urgot против Sett",
@@ -511,6 +530,7 @@ public sealed class LocalizationServiceTests
                 Dispatcher.CurrentDispatcher.Invoke(
                     static () => { },
                     DispatcherPriority.DataBind);
+                Assert.Equal("26.15 — current", patchComboBox.Text);
 
                 Assert.Equal("TempoCue — League of Legends assistant", window.Title);
                 Assert.Equal("Settings", settingsTitle.Text);

@@ -12,11 +12,9 @@ public sealed class MatchupChampionsAndRoleViewModel : ObservableObject
     private ChampionOptionViewModel? _selectedPlayerChampion;
     private ChampionOptionViewModel? _selectedOpponentChampion;
     private MatchupLaneRole _selectedRole = MatchupLaneRole.Top;
-    private string _playerSearch = string.Empty;
-    private string _opponentSearch = string.Empty;
     private string _languageCode;
     private string? _loadedLanguageCode;
-    private ChampionCatalogViewState _catalogState = ChampionCatalogViewState.NotLoaded;
+    private CatalogViewState _catalogState = CatalogViewState.NotLoaded;
     private ChampionPickerTarget _pickerTarget;
     private string _pickerSearch = string.Empty;
 
@@ -33,12 +31,6 @@ public sealed class MatchupChampionsAndRoleViewModel : ObservableObject
 
     public IReadOnlyList<ChampionOptionViewModel> Champions => _champions;
 
-    public IReadOnlyList<ChampionOptionViewModel> PlayerSuggestions =>
-        FilterChampions(PlayerSearch);
-
-    public IReadOnlyList<ChampionOptionViewModel> OpponentSuggestions =>
-        FilterChampions(OpponentSearch);
-
     public IReadOnlyList<ChampionOptionViewModel> FilteredPickerChampions =>
         FilterAllChampions(PickerSearch);
 
@@ -50,7 +42,6 @@ public sealed class MatchupChampionsAndRoleViewModel : ObservableObject
             if (SetProperty(ref _pickerTarget, value))
             {
                 OnPropertyChanged(nameof(IsPickerOpen));
-                OnPropertyChanged(nameof(CurrentPickerSelection));
             }
         }
     }
@@ -71,13 +62,6 @@ public sealed class MatchupChampionsAndRoleViewModel : ObservableObject
         }
     }
 
-    public ChampionOptionViewModel? CurrentPickerSelection => PickerTarget switch
-    {
-        ChampionPickerTarget.Player => SelectedPlayerChampion,
-        ChampionPickerTarget.Opponent => SelectedOpponentChampion,
-        _ => null
-    };
-
     public bool HasPickerResults => FilteredPickerChampions.Count > 0;
 
     public string CatalogStatusText => _localization.Format(
@@ -94,7 +78,7 @@ public sealed class MatchupChampionsAndRoleViewModel : ObservableObject
         SelectedOpponentChampion?.DisplayName ?? string.Empty,
         GetRoleLabel());
 
-    public ChampionCatalogViewState CatalogState
+    public CatalogViewState CatalogState
     {
         get => _catalogState;
         private set
@@ -111,13 +95,13 @@ public sealed class MatchupChampionsAndRoleViewModel : ObservableObject
     }
 
     public bool IsCatalogReady =>
-        CatalogState is ChampionCatalogViewState.Ready or ChampionCatalogViewState.Cached;
+        CatalogState is CatalogViewState.Ready or CatalogViewState.Cached;
 
-    public bool IsLoading => CatalogState == ChampionCatalogViewState.Loading;
+    public bool IsLoading => CatalogState == CatalogViewState.Loading;
 
-    public bool HasLoadError => CatalogState == ChampionCatalogViewState.Failed;
+    public bool HasLoadError => CatalogState == CatalogViewState.Failed;
 
-    public bool IsUsingCache => CatalogState == ChampionCatalogViewState.Cached;
+    public bool IsUsingCache => CatalogState == CatalogViewState.Cached;
 
     public ChampionOptionViewModel? SelectedPlayerChampion
     {
@@ -156,30 +140,6 @@ public sealed class MatchupChampionsAndRoleViewModel : ObservableObject
         }
     }
 
-    public string PlayerSearch
-    {
-        get => _playerSearch;
-        set
-        {
-            if (SetProperty(ref _playerSearch, value ?? string.Empty))
-            {
-                OnPropertyChanged(nameof(PlayerSuggestions));
-            }
-        }
-    }
-
-    public string OpponentSearch
-    {
-        get => _opponentSearch;
-        set
-        {
-            if (SetProperty(ref _opponentSearch, value ?? string.Empty))
-            {
-                OnPropertyChanged(nameof(OpponentSuggestions));
-            }
-        }
-    }
-
     public bool HasSameChampion =>
         SelectedPlayerChampion is not null
         && SelectedOpponentChampion is not null
@@ -201,7 +161,7 @@ public sealed class MatchupChampionsAndRoleViewModel : ObservableObject
 
         _languageCode = languageCode;
         ClosePicker();
-        CatalogState = ChampionCatalogViewState.NotLoaded;
+        CatalogState = CatalogViewState.NotLoaded;
         OnPropertyChanged(nameof(CatalogStatusText));
         OnPropertyChanged(nameof(PickerResultCountText));
         OnPropertyChanged(nameof(ReadinessSummary));
@@ -245,7 +205,7 @@ public sealed class MatchupChampionsAndRoleViewModel : ObservableObject
             return;
         }
 
-        CatalogState = ChampionCatalogViewState.Loading;
+        CatalogState = CatalogViewState.Loading;
         var requestedLanguageCode = _languageCode;
         var playerChampionId = SelectedPlayerChampion?.Id;
         var opponentChampionId = SelectedOpponentChampion?.Id;
@@ -256,7 +216,7 @@ public sealed class MatchupChampionsAndRoleViewModel : ObservableObject
                 _languageCode,
                 StringComparison.OrdinalIgnoreCase))
         {
-            CatalogState = ChampionCatalogViewState.NotLoaded;
+            CatalogState = CatalogViewState.NotLoaded;
             return;
         }
 
@@ -265,7 +225,7 @@ public sealed class MatchupChampionsAndRoleViewModel : ObservableObject
             _champions = [];
             _loadedLanguageCode = null;
             NotifyCatalogChanged();
-            CatalogState = ChampionCatalogViewState.Failed;
+            CatalogState = CatalogViewState.Failed;
             return;
         }
 
@@ -280,30 +240,14 @@ public sealed class MatchupChampionsAndRoleViewModel : ObservableObject
         SelectedOpponentChampion = FindChampion(opponentChampionId);
         NotifyCatalogChanged();
         CatalogState = result.Source == ChampionCatalogSource.Cache
-            ? ChampionCatalogViewState.Cached
-            : ChampionCatalogViewState.Ready;
+            ? CatalogViewState.Cached
+            : CatalogViewState.Ready;
     }
 
     public Task RetryCatalogLoadAsync(CancellationToken cancellationToken = default)
     {
-        CatalogState = ChampionCatalogViewState.NotLoaded;
+        CatalogState = CatalogViewState.NotLoaded;
         return EnsureCatalogLoadedAsync(cancellationToken);
-    }
-
-    private IReadOnlyList<ChampionOptionViewModel> FilterChampions(string search)
-    {
-        var normalizedSearch = search.Trim();
-        if (normalizedSearch.Length == 0)
-        {
-            return Champions.Take(5).ToArray();
-        }
-
-        return Champions
-            .Where(champion =>
-                champion.DisplayName.Contains(normalizedSearch, StringComparison.OrdinalIgnoreCase)
-                || champion.Initials.Contains(normalizedSearch, StringComparison.OrdinalIgnoreCase))
-            .Take(20)
-            .ToArray();
     }
 
     private IReadOnlyList<ChampionOptionViewModel> FilterAllChampions(string search)
@@ -341,8 +285,6 @@ public sealed class MatchupChampionsAndRoleViewModel : ObservableObject
     private void NotifyCatalogChanged()
     {
         OnPropertyChanged(nameof(Champions));
-        OnPropertyChanged(nameof(PlayerSuggestions));
-        OnPropertyChanged(nameof(OpponentSuggestions));
         OnPropertyChanged(nameof(FilteredPickerChampions));
         OnPropertyChanged(nameof(HasPickerResults));
         OnPropertyChanged(nameof(CatalogStatusText));
@@ -353,7 +295,6 @@ public sealed class MatchupChampionsAndRoleViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(HasSameChampion));
         OnPropertyChanged(nameof(IsComplete));
-        OnPropertyChanged(nameof(CurrentPickerSelection));
         OnPropertyChanged(nameof(ReadinessSummary));
     }
 

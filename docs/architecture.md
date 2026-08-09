@@ -23,7 +23,7 @@
 - `TempoCue.Application` владеет сценарием активной сессии, единственным циклом polling и портом источника снимков.
 - `TempoCue.Riot` изолирует DTO внешнего API и преобразует их в модели Core.
 - Riot-клиент допускает подстановку `HttpClient`, поэтому проверяется без реальной сети.
-- Каталог чемпионов объявлен портом Application, а Riot Data Dragon, локальный кеш и преобразование внешнего JSON изолированы в адаптере Riot.
+- Каталоги патчей и чемпионов объявлены портами Application. Общий `DataDragonClient` в адаптере Riot владеет HTTP-доступом, списком версий и адресами ресурсов; специализированные каталоги владеют преобразованием и собственным локальным кешем. Будущие каталоги предметов и других статических данных используют тот же клиент, но имеют отдельные внутренние модели и правила кеширования.
 - Экран текущего матча выделен в отдельные View/ViewModel и получает готовое состояние через binding.
 - Главная страница и настройки выделены в отдельные View/ViewModel; `MainWindow` размещает готовые экраны и не содержит их разметку.
 - Библиотека коучинга реализована самостоятельными `CoachingView`/`CoachingViewModel` и получает уже проверенный `CoachPack` из composition root. Пошаговый редактор хранит общее состояние навигации в `MatchupEditorViewModel`, а данные и представление каждого реализованного шага выделяются в собственные View/ViewModel.
@@ -84,7 +84,7 @@
 flowchart LR
     View["TempoCue.App<br/>Views и ViewModels"] --> Application["TempoCue.Application<br/>сценарии и порты"]
     Application --> Core["TempoCue.Core<br/>модель и правила"]
-    Riot["TempoCue.Riot<br/>адаптер Live Client API"] --> Application
+    Riot["TempoCue.Riot<br/>Live Client и Data Dragon"] --> Application
     Riot --> Core
     Persistence["Будущие адаптеры<br/>настройки и снимки"] --> Application
     Composition["App.OnStartup<br/>composition root"] --> View

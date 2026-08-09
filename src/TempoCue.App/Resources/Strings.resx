@@ -246,7 +246,12 @@
   <data name="Coaching.MatchupEditor.Main.Author" xml:space="preserve"><value>Author</value></data>
   <data name="Coaching.MatchupEditor.Main.AdviceLanguage" xml:space="preserve"><value>Advice language</value></data>
   <data name="Coaching.MatchupEditor.Main.GamePatch" xml:space="preserve"><value>Game patch</value></data>
-  <data name="Coaching.MatchupEditor.Main.GamePatch.Hint" xml:space="preserve"><value>Specify the patch on which the recommendations were last verified.</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch.Hint" xml:space="preserve"><value>Select the patch on which the recommendations were last verified.</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch.Current" xml:space="preserve"><value>{0} — current</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch.Loading" xml:space="preserve"><value>Loading patches…</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch.LoadError" xml:space="preserve"><value>Could not load patches.</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch.Retry" xml:space="preserve"><value>Retry</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch.UsingCache" xml:space="preserve"><value>Showing the last saved patch list.</value></data>
   <data name="Coaching.MatchupEditor.Main.VerifiedOn" xml:space="preserve"><value>Last verified</value></data>
   <data name="Coaching.MatchupEditor.Main.VerifiedOn.Hint" xml:space="preserve"><value>The draft creation date is used for now.</value></data>
   <data name="Coaching.MatchupEditor.Main.Source" xml:space="preserve"><value>Information source</value></data>

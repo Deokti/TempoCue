@@ -10,37 +10,53 @@ namespace TempoCue.App.Tests;
 public sealed class CoachingViewModelTests
 {
     [Fact]
-    public void MainInformation_RequiresMetadataAndAValidLinkedSource()
+    public async Task MainInformation_RequiresMetadataAndAValidLinkedSource()
     {
-        var viewModel = new MatchupMainInformationViewModel("ru-RU");
+        var localization = LocalizationService.Instance;
+        var initialLanguage = localization.CurrentLanguageCode;
+        localization.SetLanguage("ru-RU");
 
-        Assert.Equal("ru-RU", viewModel.AdviceLanguageCode);
-        Assert.Equal(MatchupSourceKind.PersonalExperience, viewModel.SelectedSourceKind);
-        Assert.True(viewModel.IsSourceReady);
-        Assert.False(viewModel.IsComplete);
+        try
+        {
+            var viewModel = new MatchupMainInformationViewModel(
+                "ru-RU",
+                TestGamePatchCatalog.Ready(),
+                localization);
 
-        viewModel.PackName = "Urgot против Sett";
-        viewModel.ShortDescription = "Как пережить раннюю линию и найти момент для боя.";
-        viewModel.Author = "TopLaneAuthor";
-        viewModel.GamePatch = "26.15";
+            Assert.Equal("ru-RU", viewModel.AdviceLanguageCode);
+            Assert.Equal(MatchupSourceKind.PersonalExperience, viewModel.SelectedSourceKind);
+            Assert.True(viewModel.IsSourceReady);
+            Assert.False(viewModel.IsComplete);
 
-        Assert.True(viewModel.IsComplete);
+            viewModel.PackName = "Urgot против Sett";
+            viewModel.ShortDescription = "Как пережить раннюю линию и найти момент для боя.";
+            viewModel.Author = "TopLaneAuthor";
+            await viewModel.EnsureGamePatchCatalogLoadedAsync();
 
-        viewModel.SelectedSourceKind = MatchupSourceKind.Article;
-        Assert.True(viewModel.IsSourceUrlRequired);
-        Assert.False(viewModel.IsSourceReady);
-        Assert.False(viewModel.IsComplete);
+            Assert.True(viewModel.IsComplete);
+            Assert.Equal("26.15", viewModel.GamePatch);
+            Assert.Equal("26.15 — текущий", viewModel.SelectedGamePatch?.DisplayName);
 
-        viewModel.SourceUrl = "not-a-web-link";
-        Assert.False(viewModel.IsSourceReady);
+            viewModel.SelectedSourceKind = MatchupSourceKind.Article;
+            Assert.True(viewModel.IsSourceUrlRequired);
+            Assert.False(viewModel.IsSourceReady);
+            Assert.False(viewModel.IsComplete);
 
-        viewModel.SourceUrl = "https://example.com/urgot-sett";
-        Assert.True(viewModel.IsSourceReady);
-        Assert.True(viewModel.IsComplete);
+            viewModel.SourceUrl = "not-a-web-link";
+            Assert.False(viewModel.IsSourceReady);
+
+            viewModel.SourceUrl = "https://example.com/urgot-sett";
+            Assert.True(viewModel.IsSourceReady);
+            Assert.True(viewModel.IsComplete);
+        }
+        finally
+        {
+            localization.SetLanguage(initialLanguage);
+        }
     }
 
     [Fact]
-    public void CoachingNavigation_OpensOnlyAvailablePackEditor()
+    public async Task CoachingNavigation_OpensOnlyAvailablePackEditor()
     {
         var localization = LocalizationService.Instance;
         using var viewModel = new CoachingViewModel(
@@ -53,6 +69,7 @@ public sealed class CoachingViewModelTests
                 Rules = []
             },
             localization,
+            TestGamePatchCatalog.Ready(),
             TestChampionCatalog.Ready());
 
         Assert.Equal(CoachingScreen.Library, viewModel.CurrentScreen);
@@ -72,7 +89,7 @@ public sealed class CoachingViewModelTests
         mainInformation.PackName = "Urgot против Sett";
         mainInformation.ShortDescription = "Как пережить раннюю линию и найти момент для боя.";
         mainInformation.Author = "TopLaneAuthor";
-        mainInformation.GamePatch = "26.15";
+        await mainInformation.EnsureGamePatchCatalogLoadedAsync();
 
         Assert.True(viewModel.MatchupEditor.MoveNext());
         Assert.Equal(2, viewModel.MatchupEditor.CurrentStep);
@@ -85,7 +102,7 @@ public sealed class CoachingViewModelTests
     }
 
     [Fact]
-    public async Task ChampionsAndRole_FiltersCatalogAndRejectsMirrorMatchup()
+    public async Task ChampionsAndRole_SelectsCatalogEntriesAndRejectsMirrorMatchup()
     {
         var viewModel = new MatchupChampionsAndRoleViewModel(
             TestChampionCatalog.Ready(),
@@ -93,17 +110,15 @@ public sealed class CoachingViewModelTests
 
         Assert.Equal(MatchupLaneRole.Top, viewModel.SelectedRole);
         Assert.False(viewModel.IsComplete);
-        Assert.Equal(ChampionCatalogViewState.NotLoaded, viewModel.CatalogState);
+        Assert.Equal(CatalogViewState.NotLoaded, viewModel.CatalogState);
 
         await viewModel.EnsureCatalogLoadedAsync();
-        Assert.Equal(ChampionCatalogViewState.Ready, viewModel.CatalogState);
+        Assert.Equal(CatalogViewState.Ready, viewModel.CatalogState);
 
-        viewModel.PlayerSearch = "urg";
-        var urgot = Assert.Single(viewModel.PlayerSuggestions);
+        var urgot = Assert.Single(viewModel.Champions, champion => champion.Id == "Urgot");
         Assert.Equal("Urgot", urgot.DisplayName);
 
-        viewModel.OpponentSearch = "set";
-        var sett = Assert.Single(viewModel.OpponentSuggestions);
+        var sett = Assert.Single(viewModel.Champions, champion => champion.Id == "Sett");
         Assert.Equal("Sett", sett.DisplayName);
 
         viewModel.SelectedPlayerChampion = urgot;
@@ -134,7 +149,7 @@ public sealed class CoachingViewModelTests
 
         await cachedViewModel.EnsureCatalogLoadedAsync();
 
-        Assert.Equal(ChampionCatalogViewState.Cached, cachedViewModel.CatalogState);
+        Assert.Equal(CatalogViewState.Cached, cachedViewModel.CatalogState);
         Assert.True(cachedViewModel.IsCatalogReady);
         Assert.True(cachedViewModel.IsUsingCache);
 
@@ -144,7 +159,7 @@ public sealed class CoachingViewModelTests
 
         await unavailableViewModel.EnsureCatalogLoadedAsync();
 
-        Assert.Equal(ChampionCatalogViewState.Failed, unavailableViewModel.CatalogState);
+        Assert.Equal(CatalogViewState.Failed, unavailableViewModel.CatalogState);
         Assert.True(unavailableViewModel.HasLoadError);
         Assert.False(unavailableViewModel.IsCatalogReady);
     }
@@ -211,6 +226,7 @@ public sealed class CoachingViewModelTests
             using var viewModel = new CoachingViewModel(
                 pack,
                 localization,
+                TestGamePatchCatalog.Ready(),
                 TestChampionCatalog.Ready());
 
             Assert.Equal("URG", viewModel.PlayerChampionInitials);

@@ -249,7 +249,12 @@
   <data name="Coaching.MatchupEditor.Main.Author" xml:space="preserve"><value>Автор</value></data>
   <data name="Coaching.MatchupEditor.Main.AdviceLanguage" xml:space="preserve"><value>Язык советов</value></data>
   <data name="Coaching.MatchupEditor.Main.GamePatch" xml:space="preserve"><value>Игровой патч</value></data>
-  <data name="Coaching.MatchupEditor.Main.GamePatch.Hint" xml:space="preserve"><value>Укажите патч, на котором рекомендации проверялись в последний раз.</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch.Hint" xml:space="preserve"><value>Выберите патч, на котором рекомендации проверялись в последний раз.</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch.Current" xml:space="preserve"><value>{0} — текущий</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch.Loading" xml:space="preserve"><value>Загружаем патчи…</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch.LoadError" xml:space="preserve"><value>Не удалось загрузить патчи.</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch.Retry" xml:space="preserve"><value>Повторить</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch.UsingCache" xml:space="preserve"><value>Показан последний сохранённый список патчей.</value></data>
   <data name="Coaching.MatchupEditor.Main.VerifiedOn" xml:space="preserve"><value>Дата последней проверки</value></data>
   <data name="Coaching.MatchupEditor.Main.VerifiedOn.Hint" xml:space="preserve"><value>Пока используется дата создания черновика.</value></data>
   <data name="Coaching.MatchupEditor.Main.Source" xml:space="preserve"><value>Откуда информация</value></data>

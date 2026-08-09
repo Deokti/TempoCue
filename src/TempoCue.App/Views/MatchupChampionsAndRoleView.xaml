@@ -126,7 +126,7 @@
                         <Setter Property="Visibility" Value="Collapsed" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding CatalogState}"
-                                         Value="{x:Static viewModels:ChampionCatalogViewState.Loading}">
+                                         Value="{x:Static viewModels:CatalogViewState.Loading}">
                                 <Setter Property="Visibility" Value="Visible" />
                             </DataTrigger>
                         </Style.Triggers>
@@ -203,7 +203,7 @@
                         <Setter Property="Visibility" Value="Collapsed" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding CatalogState}"
-                                         Value="{x:Static viewModels:ChampionCatalogViewState.Failed}">
+                                         Value="{x:Static viewModels:CatalogViewState.Failed}">
                                 <Setter Property="Visibility" Value="Visible" />
                             </DataTrigger>
                         </Style.Triggers>

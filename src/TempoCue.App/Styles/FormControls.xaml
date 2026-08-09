@@ -18,8 +18,8 @@
     </Style>
 
     <Style x:Key="FormTextBox" TargetType="TextBox">
-        <Setter Property="MinHeight" Value="40" />
-        <Setter Property="Padding" Value="8,9" />
+        <Setter Property="Height" Value="36" />
+        <Setter Property="Padding" Value="12,0" />
         <Setter Property="Foreground" Value="#DCEAF7" />
         <Setter Property="CaretBrush" Value="#68BFF2" />
         <Setter Property="Background" Value="#0C1420" />
@@ -35,8 +35,7 @@
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="9"
-                            Padding="{TemplateBinding Padding}">
+                            CornerRadius="9">
                         <ScrollViewer x:Name="PART_ContentHost" />
                     </Border>
                     <ControlTemplate.Triggers>
@@ -90,7 +89,7 @@
     </Style>
 
     <Style x:Key="FormComboBox" TargetType="ComboBox">
-        <Setter Property="Height" Value="40" />
+        <Setter Property="Height" Value="36" />
         <Setter Property="Foreground" Value="#DCEAF7" />
         <Setter Property="Background" Value="#0C1420" />
         <Setter Property="BorderBrush" Value="#263750" />
@@ -161,7 +160,9 @@
                                     BorderThickness="1"
                                     CornerRadius="9"
                                     ClipToBounds="True">
-                                <ScrollViewer MaxHeight="240" VerticalScrollBarVisibility="Auto">
+                                <ScrollViewer MaxHeight="240"
+                                              VerticalScrollBarVisibility="Auto"
+                                              CanContentScroll="False">
                                     <ItemsPresenter />
                                 </ScrollViewer>
                             </Border>

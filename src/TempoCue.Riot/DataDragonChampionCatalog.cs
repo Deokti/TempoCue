@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Net.Http.Json;
 using System.Text.Json;
 using TempoCue.Application;
 
@@ -9,61 +8,41 @@ namespace TempoCue.Riot;
 /// Загружает локализованный список чемпионов из Riot Data Dragon и использует
 /// последний успешный ответ при временной недоступности сети.
 /// </summary>
-public sealed class DataDragonChampionCatalog : IChampionCatalog, IDisposable
+public sealed class DataDragonChampionCatalog : IChampionCatalog
 {
-    private static readonly Uri DataDragonBaseUri = new(
-        "https://ddragon.leagueoflegends.com/",
-        UriKind.Absolute);
-    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
+    private static readonly JsonSerializerOptions CacheJsonOptions = new(JsonSerializerDefaults.Web);
 
-    private readonly HttpClient _httpClient;
-    private readonly bool _ownsHttpClient;
+    private readonly DataDragonClient _dataDragonClient;
     private readonly string _cacheDirectory;
 
-    public DataDragonChampionCatalog(string cacheDirectory)
-        : this(CreateHttpClient(), cacheDirectory, ownsHttpClient: true)
+    public DataDragonChampionCatalog(
+        DataDragonClient dataDragonClient,
+        string cacheDirectory)
     {
-    }
-
-    public DataDragonChampionCatalog(HttpClient httpClient, string cacheDirectory)
-        : this(httpClient, cacheDirectory, ownsHttpClient: false)
-    {
-    }
-
-    private DataDragonChampionCatalog(
-        HttpClient httpClient,
-        string cacheDirectory,
-        bool ownsHttpClient)
-    {
-        ArgumentNullException.ThrowIfNull(httpClient);
+        ArgumentNullException.ThrowIfNull(dataDragonClient);
         ArgumentException.ThrowIfNullOrWhiteSpace(cacheDirectory);
 
-        _httpClient = httpClient;
+        _dataDragonClient = dataDragonClient;
         _cacheDirectory = cacheDirectory;
-        _ownsHttpClient = ownsHttpClient;
     }
 
     public async Task<ChampionCatalogLoadResult> LoadAsync(
         string languageCode,
         CancellationToken cancellationToken = default)
     {
-        var locale = NormalizeLocale(languageCode);
+        var locale = DataDragonClient.NormalizeLocale(languageCode);
 
         try
         {
-            var versions = await _httpClient.GetFromJsonAsync<string[]>(
-                "api/versions.json",
-                JsonOptions,
-                cancellationToken);
-            var version = versions?.FirstOrDefault(static value => !string.IsNullOrWhiteSpace(value));
+            var version = await _dataDragonClient.GetLatestVersionAsync(cancellationToken);
             if (version is null)
             {
                 return await LoadCacheAsync(locale, cancellationToken);
             }
 
-            var response = await _httpClient.GetFromJsonAsync<DataDragonChampionListDto>(
-                $"cdn/{version}/data/{locale}/champion.json",
-                JsonOptions,
+            var escapedVersion = Uri.EscapeDataString(version);
+            var response = await _dataDragonClient.GetJsonAsync<DataDragonChampionListDto>(
+                $"cdn/{escapedVersion}/data/{locale}/champion.json",
                 cancellationToken);
             var champions = MapChampions(response, version, locale);
             if (champions.Count == 0)
@@ -85,30 +64,11 @@ public sealed class DataDragonChampionCatalog : IChampionCatalog, IDisposable
         {
             throw;
         }
-        catch (Exception exception) when (IsExpectedExternalFailure(exception))
+        catch (Exception exception) when (DataDragonClient.IsExpectedExternalFailure(exception))
         {
             return await LoadCacheAsync(locale, cancellationToken);
         }
     }
-
-    public void Dispose()
-    {
-        if (_ownsHttpClient)
-        {
-            _httpClient.Dispose();
-        }
-    }
-
-    internal static string NormalizeLocale(string languageCode) =>
-        languageCode.StartsWith("ru", StringComparison.OrdinalIgnoreCase)
-            ? "ru_RU"
-            : "en_US";
-
-    private static HttpClient CreateHttpClient() => new()
-    {
-        BaseAddress = DataDragonBaseUri,
-        Timeout = TimeSpan.FromSeconds(12)
-    };
 
     private static IReadOnlyList<ChampionCatalogEntry> MapChampions(
         DataDragonChampionListDto? response,
@@ -133,9 +93,8 @@ public sealed class DataDragonChampionCatalog : IChampionCatalog, IDisposable
             .Select(champion => new ChampionCatalogEntry(
                 champion.Id!,
                 champion.Name!,
-                new Uri(
-                    DataDragonBaseUri,
-                    $"cdn/{version}/img/champion/{Uri.EscapeDataString(champion.Image!.Full!)}")))
+                DataDragonClient.CreateResourceUri(
+                    $"cdn/{Uri.EscapeDataString(version)}/img/champion/{Uri.EscapeDataString(champion.Image!.Full!)}")))
             .OrderBy(champion => champion.DisplayName, StringComparer.Create(culture, true))
             .ToArray();
     }
@@ -170,7 +129,7 @@ public sealed class DataDragonChampionCatalog : IChampionCatalog, IDisposable
                 await JsonSerializer.SerializeAsync(
                     stream,
                     cache,
-                    JsonOptions,
+                    CacheJsonOptions,
                     cancellationToken);
             }
 
@@ -204,7 +163,7 @@ public sealed class DataDragonChampionCatalog : IChampionCatalog, IDisposable
             await using var stream = File.OpenRead(cachePath);
             var cache = await JsonSerializer.DeserializeAsync<DataDragonChampionCacheDto>(
                 stream,
-                JsonOptions,
+                CacheJsonOptions,
                 cancellationToken);
             if (cache?.Locale != locale || cache.Champions is null)
             {
@@ -242,12 +201,6 @@ public sealed class DataDragonChampionCatalog : IChampionCatalog, IDisposable
 
     private static bool IsSummonersRiftChampion(string championId) =>
         !championId.StartsWith("Jade_", StringComparison.OrdinalIgnoreCase);
-
-    private static bool IsExpectedExternalFailure(Exception exception) =>
-        exception is HttpRequestException
-            or JsonException
-            or InvalidDataException
-            or TaskCanceledException;
 
     private static bool IsExpectedCacheFailure(Exception exception) =>
         exception is IOException

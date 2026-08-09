@@ -24,7 +24,7 @@
 - советы по фактическому уровню и предметам активного игрока;
 - отдельная библиотека коучинга с разделами матчапов, контроля карты и пользовательских наборов;
 - выбор типа нового набора и два рабочих шага редактора матчапа: основная информация, затем чемпионы и роль;
-- загрузка локализованного каталога и адресов изображений чемпионов из Riot Data Dragon с локальным кешем каталога;
+- загрузка списка патчей, локализованного каталога и адресов изображений чемпионов из Riot Data Dragon с локальным кешем каталогов;
 - просмотр встроенного Coach Pack и его правил без редактирования исходного JSON;
 - русская и английская локализация интерфейса;
 - автоматические тесты Core, Application, Riot и WPF-представления.
@@ -45,7 +45,7 @@ dotnet run --project src/TempoCue.App
 src/TempoCue.App        WPF Views, ViewModels и composition root
 src/TempoCue.Application сценарии приложения и порты внешних эффектов
 src/TempoCue.Core       состояние, Coach Packs и движок правил
-src/TempoCue.Riot       подключение к Live Client Data API и преобразование JSON
+src/TempoCue.Riot       Live Client Data, Data Dragon, внешние DTO и преобразование JSON
 tests/TempoCue.Core.Tests
 tests/TempoCue.Application.Tests
 tests/TempoCue.Riot.Tests

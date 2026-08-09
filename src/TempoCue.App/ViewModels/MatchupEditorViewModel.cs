@@ -11,9 +11,13 @@ public sealed class MatchupEditorViewModel : ObservableObject
 
     public MatchupEditorViewModel(
         LocalizationService localization,
+        IGamePatchCatalog gamePatchCatalog,
         IChampionCatalog championCatalog)
     {
-        MainInformation = new MatchupMainInformationViewModel(localization.CurrentLanguageCode);
+        MainInformation = new MatchupMainInformationViewModel(
+            localization.CurrentLanguageCode,
+            gamePatchCatalog,
+            localization);
         ChampionsAndRole = new MatchupChampionsAndRoleViewModel(
             championCatalog,
             localization);
@@ -69,8 +73,11 @@ public sealed class MatchupEditorViewModel : ObservableObject
         return true;
     }
 
-    public void UpdateLanguage(string languageCode) =>
+    public void UpdateLanguage(string languageCode)
+    {
+        MainInformation.UpdateLanguage();
         ChampionsAndRole.UpdateLanguage(languageCode);
+    }
 
     private void MainInformation_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
