@@ -13,17 +13,21 @@ public partial class MainWindow : Window
     private readonly CurrentMatchViewModel _currentMatchViewModel;
     private readonly LocalizationService _localization = LocalizationService.Instance;
 
-    public MainWindow(CurrentMatchViewModel currentMatchViewModel)
+    public MainWindow(
+        CurrentMatchViewModel currentMatchViewModel,
+        HomeViewModel homeViewModel,
+        SettingsViewModel settingsViewModel)
     {
         ArgumentNullException.ThrowIfNull(currentMatchViewModel);
+        ArgumentNullException.ThrowIfNull(homeViewModel);
+        ArgumentNullException.ThrowIfNull(settingsViewModel);
         _currentMatchViewModel = currentMatchViewModel;
 
         InitializeComponent();
-        DataContext = _currentMatchViewModel;
-
-        // Названия языков показаны на самих языках: «Русский» и «English».
-        LanguageComboBox.SelectedValue = _localization.CurrentLanguageCode;
-        _isWindowInitialized = true;
+        HomeContentPage.DataContext = homeViewModel;
+        SettingsContentPage.DataContext = settingsViewModel;
+        CurrentMatchContentPage.DataContext = _currentMatchViewModel;
+        HomeContentPage.OpenCurrentMatchRequested += HomeContentPage_OpenCurrentMatchRequested;
 
         Loaded += MainWindow_Loaded;
         StateChanged += MainWindow_StateChanged;
@@ -34,6 +38,9 @@ public partial class MainWindow : Window
     {
         _currentMatchViewModel.StateUpdated += CurrentMatchViewModel_StateUpdated;
         _currentMatchViewModel.Start();
-        RenderHomeFromCurrentMatch();
+        RenderShellFromCurrentMatch();
     }
+
+    private void HomeContentPage_OpenCurrentMatchRequested(object? sender, EventArgs e) =>
+        NavigateTo(AppPage.CurrentMatch);
 }

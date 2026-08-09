@@ -16,6 +16,8 @@ public partial class App : System.Windows.Application
 {
     private LiveClientDataClient? _liveClientDataClient;
     private CurrentMatchViewModel? _currentMatchViewModel;
+    private HomeViewModel? _homeViewModel;
+    private SettingsViewModel? _settingsViewModel;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -23,7 +25,8 @@ public partial class App : System.Windows.Application
 
         // Язык выбирается до создания окна, чтобы пользователь не увидел
         // промежуточное переключение с языка по умолчанию.
-        var settings = AppSettingsService.Load();
+        var settingsService = new AppSettingsService();
+        var settings = settingsService.Load();
         LocalizationService.Instance.SetLanguage(settings.Language);
 
         var packPath = Path.Combine(
@@ -42,13 +45,24 @@ public partial class App : System.Windows.Application
         _currentMatchViewModel = new CurrentMatchViewModel(
             activeMatchSession,
             LocalizationService.Instance);
+        _homeViewModel = new HomeViewModel(
+            _currentMatchViewModel,
+            LocalizationService.Instance);
+        _settingsViewModel = new SettingsViewModel(
+            LocalizationService.Instance,
+            settingsService);
 
-        MainWindow = new MainWindow(_currentMatchViewModel);
+        MainWindow = new MainWindow(
+            _currentMatchViewModel,
+            _homeViewModel,
+            _settingsViewModel);
         MainWindow.Show();
     }
 
     protected override void OnExit(ExitEventArgs e)
     {
+        _settingsViewModel?.Dispose();
+        _homeViewModel?.Dispose();
         _currentMatchViewModel?.Dispose();
         _liveClientDataClient?.Dispose();
         base.OnExit(e);

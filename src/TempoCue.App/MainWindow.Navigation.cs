@@ -1,8 +1,6 @@
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using TempoCue.App.Settings;
 
 namespace TempoCue.App;
 
@@ -17,7 +15,6 @@ public partial class MainWindow
     }
 
     private AppPage _currentPage = AppPage.Home;
-    private bool _isWindowInitialized;
 
     private void OpenHomeButton_Click(object sender, RoutedEventArgs e) =>
         NavigateTo(AppPage.Home);
@@ -82,17 +79,6 @@ public partial class MainWindow
     }
 
     private void CloseWindowButton_Click(object sender, RoutedEventArgs e) => Close();
-
-    private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (!_isWindowInitialized || LanguageComboBox.SelectedValue is not string languageCode)
-        {
-            return;
-        }
-
-        _localization.SetLanguage(languageCode);
-        AppSettingsService.SaveLanguage(languageCode);
-    }
 
     private void UpdateTitleBarContext(string? gameTimeText = null)
     {

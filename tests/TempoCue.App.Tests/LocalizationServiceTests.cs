@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using TempoCue.App.Localization;
+using TempoCue.App.Settings;
 using TempoCue.App.ViewModels;
 using TempoCue.Application;
 using TempoCue.Core;
@@ -28,8 +29,15 @@ public sealed class LocalizationServiceTests
                     new WaitingSnapshotSource(),
                     new MatchupCoach([]),
                     TimeSpan.FromSeconds(1));
+                using var currentMatchViewModel = new CurrentMatchViewModel(session, localization);
+                using var homeViewModel = new HomeViewModel(currentMatchViewModel, localization);
+                using var settingsViewModel = new SettingsViewModel(
+                    localization,
+                    new AppSettingsService());
                 var window = new MainWindow(
-                    new CurrentMatchViewModel(session, localization));
+                    currentMatchViewModel,
+                    homeViewModel,
+                    settingsViewModel);
                 window.Show();
                 Dispatcher.CurrentDispatcher.Invoke(
                     static () => { },
@@ -43,10 +51,12 @@ public sealed class LocalizationServiceTests
                     window.FindName("CurrentMatchContentPage"));
                 var currentMatchButton = Assert.IsType<Button>(
                     window.FindName("CurrentMatchNavigationButton"));
-                var settingsPage = Assert.IsType<Grid>(window.FindName("SettingsContentPage"));
+                var settingsPage = Assert.IsType<TempoCue.App.Views.SettingsView>(
+                    window.FindName("SettingsContentPage"));
                 var settingsButton = Assert.IsType<Button>(window.FindName("SettingsNavigationButton"));
-                var settingsTitle = Assert.IsType<TextBlock>(window.FindName("SettingsTitleTextBlock"));
-                Assert.NotNull(window.FindName("LanguageComboBox"));
+                var settingsTitle = Assert.IsType<TextBlock>(
+                    settingsPage.FindName("SettingsTitleTextBlock"));
+                Assert.NotNull(settingsPage.FindName("LanguageComboBox"));
 
                 currentMatchButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
                 Assert.Equal(Visibility.Visible, currentMatchPage.Visibility);
