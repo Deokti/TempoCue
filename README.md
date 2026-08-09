@@ -36,8 +36,13 @@ src/TempoCue.Core       состояние, Coach Packs и движок прав
 src/TempoCue.Riot       подключение к Live Client Data API и преобразование JSON
 tests/TempoCue.Core.Tests
 tests/TempoCue.Riot.Tests
+tests/TempoCue.App.Tests
 docs/first-version.md    границы первой версии и следующий этап
 ```
+
+## Архитектура
+
+Обязательные границы модулей, правила добавления функций и план постепенного отделения WPF-представления описаны в [архитектурном документе](docs/architecture.md). Значимые решения и исключения фиксируются как ADR в [`docs/adr/`](docs/adr/README.md).
 
 ## Язык проекта
 
