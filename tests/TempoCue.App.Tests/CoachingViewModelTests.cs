@@ -1,5 +1,6 @@
 using TempoCue.App.Localization;
 using TempoCue.App.ViewModels;
+using TempoCue.Application;
 using TempoCue.Core;
 
 namespace TempoCue.App.Tests;
@@ -51,7 +52,8 @@ public sealed class CoachingViewModelTests
                 Patch = "test",
                 Rules = []
             },
-            localization);
+            localization,
+            TestChampionCatalog.Ready());
 
         Assert.Equal(CoachingScreen.Library, viewModel.CurrentScreen);
         Assert.True(viewModel.PackTypeSelection.IsMatchupAvailable);
@@ -64,9 +66,115 @@ public sealed class CoachingViewModelTests
         Assert.Equal(CoachingScreen.MatchupEditor, viewModel.CurrentScreen);
         Assert.Equal(1, viewModel.MatchupEditor.CurrentStep);
         Assert.Equal(7, viewModel.MatchupEditor.TotalSteps);
+        Assert.False(viewModel.MatchupEditor.MoveNext());
+
+        var mainInformation = viewModel.MatchupEditor.MainInformation;
+        mainInformation.PackName = "Urgot против Sett";
+        mainInformation.ShortDescription = "Как пережить раннюю линию и найти момент для боя.";
+        mainInformation.Author = "TopLaneAuthor";
+        mainInformation.GamePatch = "26.15";
+
+        Assert.True(viewModel.MatchupEditor.MoveNext());
+        Assert.Equal(2, viewModel.MatchupEditor.CurrentStep);
+        Assert.False(viewModel.MatchupEditor.CanMoveNext);
+        Assert.True(viewModel.MatchupEditor.MovePrevious());
+        Assert.Equal(1, viewModel.MatchupEditor.CurrentStep);
 
         viewModel.OpenLibrary();
         Assert.Equal(CoachingScreen.Library, viewModel.CurrentScreen);
+    }
+
+    [Fact]
+    public async Task ChampionsAndRole_FiltersCatalogAndRejectsMirrorMatchup()
+    {
+        var viewModel = new MatchupChampionsAndRoleViewModel(
+            TestChampionCatalog.Ready(),
+            LocalizationService.Instance);
+
+        Assert.Equal(MatchupLaneRole.Top, viewModel.SelectedRole);
+        Assert.False(viewModel.IsComplete);
+        Assert.Equal(ChampionCatalogViewState.NotLoaded, viewModel.CatalogState);
+
+        await viewModel.EnsureCatalogLoadedAsync();
+        Assert.Equal(ChampionCatalogViewState.Ready, viewModel.CatalogState);
+
+        viewModel.PlayerSearch = "urg";
+        var urgot = Assert.Single(viewModel.PlayerSuggestions);
+        Assert.Equal("Urgot", urgot.DisplayName);
+
+        viewModel.OpponentSearch = "set";
+        var sett = Assert.Single(viewModel.OpponentSuggestions);
+        Assert.Equal("Sett", sett.DisplayName);
+
+        viewModel.SelectedPlayerChampion = urgot;
+        viewModel.SelectedOpponentChampion = urgot;
+        Assert.True(viewModel.HasSameChampion);
+        Assert.False(viewModel.IsComplete);
+
+        viewModel.SelectedOpponentChampion = sett;
+        Assert.False(viewModel.HasSameChampion);
+        Assert.True(viewModel.IsComplete);
+    }
+
+    [Fact]
+    public async Task ChampionsAndRole_DistinguishesCachedCatalogAndLoadFailure()
+    {
+        var cachedCatalog = new TestChampionCatalog(
+            new ChampionCatalogLoadResult(
+                [
+                    new ChampionCatalogEntry(
+                        "Urgot",
+                        "Urgot",
+                        new Uri("https://example.test/Urgot.png"))
+                ],
+                ChampionCatalogSource.Cache));
+        var cachedViewModel = new MatchupChampionsAndRoleViewModel(
+            cachedCatalog,
+            LocalizationService.Instance);
+
+        await cachedViewModel.EnsureCatalogLoadedAsync();
+
+        Assert.Equal(ChampionCatalogViewState.Cached, cachedViewModel.CatalogState);
+        Assert.True(cachedViewModel.IsCatalogReady);
+        Assert.True(cachedViewModel.IsUsingCache);
+
+        var unavailableViewModel = new MatchupChampionsAndRoleViewModel(
+            new TestChampionCatalog(ChampionCatalogLoadResult.Unavailable()),
+            LocalizationService.Instance);
+
+        await unavailableViewModel.EnsureCatalogLoadedAsync();
+
+        Assert.Equal(ChampionCatalogViewState.Failed, unavailableViewModel.CatalogState);
+        Assert.True(unavailableViewModel.HasLoadError);
+        Assert.False(unavailableViewModel.IsCatalogReady);
+    }
+
+    [Fact]
+    public async Task ChampionsAndRole_PickerSearchesAndUpdatesRequestedSide()
+    {
+        var viewModel = new MatchupChampionsAndRoleViewModel(
+            TestChampionCatalog.Ready(),
+            LocalizationService.Instance);
+        await viewModel.EnsureCatalogLoadedAsync();
+
+        viewModel.OpenPlayerPicker();
+
+        Assert.True(viewModel.IsPickerOpen);
+        Assert.Equal(ChampionPickerTarget.Player, viewModel.PickerTarget);
+        viewModel.PickerSearch = "set";
+        var sett = Assert.Single(viewModel.FilteredPickerChampions);
+
+        viewModel.SelectPickerChampion(sett);
+
+        Assert.False(viewModel.IsPickerOpen);
+        Assert.Equal("Sett", viewModel.SelectedPlayerChampion?.Id);
+
+        viewModel.OpenOpponentPicker();
+        var urgot = viewModel.FilteredPickerChampions.Single(champion => champion.Id == "Urgot");
+        viewModel.SelectPickerChampion(urgot);
+
+        Assert.Equal("Urgot", viewModel.SelectedOpponentChampion?.Id);
+        Assert.True(viewModel.IsComplete);
     }
 
     [Fact]
@@ -100,7 +208,10 @@ public sealed class CoachingViewModelTests
                         "Можно играть активнее")
                 ]
             };
-            using var viewModel = new CoachingViewModel(pack, localization);
+            using var viewModel = new CoachingViewModel(
+                pack,
+                localization,
+                TestChampionCatalog.Ready());
 
             Assert.Equal("URG", viewModel.PlayerChampionInitials);
             Assert.Equal("SET", viewModel.OpponentChampionInitials);

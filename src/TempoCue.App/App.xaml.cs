@@ -15,6 +15,7 @@ namespace TempoCue.App;
 public partial class App : System.Windows.Application
 {
     private LiveClientDataClient? _liveClientDataClient;
+    private DataDragonChampionCatalog? _championCatalog;
     private CurrentMatchViewModel? _currentMatchViewModel;
     private HomeViewModel? _homeViewModel;
     private SettingsViewModel? _settingsViewModel;
@@ -52,9 +53,16 @@ public partial class App : System.Windows.Application
         _settingsViewModel = new SettingsViewModel(
             LocalizationService.Instance,
             settingsService);
+        var championCacheDirectory = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "TempoCue",
+            "Cache",
+            "DataDragon");
+        _championCatalog = new DataDragonChampionCatalog(championCacheDirectory);
         _coachingViewModel = new CoachingViewModel(
             pack,
-            LocalizationService.Instance);
+            LocalizationService.Instance,
+            _championCatalog);
 
         MainWindow = new MainWindow(
             _currentMatchViewModel,
@@ -70,6 +78,7 @@ public partial class App : System.Windows.Application
         _settingsViewModel?.Dispose();
         _homeViewModel?.Dispose();
         _currentMatchViewModel?.Dispose();
+        _championCatalog?.Dispose();
         _liveClientDataClient?.Dispose();
         base.OnExit(e);
     }

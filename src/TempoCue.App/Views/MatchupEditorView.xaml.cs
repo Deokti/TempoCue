@@ -1,5 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
+using TempoCue.App.ViewModels;
 
 namespace TempoCue.App.Views;
 
@@ -13,6 +15,31 @@ public partial class MatchupEditorView : UserControl
 
     public event EventHandler? BackRequested;
 
-    private void BackToPackTypeButton_Click(object sender, RoutedEventArgs e) =>
-        BackRequested?.Invoke(this, EventArgs.Empty);
+    private MatchupEditorViewModel ViewModel =>
+        (MatchupEditorViewModel)DataContext;
+
+    private void BackToPackTypeButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (ViewModel.MovePrevious())
+        {
+            ResetContentScroll();
+        }
+        else
+        {
+            BackRequested?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    private void MatchupEditorNextButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (ViewModel.MoveNext())
+        {
+            ResetContentScroll();
+        }
+    }
+
+    private void ResetContentScroll() =>
+        Dispatcher.BeginInvoke(
+            DispatcherPriority.Loaded,
+            new Action(MatchupEditorContentScrollViewer.ScrollToTop));
 }

@@ -68,6 +68,8 @@
   <data name="Log.NoRule" xml:space="preserve"><value>no rule</value></data>
   <data name="Count.Player.One" xml:space="preserve"><value>{0} player</value></data>
   <data name="Count.Player.Other" xml:space="preserve"><value>{0} players</value></data>
+  <data name="Count.Champion.One" xml:space="preserve"><value>{0} champion</value></data>
+  <data name="Count.Champion.Other" xml:space="preserve"><value>{0} champions</value></data>
   <data name="Count.Item.One" xml:space="preserve"><value>{0} item</value></data>
   <data name="Count.Item.Other" xml:space="preserve"><value>{0} items</value></data>
   <data name="Nav.Home" xml:space="preserve"><value>Home</value></data>
@@ -267,4 +269,33 @@
   <data name="Coaching.MatchupEditor.Main.Readiness.LinkRequired" xml:space="preserve"><value>link required</value></data>
   <data name="Coaching.MatchupEditor.Main.Readiness.SourceReady" xml:space="preserve"><value>specified</value></data>
   <data name="Coaching.MatchupEditor.Main.Readiness.NextIteration" xml:space="preserve"><value>The next step will become available after its own verified iteration.</value></data>
+  <data name="Coaching.MatchupEditor.StepSummary.Champions" xml:space="preserve"><value>Step 2 of 7 · Champions and role</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Description" xml:space="preserve"><value>This advice pack applies only to this matchup: your champion against the selected opponent in the same lane.</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Player" xml:space="preserve"><value>I am playing</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Opponent" xml:space="preserve"><value>My opponent</value></data>
+  <data name="Coaching.MatchupEditor.Champions.SelectionHint" xml:space="preserve"><value>Select another champion from the list below.</value></data>
+  <data name="Coaching.MatchupEditor.Champions.SelectPlaceholder" xml:space="preserve"><value>Select a champion</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Search" xml:space="preserve"><value>Search…</value></data>
+  <data name="Coaching.MatchupEditor.Champions.SameChampionError" xml:space="preserve"><value>The player and opponent must be different champions.</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Role" xml:space="preserve"><value>Lane role</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Role.Any" xml:space="preserve"><value>Any role</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Loading" xml:space="preserve"><value>Loading champions…</value></data>
+  <data name="Coaching.MatchupEditor.Champions.LoadError" xml:space="preserve"><value>Could not load the champion list</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Retry" xml:space="preserve"><value>Try again</value></data>
+  <data name="Coaching.MatchupEditor.Champions.UsingCache" xml:space="preserve"><value>Using the saved champion list</value></data>
+  <data name="Coaching.MatchupEditor.Champions.CatalogLoaded" xml:space="preserve"><value>Riot Data Dragon catalog · {0} champions loaded</value></data>
+  <data name="Coaching.MatchupEditor.Champions.CatalogLoading" xml:space="preserve"><value>Riot Data Dragon catalog · loading champions</value></data>
+  <data name="Coaching.MatchupEditor.Champions.ReadinessSummary" xml:space="preserve"><value>{0} vs {1} · {2}</value></data>
+  <data name="Coaching.MatchupEditor.Champions.CatalogSource" xml:space="preserve"><value>Riot Data Dragon catalog</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Change" xml:space="preserve"><value>Change</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Refresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="Coaching.MatchupEditor.Champions.LoadErrorDescription" xml:space="preserve"><value>Data Dragon is unavailable and no saved copy was found.</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.PlayerTitle" xml:space="preserve"><value>Choose your champion</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.OpponentTitle" xml:space="preserve"><value>Choose the opponent</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.PlayerDescription" xml:space="preserve"><value>The champion you play in this matchup</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.OpponentDescription" xml:space="preserve"><value>The champion you face in this matchup</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.Close" xml:space="preserve"><value>Close</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.Search" xml:space="preserve"><value>Search by name</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.Empty" xml:space="preserve"><value>No champions found</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.EmptyDescription" xml:space="preserve"><value>Try another search query.</value></data>
 </root>

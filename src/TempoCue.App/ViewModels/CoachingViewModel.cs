@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using TempoCue.App.Localization;
+using TempoCue.Application;
 using TempoCue.Core;
 
 namespace TempoCue.App.ViewModels;
@@ -20,7 +21,10 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
     private CoachingScreen _currentScreen = CoachingScreen.Library;
     private bool _isDisposed;
 
-    public CoachingViewModel(CoachPack pack, LocalizationService localization)
+    public CoachingViewModel(
+        CoachPack pack,
+        LocalizationService localization,
+        IChampionCatalog championCatalog)
     {
         _pack = pack;
         _localization = localization;
@@ -30,7 +34,9 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
         PlayerChampionInitials = GetInitials(firstRule?.PlayerChampion);
         OpponentChampionInitials = GetInitials(firstRule?.OpponentChampion);
         PackTypeSelection = new PackTypeSelectionViewModel();
-        MatchupEditor = new MatchupEditorViewModel(localization.CurrentLanguageCode);
+        MatchupEditor = new MatchupEditorViewModel(
+            localization,
+            championCatalog);
         RenderLocalizedPresentation();
     }
 
@@ -94,8 +100,11 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
         _localization.PropertyChanged -= Localization_PropertyChanged;
     }
 
-    private void Localization_PropertyChanged(object? sender, PropertyChangedEventArgs e) =>
+    private void Localization_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        MatchupEditor.UpdateLanguage(_localization.CurrentLanguageCode);
         RenderLocalizedPresentation();
+    }
 
     private void RenderLocalizedPresentation()
     {

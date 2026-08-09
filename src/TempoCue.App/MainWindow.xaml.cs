@@ -26,6 +26,7 @@ public partial class MainWindow : Window
         _currentMatchViewModel = currentMatchViewModel;
 
         InitializeComponent();
+        WindowWorkAreaBehavior.Attach(this);
         HomeContentPage.DataContext = homeViewModel;
         SettingsContentPage.DataContext = settingsViewModel;
         CoachingContentPage.DataContext = coachingViewModel;

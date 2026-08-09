@@ -12,8 +12,6 @@
                 <ResourceDictionary Source="../Styles/FormControls.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <Style TargetType="ScrollBar" BasedOn="{StaticResource ShellHorizontalScrollBar}" />
-
             <Style x:Key="EditorStepsListBox" TargetType="ListBox">
                 <Setter Property="Background" Value="Transparent" />
                 <Setter Property="BorderThickness" Value="0" />
@@ -127,10 +125,21 @@
                                    FontWeight="SemiBold" />
                     </Border>
                 </StackPanel>
-                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.StepSummary}"
+                <TextBlock x:Name="MatchupEditorStepSummaryTextBlock"
                            Foreground="#8EA2BC"
                            FontSize="{StaticResource Typography.FontSize.Body}"
-                           Margin="0,5,0,0" />
+                           Margin="0,5,0,0">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Text" Value="{localization:Loc Coaching.MatchupEditor.StepSummary}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentStep}" Value="2">
+                                    <Setter Property="Text" Value="{localization:Loc Coaching.MatchupEditor.StepSummary.Champions}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
             </StackPanel>
 
             <StackPanel Grid.Column="2"
@@ -161,10 +170,12 @@
                         Content="{localization:Loc Coaching.MatchupEditor.Back}"
                         Style="{StaticResource SecondaryButton}"
                         Click="BackToPackTypeButton_Click" />
-                <Button Content="{localization:Loc Coaching.MatchupEditor.Next}"
+                <Button x:Name="MatchupEditorNextButton"
+                        Content="{localization:Loc Coaching.MatchupEditor.Next}"
                         Style="{StaticResource PrimaryButton}"
                         Margin="10,0,0,0"
-                        IsEnabled="False"
+                        IsEnabled="{Binding CanMoveNext}"
+                        Click="MatchupEditorNextButton_Click"
                         ToolTip="{localization:Loc Coaching.MatchupEditor.Placeholder}" />
             </StackPanel>
         </Grid>
@@ -182,6 +193,7 @@
                      SelectedIndex="{Binding CurrentStepIndex, Mode=OneWay}">
                 <ListBox.Resources>
                     <Style TargetType="ListBoxItem" BasedOn="{StaticResource EditorStepItem}" />
+                    <Style TargetType="ScrollBar" BasedOn="{StaticResource ShellHorizontalScrollBar}" />
                 </ListBox.Resources>
                 <ListBoxItem Tag="1" Content="{localization:Loc Coaching.MatchupEditor.Step.Main}" />
                 <ListBoxItem Tag="2" Content="{localization:Loc Coaching.MatchupEditor.Step.Champions}" />
@@ -193,8 +205,69 @@
             </ListBox>
         </Border>
 
-        <views:MatchupMainInformationView x:Name="MatchupMainInformationPage"
-                                          Grid.Row="4"
-                                          DataContext="{Binding MainInformation}" />
+        <ScrollViewer x:Name="MatchupEditorContentScrollViewer"
+                      Grid.Row="4"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <ScrollViewer.Resources>
+                <Style TargetType="ScrollBar" BasedOn="{StaticResource ShellScrollBar}" />
+            </ScrollViewer.Resources>
+            <Grid Margin="0,0,8,24">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="5*" />
+                    <ColumnDefinition Width="16" />
+                    <ColumnDefinition Width="3*" />
+                </Grid.ColumnDefinitions>
+
+                <Grid>
+                    <views:MatchupMainInformationView x:Name="MatchupMainInformationPage"
+                                                      DataContext="{Binding MainInformation}">
+                        <views:MatchupMainInformationView.Style>
+                            <Style TargetType="views:MatchupMainInformationView">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DataContext.CurrentStep, RelativeSource={RelativeSource AncestorType={x:Type views:MatchupEditorView}}}"
+                                                 Value="2">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </views:MatchupMainInformationView.Style>
+                    </views:MatchupMainInformationView>
+                    <views:MatchupChampionsAndRoleView x:Name="MatchupChampionsAndRolePage"
+                                                       DataContext="{Binding ChampionsAndRole}">
+                        <views:MatchupChampionsAndRoleView.Style>
+                            <Style TargetType="views:MatchupChampionsAndRoleView">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DataContext.CurrentStep, RelativeSource={RelativeSource AncestorType={x:Type views:MatchupEditorView}}}"
+                                                 Value="2">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </views:MatchupChampionsAndRoleView.Style>
+                    </views:MatchupChampionsAndRoleView>
+                </Grid>
+
+                <views:MatchupEditorSidebarView x:Name="MatchupEditorSidebar"
+                                                Grid.Column="2" />
+            </Grid>
+        </ScrollViewer>
+
+        <views:ChampionPickerDialogView x:Name="ChampionPickerDialog"
+                                        Grid.RowSpan="5"
+                                        Panel.ZIndex="20"
+                                        DataContext="{Binding ChampionsAndRole}">
+            <views:ChampionPickerDialogView.Style>
+                <Style TargetType="views:ChampionPickerDialogView">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsPickerOpen}" Value="True">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </views:ChampionPickerDialogView.Style>
+        </views:ChampionPickerDialogView>
     </Grid>
 </UserControl>

@@ -17,6 +17,85 @@ namespace TempoCue.App.Tests;
 public sealed class LocalizationServiceTests
 {
     [Fact]
+    public void ChampionsAndRoleView_ShowsLoadingLayoutFromDesign()
+    {
+        Exception? failure = null;
+        var thread = new Thread(() =>
+        {
+            try
+            {
+                var localization = LocalizationService.Instance;
+                localization.SetLanguage("ru-RU");
+                var catalog = new DeferredChampionCatalog();
+                var viewModel = new MatchupChampionsAndRoleViewModel(catalog, localization);
+                var loadTask = viewModel.EnsureCatalogLoadedAsync();
+                var view = new TempoCue.App.Views.MatchupChampionsAndRoleView
+                {
+                    DataContext = viewModel
+                };
+                var window = new Window
+                {
+                    Width = 760,
+                    Height = 560,
+                    Content = view,
+                    ShowInTaskbar = false,
+                    WindowStyle = WindowStyle.None
+                };
+
+                window.Show();
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.Render);
+
+                Assert.Equal(
+                    Visibility.Visible,
+                    Assert.IsType<StackPanel>(
+                        view.FindName("ChampionCatalogLoadingPanel")).Visibility);
+                Assert.Equal(
+                    Visibility.Collapsed,
+                    Assert.IsType<StackPanel>(
+                        view.FindName("ChampionSelectionContent")).Visibility);
+                Assert.Equal(
+                    Visibility.Visible,
+                    Assert.IsType<StackPanel>(
+                        view.FindName("MatchupRoleSelectionPanel")).Visibility);
+                Assert.Equal(
+                    86d,
+                    Assert.IsType<Border>(
+                        view.FindName("PlayerChampionLoadingCard")).ActualHeight);
+                Assert.Equal(
+                    new CornerRadius(12),
+                    Assert.IsType<Border>(
+                        view.FindName("OpponentChampionLoadingCard")).CornerRadius);
+                Assert.Equal(
+                    5,
+                    Assert.IsType<ListBox>(
+                        view.FindName("MatchupRoleListBox")).Items.Count);
+
+                catalog.Complete(ChampionCatalogLoadResult.Unavailable());
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.Background);
+                loadTask.GetAwaiter().GetResult();
+                window.Close();
+            }
+            catch (Exception exception)
+            {
+                failure = exception;
+            }
+        });
+
+        thread.SetApartmentState(ApartmentState.STA);
+        thread.Start();
+        thread.Join();
+
+        if (failure is not null)
+        {
+            ExceptionDispatchInfo.Capture(failure).Throw();
+        }
+    }
+
+    [Fact]
     public void MainWindow_LoadsLocalizedXamlAndUpdatesTitleWithoutRestart()
     {
         Exception? failure = null;
@@ -38,7 +117,8 @@ public sealed class LocalizationServiceTests
                     new AppSettingsService());
                 using var coachingViewModel = new CoachingViewModel(
                     CreateCoachPack(),
-                    localization);
+                    localization,
+                    TestChampionCatalog.Ready());
                 var window = new MainWindow(
                     currentMatchViewModel,
                     homeViewModel,
@@ -54,6 +134,13 @@ public sealed class LocalizationServiceTests
                 Assert.Equal(ResizeMode.NoResize, window.ResizeMode);
                 Assert.Equal(WindowStyle.None, window.WindowStyle);
                 Assert.NotNull(window.Icon);
+                window.WindowState = WindowState.Maximized;
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.Render);
+                Assert.True(window.ActualWidth <= SystemParameters.WorkArea.Width + 1);
+                Assert.True(window.ActualHeight <= SystemParameters.WorkArea.Height + 1);
+                window.WindowState = WindowState.Normal;
                 var homeNavigationIcon = Assert.IsType<System.Windows.Shapes.Path>(
                     window.FindName("HomeNavigationIcon"));
                 Assert.NotNull(homeNavigationIcon.Data);
@@ -83,6 +170,26 @@ public sealed class LocalizationServiceTests
                     coachingPage.FindName("MatchupEditorPage"));
                 var matchupMainInformationPage = Assert.IsType<TempoCue.App.Views.MatchupMainInformationView>(
                     matchupEditorPage.FindName("MatchupMainInformationPage"));
+                var matchupChampionsAndRolePage = Assert.IsType<TempoCue.App.Views.MatchupChampionsAndRoleView>(
+                    matchupEditorPage.FindName("MatchupChampionsAndRolePage"));
+                var matchupEditorSidebar = Assert.IsType<TempoCue.App.Views.MatchupEditorSidebarView>(
+                    matchupEditorPage.FindName("MatchupEditorSidebar"));
+                var championPickerDialog = Assert.IsType<TempoCue.App.Views.ChampionPickerDialogView>(
+                    matchupEditorPage.FindName("ChampionPickerDialog"));
+                var sharedTextBoxPadding = new Thickness(8, 9, 8, 9);
+                foreach (var textBoxName in new[]
+                         {
+                             "MatchupPackNameTextBox",
+                             "MatchupDescriptionTextBox",
+                             "MatchupAuthorTextBox",
+                             "MatchupPatchTextBox",
+                             "MatchupSourceUrlTextBox"
+                         })
+                {
+                    Assert.Equal(
+                        sharedTextBoxPadding,
+                        Assert.IsType<TextBox>(matchupMainInformationPage.FindName(textBoxName)).Padding);
+                }
                 var settingsTitle = Assert.IsType<TextBlock>(
                     settingsPage.FindName("SettingsTitleTextBlock"));
                 var languageComboBox = Assert.IsType<ComboBox>(
@@ -240,11 +347,11 @@ public sealed class LocalizationServiceTests
                 Assert.Equal(
                     "Urgot против Sett",
                     Assert.IsType<TextBlock>(
-                        matchupMainInformationPage.FindName("MatchupPreviewNameTextBlock")).Text);
+                        matchupEditorSidebar.FindName("MatchupPreviewNameTextBlock")).Text);
                 Assert.Equal(
                     "заполнено",
                     Assert.IsType<TextBlock>(
-                        matchupMainInformationPage.FindName("MatchupReadinessTextBlock")).Text);
+                        matchupEditorSidebar.FindName("MatchupReadinessTextBlock")).Text);
 
                 coachingViewModel.MatchupEditor.MainInformation.SelectedSourceKind = MatchupSourceKind.Article;
                 Dispatcher.CurrentDispatcher.Invoke(
@@ -252,6 +359,126 @@ public sealed class LocalizationServiceTests
                     DispatcherPriority.DataBind);
                 Assert.Equal(Visibility.Visible, matchupSourceUrlPanel.Visibility);
                 Assert.False(coachingViewModel.MatchupEditor.MainInformation.IsComplete);
+
+                coachingViewModel.MatchupEditor.MainInformation.SelectedSourceKind =
+                    MatchupSourceKind.PersonalExperience;
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
+                var matchupEditorNextButton = Assert.IsType<Button>(
+                    matchupEditorPage.FindName("MatchupEditorNextButton"));
+                var matchupEditorContentScrollViewer = Assert.IsType<ScrollViewer>(
+                    matchupEditorPage.FindName("MatchupEditorContentScrollViewer"));
+                matchupEditorContentScrollViewer.ScrollToVerticalOffset(120);
+                window.UpdateLayout();
+                Assert.True(matchupEditorContentScrollViewer.VerticalOffset > 0);
+                Assert.True(matchupEditorNextButton.IsEnabled);
+                matchupEditorNextButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.ApplicationIdle);
+
+                Assert.Equal(2, coachingViewModel.MatchupEditor.CurrentStep);
+                Assert.Equal(0d, matchupEditorContentScrollViewer.VerticalOffset);
+                Assert.Equal(1, matchupEditorSteps.SelectedIndex);
+                Assert.Equal(Visibility.Collapsed, matchupMainInformationPage.Visibility);
+                Assert.Equal(Visibility.Visible, matchupChampionsAndRolePage.Visibility);
+                Assert.Equal(
+                    "Шаг 2 из 7 · Чемпионы и роль",
+                    Assert.IsType<TextBlock>(
+                        matchupEditorPage.FindName("MatchupEditorStepSummaryTextBlock")).Text);
+
+                var championsAndRole = coachingViewModel.MatchupEditor.ChampionsAndRole;
+                championsAndRole.EnsureCatalogLoadedAsync().GetAwaiter().GetResult();
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
+                Assert.Equal(
+                    Visibility.Visible,
+                    Assert.IsType<StackPanel>(
+                        matchupChampionsAndRolePage.FindName("ChampionSelectionContent")).Visibility);
+                Assert.IsType<Button>(
+                        matchupChampionsAndRolePage.FindName("ChangePlayerChampionButton"))
+                    .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
+                Assert.Equal(Visibility.Visible, championPickerDialog.Visibility);
+                Assert.Equal(ChampionPickerTarget.Player, championsAndRole.PickerTarget);
+                window.UpdateLayout();
+                var closePickerButton = Assert.IsType<Button>(
+                    championPickerDialog.FindName("CloseChampionPickerButton"));
+                Assert.Equal(new Thickness(0), closePickerButton.Padding);
+                var closePickerIcon = Assert.Single(
+                    FindVisualDescendants<System.Windows.Shapes.Path>(closePickerButton));
+                Assert.NotNull(closePickerIcon.Data);
+                Assert.NotNull(closePickerIcon.Stroke);
+                var pickerSearchTextBox = Assert.IsType<TextBox>(
+                    championPickerDialog.FindName("ChampionPickerSearchTextBox"));
+                Assert.Equal(sharedTextBoxPadding, pickerSearchTextBox.Padding);
+                Assert.Equal(600d, pickerSearchTextBox.ActualWidth);
+                var pickerSearchPlaceholder = Assert.IsType<TextBlock>(
+                    championPickerDialog.FindName("ChampionPickerSearchPlaceholder"));
+                Assert.Equal(new Thickness(9, 0, 0, 0), pickerSearchPlaceholder.Margin);
+                var pickerItems = Assert.IsType<ItemsControl>(
+                    championPickerDialog.FindName("ChampionPickerItemsControl"));
+                var pickerButtonStyle = Assert.IsType<Style>(
+                    championPickerDialog.FindResource("ChampionPickerButton"));
+                var pickerButtonWidth = Assert.IsType<double>(Assert.Single(
+                    pickerButtonStyle.Setters.OfType<Setter>(),
+                    setter => setter.Property == FrameworkElement.WidthProperty).Value);
+                var pickerButtonMargin = Assert.IsType<Thickness>(Assert.Single(
+                    pickerButtonStyle.Setters.OfType<Setter>(),
+                    setter => setter.Property == FrameworkElement.MarginProperty).Value);
+                var fiveCardRowWidth = (pickerButtonWidth * 5) + (pickerButtonMargin.Right * 4);
+                Assert.Equal(fiveCardRowWidth, pickerSearchTextBox.ActualWidth);
+                pickerSearchTextBox.Focus();
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.Input);
+                Assert.True(pickerSearchTextBox.IsKeyboardFocusWithin);
+                Assert.Equal(
+                    Visibility.Collapsed,
+                    pickerSearchPlaceholder.Visibility);
+                var urgotButton = FindVisualDescendants<Button>(pickerItems)
+                    .Single(button => button.DataContext is ChampionOptionViewModel { Id: "Urgot" });
+                urgotButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
+                Assert.Equal(Visibility.Collapsed, championPickerDialog.Visibility);
+
+                Assert.IsType<Button>(
+                        matchupChampionsAndRolePage.FindName("ChangeOpponentChampionButton"))
+                    .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
+                window.UpdateLayout();
+                var settButton = FindVisualDescendants<Button>(pickerItems)
+                    .Single(button => button.DataContext is ChampionOptionViewModel { Id: "Sett" });
+                settButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
+                Assert.True(championsAndRole.IsComplete);
+                Assert.Equal(
+                    "Urgot против Sett · TOP",
+                    Assert.IsType<TextBlock>(
+                        matchupEditorSidebar.FindName("MatchupChampionsReadinessTextBlock")).Text);
+
+                Assert.IsType<Button>(
+                        matchupEditorPage.FindName("BackToPackTypeButton"))
+                    .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
+                Assert.Equal(1, coachingViewModel.MatchupEditor.CurrentStep);
+                Assert.Equal(Visibility.Visible, matchupMainInformationPage.Visibility);
+                Assert.Equal(Visibility.Collapsed, matchupChampionsAndRolePage.Visibility);
 
                 Assert.IsType<Button>(
                         matchupEditorPage.FindName("BackToPackTypeButton"))
@@ -291,6 +518,18 @@ public sealed class LocalizationServiceTests
                     "What kind of advice pack are we creating?",
                     Assert.IsType<TextBlock>(
                         packTypeSelectionPage.FindName("PackTypeTitleTextBlock")).Text);
+                Assert.Equal(
+                    "Champions and role",
+                    Assert.IsType<TextBlock>(
+                        matchupChampionsAndRolePage.FindName("MatchupChampionsStepTitleTextBlock")).Text);
+                championsAndRole.EnsureCatalogLoadedAsync().GetAwaiter().GetResult();
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
+                Assert.Equal(
+                    "Urgot vs Sett · TOP",
+                    Assert.IsType<TextBlock>(
+                        matchupEditorSidebar.FindName("MatchupChampionsReadinessTextBlock")).Text);
                 window.UpdateLayout();
                 Dispatcher.CurrentDispatcher.Invoke(
                     static () => { },

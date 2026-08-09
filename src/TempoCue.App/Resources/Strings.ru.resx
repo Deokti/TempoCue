@@ -69,6 +69,9 @@
   <data name="Count.Player.One" xml:space="preserve"><value>{0} игрок</value></data>
   <data name="Count.Player.Few" xml:space="preserve"><value>{0} игрока</value></data>
   <data name="Count.Player.Many" xml:space="preserve"><value>{0} игроков</value></data>
+  <data name="Count.Champion.One" xml:space="preserve"><value>{0} чемпион</value></data>
+  <data name="Count.Champion.Few" xml:space="preserve"><value>{0} чемпиона</value></data>
+  <data name="Count.Champion.Many" xml:space="preserve"><value>{0} чемпионов</value></data>
   <data name="Count.Item.One" xml:space="preserve"><value>{0} предмет</value></data>
   <data name="Count.Item.Few" xml:space="preserve"><value>{0} предмета</value></data>
   <data name="Count.Item.Many" xml:space="preserve"><value>{0} предметов</value></data>
@@ -269,4 +272,33 @@
   <data name="Coaching.MatchupEditor.Main.Readiness.LinkRequired" xml:space="preserve"><value>нужна ссылка</value></data>
   <data name="Coaching.MatchupEditor.Main.Readiness.SourceReady" xml:space="preserve"><value>указан</value></data>
   <data name="Coaching.MatchupEditor.Main.Readiness.NextIteration" xml:space="preserve"><value>Следующий шаг станет доступен после отдельной проверяемой итерации.</value></data>
+  <data name="Coaching.MatchupEditor.StepSummary.Champions" xml:space="preserve"><value>Шаг 2 из 7 · Чемпионы и роль</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Description" xml:space="preserve"><value>Набор советов работает только в этом матчапе: ваш чемпион против выбранного противника на одной линии.</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Player" xml:space="preserve"><value>Я играю на</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Opponent" xml:space="preserve"><value>Мой противник</value></data>
+  <data name="Coaching.MatchupEditor.Champions.SelectionHint" xml:space="preserve"><value>Выберите другого чемпиона в списке ниже.</value></data>
+  <data name="Coaching.MatchupEditor.Champions.SelectPlaceholder" xml:space="preserve"><value>Выберите чемпиона</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Search" xml:space="preserve"><value>Поиск…</value></data>
+  <data name="Coaching.MatchupEditor.Champions.SameChampionError" xml:space="preserve"><value>Чемпионы игрока и противника должны отличаться.</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Role" xml:space="preserve"><value>Роль на линии</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Role.Any" xml:space="preserve"><value>Любая роль</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Loading" xml:space="preserve"><value>Загружаем чемпионов…</value></data>
+  <data name="Coaching.MatchupEditor.Champions.LoadError" xml:space="preserve"><value>Не удалось загрузить список чемпионов</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Retry" xml:space="preserve"><value>Повторить</value></data>
+  <data name="Coaching.MatchupEditor.Champions.UsingCache" xml:space="preserve"><value>Используется сохранённый список чемпионов</value></data>
+  <data name="Coaching.MatchupEditor.Champions.CatalogLoaded" xml:space="preserve"><value>каталог Riot Data Dragon · загружено {0} чемпионов</value></data>
+  <data name="Coaching.MatchupEditor.Champions.CatalogLoading" xml:space="preserve"><value>каталог Riot Data Dragon · загружаем чемпионов</value></data>
+  <data name="Coaching.MatchupEditor.Champions.ReadinessSummary" xml:space="preserve"><value>{0} против {1} · {2}</value></data>
+  <data name="Coaching.MatchupEditor.Champions.CatalogSource" xml:space="preserve"><value>Каталог Riot Data Dragon</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Change" xml:space="preserve"><value>Изменить</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Refresh" xml:space="preserve"><value>Обновить</value></data>
+  <data name="Coaching.MatchupEditor.Champions.LoadErrorDescription" xml:space="preserve"><value>Data Dragon недоступен, а сохранённая копия ещё не создана.</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.PlayerTitle" xml:space="preserve"><value>Выберите своего чемпиона</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.OpponentTitle" xml:space="preserve"><value>Выберите противника</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.PlayerDescription" xml:space="preserve"><value>Чемпион, за которого вы играете в этом матчапе</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.OpponentDescription" xml:space="preserve"><value>Чемпион, против которого вы играете в этом матчапе</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.Close" xml:space="preserve"><value>Закрыть</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.Search" xml:space="preserve"><value>Поиск по имени</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.Empty" xml:space="preserve"><value>Чемпионы не найдены</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.EmptyDescription" xml:space="preserve"><value>Попробуйте изменить поисковый запрос.</value></data>
 </root>
