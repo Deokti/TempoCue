@@ -14,9 +14,6 @@ public sealed class LiveClientDataClient : IMatchSnapshotSource, IDisposable
     public static readonly Uri AllGameDataEndpoint =
         new("https://127.0.0.1:2999/liveclientdata/allgamedata");
 
-    private static readonly Uri PlayerScoresEndpoint =
-        new("https://127.0.0.1:2999/liveclientdata/playerscores");
-
     private static readonly JsonSerializerOptions ReadOptions = new(JsonSerializerDefaults.Web);
 
     private static readonly JsonSerializerOptions DisplayOptions = new(JsonSerializerDefaults.Web)
@@ -77,9 +74,7 @@ public sealed class LiveClientDataClient : IMatchSnapshotSource, IDisposable
         var data = JsonSerializer.Deserialize<LiveClientAllGameDataDto>(rawJson, ReadOptions)
             ?? throw new InvalidDataException("Riot API вернул пустой JSON активного матча.");
 
-        var currentScores = await GetAllPlayerScoresAsync(data, cancellationToken)
-            .ConfigureAwait(false);
-        var match = LiveClientDataMapper.Map(data, currentScores);
+        var match = LiveClientDataMapper.Map(data);
         var events = LiveClientDataMapper.MapEvents(data);
 
         // Повторная сериализация нужна только для удобного отображения JSON в приложении.
@@ -121,20 +116,34 @@ public sealed class LiveClientDataClient : IMatchSnapshotSource, IDisposable
         {
             return GetUnavailableResult();
         }
-        catch (HttpRequestException)
+        catch (HttpRequestException exception)
         {
+            Trace.TraceError(
+                "Live Client Data вернул ошибку HTTP {0}: {1}",
+                exception.StatusCode,
+                exception.Message);
             return MatchSnapshotReadResult.Failed();
         }
-        catch (JsonException)
+        catch (JsonException exception)
         {
+            Trace.TraceError(
+                "Не удалось разобрать JSON Live Client Data: {0}",
+                exception.Message);
             return MatchSnapshotReadResult.InvalidData();
         }
-        catch (InvalidDataException)
+        catch (InvalidDataException exception)
         {
+            Trace.TraceError(
+                "Live Client Data не содержит обязательные данные: {0}",
+                exception.Message);
             return MatchSnapshotReadResult.InvalidData();
         }
-        catch (Exception)
+        catch (Exception exception)
         {
+            Trace.TraceError(
+                "Непредвиденная ошибка Live Client Data ({0}): {1}",
+                exception.GetType().Name,
+                exception.Message);
             return MatchSnapshotReadResult.Failed();
         }
     }
@@ -151,83 +160,6 @@ public sealed class LiveClientDataClient : IMatchSnapshotSource, IDisposable
         _isGameProcessRunning()
             ? MatchSnapshotReadResult.GameLoading()
             : MatchSnapshotReadResult.NoActiveMatch();
-
-    private async Task<IReadOnlyDictionary<string, LiveClientScoresDto>> GetAllPlayerScoresAsync(
-        LiveClientAllGameDataDto data,
-        CancellationToken cancellationToken)
-    {
-        var requests = data.AllPlayers
-            .Select(player => GetPlayerScoresAsync(player, cancellationToken))
-            .ToArray();
-        var results = await Task.WhenAll(requests).ConfigureAwait(false);
-
-        return results
-            .Where(result => result.HasValue)
-            .Select(result => result.GetValueOrDefault())
-            .GroupBy(result => result.Key, StringComparer.OrdinalIgnoreCase)
-            .ToDictionary(
-                group => group.Key,
-                group => group.Last().Value,
-                StringComparer.OrdinalIgnoreCase);
-    }
-
-    private async Task<KeyValuePair<string, LiveClientScoresDto>?> GetPlayerScoresAsync(
-        LiveClientPlayerDto player,
-        CancellationToken cancellationToken)
-    {
-        var riotId = LiveClientDataMapper.GetParticipantId(
-            player.RiotId,
-            player.SummonerName);
-
-        if (string.IsNullOrWhiteSpace(riotId))
-        {
-            return null;
-        }
-
-        var endpoint = new UriBuilder(PlayerScoresEndpoint)
-        {
-            Query = $"riotId={Uri.EscapeDataString(riotId)}"
-        }.Uri;
-
-        try
-        {
-            using var response = await _httpClient
-                .GetAsync(endpoint, cancellationToken)
-                .ConfigureAwait(false);
-
-            // Подробный endpoint — только необязательное уточнение общего снимка.
-            // Некоторые боты и режимы не позволяют запросить показатели по Riot ID.
-            if (!response.IsSuccessStatusCode)
-            {
-                return null;
-            }
-
-            var json = await response.Content
-                .ReadAsStringAsync(cancellationToken)
-                .ConfigureAwait(false);
-            var scores = JsonSerializer.Deserialize<LiveClientScoresDto>(json, ReadOptions);
-
-            return scores is null
-                ? null
-                : KeyValuePair.Create(riotId, scores);
-        }
-        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-        {
-            throw;
-        }
-        catch (TaskCanceledException)
-        {
-            return null;
-        }
-        catch (HttpRequestException)
-        {
-            return null;
-        }
-        catch (JsonException)
-        {
-            return null;
-        }
-    }
 
     private static HttpClient CreateHttpClient()
     {

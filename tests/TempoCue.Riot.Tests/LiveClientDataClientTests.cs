@@ -93,24 +93,14 @@ public sealed class LiveClientDataClientTests
             }
             """;
 
-        var handler = new StubHttpMessageHandler(
-            json,
-            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-            {
-                ["UrgotPlayer#TEST"] =
-                    """{"kills":2,"deaths":1,"assists":3,"creepScore":94}""",
-                ["AllySupport#TEST"] =
-                    """{"kills":0,"deaths":2,"assists":5,"creepScore":13}""",
-                ["SettPlayer#TEST"] =
-                    """{"kills":1,"deaths":2,"assists":0,"creepScore":84}"""
-            });
+        var handler = new StubHttpMessageHandler(json);
         using var httpClient = new HttpClient(handler);
         using var client = new LiveClientDataClient(httpClient);
 
         var snapshot = await client.GetSnapshotAsync();
 
         Assert.Contains(LiveClientDataClient.AllGameDataEndpoint, handler.RequestedUris);
-        Assert.Equal(4, handler.RequestedUris.Count);
+        Assert.Single(handler.RequestedUris);
         Assert.Equal(645.25, snapshot.Match.GameTimeSeconds);
         Assert.Equal("UrgotPlayer#TEST", snapshot.Match.ActivePlayerId);
         Assert.Equal(3, snapshot.Match.Players.Count);
@@ -123,15 +113,15 @@ public sealed class LiveClientDataClientTests
         Assert.Equal(2, activePlayer.Kills);
         Assert.Equal(1, activePlayer.Deaths);
         Assert.Equal(3, activePlayer.Assists);
-        Assert.Equal(94, activePlayer.CreepScore);
+        Assert.Equal(91, activePlayer.CreepScore);
 
         var support = Assert.Single(snapshot.Match.GetAllies());
         Assert.Equal(PlayerPosition.Support, support.Position);
-        Assert.Equal(13, support.CreepScore);
+        Assert.Equal(11, support.CreepScore);
 
         var sett = Assert.Single(snapshot.Match.GetEnemies());
         Assert.Equal("Sett", sett.ChampionName);
-        Assert.Equal(84, sett.CreepScore);
+        Assert.Equal(80, sett.CreepScore);
         Assert.True(sett.IsDead);
         Assert.Equal(12.5, sett.RespawnTimerSeconds);
 
@@ -200,7 +190,7 @@ public sealed class LiveClientDataClientTests
     }
 
     [Fact]
-    public async Task GetSnapshotAsync_UsesGeneralScoresWhenDetailedRequestIsUnavailable()
+    public async Task GetSnapshotAsync_ReadsAllPlayerScoresFromFullSnapshot()
     {
         const string json = """
             {
@@ -231,19 +221,14 @@ public sealed class LiveClientDataClientTests
               "gameData": { "gameTime": 420 }
             }
             """;
-        var handler = new StubHttpMessageHandler(
-            json,
-            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-            {
-                ["AatroxPlayer#TEST"] =
-                    """{"kills":0,"deaths":0,"assists":0,"creepScore":55}"""
-            });
+        var handler = new StubHttpMessageHandler(json);
         using var httpClient = new HttpClient(handler);
         using var client = new LiveClientDataClient(httpClient);
 
         var snapshot = await client.GetSnapshotAsync();
 
-        Assert.Equal(55, snapshot.Match.GetActivePlayer()?.CreepScore);
+        Assert.Single(handler.RequestedUris);
+        Assert.Equal(53, snapshot.Match.GetActivePlayer()?.CreepScore);
         Assert.Equal(48, Assert.Single(snapshot.Match.GetEnemies()).CreepScore);
     }
 
@@ -279,7 +264,6 @@ public sealed class LiveClientDataClientTests
 
     private sealed class StubHttpMessageHandler(
         string responseJson,
-        IReadOnlyDictionary<string, string>? scoreResponses = null,
         HttpStatusCode allGameStatusCode = HttpStatusCode.OK) : HttpMessageHandler
     {
         public ConcurrentBag<Uri> RequestedUris { get; } = [];
@@ -292,29 +276,14 @@ public sealed class LiveClientDataClientTests
                 ?? throw new InvalidOperationException("Тестовый запрос не содержит URI.");
             RequestedUris.Add(requestUri);
 
-            var content = responseJson;
-            var isPlayerScoresRequest = requestUri.AbsolutePath.EndsWith(
-                    "/playerscores",
-                    StringComparison.OrdinalIgnoreCase);
-            if (!isPlayerScoresRequest && allGameStatusCode != HttpStatusCode.OK)
+            if (allGameStatusCode != HttpStatusCode.OK)
             {
                 return Task.FromResult(new HttpResponseMessage(allGameStatusCode));
             }
 
-            if (isPlayerScoresRequest)
-            {
-                var encodedRiotId = requestUri.Query["?riotId=".Length..];
-                var riotId = Uri.UnescapeDataString(encodedRiotId);
-                if (scoreResponses is null
-                    || !scoreResponses.TryGetValue(riotId, out content))
-                {
-                    return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound));
-                }
-            }
-
             var response = new HttpResponseMessage(HttpStatusCode.OK)
             {
-                Content = new StringContent(content, Encoding.UTF8, "application/json")
+                Content = new StringContent(responseJson, Encoding.UTF8, "application/json")
             };
 
             return Task.FromResult(response);

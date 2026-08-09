@@ -8,9 +8,7 @@ namespace TempoCue.Riot;
 /// </summary>
 internal static class LiveClientDataMapper
 {
-    public static MatchState Map(
-        LiveClientAllGameDataDto source,
-        IReadOnlyDictionary<string, LiveClientScoresDto>? currentScores = null)
+    public static MatchState Map(LiveClientAllGameDataDto source)
     {
         ArgumentNullException.ThrowIfNull(source);
 
@@ -24,7 +22,7 @@ internal static class LiveClientDataMapper
         }
 
         var players = source.AllPlayers
-            .Select((player, index) => MapPlayer(player, index, currentScores))
+            .Select(MapPlayer)
             .ToArray();
 
         return new MatchState
@@ -51,15 +49,12 @@ internal static class LiveClientDataMapper
             .ToArray();
     }
 
-    private static PlayerState MapPlayer(
-        LiveClientPlayerDto source,
-        int index,
-        IReadOnlyDictionary<string, LiveClientScoresDto>? currentScores)
+    private static PlayerState MapPlayer(LiveClientPlayerDto source, int index)
     {
         var participantId = GetParticipantId(source.RiotId, source.SummonerName)
             ?? $"participant-{index}";
 
-        var player = new PlayerState
+        return new PlayerState
         {
             ParticipantId = participantId,
             ChampionName = GetCanonicalChampionName(source),
@@ -74,26 +69,6 @@ internal static class LiveClientDataMapper
             Deaths = source.Scores.Deaths,
             Assists = source.Scores.Assists,
             CreepScore = source.Scores.CreepScore
-        };
-
-        return currentScores is not null
-            && currentScores.TryGetValue(participantId, out var scores)
-                ? ApplyCurrentScores(player, scores)
-                : player;
-    }
-
-    private static PlayerState ApplyCurrentScores(
-        PlayerState player,
-        LiveClientScoresDto currentScores)
-    {
-        // Оба ответа Riot относятся к одному моменту матча, а эти показатели
-        // могут только увеличиваться. Максимум защищает от задержки одного из endpoint.
-        return player with
-        {
-            Kills = Math.Max(player.Kills, currentScores.Kills),
-            Deaths = Math.Max(player.Deaths, currentScores.Deaths),
-            Assists = Math.Max(player.Assists, currentScores.Assists),
-            CreepScore = Math.Max(player.CreepScore, currentScores.CreepScore)
         };
     }
 
