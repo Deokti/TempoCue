@@ -210,4 +210,32 @@
   <data name="Coaching.Sharing.Title" xml:space="preserve"><value>Как будут распространяться наборы сообщества</value></data>
   <data name="Coaching.Sharing.Description" xml:space="preserve"><value>Сначала — через безопасный импорт и экспорт версионированного файла Coach Pack. Позже этот же формат сможет использовать каталог сообщества.</value></data>
   <data name="Coaching.Sharing.CommunityPlacement" xml:space="preserve"><value>Установленные наборы других авторов появятся в «Матчапах» или «Контроле карты». В «Моих наборах» останутся только созданные вами.</value></data>
+  <data name="Coaching.NewPack.Back" xml:space="preserve"><value>Назад в библиотеку</value></data>
+  <data name="Coaching.NewPack.Title" xml:space="preserve"><value>Какой набор советов создаём?</value></data>
+  <data name="Coaching.NewPack.Description" xml:space="preserve"><value>Тип определяет, какие вопросы задаст редактор. Позже его можно поменять только пересозданием набора.</value></data>
+  <data name="Coaching.NewPack.ConstructorAsks" xml:space="preserve"><value>Редактор спросит про</value></data>
+  <data name="Coaching.NewPack.Matchup.Title" xml:space="preserve"><value>Матчап</value></data>
+  <data name="Coaching.NewPack.Matchup.Description" xml:space="preserve"><value>Расскажите игроку, как действовать против конкретного чемпиона на разных этапах матча.</value></data>
+  <data name="Coaching.NewPack.Matchup.PromptItems" xml:space="preserve"><value>двух чемпионов и роль · фазы матчапа · условия по уровню и предметам · текст советов</value></data>
+  <data name="Coaching.NewPack.Matchup.Start" xml:space="preserve"><value>Начать · шаг 1 из 7</value></data>
+  <data name="Coaching.NewPack.GameControl.Title" xml:space="preserve"><value>Контроль игры</value></data>
+  <data name="Coaching.NewPack.GameControl.Description" xml:space="preserve"><value>Создайте напоминания о карте, гангах, объектах, пропавших противниках и других игровых событиях.</value></data>
+  <data name="Coaching.NewPack.GameControl.PromptItems" xml:space="preserve"><value>роль и режим · игровую ситуацию из шаблонов · условия по времени и карте · способ показа</value></data>
+  <data name="Coaching.NewPack.GameControl.Unavailable" xml:space="preserve"><value>Недоступно в этой итерации</value></data>
+  <data name="Coaching.NewPack.Soon" xml:space="preserve"><value>Скоро</value></data>
+  <data name="Coaching.MatchupEditor.Back" xml:space="preserve"><value>Назад</value></data>
+  <data name="Coaching.MatchupEditor.Next" xml:space="preserve"><value>Дальше</value></data>
+  <data name="Coaching.MatchupEditor.Mode.Simple" xml:space="preserve"><value>Простой</value></data>
+  <data name="Coaching.MatchupEditor.Mode.Advanced" xml:space="preserve"><value>Расширенный</value></data>
+  <data name="Coaching.MatchupEditor.Title" xml:space="preserve"><value>Новый матчап</value></data>
+  <data name="Coaching.MatchupEditor.Draft" xml:space="preserve"><value>Черновик</value></data>
+  <data name="Coaching.MatchupEditor.StepSummary" xml:space="preserve"><value>Шаг 1 из 7 · Основная информация</value></data>
+  <data name="Coaching.MatchupEditor.Step.Main" xml:space="preserve"><value>Основная информация</value></data>
+  <data name="Coaching.MatchupEditor.Step.Champions" xml:space="preserve"><value>Чемпионы и роль</value></data>
+  <data name="Coaching.MatchupEditor.Step.Phases" xml:space="preserve"><value>Фазы матчапа</value></data>
+  <data name="Coaching.MatchupEditor.Step.Conditions" xml:space="preserve"><value>Условия</value></data>
+  <data name="Coaching.MatchupEditor.Step.Content" xml:space="preserve"><value>Содержание совета</value></data>
+  <data name="Coaching.MatchupEditor.Step.Test" xml:space="preserve"><value>Проверка</value></data>
+  <data name="Coaching.MatchupEditor.Step.Save" xml:space="preserve"><value>Сохранение</value></data>
+  <data name="Coaching.MatchupEditor.Placeholder" xml:space="preserve"><value>Каркас редактора готов. Поля этого шага появятся в следующей проверяемой итерации.</value></data>
 </root>

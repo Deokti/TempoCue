@@ -17,6 +17,7 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
     private string _rulesSummary = string.Empty;
     private string _patchSummary = string.Empty;
     private string _patchWarningDescription = string.Empty;
+    private CoachingScreen _currentScreen = CoachingScreen.Library;
     private bool _isDisposed;
 
     public CoachingViewModel(CoachPack pack, LocalizationService localization)
@@ -28,7 +29,19 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
         var firstRule = pack.Rules.FirstOrDefault();
         PlayerChampionInitials = GetInitials(firstRule?.PlayerChampion);
         OpponentChampionInitials = GetInitials(firstRule?.OpponentChampion);
+        PackTypeSelection = new PackTypeSelectionViewModel();
+        MatchupEditor = new MatchupEditorViewModel();
         RenderLocalizedPresentation();
+    }
+
+    public PackTypeSelectionViewModel PackTypeSelection { get; }
+
+    public MatchupEditorViewModel MatchupEditor { get; }
+
+    public CoachingScreen CurrentScreen
+    {
+        get => _currentScreen;
+        private set => SetProperty(ref _currentScreen, value);
     }
 
     public string PackName => _pack.Name;
@@ -60,6 +73,15 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
         get => _patchWarningDescription;
         private set => SetProperty(ref _patchWarningDescription, value);
     }
+
+    public void OpenPackTypeSelection() =>
+        CurrentScreen = CoachingScreen.PackTypeSelection;
+
+    public void OpenMatchupEditor() =>
+        CurrentScreen = CoachingScreen.MatchupEditor;
+
+    public void OpenLibrary() =>
+        CurrentScreen = CoachingScreen.Library;
 
     public void Dispose()
     {

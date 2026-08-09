@@ -9,6 +9,37 @@ namespace TempoCue.App.Tests;
 public sealed class CoachingViewModelTests
 {
     [Fact]
+    public void CoachingNavigation_OpensOnlyAvailablePackEditor()
+    {
+        var localization = LocalizationService.Instance;
+        using var viewModel = new CoachingViewModel(
+            new CoachPack
+            {
+                SchemaVersion = 1,
+                Id = "test.navigation",
+                Name = "Test",
+                Patch = "test",
+                Rules = []
+            },
+            localization);
+
+        Assert.Equal(CoachingScreen.Library, viewModel.CurrentScreen);
+        Assert.True(viewModel.PackTypeSelection.IsMatchupAvailable);
+        Assert.False(viewModel.PackTypeSelection.IsGameControlAvailable);
+
+        viewModel.OpenPackTypeSelection();
+        Assert.Equal(CoachingScreen.PackTypeSelection, viewModel.CurrentScreen);
+
+        viewModel.OpenMatchupEditor();
+        Assert.Equal(CoachingScreen.MatchupEditor, viewModel.CurrentScreen);
+        Assert.Equal(1, viewModel.MatchupEditor.CurrentStep);
+        Assert.Equal(7, viewModel.MatchupEditor.TotalSteps);
+
+        viewModel.OpenLibrary();
+        Assert.Equal(CoachingScreen.Library, viewModel.CurrentScreen);
+    }
+
+    [Fact]
     public void LanguageChange_UpdatesSystemLabelsButPreservesPackContent()
     {
         var localization = LocalizationService.Instance;

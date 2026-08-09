@@ -208,4 +208,32 @@
   <data name="Coaching.Sharing.Title" xml:space="preserve"><value>How community packs will be shared</value></data>
   <data name="Coaching.Sharing.Description" xml:space="preserve"><value>Initially through safe import and export of a versioned Coach Pack file. A community catalog can use the same format later.</value></data>
   <data name="Coaching.Sharing.CommunityPlacement" xml:space="preserve"><value>Installed packs from other authors will appear under Matchups or Map control. My packs will contain only packs created by you.</value></data>
+  <data name="Coaching.NewPack.Back" xml:space="preserve"><value>Back to library</value></data>
+  <data name="Coaching.NewPack.Title" xml:space="preserve"><value>What kind of advice pack are we creating?</value></data>
+  <data name="Coaching.NewPack.Description" xml:space="preserve"><value>The type determines which questions the editor asks. Changing it later requires creating a new pack.</value></data>
+  <data name="Coaching.NewPack.ConstructorAsks" xml:space="preserve"><value>The editor will ask about</value></data>
+  <data name="Coaching.NewPack.Matchup.Title" xml:space="preserve"><value>Matchup</value></data>
+  <data name="Coaching.NewPack.Matchup.Description" xml:space="preserve"><value>Explain how to play against a specific champion at different stages of the match.</value></data>
+  <data name="Coaching.NewPack.Matchup.PromptItems" xml:space="preserve"><value>two champions and a role · matchup phases · level and item conditions · advice text</value></data>
+  <data name="Coaching.NewPack.Matchup.Start" xml:space="preserve"><value>Start · step 1 of 7</value></data>
+  <data name="Coaching.NewPack.GameControl.Title" xml:space="preserve"><value>Game control</value></data>
+  <data name="Coaching.NewPack.GameControl.Description" xml:space="preserve"><value>Create reminders about the map, ganks, objectives, missing opponents and other game events.</value></data>
+  <data name="Coaching.NewPack.GameControl.PromptItems" xml:space="preserve"><value>role and mode · a situation template · time and map conditions · display method</value></data>
+  <data name="Coaching.NewPack.GameControl.Unavailable" xml:space="preserve"><value>Unavailable in this iteration</value></data>
+  <data name="Coaching.NewPack.Soon" xml:space="preserve"><value>Soon</value></data>
+  <data name="Coaching.MatchupEditor.Back" xml:space="preserve"><value>Back</value></data>
+  <data name="Coaching.MatchupEditor.Next" xml:space="preserve"><value>Next</value></data>
+  <data name="Coaching.MatchupEditor.Mode.Simple" xml:space="preserve"><value>Simple</value></data>
+  <data name="Coaching.MatchupEditor.Mode.Advanced" xml:space="preserve"><value>Advanced</value></data>
+  <data name="Coaching.MatchupEditor.Title" xml:space="preserve"><value>New matchup</value></data>
+  <data name="Coaching.MatchupEditor.Draft" xml:space="preserve"><value>Draft</value></data>
+  <data name="Coaching.MatchupEditor.StepSummary" xml:space="preserve"><value>Step 1 of 7 · Main information</value></data>
+  <data name="Coaching.MatchupEditor.Step.Main" xml:space="preserve"><value>Main information</value></data>
+  <data name="Coaching.MatchupEditor.Step.Champions" xml:space="preserve"><value>Champions and role</value></data>
+  <data name="Coaching.MatchupEditor.Step.Phases" xml:space="preserve"><value>Matchup phases</value></data>
+  <data name="Coaching.MatchupEditor.Step.Conditions" xml:space="preserve"><value>Conditions</value></data>
+  <data name="Coaching.MatchupEditor.Step.Content" xml:space="preserve"><value>Advice content</value></data>
+  <data name="Coaching.MatchupEditor.Step.Test" xml:space="preserve"><value>Test</value></data>
+  <data name="Coaching.MatchupEditor.Step.Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Coaching.MatchupEditor.Placeholder" xml:space="preserve"><value>The editor shell is ready. Fields for this step will be added in the next verified iteration.</value></data>
 </root>

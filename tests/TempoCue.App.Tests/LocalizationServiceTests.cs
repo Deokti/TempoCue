@@ -75,6 +75,12 @@ public sealed class LocalizationServiceTests
                     window.FindName("CoachingContentPage"));
                 var coachingButton = Assert.IsType<Button>(
                     window.FindName("CoachingNavigationButton"));
+                var coachingLibraryPanel = Assert.IsType<Grid>(
+                    coachingPage.FindName("CoachingLibraryPanel"));
+                var packTypeSelectionPage = Assert.IsType<TempoCue.App.Views.PackTypeSelectionView>(
+                    coachingPage.FindName("PackTypeSelectionPage"));
+                var matchupEditorPage = Assert.IsType<TempoCue.App.Views.MatchupEditorView>(
+                    coachingPage.FindName("MatchupEditorPage"));
                 var settingsTitle = Assert.IsType<TextBlock>(
                     settingsPage.FindName("SettingsTitleTextBlock"));
                 var languageComboBox = Assert.IsType<ComboBox>(
@@ -106,8 +112,9 @@ public sealed class LocalizationServiceTests
                 var coachingTabs = Assert.IsType<TabControl>(
                     coachingPage.FindName("CoachingSectionsTabControl"));
                 Assert.Equal(3, coachingTabs.Items.Count);
-                Assert.False(Assert.IsType<Button>(
-                    coachingPage.FindName("CreatePackButton")).IsEnabled);
+                var createPackButton = Assert.IsType<Button>(
+                    coachingPage.FindName("CreatePackButton"));
+                Assert.True(createPackButton.IsEnabled);
                 Assert.True(coachingPage.ActualWidth > 900);
                 Assert.True(coachingPage.ActualHeight > 500);
                 var rulesScrollViewer = Assert.IsType<ScrollViewer>(
@@ -132,7 +139,11 @@ public sealed class LocalizationServiceTests
                 var coachingTabFontSize = Assert.Single(
                     coachingTabStyle.Setters.OfType<Setter>(),
                     setter => setter.Property == Control.FontSizeProperty);
-                Assert.Equal(14d, coachingTabFontSize.Value);
+                Assert.Equal(15d, coachingTabFontSize.Value);
+                Assert.Equal(
+                    24d,
+                    Assert.IsType<double>(
+                        coachingPage.FindResource("Typography.FontSize.PageTitle")));
 
                 coachingTabs.SelectedIndex = 1;
                 Dispatcher.CurrentDispatcher.Invoke(
@@ -147,6 +158,54 @@ public sealed class LocalizationServiceTests
                     DispatcherPriority.Render);
                 Assert.True(Assert.IsType<Border>(
                     coachingPage.FindName("MyPacksEmptyState")).IsVisible);
+
+                createPackButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
+                Assert.Equal(Visibility.Collapsed, coachingLibraryPanel.Visibility);
+                Assert.Equal(Visibility.Visible, packTypeSelectionPage.Visibility);
+                var matchupPackTypeButton = Assert.IsType<Button>(
+                    packTypeSelectionPage.FindName("MatchupPackTypeButton"));
+                var gameControlPackTypeButton = Assert.IsType<Button>(
+                    packTypeSelectionPage.FindName("GameControlPackTypeButton"));
+                Assert.True(matchupPackTypeButton.IsEnabled);
+                Assert.False(gameControlPackTypeButton.IsEnabled);
+
+                matchupPackTypeButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
+                Assert.Equal(Visibility.Collapsed, packTypeSelectionPage.Visibility);
+                Assert.Equal(Visibility.Visible, matchupEditorPage.Visibility);
+                Assert.Equal(
+                    24d,
+                    Assert.IsType<TextBlock>(
+                        matchupEditorPage.FindName("MatchupEditorTitleTextBlock")).FontSize);
+                var matchupEditorStepsPanel = Assert.IsType<Border>(
+                    matchupEditorPage.FindName("MatchupEditorStepsPanel"));
+                Assert.Equal(new CornerRadius(12), matchupEditorStepsPanel.CornerRadius);
+                Assert.Equal(new Thickness(12, 10, 8, 8), matchupEditorStepsPanel.Padding);
+                Assert.Equal(
+                    "Основная информация",
+                    Assert.IsType<TextBlock>(
+                        matchupEditorPage.FindName("MatchupEditorStepTitleTextBlock")).Text);
+
+                Assert.IsType<Button>(
+                        matchupEditorPage.FindName("BackToPackTypeButton"))
+                    .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
+                Assert.Equal(Visibility.Visible, packTypeSelectionPage.Visibility);
+
+                Assert.IsType<Button>(
+                        packTypeSelectionPage.FindName("BackToLibraryButton"))
+                    .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
+                Assert.Equal(Visibility.Visible, coachingLibraryPanel.Visibility);
 
                 settingsButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
                 Assert.Equal(Visibility.Visible, settingsPage.Visibility);
@@ -166,6 +225,10 @@ public sealed class LocalizationServiceTests
 
                 Assert.Equal("TempoCue — League of Legends assistant", window.Title);
                 Assert.Equal("Settings", settingsTitle.Text);
+                Assert.Equal(
+                    "What kind of advice pack are we creating?",
+                    Assert.IsType<TextBlock>(
+                        packTypeSelectionPage.FindName("PackTypeTitleTextBlock")).Text);
                 window.UpdateLayout();
                 Dispatcher.CurrentDispatcher.Invoke(
                     static () => { },

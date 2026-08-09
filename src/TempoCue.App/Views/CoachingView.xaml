@@ -3,6 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:core="clr-namespace:TempoCue.Core;assembly=TempoCue.Core"
              xmlns:localization="clr-namespace:TempoCue.App.Localization"
+             xmlns:viewModels="clr-namespace:TempoCue.App.ViewModels"
+             xmlns:views="clr-namespace:TempoCue.App.Views"
              Background="#080D14"
              FontFamily="Segoe UI">
     <UserControl.Resources>
@@ -42,7 +44,7 @@
                 <Setter Property="Foreground" Value="#7F93AF" />
                 <Setter Property="Background" Value="Transparent" />
                 <Setter Property="Padding" Value="18,7" />
-                <Setter Property="FontSize" Value="14" />
+                <Setter Property="FontSize" Value="{StaticResource Typography.FontSize.BodyLarge}" />
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="TabItem">
@@ -97,7 +99,7 @@
 
             <Style x:Key="CoachingPowerText" TargetType="TextBlock">
                 <Setter Property="Foreground" Value="#76C9F0" />
-                <Setter Property="FontSize" Value="12" />
+                <Setter Property="FontSize" Value="{StaticResource Typography.FontSize.Caption}" />
                 <Setter Property="FontWeight" Value="SemiBold" />
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding PowerState}" Value="{x:Static core:PowerState.Dangerous}">
@@ -116,7 +118,19 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid Margin="24">
+    <Grid>
+    <Grid x:Name="CoachingLibraryPanel" Margin="24">
+        <Grid.Style>
+            <Style TargetType="Grid">
+                <Setter Property="Visibility" Value="Collapsed" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding CurrentScreen}"
+                                 Value="{x:Static viewModels:CoachingScreen.Library}">
+                        <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Grid.Style>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="16" />
@@ -132,7 +146,7 @@
                 <TextBlock x:Name="CoachingTitleTextBlock"
                            Text="{localization:Loc Coaching.Title}"
                            Foreground="#F4F7FB"
-                           FontSize="22"
+                           FontSize="{StaticResource Typography.FontSize.PageTitle}"
                            FontWeight="SemiBold" />
                 <TextBlock Text="{localization:Loc Coaching.Summary}"
                            Style="{StaticResource ShellCaption}"
@@ -150,8 +164,7 @@
                         Content="{localization:Loc Coaching.Create}"
                         Style="{StaticResource PrimaryButton}"
                         Margin="10,0,0,0"
-                        IsEnabled="False"
-                        ToolTip="{localization:Loc Coaching.PlannedTooltip}" />
+                        Click="CreatePackButton_Click" />
             </StackPanel>
         </Grid>
 
@@ -183,11 +196,11 @@
                             <StackPanel Grid.Column="2">
                                 <TextBlock Text="{localization:Loc Coaching.Update.WarningTitle}"
                                            Foreground="#F1D274"
-                                           FontSize="14"
+                                           FontSize="{StaticResource Typography.FontSize.BodyLarge}"
                                            FontWeight="SemiBold" />
                                 <TextBlock Text="{Binding PatchWarningDescription}"
                                            Foreground="#9FAAB9"
-                                           FontSize="12"
+                                           FontSize="{StaticResource Typography.FontSize.Body}"
                                            TextWrapping="Wrap"
                                            Margin="0,4,0,0" />
                             </StackPanel>
@@ -209,7 +222,7 @@
                                 </Grid.RowDefinitions>
                                 <TextBlock Text="{localization:Loc Coaching.Matchups.LibraryTitle}"
                                            Foreground="#91A4BD"
-                                           FontSize="13"
+                                           FontSize="{StaticResource Typography.FontSize.Body}"
                                            FontWeight="SemiBold"
                                            Margin="16,14,16,10" />
                                 <Border Grid.Row="1"
@@ -233,7 +246,7 @@
                                                 CornerRadius="6">
                                             <TextBlock Text="{Binding PlayerChampionInitials}"
                                                        Foreground="#6FC4EF"
-                                                       FontSize="8"
+                                                       FontSize="{StaticResource Typography.FontSize.Micro}"
                                                        FontWeight="Bold"
                                                        HorizontalAlignment="Center"
                                                        VerticalAlignment="Center" />
@@ -246,7 +259,7 @@
                                                 CornerRadius="6">
                                             <TextBlock Text="{Binding OpponentChampionInitials}"
                                                        Foreground="#C1A7B5"
-                                                       FontSize="8"
+                                                       FontSize="{StaticResource Typography.FontSize.Micro}"
                                                        FontWeight="Bold"
                                                        HorizontalAlignment="Center"
                                                        VerticalAlignment="Center" />
@@ -254,12 +267,12 @@
                                         <StackPanel Grid.Column="2" Margin="8,-1,0,0">
                                             <TextBlock Text="{Binding PackName}"
                                                        Foreground="#F4F7FB"
-                                                       FontSize="14"
+                                                       FontSize="{StaticResource Typography.FontSize.BodyLarge}"
                                                        FontWeight="SemiBold"
                                                        TextTrimming="CharacterEllipsis" />
                                             <TextBlock Text="{Binding RulesSummary}"
                                                        Foreground="#7F93AF"
-                                                       FontSize="12"
+                                                       FontSize="{StaticResource Typography.FontSize.Body}"
                                                        Margin="0,4,0,0" />
                                             <Border Background="#3B3421"
                                                     CornerRadius="9"
@@ -268,12 +281,12 @@
                                                     Margin="0,9,0,0">
                                                 <TextBlock Text="{localization:Loc Coaching.Pack.VerificationRequired}"
                                                            Foreground="#F3C969"
-                                                           FontSize="11"
+                                                           FontSize="{StaticResource Typography.FontSize.Caption}"
                                                            FontWeight="SemiBold" />
                                             </Border>
                                             <TextBlock Text="{Binding PatchSummary}"
                                                        Foreground="#6F849F"
-                                                       FontSize="11"
+                                                       FontSize="{StaticResource Typography.FontSize.Caption}"
                                                        TextWrapping="Wrap"
                                                        Margin="0,7,0,0" />
                                         </StackPanel>
@@ -291,16 +304,16 @@
                                 </Grid.RowDefinitions>
                                 <TextBlock Text="{localization:Loc Coaching.Pack.DetailsTitle}"
                                            Foreground="#91A4BD"
-                                           FontSize="13"
+                                           FontSize="{StaticResource Typography.FontSize.Body}"
                                            FontWeight="SemiBold" />
                                 <StackPanel Grid.Row="1" Margin="0,7,0,12">
                                     <TextBlock Text="{Binding PackName}"
                                                Foreground="#F4F7FB"
-                                               FontSize="15"
+                                               FontSize="{StaticResource Typography.FontSize.CardTitle}"
                                                FontWeight="SemiBold" />
                                     <TextBlock Text="{Binding PatchSummary}"
                                                Foreground="#6F849F"
-                                               FontSize="11"
+                                               FontSize="{StaticResource Typography.FontSize.Caption}"
                                                TextTrimming="CharacterEllipsis"
                                                Margin="0,4,0,0" />
                                 </StackPanel>
@@ -320,25 +333,25 @@
                                                             </Border>
                                                             <TextBlock Text="{Binding LevelRange}"
                                                                        Foreground="#7F93AF"
-                                                                       FontSize="12"
+                                                                       FontSize="{StaticResource Typography.FontSize.Body}"
                                                                        Margin="10,0,0,0"
                                                                        VerticalAlignment="Center" />
                                                         </StackPanel>
                                                         <TextBlock Text="{Binding Title}"
                                                                    Foreground="#F2F6FB"
-                                                                   FontSize="14"
+                                                                   FontSize="{StaticResource Typography.FontSize.BodyLarge}"
                                                                    FontWeight="SemiBold"
                                                                    TextWrapping="Wrap"
                                                                    Margin="0,9,0,0" />
                                                         <TextBlock Text="{Binding Message}"
                                                                    Foreground="#AFC0D4"
-                                                                   FontSize="13"
+                                                                   FontSize="{StaticResource Typography.FontSize.Body}"
                                                                    LineHeight="19"
                                                                    TextWrapping="Wrap"
                                                                    Margin="0,6,0,0" />
                                                         <TextBlock Text="{Binding Source}"
                                                                    Foreground="#657A97"
-                                                                   FontSize="11"
+                                                                   FontSize="{StaticResource Typography.FontSize.Caption}"
                                                                    TextWrapping="Wrap"
                                                                    Margin="0,8,0,0" />
                                                     </StackPanel>
@@ -369,13 +382,13 @@
                               HorizontalAlignment="Center" />
                         <TextBlock Text="{localization:Loc Coaching.Empty.MapControl.Title}"
                                    Foreground="#F4F7FB"
-                                   FontSize="18"
+                                   FontSize="{StaticResource Typography.FontSize.SectionTitle}"
                                    FontWeight="SemiBold"
                                    HorizontalAlignment="Center"
                                    Margin="0,14,0,0" />
                         <TextBlock Text="{localization:Loc Coaching.Empty.MapControl.Description}"
                                    Foreground="#91A4BD"
-                                   FontSize="14"
+                                   FontSize="{StaticResource Typography.FontSize.BodyLarge}"
                                    LineHeight="20"
                                    TextAlignment="Center"
                                    TextWrapping="Wrap"
@@ -398,20 +411,20 @@
                         <StackPanel VerticalAlignment="Center">
                             <TextBlock Text="{localization:Loc Coaching.Empty.MyPacks.Title}"
                                        Foreground="#F4F7FB"
-                                       FontSize="18"
+                                       FontSize="{StaticResource Typography.FontSize.SectionTitle}"
                                        FontWeight="SemiBold" />
                             <TextBlock Text="{localization:Loc Coaching.Empty.MyPacks.Description}"
                                        Foreground="#91A4BD"
-                                       FontSize="13"
+                                       FontSize="{StaticResource Typography.FontSize.Body}"
                                        LineHeight="19"
                                        TextWrapping="Wrap"
                                        Margin="0,9,0,0" />
-                            <Button Content="{localization:Loc Coaching.Create}"
+                            <Button x:Name="CreateFirstPackButton"
+                                    Content="{localization:Loc Coaching.Create}"
                                     Style="{StaticResource PrimaryButton}"
                                     HorizontalAlignment="Left"
                                     Margin="0,18,0,0"
-                                    IsEnabled="False"
-                                    ToolTip="{localization:Loc Coaching.PlannedTooltip}" />
+                                    Click="CreatePackButton_Click" />
                         </StackPanel>
                     </Border>
                     <Border Grid.Column="2"
@@ -420,18 +433,18 @@
                         <StackPanel VerticalAlignment="Center">
                             <TextBlock Text="{localization:Loc Coaching.Sharing.Title}"
                                        Foreground="#F4F7FB"
-                                       FontSize="18"
+                                       FontSize="{StaticResource Typography.FontSize.SectionTitle}"
                                        FontWeight="SemiBold" />
                             <TextBlock Text="{localization:Loc Coaching.Sharing.Description}"
                                        Foreground="#AFC0D4"
-                                       FontSize="13"
+                                       FontSize="{StaticResource Typography.FontSize.Body}"
                                        LineHeight="19"
                                        TextWrapping="Wrap"
                                        Margin="0,9,0,0" />
                             <Border Height="1" Background="#263750" Margin="0,16,0,14" />
                             <TextBlock Text="{localization:Loc Coaching.Sharing.CommunityPlacement}"
                                        Foreground="#7F93AF"
-                                       FontSize="12"
+                                       FontSize="{StaticResource Typography.FontSize.Caption}"
                                        LineHeight="18"
                                        TextWrapping="Wrap" />
                         </StackPanel>
@@ -439,5 +452,39 @@
                 </Grid>
             </TabItem>
         </TabControl>
+    </Grid>
+
+        <views:PackTypeSelectionView x:Name="PackTypeSelectionPage"
+                                     DataContext="{Binding PackTypeSelection}"
+                                     BackRequested="PackTypeSelectionPage_BackRequested"
+                                     MatchupSelected="PackTypeSelectionPage_MatchupSelected">
+            <views:PackTypeSelectionView.Style>
+                <Style TargetType="views:PackTypeSelectionView">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding DataContext.CurrentScreen, RelativeSource={RelativeSource AncestorType=views:CoachingView}}"
+                                     Value="{x:Static viewModels:CoachingScreen.PackTypeSelection}">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </views:PackTypeSelectionView.Style>
+        </views:PackTypeSelectionView>
+
+        <views:MatchupEditorView x:Name="MatchupEditorPage"
+                                 DataContext="{Binding MatchupEditor}"
+                                 BackRequested="MatchupEditorPage_BackRequested">
+            <views:MatchupEditorView.Style>
+                <Style TargetType="views:MatchupEditorView">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding DataContext.CurrentScreen, RelativeSource={RelativeSource AncestorType=views:CoachingView}}"
+                                     Value="{x:Static viewModels:CoachingScreen.MatchupEditor}">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </views:MatchupEditorView.Style>
+        </views:MatchupEditorView>
     </Grid>
 </UserControl>
