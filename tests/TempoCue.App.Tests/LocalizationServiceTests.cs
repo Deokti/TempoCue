@@ -81,6 +81,8 @@ public sealed class LocalizationServiceTests
                     coachingPage.FindName("PackTypeSelectionPage"));
                 var matchupEditorPage = Assert.IsType<TempoCue.App.Views.MatchupEditorView>(
                     coachingPage.FindName("MatchupEditorPage"));
+                var matchupMainInformationPage = Assert.IsType<TempoCue.App.Views.MatchupMainInformationView>(
+                    matchupEditorPage.FindName("MatchupMainInformationPage"));
                 var settingsTitle = Assert.IsType<TextBlock>(
                     settingsPage.FindName("SettingsTitleTextBlock"));
                 var languageComboBox = Assert.IsType<ComboBox>(
@@ -186,19 +188,26 @@ public sealed class LocalizationServiceTests
                     matchupEditorPage.FindName("MatchupEditorStepsPanel"));
                 Assert.Equal(new CornerRadius(12), matchupEditorStepsPanel.CornerRadius);
                 Assert.Equal(new Thickness(12, 10, 8, 8), matchupEditorStepsPanel.Padding);
+                var matchupEditorSteps = Assert.IsType<ListBox>(
+                    matchupEditorPage.FindName("MatchupEditorStepsListBox"));
+                Assert.Equal(7, matchupEditorSteps.Items.Count);
+                Assert.Equal(0, matchupEditorSteps.SelectedIndex);
+                Assert.Same(
+                    coachingViewModel.MatchupEditor.MainInformation,
+                    matchupMainInformationPage.DataContext);
                 Assert.Equal(
                     "Основная информация",
                     Assert.IsType<TextBlock>(
-                        matchupEditorPage.FindName("MatchupEditorStepTitleTextBlock")).Text);
+                        matchupMainInformationPage.FindName("MatchupEditorStepTitleTextBlock")).Text);
                 var matchupSourceUrlPanel = Assert.IsType<StackPanel>(
-                    matchupEditorPage.FindName("MatchupSourceUrlPanel"));
+                    matchupMainInformationPage.FindName("MatchupSourceUrlPanel"));
                 Assert.Equal(Visibility.Collapsed, matchupSourceUrlPanel.Visibility);
 
-                coachingViewModel.MatchupEditor.PackName = "Urgot против Sett";
-                coachingViewModel.MatchupEditor.ShortDescription =
+                coachingViewModel.MatchupEditor.MainInformation.PackName = "Urgot против Sett";
+                coachingViewModel.MatchupEditor.MainInformation.ShortDescription =
                     "Как пережить раннюю линию и найти момент для боя.";
-                coachingViewModel.MatchupEditor.Author = "TopLaneAuthor";
-                coachingViewModel.MatchupEditor.GamePatch = "26.15";
+                coachingViewModel.MatchupEditor.MainInformation.Author = "TopLaneAuthor";
+                coachingViewModel.MatchupEditor.MainInformation.GamePatch = "26.15";
                 Dispatcher.CurrentDispatcher.Invoke(
                     static () => { },
                     DispatcherPriority.DataBind);
@@ -206,18 +215,18 @@ public sealed class LocalizationServiceTests
                 Assert.Equal(
                     "Urgot против Sett",
                     Assert.IsType<TextBlock>(
-                        matchupEditorPage.FindName("MatchupPreviewNameTextBlock")).Text);
+                        matchupMainInformationPage.FindName("MatchupPreviewNameTextBlock")).Text);
                 Assert.Equal(
                     "заполнено",
                     Assert.IsType<TextBlock>(
-                        matchupEditorPage.FindName("MatchupReadinessTextBlock")).Text);
+                        matchupMainInformationPage.FindName("MatchupReadinessTextBlock")).Text);
 
-                coachingViewModel.MatchupEditor.SelectedSourceKind = MatchupSourceKind.Article;
+                coachingViewModel.MatchupEditor.MainInformation.SelectedSourceKind = MatchupSourceKind.Article;
                 Dispatcher.CurrentDispatcher.Invoke(
                     static () => { },
                     DispatcherPriority.DataBind);
                 Assert.Equal(Visibility.Visible, matchupSourceUrlPanel.Visibility);
-                Assert.False(coachingViewModel.MatchupEditor.IsMainInformationComplete);
+                Assert.False(coachingViewModel.MatchupEditor.MainInformation.IsComplete);
 
                 Assert.IsType<Button>(
                         matchupEditorPage.FindName("BackToPackTypeButton"))

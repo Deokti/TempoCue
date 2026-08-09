@@ -2,7 +2,7 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:localization="clr-namespace:TempoCue.App.Localization"
-             xmlns:viewModels="clr-namespace:TempoCue.App.ViewModels"
+             xmlns:views="clr-namespace:TempoCue.App.Views"
              Background="#080D14"
              FontFamily="Segoe UI">
     <UserControl.Resources>
@@ -14,30 +14,76 @@
 
             <Style TargetType="ScrollBar" BasedOn="{StaticResource ShellHorizontalScrollBar}" />
 
-            <Style x:Key="EditorStep" TargetType="Border">
+            <Style x:Key="EditorStepsListBox" TargetType="ListBox">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="IsHitTestVisible" Value="False" />
+                <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
+                <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
+                <Setter Property="ItemsPanel">
+                    <Setter.Value>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="EditorStepItem" TargetType="ListBoxItem">
                 <Setter Property="MinHeight" Value="44" />
                 <Setter Property="Background" Value="#0D1625" />
                 <Setter Property="BorderBrush" Value="#263750" />
                 <Setter Property="BorderThickness" Value="1" />
-                <Setter Property="CornerRadius" Value="10" />
                 <Setter Property="Padding" Value="13,9" />
                 <Setter Property="Margin" Value="0,0,10,0" />
-            </Style>
-
-            <Style x:Key="EditorStepNumber" TargetType="Border">
-                <Setter Property="Width" Value="24" />
-                <Setter Property="Height" Value="24" />
-                <Setter Property="Background" Value="#101A2B" />
-                <Setter Property="BorderBrush" Value="#263750" />
-                <Setter Property="BorderThickness" Value="1" />
-                <Setter Property="CornerRadius" Value="12" />
-            </Style>
-
-            <Style x:Key="EditorStepText" TargetType="TextBlock">
-                <Setter Property="Foreground" Value="#7F93AF" />
-                <Setter Property="FontSize" Value="{StaticResource Typography.FontSize.Body}" />
-                <Setter Property="VerticalAlignment" Value="Center" />
-                <Setter Property="Margin" Value="9,0,0,0" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ListBoxItem">
+                            <Border x:Name="StepBorder"
+                                    MinHeight="{TemplateBinding MinHeight}"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="10"
+                                    Padding="{TemplateBinding Padding}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Border x:Name="StepNumberBorder"
+                                            Width="24"
+                                            Height="24"
+                                            Background="#101A2B"
+                                            BorderBrush="#263750"
+                                            BorderThickness="1"
+                                            CornerRadius="12">
+                                        <TextBlock x:Name="StepNumber"
+                                                   Text="{TemplateBinding Tag}"
+                                                   Foreground="#7F93AF"
+                                                   FontSize="{StaticResource Typography.FontSize.Body}"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                    </Border>
+                                    <ContentPresenter x:Name="StepTitle"
+                                                      ContentSource="Content"
+                                                      TextElement.Foreground="#7F93AF"
+                                                      TextElement.FontSize="{StaticResource Typography.FontSize.Body}"
+                                                      VerticalAlignment="Center"
+                                                      Margin="9,0,0,0" />
+                                </StackPanel>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="StepBorder" Property="Background" Value="#16263E" />
+                                    <Setter TargetName="StepBorder" Property="BorderBrush" Value="#4FAAE8" />
+                                    <Setter TargetName="StepNumberBorder" Property="Background" Value="#4FAAE8" />
+                                    <Setter TargetName="StepNumberBorder" Property="BorderBrush" Value="#4FAAE8" />
+                                    <Setter TargetName="StepNumber" Property="Foreground" Value="#071019" />
+                                    <Setter TargetName="StepNumber" Property="FontWeight" Value="Bold" />
+                                    <Setter TargetName="StepTitle" Property="TextElement.Foreground" Value="#F4F7FB" />
+                                    <Setter TargetName="StepTitle" Property="TextElement.FontWeight" Value="SemiBold" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
             </Style>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -126,433 +172,22 @@
                 BorderThickness="1"
                 CornerRadius="12"
                 Padding="12,10,8,8">
-            <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                          VerticalScrollBarVisibility="Disabled">
-                <StackPanel Orientation="Horizontal" MinWidth="1050" Margin="0,0,0,7">
-                    <Border Style="{StaticResource EditorStep}"
-                            Background="#16263E"
-                            BorderBrush="#4FAAE8">
-                        <StackPanel Orientation="Horizontal">
-                            <Border Style="{StaticResource EditorStepNumber}"
-                                    Background="#4FAAE8"
-                                    BorderBrush="#4FAAE8">
-                                <TextBlock Text="1"
-                                           Foreground="#071019"
-                                           FontSize="{StaticResource Typography.FontSize.Body}"
-                                           FontWeight="Bold"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center" />
-                            </Border>
-                            <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Step.Main}"
-                                       Style="{StaticResource EditorStepText}"
-                                       Foreground="#F4F7FB"
-                                       FontWeight="SemiBold" />
-                        </StackPanel>
-                    </Border>
-                    <Border Style="{StaticResource EditorStep}">
-                        <StackPanel Orientation="Horizontal">
-                            <Border Style="{StaticResource EditorStepNumber}">
-                                <TextBlock Text="2" Foreground="#7F93AF" FontSize="{StaticResource Typography.FontSize.Body}"
-                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
-                            </Border>
-                            <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Step.Champions}" Style="{StaticResource EditorStepText}" />
-                        </StackPanel>
-                    </Border>
-                    <Border Style="{StaticResource EditorStep}">
-                        <StackPanel Orientation="Horizontal">
-                            <Border Style="{StaticResource EditorStepNumber}">
-                                <TextBlock Text="3" Foreground="#7F93AF" FontSize="{StaticResource Typography.FontSize.Body}"
-                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
-                            </Border>
-                            <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Step.Phases}" Style="{StaticResource EditorStepText}" />
-                        </StackPanel>
-                    </Border>
-                    <Border Style="{StaticResource EditorStep}">
-                        <StackPanel Orientation="Horizontal">
-                            <Border Style="{StaticResource EditorStepNumber}">
-                                <TextBlock Text="4" Foreground="#7F93AF" FontSize="{StaticResource Typography.FontSize.Body}"
-                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
-                            </Border>
-                            <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Step.Conditions}" Style="{StaticResource EditorStepText}" />
-                        </StackPanel>
-                    </Border>
-                    <Border Style="{StaticResource EditorStep}">
-                        <StackPanel Orientation="Horizontal">
-                            <Border Style="{StaticResource EditorStepNumber}">
-                                <TextBlock Text="5" Foreground="#7F93AF" FontSize="{StaticResource Typography.FontSize.Body}"
-                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
-                            </Border>
-                            <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Step.Content}" Style="{StaticResource EditorStepText}" />
-                        </StackPanel>
-                    </Border>
-                    <Border Style="{StaticResource EditorStep}">
-                        <StackPanel Orientation="Horizontal">
-                            <Border Style="{StaticResource EditorStepNumber}">
-                                <TextBlock Text="6" Foreground="#7F93AF" FontSize="{StaticResource Typography.FontSize.Body}"
-                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
-                            </Border>
-                            <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Step.Test}" Style="{StaticResource EditorStepText}" />
-                        </StackPanel>
-                    </Border>
-                    <Border Style="{StaticResource EditorStep}" Margin="0">
-                        <StackPanel Orientation="Horizontal">
-                            <Border Style="{StaticResource EditorStepNumber}">
-                                <TextBlock Text="7" Foreground="#7F93AF" FontSize="{StaticResource Typography.FontSize.Body}"
-                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
-                            </Border>
-                            <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Step.Save}" Style="{StaticResource EditorStepText}" />
-                        </StackPanel>
-                    </Border>
-                </StackPanel>
-            </ScrollViewer>
+            <ListBox x:Name="MatchupEditorStepsListBox"
+                     Style="{StaticResource EditorStepsListBox}"
+                     ItemContainerStyle="{StaticResource EditorStepItem}"
+                     SelectedIndex="{Binding CurrentStepIndex, Mode=OneWay}">
+                <ListBoxItem Tag="1" Content="{localization:Loc Coaching.MatchupEditor.Step.Main}" />
+                <ListBoxItem Tag="2" Content="{localization:Loc Coaching.MatchupEditor.Step.Champions}" />
+                <ListBoxItem Tag="3" Content="{localization:Loc Coaching.MatchupEditor.Step.Phases}" />
+                <ListBoxItem Tag="4" Content="{localization:Loc Coaching.MatchupEditor.Step.Conditions}" />
+                <ListBoxItem Tag="5" Content="{localization:Loc Coaching.MatchupEditor.Step.Content}" />
+                <ListBoxItem Tag="6" Content="{localization:Loc Coaching.MatchupEditor.Step.Test}" />
+                <ListBoxItem Tag="7" Content="{localization:Loc Coaching.MatchupEditor.Step.Save}" />
+            </ListBox>
         </Border>
 
-        <ScrollViewer Grid.Row="4"
-                      VerticalScrollBarVisibility="Auto"
-                      HorizontalScrollBarVisibility="Disabled">
-            <Grid Margin="0,0,8,24">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="5*" />
-                    <ColumnDefinition Width="16" />
-                    <ColumnDefinition Width="3*" />
-                </Grid.ColumnDefinitions>
-
-                <Border Style="{StaticResource ShellCard}" Padding="20">
-                    <StackPanel>
-                        <TextBlock x:Name="MatchupEditorStepTitleTextBlock"
-                                   Text="{localization:Loc Coaching.MatchupEditor.Step.Main}"
-                                   Foreground="#F4F7FB"
-                                   FontSize="{StaticResource Typography.FontSize.SectionTitle}"
-                                   FontWeight="SemiBold" />
-                        <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.Description}"
-                                   Foreground="#91A4BD"
-                                   FontSize="{StaticResource Typography.FontSize.Body}"
-                                   TextWrapping="Wrap"
-                                   Margin="0,6,0,20" />
-
-                        <StackPanel>
-                            <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.PackName}"
-                                       Style="{StaticResource FormFieldLabel}" />
-                            <TextBox x:Name="MatchupPackNameTextBox"
-                                     Text="{Binding PackName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource FormTextBox}"
-                                     MaxLength="80" />
-                            <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.PackName.Hint}"
-                                       Style="{StaticResource FormFieldHint}" />
-                        </StackPanel>
-
-                        <StackPanel Margin="0,16,0,0">
-                            <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.ShortDescription}"
-                                       Style="{StaticResource FormFieldLabel}" />
-                            <TextBox x:Name="MatchupDescriptionTextBox"
-                                     Text="{Binding ShortDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource FormTextBox}"
-                                     MaxLength="240"
-                                     MinHeight="78"
-                                     AcceptsReturn="True"
-                                     TextWrapping="Wrap"
-                                     VerticalContentAlignment="Top" />
-                            <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.ShortDescription.Hint}"
-                                       Style="{StaticResource FormFieldHint}" />
-                        </StackPanel>
-
-                        <Grid Margin="0,16,0,0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="14" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <StackPanel>
-                                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.Author}"
-                                           Style="{StaticResource FormFieldLabel}" />
-                                <TextBox x:Name="MatchupAuthorTextBox"
-                                         Text="{Binding Author, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                         Style="{StaticResource FormTextBox}"
-                                         MaxLength="40" />
-                            </StackPanel>
-                            <StackPanel Grid.Column="2">
-                                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.AdviceLanguage}"
-                                           Style="{StaticResource FormFieldLabel}" />
-                                <ComboBox x:Name="MatchupAdviceLanguageComboBox"
-                                          ItemsSource="{Binding AdviceLanguages}"
-                                          SelectedValuePath="Code"
-                                          SelectedValue="{Binding AdviceLanguageCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                          Style="{StaticResource FormComboBox}">
-                                    <ComboBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{Binding DisplayName}" />
-                                        </DataTemplate>
-                                    </ComboBox.ItemTemplate>
-                                </ComboBox>
-                            </StackPanel>
-                        </Grid>
-
-                        <Grid Margin="0,16,0,0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="14" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <StackPanel>
-                                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.GamePatch}"
-                                           Style="{StaticResource FormFieldLabel}" />
-                                <TextBox x:Name="MatchupPatchTextBox"
-                                         Text="{Binding GamePatch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                         Style="{StaticResource FormTextBox}"
-                                         MaxLength="24" />
-                                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.GamePatch.Hint}"
-                                           Style="{StaticResource FormFieldHint}" />
-                            </StackPanel>
-                            <StackPanel Grid.Column="2">
-                                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.VerifiedOn}"
-                                           Style="{StaticResource FormFieldLabel}" />
-                                <TextBox Text="{Binding VerifiedOn, Mode=OneWay, StringFormat={}{0:dd.MM.yyyy}}"
-                                         Style="{StaticResource FormTextBox}"
-                                         IsReadOnly="True"
-                                         IsTabStop="False" />
-                                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.VerifiedOn.Hint}"
-                                           Style="{StaticResource FormFieldHint}" />
-                            </StackPanel>
-                        </Grid>
-
-                        <StackPanel Margin="0,16,0,0">
-                            <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.Source}"
-                                       Style="{StaticResource FormFieldLabel}" />
-                            <ComboBox x:Name="MatchupSourceComboBox"
-                                      SelectedValuePath="Tag"
-                                      SelectedValue="{Binding SelectedSourceKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                      Style="{StaticResource FormComboBox}">
-                                <ComboBoxItem Tag="{x:Static viewModels:MatchupSourceKind.PersonalExperience}"
-                                              Content="{localization:Loc Coaching.MatchupEditor.Main.Source.Personal}" />
-                                <ComboBoxItem Tag="{x:Static viewModels:MatchupSourceKind.Article}"
-                                              Content="{localization:Loc Coaching.MatchupEditor.Main.Source.Article}" />
-                                <ComboBoxItem Tag="{x:Static viewModels:MatchupSourceKind.Video}"
-                                              Content="{localization:Loc Coaching.MatchupEditor.Main.Source.Video}" />
-                                <ComboBoxItem Tag="{x:Static viewModels:MatchupSourceKind.Guide}"
-                                              Content="{localization:Loc Coaching.MatchupEditor.Main.Source.Guide}" />
-                            </ComboBox>
-                            <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.Source.Personal.Hint}">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock" BasedOn="{StaticResource FormFieldHint}">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding SelectedSourceKind}"
-                                                         Value="{x:Static viewModels:MatchupSourceKind.PersonalExperience}">
-                                                <Setter Property="Visibility" Value="Visible" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                            <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.Source.Link.Hint}">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock" BasedOn="{StaticResource FormFieldHint}">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding SelectedSourceKind}"
-                                                         Value="{x:Static viewModels:MatchupSourceKind.PersonalExperience}">
-                                                <Setter Property="Visibility" Value="Collapsed" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                        </StackPanel>
-
-                        <StackPanel x:Name="MatchupSourceUrlPanel" Margin="0,16,0,0">
-                            <StackPanel.Style>
-                                <Style TargetType="StackPanel">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsSourceUrlRequired}" Value="True">
-                                            <Setter Property="Visibility" Value="Visible" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </StackPanel.Style>
-                            <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.SourceUrl}"
-                                       Style="{StaticResource FormFieldLabel}" />
-                            <TextBox x:Name="MatchupSourceUrlTextBox"
-                                     Text="{Binding SourceUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource FormTextBox}"
-                                     MaxLength="500" />
-                        </StackPanel>
-                    </StackPanel>
-                </Border>
-
-                <StackPanel Grid.Column="2">
-                    <Border Style="{StaticResource ShellCard}" Padding="18">
-                        <StackPanel>
-                            <Grid>
-                                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.Preview.Title}"
-                                           Foreground="#91A4BD"
-                                           FontSize="{StaticResource Typography.FontSize.Body}"
-                                           FontWeight="SemiBold" />
-                                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.Preview.Live}"
-                                           Foreground="#6F849F"
-                                           FontSize="{StaticResource Typography.FontSize.Caption}"
-                                           HorizontalAlignment="Right" />
-                            </Grid>
-                            <Border Background="#152238"
-                                    BorderBrush="#31506C"
-                                    BorderThickness="0,0,0,0"
-                                    CornerRadius="10"
-                                    Padding="16"
-                                    Margin="0,14,0,0">
-                                <StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Border Background="#173548" CornerRadius="9" Padding="9,4">
-                                            <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.Preview.Matchup}"
-                                                       Foreground="#76C9F0"
-                                                       FontSize="{StaticResource Typography.FontSize.Caption}"
-                                                       FontWeight="SemiBold" />
-                                        </Border>
-                                        <Border Background="#1B2A42" CornerRadius="9" Padding="9,4" Margin="8,0,0,0">
-                                            <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Draft}"
-                                                       Foreground="#A8B8CC"
-                                                       FontSize="{StaticResource Typography.FontSize.Caption}"
-                                                       FontWeight="SemiBold" />
-                                        </Border>
-                                    </StackPanel>
-                                    <TextBlock x:Name="MatchupPreviewNameTextBlock"
-                                               Foreground="#F4F7FB"
-                                               FontSize="{StaticResource Typography.FontSize.CardTitle}"
-                                               FontWeight="SemiBold"
-                                               TextWrapping="Wrap"
-                                               Margin="0,14,0,0">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="Text" Value="{Binding PackName}" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding PackName}" Value="">
-                                                        <Setter Property="Text" Value="{localization:Loc Coaching.MatchupEditor.Main.Preview.EmptyName}" />
-                                                        <Setter Property="Foreground" Value="#7F93AF" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
-                                    <TextBlock x:Name="MatchupPreviewDescriptionTextBlock"
-                                               Foreground="#AFC0D4"
-                                               FontSize="{StaticResource Typography.FontSize.Body}"
-                                               LineHeight="20"
-                                               TextWrapping="Wrap"
-                                               Margin="0,8,0,0">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="Text" Value="{Binding ShortDescription}" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding ShortDescription}" Value="">
-                                                        <Setter Property="Text" Value="{localization:Loc Coaching.MatchupEditor.Main.Preview.EmptyDescription}" />
-                                                        <Setter Property="Foreground" Value="#6F849F" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
-                                    <Border Height="1" Background="#263750" Margin="0,14,0,12" />
-                                    <Grid>
-                                        <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.Preview.EmptyAuthor}"
-                                                   Foreground="#7F93AF"
-                                                   FontSize="{StaticResource Typography.FontSize.Caption}">
-                                            <TextBlock.Style>
-                                                <Style TargetType="TextBlock">
-                                                    <Setter Property="Visibility" Value="Collapsed" />
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Author}" Value="">
-                                                            <Setter Property="Visibility" Value="Visible" />
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Author}" Value="{x:Null}">
-                                                            <Setter Property="Visibility" Value="Visible" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </TextBlock.Style>
-                                        </TextBlock>
-                                        <StackPanel Orientation="Horizontal">
-                                            <StackPanel.Style>
-                                                <Style TargetType="StackPanel">
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Author}" Value="">
-                                                            <Setter Property="Visibility" Value="Collapsed" />
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Author}" Value="{x:Null}">
-                                                            <Setter Property="Visibility" Value="Collapsed" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </StackPanel.Style>
-                                            <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.Author}"
-                                                       Foreground="#7F93AF"
-                                                       FontSize="{StaticResource Typography.FontSize.Caption}" />
-                                            <TextBlock Text="{Binding Author}"
-                                                       Foreground="#7F93AF"
-                                                       FontSize="{StaticResource Typography.FontSize.Caption}"
-                                                       Margin="5,0,0,0" />
-                                        </StackPanel>
-                                    </Grid>
-                                </StackPanel>
-                            </Border>
-                        </StackPanel>
-                    </Border>
-
-                    <Border Style="{StaticResource ShellCard}" Padding="18" Margin="0,16,0,0">
-                        <StackPanel>
-                            <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.Readiness.Title}"
-                                       Foreground="#91A4BD"
-                                       FontSize="{StaticResource Typography.FontSize.Body}"
-                                       FontWeight="SemiBold" />
-                            <Grid Margin="0,14,0,0">
-                                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Step.Main}"
-                                           Foreground="#DCEAF7"
-                                           FontSize="{StaticResource Typography.FontSize.Body}" />
-                                <TextBlock x:Name="MatchupReadinessTextBlock"
-                                           HorizontalAlignment="Right"
-                                           FontSize="{StaticResource Typography.FontSize.Caption}"
-                                           FontWeight="SemiBold">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Text" Value="{localization:Loc Coaching.MatchupEditor.Main.Readiness.Pending}" />
-                                            <Setter Property="Foreground" Value="#F3C969" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsMainInformationComplete}" Value="True">
-                                                    <Setter Property="Text" Value="{localization:Loc Coaching.MatchupEditor.Main.Readiness.Complete}" />
-                                                    <Setter Property="Foreground" Value="#76D7A8" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </Grid>
-                            <Grid Margin="0,11,0,0">
-                                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.Source}"
-                                           Foreground="#DCEAF7"
-                                           FontSize="{StaticResource Typography.FontSize.Body}" />
-                                <TextBlock HorizontalAlignment="Right"
-                                           FontSize="{StaticResource Typography.FontSize.Caption}"
-                                           FontWeight="SemiBold">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Text" Value="{localization:Loc Coaching.MatchupEditor.Main.Readiness.LinkRequired}" />
-                                            <Setter Property="Foreground" Value="#F3C969" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsSourceReady}" Value="True">
-                                                    <Setter Property="Text" Value="{localization:Loc Coaching.MatchupEditor.Main.Readiness.SourceReady}" />
-                                                    <Setter Property="Foreground" Value="#76D7A8" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </Grid>
-                            <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.Readiness.NextIteration}"
-                                       Foreground="#6F849F"
-                                       FontSize="{StaticResource Typography.FontSize.Caption}"
-                                       TextWrapping="Wrap"
-                                       Margin="0,14,0,0" />
-                        </StackPanel>
-                    </Border>
-                </StackPanel>
-            </Grid>
-        </ScrollViewer>
+        <views:MatchupMainInformationView x:Name="MatchupMainInformationPage"
+                                          Grid.Row="4"
+                                          DataContext="{Binding MainInformation}" />
     </Grid>
 </UserControl>

@@ -11,31 +11,31 @@ public sealed class CoachingViewModelTests
     [Fact]
     public void MainInformation_RequiresMetadataAndAValidLinkedSource()
     {
-        var viewModel = new MatchupEditorViewModel("ru-RU");
+        var viewModel = new MatchupMainInformationViewModel("ru-RU");
 
         Assert.Equal("ru-RU", viewModel.AdviceLanguageCode);
         Assert.Equal(MatchupSourceKind.PersonalExperience, viewModel.SelectedSourceKind);
         Assert.True(viewModel.IsSourceReady);
-        Assert.False(viewModel.IsMainInformationComplete);
+        Assert.False(viewModel.IsComplete);
 
         viewModel.PackName = "Urgot против Sett";
         viewModel.ShortDescription = "Как пережить раннюю линию и найти момент для боя.";
         viewModel.Author = "TopLaneAuthor";
         viewModel.GamePatch = "26.15";
 
-        Assert.True(viewModel.IsMainInformationComplete);
+        Assert.True(viewModel.IsComplete);
 
         viewModel.SelectedSourceKind = MatchupSourceKind.Article;
         Assert.True(viewModel.IsSourceUrlRequired);
         Assert.False(viewModel.IsSourceReady);
-        Assert.False(viewModel.IsMainInformationComplete);
+        Assert.False(viewModel.IsComplete);
 
         viewModel.SourceUrl = "not-a-web-link";
         Assert.False(viewModel.IsSourceReady);
 
         viewModel.SourceUrl = "https://example.com/urgot-sett";
         Assert.True(viewModel.IsSourceReady);
-        Assert.True(viewModel.IsMainInformationComplete);
+        Assert.True(viewModel.IsComplete);
     }
 
     [Fact]
