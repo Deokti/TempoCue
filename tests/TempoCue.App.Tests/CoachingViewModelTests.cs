@@ -9,6 +9,36 @@ namespace TempoCue.App.Tests;
 public sealed class CoachingViewModelTests
 {
     [Fact]
+    public void MainInformation_RequiresMetadataAndAValidLinkedSource()
+    {
+        var viewModel = new MatchupEditorViewModel("ru-RU");
+
+        Assert.Equal("ru-RU", viewModel.AdviceLanguageCode);
+        Assert.Equal(MatchupSourceKind.PersonalExperience, viewModel.SelectedSourceKind);
+        Assert.True(viewModel.IsSourceReady);
+        Assert.False(viewModel.IsMainInformationComplete);
+
+        viewModel.PackName = "Urgot против Sett";
+        viewModel.ShortDescription = "Как пережить раннюю линию и найти момент для боя.";
+        viewModel.Author = "TopLaneAuthor";
+        viewModel.GamePatch = "26.15";
+
+        Assert.True(viewModel.IsMainInformationComplete);
+
+        viewModel.SelectedSourceKind = MatchupSourceKind.Article;
+        Assert.True(viewModel.IsSourceUrlRequired);
+        Assert.False(viewModel.IsSourceReady);
+        Assert.False(viewModel.IsMainInformationComplete);
+
+        viewModel.SourceUrl = "not-a-web-link";
+        Assert.False(viewModel.IsSourceReady);
+
+        viewModel.SourceUrl = "https://example.com/urgot-sett";
+        Assert.True(viewModel.IsSourceReady);
+        Assert.True(viewModel.IsMainInformationComplete);
+    }
+
+    [Fact]
     public void CoachingNavigation_OpensOnlyAvailablePackEditor()
     {
         var localization = LocalizationService.Instance;

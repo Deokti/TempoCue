@@ -238,4 +238,35 @@
   <data name="Coaching.MatchupEditor.Step.Test" xml:space="preserve"><value>Проверка</value></data>
   <data name="Coaching.MatchupEditor.Step.Save" xml:space="preserve"><value>Сохранение</value></data>
   <data name="Coaching.MatchupEditor.Placeholder" xml:space="preserve"><value>Каркас редактора готов. Поля этого шага появятся в следующей проверяемой итерации.</value></data>
+  <data name="Coaching.MatchupEditor.Main.Description" xml:space="preserve"><value>Эти данные увидят другие игроки, если вы поделитесь набором.</value></data>
+  <data name="Coaching.MatchupEditor.Main.PackName" xml:space="preserve"><value>Название набора</value></data>
+  <data name="Coaching.MatchupEditor.Main.PackName.Hint" xml:space="preserve"><value>От 3 до 80 символов. Чемпионы выбираются на следующем шаге.</value></data>
+  <data name="Coaching.MatchupEditor.Main.ShortDescription" xml:space="preserve"><value>Краткое описание</value></data>
+  <data name="Coaching.MatchupEditor.Main.ShortDescription.Hint" xml:space="preserve"><value>Опишите цель набора в 10–240 символах.</value></data>
+  <data name="Coaching.MatchupEditor.Main.Author" xml:space="preserve"><value>Автор</value></data>
+  <data name="Coaching.MatchupEditor.Main.AdviceLanguage" xml:space="preserve"><value>Язык советов</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch" xml:space="preserve"><value>Игровой патч</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch.Hint" xml:space="preserve"><value>Укажите патч, на котором рекомендации проверялись в последний раз.</value></data>
+  <data name="Coaching.MatchupEditor.Main.VerifiedOn" xml:space="preserve"><value>Дата последней проверки</value></data>
+  <data name="Coaching.MatchupEditor.Main.VerifiedOn.Hint" xml:space="preserve"><value>Пока используется дата создания черновика.</value></data>
+  <data name="Coaching.MatchupEditor.Main.Source" xml:space="preserve"><value>Откуда информация</value></data>
+  <data name="Coaching.MatchupEditor.Main.Source.Personal" xml:space="preserve"><value>Личный опыт</value></data>
+  <data name="Coaching.MatchupEditor.Main.Source.Article" xml:space="preserve"><value>Статья</value></data>
+  <data name="Coaching.MatchupEditor.Main.Source.Video" xml:space="preserve"><value>Видео</value></data>
+  <data name="Coaching.MatchupEditor.Main.Source.Guide" xml:space="preserve"><value>Гайд</value></data>
+  <data name="Coaching.MatchupEditor.Main.Source.Personal.Hint" xml:space="preserve"><value>Личный опыт — полноценный источник, ссылка не требуется.</value></data>
+  <data name="Coaching.MatchupEditor.Main.Source.Link.Hint" xml:space="preserve"><value>Добавьте прямую ссылку, чтобы другие игроки могли проверить рекомендацию.</value></data>
+  <data name="Coaching.MatchupEditor.Main.SourceUrl" xml:space="preserve"><value>Ссылка на источник</value></data>
+  <data name="Coaching.MatchupEditor.Main.Preview.Title" xml:space="preserve"><value>Так это увидит игрок</value></data>
+  <data name="Coaching.MatchupEditor.Main.Preview.Live" xml:space="preserve"><value>обновляется на ходу</value></data>
+  <data name="Coaching.MatchupEditor.Main.Preview.Matchup" xml:space="preserve"><value>Матчап</value></data>
+  <data name="Coaching.MatchupEditor.Main.Preview.EmptyName" xml:space="preserve"><value>Здесь появится название набора</value></data>
+  <data name="Coaching.MatchupEditor.Main.Preview.EmptyDescription" xml:space="preserve"><value>Добавьте краткое описание, чтобы объяснить назначение набора.</value></data>
+  <data name="Coaching.MatchupEditor.Main.Preview.EmptyAuthor" xml:space="preserve"><value>Автор пока не указан</value></data>
+  <data name="Coaching.MatchupEditor.Main.Readiness.Title" xml:space="preserve"><value>Готовность набора</value></data>
+  <data name="Coaching.MatchupEditor.Main.Readiness.Pending" xml:space="preserve"><value>нужны данные</value></data>
+  <data name="Coaching.MatchupEditor.Main.Readiness.Complete" xml:space="preserve"><value>заполнено</value></data>
+  <data name="Coaching.MatchupEditor.Main.Readiness.LinkRequired" xml:space="preserve"><value>нужна ссылка</value></data>
+  <data name="Coaching.MatchupEditor.Main.Readiness.SourceReady" xml:space="preserve"><value>указан</value></data>
+  <data name="Coaching.MatchupEditor.Main.Readiness.NextIteration" xml:space="preserve"><value>Следующий шаг станет доступен после отдельной проверяемой итерации.</value></data>
 </root>

@@ -190,6 +190,34 @@ public sealed class LocalizationServiceTests
                     "Основная информация",
                     Assert.IsType<TextBlock>(
                         matchupEditorPage.FindName("MatchupEditorStepTitleTextBlock")).Text);
+                var matchupSourceUrlPanel = Assert.IsType<StackPanel>(
+                    matchupEditorPage.FindName("MatchupSourceUrlPanel"));
+                Assert.Equal(Visibility.Collapsed, matchupSourceUrlPanel.Visibility);
+
+                coachingViewModel.MatchupEditor.PackName = "Urgot против Sett";
+                coachingViewModel.MatchupEditor.ShortDescription =
+                    "Как пережить раннюю линию и найти момент для боя.";
+                coachingViewModel.MatchupEditor.Author = "TopLaneAuthor";
+                coachingViewModel.MatchupEditor.GamePatch = "26.15";
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
+
+                Assert.Equal(
+                    "Urgot против Sett",
+                    Assert.IsType<TextBlock>(
+                        matchupEditorPage.FindName("MatchupPreviewNameTextBlock")).Text);
+                Assert.Equal(
+                    "заполнено",
+                    Assert.IsType<TextBlock>(
+                        matchupEditorPage.FindName("MatchupReadinessTextBlock")).Text);
+
+                coachingViewModel.MatchupEditor.SelectedSourceKind = MatchupSourceKind.Article;
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
+                Assert.Equal(Visibility.Visible, matchupSourceUrlPanel.Visibility);
+                Assert.False(coachingViewModel.MatchupEditor.IsMainInformationComplete);
 
                 Assert.IsType<Button>(
                         matchupEditorPage.FindName("BackToPackTypeButton"))

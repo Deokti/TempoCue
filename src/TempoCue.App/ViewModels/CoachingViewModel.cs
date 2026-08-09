@@ -30,7 +30,7 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
         PlayerChampionInitials = GetInitials(firstRule?.PlayerChampion);
         OpponentChampionInitials = GetInitials(firstRule?.OpponentChampion);
         PackTypeSelection = new PackTypeSelectionViewModel();
-        MatchupEditor = new MatchupEditorViewModel();
+        MatchupEditor = new MatchupEditorViewModel(localization.CurrentLanguageCode);
         RenderLocalizedPresentation();
     }
 
