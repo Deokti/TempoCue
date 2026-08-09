@@ -95,6 +95,7 @@ public sealed class LocalizationServiceTests
             Assert.Equal("Settings", localization.Get("Settings.Title"));
             Assert.Equal("Interface language", localization.Get("Settings.Language.Label"));
             Assert.Equal("Available now", localization.Get("Home.Available.Title"));
+            Assert.Equal("v0.2.0", AppVersion.Display);
             Assert.Equal("1 player", localization.Plural("Count.Player", 1));
             Assert.Equal("10 players", localization.Plural("Count.Player", 10));
 
