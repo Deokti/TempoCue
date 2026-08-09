@@ -285,8 +285,18 @@
                                                Grid.Column="1" Text="{localization:Loc Nav.CurrentMatch}"
                                                FontSize="14" />
                                     <TextBlock x:Name="HomeMatchNavBadgeTextBlock"
-                                               Grid.Column="2" Text="—" Foreground="#5E7390"
-                                               FontSize="13" />
+                                               Grid.Column="2" Text="—" FontSize="13">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="#5E7390" />
+                                                <Style.Triggers>
+                                                    <Trigger Property="Text" Value="LIVE">
+                                                        <Setter Property="Foreground" Value="#64D5A4" />
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
                                 </Grid>
                             </Button>
                             <Button Style="{StaticResource ShellNavButton}" IsEnabled="False">
