@@ -17,13 +17,15 @@
             <Style x:Key="EditorStepsListBox" TargetType="ListBox">
                 <Setter Property="Background" Value="Transparent" />
                 <Setter Property="BorderThickness" Value="0" />
-                <Setter Property="IsHitTestVisible" Value="False" />
+                <Setter Property="Focusable" Value="False" />
+                <Setter Property="IsTabStop" Value="False" />
                 <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
                 <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
+                <Setter Property="ScrollViewer.CanContentScroll" Value="False" />
                 <Setter Property="ItemsPanel">
                     <Setter.Value>
                         <ItemsPanelTemplate>
-                            <StackPanel Orientation="Horizontal" />
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8" />
                         </ItemsPanelTemplate>
                     </Setter.Value>
                 </Setter>
@@ -36,6 +38,8 @@
                 <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="Padding" Value="13,9" />
                 <Setter Property="Margin" Value="0,0,10,0" />
+                <Setter Property="Focusable" Value="False" />
+                <Setter Property="IsHitTestVisible" Value="False" />
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="ListBoxItem">
@@ -176,6 +180,9 @@
                      Style="{StaticResource EditorStepsListBox}"
                      ItemContainerStyle="{StaticResource EditorStepItem}"
                      SelectedIndex="{Binding CurrentStepIndex, Mode=OneWay}">
+                <ListBox.Resources>
+                    <Style TargetType="ListBoxItem" BasedOn="{StaticResource EditorStepItem}" />
+                </ListBox.Resources>
                 <ListBoxItem Tag="1" Content="{localization:Loc Coaching.MatchupEditor.Step.Main}" />
                 <ListBoxItem Tag="2" Content="{localization:Loc Coaching.MatchupEditor.Step.Champions}" />
                 <ListBoxItem Tag="3" Content="{localization:Loc Coaching.MatchupEditor.Step.Phases}" />

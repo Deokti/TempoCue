@@ -192,6 +192,31 @@ public sealed class LocalizationServiceTests
                     matchupEditorPage.FindName("MatchupEditorStepsListBox"));
                 Assert.Equal(7, matchupEditorSteps.Items.Count);
                 Assert.Equal(0, matchupEditorSteps.SelectedIndex);
+                Assert.True(matchupEditorSteps.IsHitTestVisible);
+                Assert.All(
+                    matchupEditorSteps.Items.Cast<ListBoxItem>(),
+                    item => Assert.False(item.IsHitTestVisible));
+                Assert.False(ScrollViewer.GetCanContentScroll(matchupEditorSteps));
+                window.UpdateLayout();
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.Render);
+                var matchupStepsItemsPanel = Assert.Single(
+                    FindVisualDescendants<StackPanel>(matchupEditorSteps),
+                    panel => panel.IsItemsHost);
+                Assert.Equal(new Thickness(0, 0, 0, 8), matchupStepsItemsPanel.Margin);
+                var matchupStepsScrollBar = Assert.Single(
+                    FindVisualDescendants<ScrollBar>(matchupEditorSteps),
+                    scrollBar => scrollBar.Orientation == Orientation.Horizontal
+                        && scrollBar.IsVisible);
+                Assert.Equal(4d, matchupStepsScrollBar.ActualHeight);
+                Assert.True(matchupStepsScrollBar.IsHitTestVisible);
+                var matchupStepsScrollViewer = Assert.Single(
+                    FindVisualDescendants<ScrollViewer>(matchupEditorSteps));
+                Assert.True(matchupStepsScrollViewer.ScrollableWidth > 0);
+                matchupStepsScrollViewer.ScrollToHorizontalOffset(24);
+                window.UpdateLayout();
+                Assert.True(matchupStepsScrollViewer.HorizontalOffset > 0);
                 Assert.Same(
                     coachingViewModel.MatchupEditor.MainInformation,
                     matchupMainInformationPage.DataContext);
