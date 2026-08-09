@@ -10,7 +10,7 @@ namespace TempoCue.App.Tests;
 public sealed class CoachingViewModelTests
 {
     [Fact]
-    public async Task MainInformation_RequiresMetadataAndAValidLinkedSource()
+    public async Task MainInformation_RequiresOnlyFirstStepMetadata()
     {
         var localization = LocalizationService.Instance;
         var initialLanguage = localization.CurrentLanguageCode;
@@ -24,9 +24,8 @@ public sealed class CoachingViewModelTests
                 localization);
 
             Assert.Equal("ru-RU", viewModel.AdviceLanguageCode);
-            Assert.Equal(MatchupSourceKind.PersonalExperience, viewModel.SelectedSourceKind);
-            Assert.True(viewModel.IsSourceReady);
             Assert.False(viewModel.IsComplete);
+            Assert.Equal("Новый матчап", viewModel.DisplayTitle);
 
             viewModel.PackName = "Urgot против Sett";
             viewModel.ShortDescription = "Как пережить раннюю линию и найти момент для боя.";
@@ -34,20 +33,9 @@ public sealed class CoachingViewModelTests
             await viewModel.EnsureGamePatchCatalogLoadedAsync();
 
             Assert.True(viewModel.IsComplete);
+            Assert.Equal("Urgot против Sett", viewModel.DisplayTitle);
             Assert.Equal("26.15", viewModel.GamePatch);
             Assert.Equal("26.15 — текущий", viewModel.SelectedGamePatch?.DisplayName);
-
-            viewModel.SelectedSourceKind = MatchupSourceKind.Article;
-            Assert.True(viewModel.IsSourceUrlRequired);
-            Assert.False(viewModel.IsSourceReady);
-            Assert.False(viewModel.IsComplete);
-
-            viewModel.SourceUrl = "not-a-web-link";
-            Assert.False(viewModel.IsSourceReady);
-
-            viewModel.SourceUrl = "https://example.com/urgot-sett";
-            Assert.True(viewModel.IsSourceReady);
-            Assert.True(viewModel.IsComplete);
         }
         finally
         {
@@ -82,7 +70,7 @@ public sealed class CoachingViewModelTests
         viewModel.OpenMatchupEditor();
         Assert.Equal(CoachingScreen.MatchupEditor, viewModel.CurrentScreen);
         Assert.Equal(1, viewModel.MatchupEditor.CurrentStep);
-        Assert.Equal(7, viewModel.MatchupEditor.TotalSteps);
+        Assert.Equal(5, viewModel.MatchupEditor.TotalSteps);
         Assert.False(viewModel.MatchupEditor.MoveNext());
 
         var mainInformation = viewModel.MatchupEditor.MainInformation;

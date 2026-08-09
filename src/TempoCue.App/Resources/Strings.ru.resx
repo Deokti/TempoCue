@@ -232,22 +232,23 @@
   <data name="Coaching.MatchupEditor.Mode.Advanced" xml:space="preserve"><value>Расширенный</value></data>
   <data name="Coaching.MatchupEditor.Title" xml:space="preserve"><value>Новый матчап</value></data>
   <data name="Coaching.MatchupEditor.Draft" xml:space="preserve"><value>Черновик</value></data>
-  <data name="Coaching.MatchupEditor.StepSummary" xml:space="preserve"><value>Шаг 1 из 7 · Основная информация</value></data>
+  <data name="Coaching.MatchupEditor.StepSummary" xml:space="preserve"><value>Шаг 1 из 5 · Основная информация</value></data>
   <data name="Coaching.MatchupEditor.Step.Main" xml:space="preserve"><value>Основная информация</value></data>
   <data name="Coaching.MatchupEditor.Step.Champions" xml:space="preserve"><value>Чемпионы и роль</value></data>
+  <data name="Coaching.MatchupEditor.Step.MatchupContent" xml:space="preserve"><value>Содержание матчапа</value></data>
   <data name="Coaching.MatchupEditor.Step.Phases" xml:space="preserve"><value>Фазы матчапа</value></data>
   <data name="Coaching.MatchupEditor.Step.Conditions" xml:space="preserve"><value>Условия</value></data>
   <data name="Coaching.MatchupEditor.Step.Content" xml:space="preserve"><value>Содержание совета</value></data>
   <data name="Coaching.MatchupEditor.Step.Test" xml:space="preserve"><value>Проверка</value></data>
   <data name="Coaching.MatchupEditor.Step.Save" xml:space="preserve"><value>Сохранение</value></data>
   <data name="Coaching.MatchupEditor.Placeholder" xml:space="preserve"><value>Каркас редактора готов. Поля этого шага появятся в следующей проверяемой итерации.</value></data>
-  <data name="Coaching.MatchupEditor.Main.Description" xml:space="preserve"><value>Эти данные увидят другие игроки, если вы поделитесь набором.</value></data>
+  <data name="Coaching.MatchupEditor.Main.Description" xml:space="preserve"><value>Эти данные видны в библиотеке и в журнале советов во время матча.</value></data>
   <data name="Coaching.MatchupEditor.Main.PackName" xml:space="preserve"><value>Название набора</value></data>
   <data name="Coaching.MatchupEditor.Main.PackName.Hint" xml:space="preserve"><value>От 3 до 80 символов. Чемпионы выбираются на следующем шаге.</value></data>
   <data name="Coaching.MatchupEditor.Main.ShortDescription" xml:space="preserve"><value>Краткое описание</value></data>
   <data name="Coaching.MatchupEditor.Main.ShortDescription.Hint" xml:space="preserve"><value>Опишите цель набора в 10–240 символах.</value></data>
   <data name="Coaching.MatchupEditor.Main.Author" xml:space="preserve"><value>Автор</value></data>
-  <data name="Coaching.MatchupEditor.Main.AdviceLanguage" xml:space="preserve"><value>Язык советов</value></data>
+  <data name="Coaching.MatchupEditor.Main.AdviceLanguage" xml:space="preserve"><value>Язык содержимого</value></data>
   <data name="Coaching.MatchupEditor.Main.GamePatch" xml:space="preserve"><value>Игровой патч</value></data>
   <data name="Coaching.MatchupEditor.Main.GamePatch.Hint" xml:space="preserve"><value>Выберите патч, на котором рекомендации проверялись в последний раз.</value></data>
   <data name="Coaching.MatchupEditor.Main.GamePatch.Current" xml:space="preserve"><value>{0} — текущий</value></data>
@@ -257,6 +258,8 @@
   <data name="Coaching.MatchupEditor.Main.GamePatch.UsingCache" xml:space="preserve"><value>Показан последний сохранённый список патчей.</value></data>
   <data name="Coaching.MatchupEditor.Main.VerifiedOn" xml:space="preserve"><value>Дата последней проверки</value></data>
   <data name="Coaching.MatchupEditor.Main.VerifiedOn.Hint" xml:space="preserve"><value>Пока используется дата создания черновика.</value></data>
+  <data name="Coaching.MatchupEditor.Main.LanguageNote.Title" xml:space="preserve"><value>О языке набора</value></data>
+  <data name="Coaching.MatchupEditor.Main.LanguageNote.Description" xml:space="preserve"><value>Интерфейс TempoCue переключается между языками, но текст вашего набора остаётся таким, каким вы его написали — автоматического перевода содержимого нет.</value></data>
   <data name="Coaching.MatchupEditor.Main.Source" xml:space="preserve"><value>Откуда информация</value></data>
   <data name="Coaching.MatchupEditor.Main.Source.Personal" xml:space="preserve"><value>Личный опыт</value></data>
   <data name="Coaching.MatchupEditor.Main.Source.Article" xml:space="preserve"><value>Статья</value></data>
@@ -277,7 +280,7 @@
   <data name="Coaching.MatchupEditor.Main.Readiness.LinkRequired" xml:space="preserve"><value>нужна ссылка</value></data>
   <data name="Coaching.MatchupEditor.Main.Readiness.SourceReady" xml:space="preserve"><value>указан</value></data>
   <data name="Coaching.MatchupEditor.Main.Readiness.NextIteration" xml:space="preserve"><value>Следующий шаг станет доступен после отдельной проверяемой итерации.</value></data>
-  <data name="Coaching.MatchupEditor.StepSummary.Champions" xml:space="preserve"><value>Шаг 2 из 7 · Чемпионы и роль</value></data>
+  <data name="Coaching.MatchupEditor.StepSummary.Champions" xml:space="preserve"><value>Шаг 2 из 5 · Чемпионы и роль</value></data>
   <data name="Coaching.MatchupEditor.Champions.Description" xml:space="preserve"><value>Набор советов работает только в этом матчапе: ваш чемпион против выбранного противника на одной линии.</value></data>
   <data name="Coaching.MatchupEditor.Champions.Player" xml:space="preserve"><value>Я играю на</value></data>
   <data name="Coaching.MatchupEditor.Champions.Opponent" xml:space="preserve"><value>Мой противник</value></data>

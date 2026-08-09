@@ -173,16 +173,13 @@ public sealed class LocalizationServiceTests
                     matchupEditorPage.FindName("MatchupMainInformationPage"));
                 var matchupChampionsAndRolePage = Assert.IsType<TempoCue.App.Views.MatchupChampionsAndRoleView>(
                     matchupEditorPage.FindName("MatchupChampionsAndRolePage"));
-                var matchupEditorSidebar = Assert.IsType<TempoCue.App.Views.MatchupEditorSidebarView>(
-                    matchupEditorPage.FindName("MatchupEditorSidebar"));
                 var championPickerDialog = Assert.IsType<TempoCue.App.Views.ChampionPickerDialogView>(
                     matchupEditorPage.FindName("ChampionPickerDialog"));
                 var sharedTextBoxPadding = new Thickness(12, 0, 12, 0);
                 foreach (var textBoxName in new[]
                          {
                              "MatchupPackNameTextBox",
-                             "MatchupAuthorTextBox",
-                             "MatchupSourceUrlTextBox"
+                             "MatchupAuthorTextBox"
                          })
                 {
                     Assert.Equal(
@@ -194,7 +191,7 @@ public sealed class LocalizationServiceTests
                     Assert.IsType<TextBox>(
                         matchupMainInformationPage.FindName("MatchupPackNameTextBox")).Height);
                 Assert.Equal(
-                    78d,
+                    58d,
                     Assert.IsType<TextBox>(
                         matchupMainInformationPage.FindName("MatchupDescriptionTextBox")).Height);
                 Assert.Equal(
@@ -308,7 +305,7 @@ public sealed class LocalizationServiceTests
                 Assert.Equal(new Thickness(12, 10, 8, 8), matchupEditorStepsPanel.Padding);
                 var matchupEditorSteps = Assert.IsType<ListBox>(
                     matchupEditorPage.FindName("MatchupEditorStepsListBox"));
-                Assert.Equal(7, matchupEditorSteps.Items.Count);
+                Assert.Equal(5, matchupEditorSteps.Items.Count);
                 Assert.Equal(0, matchupEditorSteps.SelectedIndex);
                 Assert.True(matchupEditorSteps.IsHitTestVisible);
                 Assert.All(
@@ -323,18 +320,9 @@ public sealed class LocalizationServiceTests
                     FindVisualDescendants<StackPanel>(matchupEditorSteps),
                     panel => panel.IsItemsHost);
                 Assert.Equal(new Thickness(0, 0, 0, 8), matchupStepsItemsPanel.Margin);
-                var matchupStepsScrollBar = Assert.Single(
-                    FindVisualDescendants<ScrollBar>(matchupEditorSteps),
-                    scrollBar => scrollBar.Orientation == Orientation.Horizontal
-                        && scrollBar.IsVisible);
-                Assert.Equal(4d, matchupStepsScrollBar.ActualHeight);
-                Assert.True(matchupStepsScrollBar.IsHitTestVisible);
                 var matchupStepsScrollViewer = Assert.Single(
                     FindVisualDescendants<ScrollViewer>(matchupEditorSteps));
-                Assert.True(matchupStepsScrollViewer.ScrollableWidth > 0);
-                matchupStepsScrollViewer.ScrollToHorizontalOffset(24);
-                window.UpdateLayout();
-                Assert.True(matchupStepsScrollViewer.HorizontalOffset > 0);
+                Assert.Equal(0d, matchupStepsScrollViewer.ScrollableWidth);
                 Assert.Same(
                     coachingViewModel.MatchupEditor.MainInformation,
                     matchupMainInformationPage.DataContext);
@@ -342,10 +330,6 @@ public sealed class LocalizationServiceTests
                     "Основная информация",
                     Assert.IsType<TextBlock>(
                         matchupMainInformationPage.FindName("MatchupEditorStepTitleTextBlock")).Text);
-                var matchupSourceUrlPanel = Assert.IsType<StackPanel>(
-                    matchupMainInformationPage.FindName("MatchupSourceUrlPanel"));
-                Assert.Equal(Visibility.Collapsed, matchupSourceUrlPanel.Visibility);
-
                 coachingViewModel.MatchupEditor.MainInformation.PackName = "Urgot против Sett";
                 coachingViewModel.MatchupEditor.MainInformation.ShortDescription =
                     "Как пережить раннюю линию и найти момент для боя.";
@@ -362,25 +346,14 @@ public sealed class LocalizationServiceTests
                     matchupMainInformationPage.FindName("MatchupPatchComboBox"));
                 Assert.Equal(36d, patchComboBox.Height);
                 Assert.Equal("26.15 — текущий", patchComboBox.Text);
-
                 Assert.Equal(
                     "Urgot против Sett",
                     Assert.IsType<TextBlock>(
-                        matchupEditorSidebar.FindName("MatchupPreviewNameTextBlock")).Text);
+                        matchupEditorPage.FindName("MatchupEditorTitleTextBlock")).Text);
                 Assert.Equal(
-                    "заполнено",
+                    "О языке набора",
                     Assert.IsType<TextBlock>(
-                        matchupEditorSidebar.FindName("MatchupReadinessTextBlock")).Text);
-
-                coachingViewModel.MatchupEditor.MainInformation.SelectedSourceKind = MatchupSourceKind.Article;
-                Dispatcher.CurrentDispatcher.Invoke(
-                    static () => { },
-                    DispatcherPriority.DataBind);
-                Assert.Equal(Visibility.Visible, matchupSourceUrlPanel.Visibility);
-                Assert.False(coachingViewModel.MatchupEditor.MainInformation.IsComplete);
-
-                coachingViewModel.MatchupEditor.MainInformation.SelectedSourceKind =
-                    MatchupSourceKind.PersonalExperience;
+                        matchupMainInformationPage.FindName("MatchupLanguageNoteTitleTextBlock")).Text);
                 Dispatcher.CurrentDispatcher.Invoke(
                     static () => { },
                     DispatcherPriority.DataBind);
@@ -390,7 +363,6 @@ public sealed class LocalizationServiceTests
                     matchupEditorPage.FindName("MatchupEditorContentScrollViewer"));
                 matchupEditorContentScrollViewer.ScrollToVerticalOffset(120);
                 window.UpdateLayout();
-                Assert.True(matchupEditorContentScrollViewer.VerticalOffset > 0);
                 Assert.True(matchupEditorNextButton.IsEnabled);
                 matchupEditorNextButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
                 Dispatcher.CurrentDispatcher.Invoke(
@@ -406,7 +378,7 @@ public sealed class LocalizationServiceTests
                 Assert.Equal(Visibility.Collapsed, matchupMainInformationPage.Visibility);
                 Assert.Equal(Visibility.Visible, matchupChampionsAndRolePage.Visibility);
                 Assert.Equal(
-                    "Шаг 2 из 7 · Чемпионы и роль",
+                    "Шаг 2 из 5 · Чемпионы и роль",
                     Assert.IsType<TextBlock>(
                         matchupEditorPage.FindName("MatchupEditorStepSummaryTextBlock")).Text);
 
@@ -484,10 +456,6 @@ public sealed class LocalizationServiceTests
                     static () => { },
                     DispatcherPriority.DataBind);
                 Assert.True(championsAndRole.IsComplete);
-                Assert.Equal(
-                    "Urgot против Sett · TOP",
-                    Assert.IsType<TextBlock>(
-                        matchupEditorSidebar.FindName("MatchupChampionsReadinessTextBlock")).Text);
 
                 Assert.IsType<Button>(
                         matchupEditorPage.FindName("BackToPackTypeButton"))
@@ -498,10 +466,10 @@ public sealed class LocalizationServiceTests
                 Assert.Equal(1, coachingViewModel.MatchupEditor.CurrentStep);
                 Assert.Equal(Visibility.Visible, matchupMainInformationPage.Visibility);
                 Assert.Equal(Visibility.Collapsed, matchupChampionsAndRolePage.Visibility);
+                Assert.False(Assert.IsType<Button>(
+                    matchupEditorPage.FindName("BackToPackTypeButton")).IsEnabled);
 
-                Assert.IsType<Button>(
-                        matchupEditorPage.FindName("BackToPackTypeButton"))
-                    .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                coachingViewModel.OpenPackTypeSelection();
                 Dispatcher.CurrentDispatcher.Invoke(
                     static () => { },
                     DispatcherPriority.DataBind);
@@ -546,10 +514,6 @@ public sealed class LocalizationServiceTests
                 Dispatcher.CurrentDispatcher.Invoke(
                     static () => { },
                     DispatcherPriority.DataBind);
-                Assert.Equal(
-                    "Urgot vs Sett · TOP",
-                    Assert.IsType<TextBlock>(
-                        matchupEditorSidebar.FindName("MatchupChampionsReadinessTextBlock")).Text);
                 window.UpdateLayout();
                 Dispatcher.CurrentDispatcher.Invoke(
                     static () => { },

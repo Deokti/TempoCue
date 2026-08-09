@@ -4,7 +4,7 @@ using TempoCue.App.ViewModels;
 
 namespace TempoCue.App.Views;
 
-/// <summary>Первый шаг редактора матчапа: метаданные, источник и предпросмотр.</summary>
+/// <summary>Первый шаг редактора матчапа: основные метаданные набора.</summary>
 public partial class MatchupMainInformationView : UserControl
 {
     public MatchupMainInformationView()

@@ -1,3 +1,4 @@
+using System.Globalization;
 using TempoCue.App.Localization;
 using TempoCue.Application;
 
@@ -15,8 +16,6 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
     private IReadOnlyList<GamePatchOptionViewModel> _gamePatches = [];
     private GamePatchOptionViewModel? _selectedGamePatch;
     private CatalogViewState _gamePatchCatalogState = CatalogViewState.NotLoaded;
-    private MatchupSourceKind _selectedSourceKind = MatchupSourceKind.PersonalExperience;
-    private string _sourceUrl = string.Empty;
 
     public MatchupMainInformationViewModel(
         string defaultLanguageCode,
@@ -39,6 +38,14 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
 
     public DateTime VerifiedOn { get; } = DateTime.Today;
 
+    public string DisplayTitle => string.IsNullOrWhiteSpace(PackName)
+        ? _localization.Get("Coaching.MatchupEditor.Title")
+        : PackName.Trim();
+
+    public string VerifiedOnDisplayName => VerifiedOn.ToString(
+        "d MMMM yyyy",
+        CultureInfo.GetCultureInfo(_localization.CurrentLanguageCode));
+
     public string PackName
     {
         get => _packName;
@@ -46,6 +53,7 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
         {
             if (SetProperty(ref _packName, value ?? string.Empty))
             {
+                OnPropertyChanged(nameof(DisplayTitle));
                 NotifyFormStateChanged();
             }
         }
@@ -133,44 +141,13 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
     public bool IsUsingGamePatchCache =>
         GamePatchCatalogState == CatalogViewState.Cached;
 
-    public MatchupSourceKind SelectedSourceKind
-    {
-        get => _selectedSourceKind;
-        set
-        {
-            if (SetProperty(ref _selectedSourceKind, value))
-            {
-                NotifyFormStateChanged();
-            }
-        }
-    }
-
-    public string SourceUrl
-    {
-        get => _sourceUrl;
-        set
-        {
-            if (SetProperty(ref _sourceUrl, value ?? string.Empty))
-            {
-                NotifyFormStateChanged();
-            }
-        }
-    }
-
-    public bool IsSourceUrlRequired =>
-        SelectedSourceKind is not MatchupSourceKind.PersonalExperience;
-
-    public bool IsSourceReady =>
-        !IsSourceUrlRequired || IsValidWebUrl(SourceUrl);
-
     public bool IsComplete =>
         IsWithinLength(PackName, 3, 80)
         && IsWithinLength(ShortDescription, 10, 240)
         && IsWithinLength(Author, 2, 40)
         && IsGamePatchCatalogReady
         && SelectedGamePatch is not null
-        && AdviceLanguages.Any(language => language.Code == AdviceLanguageCode)
-        && IsSourceReady;
+        && AdviceLanguages.Any(language => language.Code == AdviceLanguageCode);
 
     public async Task EnsureGamePatchCatalogLoadedAsync(
         CancellationToken cancellationToken = default)
@@ -211,6 +188,9 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
 
     public void UpdateLanguage()
     {
+        OnPropertyChanged(nameof(DisplayTitle));
+        OnPropertyChanged(nameof(VerifiedOnDisplayName));
+
         if (_gamePatches.Count == 0)
         {
             return;
@@ -226,8 +206,6 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
 
     private void NotifyFormStateChanged()
     {
-        OnPropertyChanged(nameof(IsSourceUrlRequired));
-        OnPropertyChanged(nameof(IsSourceReady));
         OnPropertyChanged(nameof(IsComplete));
     }
 
@@ -256,7 +234,4 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
         return length >= minimumLength && length <= maximumLength;
     }
 
-    private static bool IsValidWebUrl(string value) =>
-        Uri.TryCreate(value.Trim(), UriKind.Absolute, out var uri)
-        && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
 }

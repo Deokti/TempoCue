@@ -40,7 +40,7 @@ public sealed class MatchupEditorViewModel : ObservableObject
 
     public int CurrentStepIndex => CurrentStep - 1;
 
-    public int TotalSteps => 7;
+    public int TotalSteps => 5;
 
     public MatchupMainInformationViewModel MainInformation { get; }
 
