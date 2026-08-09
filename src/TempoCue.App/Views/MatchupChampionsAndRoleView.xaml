@@ -75,8 +75,6 @@
 
     <Border x:Name="MatchupChampionsCard"
             Style="{StaticResource ShellCard}"
-            MaxWidth="900"
-            HorizontalAlignment="Left"
             Padding="20">
         <StackPanel>
             <StackPanel Orientation="Horizontal">

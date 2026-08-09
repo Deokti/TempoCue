@@ -16,8 +16,6 @@
 
     <Border x:Name="MatchupMainInformationCard"
             Style="{StaticResource ShellCard}"
-            MaxWidth="900"
-            HorizontalAlignment="Left"
             Padding="20">
                 <StackPanel>
                     <TextBlock x:Name="MatchupEditorStepTitleTextBlock"

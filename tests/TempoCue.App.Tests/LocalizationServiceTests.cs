@@ -1,5 +1,6 @@
 using System.Runtime.ExceptionServices;
 using System.Windows;
+using System.Windows.Shell;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
@@ -132,8 +133,14 @@ public sealed class LocalizationServiceTests
                 Assert.Equal("TempoCue — ассистент для League of Legends", window.Title);
                 Assert.Equal(1280, window.Width);
                 Assert.Equal(720, window.Height);
-                Assert.Equal(ResizeMode.NoResize, window.ResizeMode);
+                Assert.Equal(1280, window.MinWidth);
+                Assert.Equal(720, window.MinHeight);
+                Assert.Equal(ResizeMode.CanResize, window.ResizeMode);
                 Assert.Equal(WindowStyle.None, window.WindowStyle);
+                var windowChrome = WindowChrome.GetWindowChrome(window);
+                Assert.NotNull(windowChrome);
+                Assert.Equal(new Thickness(6), windowChrome.ResizeBorderThickness);
+                Assert.Equal(new Thickness(0), windowChrome.GlassFrameThickness);
                 Assert.NotNull(window.Icon);
                 window.WindowState = WindowState.Maximized;
                 Dispatcher.CurrentDispatcher.Invoke(
