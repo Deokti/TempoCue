@@ -54,10 +54,15 @@
                                   Width="240"
                                   VerticalAlignment="Center"
                                   ItemsSource="{Binding Languages}"
-                                  DisplayMemberPath="DisplayName"
                                   SelectedValuePath="Code"
                                   SelectedValue="{Binding SelectedLanguageCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                  ToolTip="{localization:Loc Language.Tooltip}" />
+                                  ToolTip="{localization:Loc Language.Tooltip}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding DisplayName}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
                     </Grid>
                 </StackPanel>
             </Border>

@@ -10,6 +10,7 @@
     <Content Include="Assets\CoachPacks\*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Assets\Brand\AppIcon.ico" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -18,6 +19,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>Assets\Brand\AppIcon.ico</ApplicationIcon>
   </PropertyGroup>
 
 </Project>

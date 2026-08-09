@@ -119,10 +119,10 @@ public partial class MainWindow
         SettingsNavigationButton.Style = (Style)FindResource(
             settingsAreOpen ? "ShellNavButtonActive" : "ShellNavButton");
 
-        HomeNavigationIcon.Foreground = ToBrush(homeIsOpen ? "#50B7ED" : "#7F93AF");
-        CurrentMatchNavigationIcon.Foreground = ToBrush(matchIsOpen ? "#50B7ED" : "#7F93AF");
-        CoachingNavigationIcon.Foreground = ToBrush(coachingIsOpen ? "#50B7ED" : "#7F93AF");
-        SettingsNavigationIcon.Foreground = ToBrush(settingsAreOpen ? "#50B7ED" : "#7F93AF");
+        HomeNavigationIcon.Stroke = ToBrush(homeIsOpen ? "#50B7ED" : "#7F93AF");
+        CurrentMatchNavigationIcon.Stroke = ToBrush(matchIsOpen ? "#50B7ED" : "#7F93AF");
+        CoachingNavigationIcon.Stroke = ToBrush(coachingIsOpen ? "#50B7ED" : "#7F93AF");
+        SettingsNavigationIcon.Stroke = ToBrush(settingsAreOpen ? "#50B7ED" : "#7F93AF");
         HomeNavigationTextBlock.FontWeight = homeIsOpen ? FontWeights.SemiBold : FontWeights.Normal;
         CurrentMatchNavigationTextBlock.FontWeight = matchIsOpen
             ? FontWeights.SemiBold

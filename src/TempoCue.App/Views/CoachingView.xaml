@@ -362,10 +362,11 @@
                     <StackPanel HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
                                 MaxWidth="600">
-                        <TextBlock Text="◎"
-                                   Foreground="#50B7ED"
-                                   FontSize="32"
-                                   HorizontalAlignment="Center" />
+                        <Path Width="32" Height="32"
+                              Data="{StaticResource Icon.MapMinimap}"
+                              Style="{StaticResource TempoIcon}"
+                              Stroke="#50B7ED"
+                              HorizontalAlignment="Center" />
                         <TextBlock Text="{localization:Loc Coaching.Empty.MapControl.Title}"
                                    Foreground="#F4F7FB"
                                    FontSize="18"

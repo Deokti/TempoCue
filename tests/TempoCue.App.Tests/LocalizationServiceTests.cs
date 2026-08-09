@@ -53,6 +53,11 @@ public sealed class LocalizationServiceTests
                 Assert.Equal(720, window.Height);
                 Assert.Equal(ResizeMode.NoResize, window.ResizeMode);
                 Assert.Equal(WindowStyle.None, window.WindowStyle);
+                Assert.NotNull(window.Icon);
+                var homeNavigationIcon = Assert.IsType<System.Windows.Shapes.Path>(
+                    window.FindName("HomeNavigationIcon"));
+                Assert.NotNull(homeNavigationIcon.Data);
+                Assert.IsType<StreamGeometry>(window.FindResource("Icon.NavHome"));
                 var currentMatchPage = Assert.IsType<TempoCue.App.Views.CurrentMatchView>(
                     window.FindName("CurrentMatchContentPage"));
                 Assert.Contains(
@@ -72,7 +77,8 @@ public sealed class LocalizationServiceTests
                     window.FindName("CoachingNavigationButton"));
                 var settingsTitle = Assert.IsType<TextBlock>(
                     settingsPage.FindName("SettingsTitleTextBlock"));
-                Assert.NotNull(settingsPage.FindName("LanguageComboBox"));
+                var languageComboBox = Assert.IsType<ComboBox>(
+                    settingsPage.FindName("LanguageComboBox"));
 
                 currentMatchButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
                 Assert.Equal(Visibility.Visible, currentMatchPage.Visibility);
@@ -145,6 +151,13 @@ public sealed class LocalizationServiceTests
                 settingsButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
                 Assert.Equal(Visibility.Visible, settingsPage.Visibility);
                 Assert.Equal("Настройки", settingsTitle.Text);
+                window.UpdateLayout();
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.Render);
+                Assert.Contains(
+                    FindVisualDescendants<TextBlock>(languageComboBox),
+                    textBlock => textBlock.Text == settingsViewModel.Languages[0].DisplayName);
 
                 localization.SetLanguage("en-US");
                 Dispatcher.CurrentDispatcher.Invoke(
@@ -153,6 +166,13 @@ public sealed class LocalizationServiceTests
 
                 Assert.Equal("TempoCue — League of Legends assistant", window.Title);
                 Assert.Equal("Settings", settingsTitle.Text);
+                window.UpdateLayout();
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.Render);
+                Assert.Contains(
+                    FindVisualDescendants<TextBlock>(languageComboBox),
+                    textBlock => textBlock.Text == settingsViewModel.Languages[1].DisplayName);
                 window.Close();
             }
             catch (Exception exception)
