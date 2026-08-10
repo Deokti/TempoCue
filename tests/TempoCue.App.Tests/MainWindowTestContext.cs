@@ -30,7 +30,7 @@ internal sealed class MainWindowTestContext : IDisposable
         Settings = new SettingsViewModel(Localization, new AppSettingsService());
         CoachPackStore = new TestCoachPackStore();
         Coaching = CoachingViewModelTestFactory.Create(
-            CreateCoachPack(),
+            TestCoachPackFactory.CreateMatchup(),
             Localization,
             CoachPackStore);
         Window = new MainWindow(CurrentMatch, Home, Settings, Coaching);
@@ -223,30 +223,6 @@ internal sealed class MainWindowTestContext : IDisposable
         CurrentMatch.Dispose();
         Localization.SetLanguage(_initialLanguage);
     }
-
-    private static CoachPack CreateCoachPack() => new()
-    {
-        SchemaVersion = 1,
-        Id = "test.urgot-vs-sett",
-        Name = "Urgot vs Sett",
-        Patch = "test",
-        Rules =
-        [
-            new CoachRuleDefinition
-            {
-                Id = "early",
-                PlayerChampion = "Urgot",
-                OpponentChampion = "Sett",
-                MinimumLevel = 1,
-                MaximumLevel = 8,
-                PowerState = PowerState.Dangerous,
-                Priority = 1,
-                Title = "Test title",
-                Message = "Test message",
-                Source = "Test source"
-            }
-        ]
-    };
 
     private sealed class WaitingSnapshotSource : IMatchSnapshotSource
     {

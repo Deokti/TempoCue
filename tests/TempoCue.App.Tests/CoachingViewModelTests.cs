@@ -13,14 +13,10 @@ public sealed class CoachingViewModelTests
     {
         var localization = LocalizationService.Instance;
         using var viewModel = CoachingViewModelTestFactory.Create(
-            new CoachPack
-            {
-                SchemaVersion = 1,
-                Id = "test.navigation",
-                Name = "Test",
-                Patch = "test",
-                Rules = []
-            },
+            TestCoachPackFactory.CreateMatchup(
+                id: "test.navigation",
+                name: "Test",
+                rules: []),
             localization);
 
         Assert.Equal(CoachingScreen.Library, viewModel.CurrentScreen);
@@ -84,28 +80,24 @@ public sealed class CoachingViewModelTests
 
         try
         {
-            var pack = new CoachPack
-            {
-                SchemaVersion = 1,
-                Id = "test.urgot-vs-sett",
-                Name = "Urgot vs Sett — авторский текст",
-                Patch = "требует проверки",
-                Rules =
+            var pack = TestCoachPackFactory.CreateMatchup(
+                name: "Urgot vs Sett — авторский текст",
+                patch: "требует проверки",
+                rules:
                 [
-                    CreateRule(
+                    TestCoachPackFactory.CreateRule(
                         "early",
                         1,
                         8,
                         PowerState.Dangerous,
                         "Не принимай ранний бой"),
-                    CreateRule(
+                    TestCoachPackFactory.CreateRule(
                         "late",
                         9,
                         null,
                         PowerState.Playable,
                         "Можно играть активнее")
-                ]
-            };
+                ]);
             using var viewModel = CoachingViewModelTestFactory.Create(
                 pack,
                 localization);
@@ -133,22 +125,4 @@ public sealed class CoachingViewModelTests
         }
     }
 
-    private static CoachRuleDefinition CreateRule(
-        string id,
-        int minimumLevel,
-        int? maximumLevel,
-        PowerState powerState,
-        string title) => new()
-        {
-            Id = id,
-            PlayerChampion = "Urgot",
-            OpponentChampion = "Sett",
-            MinimumLevel = minimumLevel,
-            MaximumLevel = maximumLevel,
-            PowerState = powerState,
-            Priority = 1,
-            Title = title,
-            Message = "Содержимое набора остаётся на языке автора.",
-            Source = "Тестовый источник"
-        };
 }
