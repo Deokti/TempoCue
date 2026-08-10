@@ -1,6 +1,5 @@
 using System.IO;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using TempoCue.Application;
 using TempoCue.Core;
 
@@ -9,7 +8,6 @@ namespace TempoCue.App.Persistence;
 /// <summary>Хранит пользовательские Coach Packs и их локальное состояние в LocalAppData.</summary>
 public sealed class LocalCoachPackStore : ICoachPackStore
 {
-    private static readonly JsonSerializerOptions StateSerializerOptions = CreateStateOptions();
     private readonly string _rootDirectory;
 
     public LocalCoachPackStore(string rootDirectory)
@@ -29,65 +27,17 @@ public sealed class LocalCoachPackStore : ICoachPackStore
                 new Dictionary<string, LocalCoachPackState>(StringComparer.OrdinalIgnoreCase));
         }
 
-        var entries = new List<LocalCoachPackEntry>();
-        var invalidFileCount = 0;
-        var localStates = new Dictionary<string, LocalStateReadResult>(
-            StringComparer.OrdinalIgnoreCase);
-        foreach (var statePath in Directory.EnumerateFiles(
-                     _rootDirectory,
-                     "*.state.json",
-                     SearchOption.TopDirectoryOnly))
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            try
-            {
-                var stateResult = await LoadStateFileAsync(statePath, cancellationToken);
-                localStates[stateResult.PackId] = stateResult;
-            }
-            catch (Exception exception) when (exception is IOException
-                                              or UnauthorizedAccessException
-                                              or InvalidDataException
-                                              or JsonException)
-            {
-                invalidFileCount++;
-            }
-        }
-
-        foreach (var packPath in Directory
-                     .EnumerateFiles(_rootDirectory, "*.json", SearchOption.TopDirectoryOnly)
-                     .Where(static path => !path.EndsWith(
-                         ".state.json",
-                         StringComparison.OrdinalIgnoreCase)))
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            try
-            {
-                await using var packStream = OpenFile(packPath);
-                var pack = await CoachPackLoader.LoadAsync(packStream, cancellationToken);
-                var stateResult = localStates.GetValueOrDefault(pack.Id);
-                entries.Add(new LocalCoachPackEntry(
-                    pack,
-                    stateResult?.State ?? LocalCoachPackState.Draft,
-                    File.GetLastWriteTimeUtc(packPath)));
-            }
-            catch (Exception exception) when (exception is IOException
-                                              or UnauthorizedAccessException
-                                              or InvalidDataException
-                                              or JsonException)
-            {
-                invalidFileCount++;
-            }
-        }
+        var stateFiles = await ReadStateFilesAsync(cancellationToken);
+        var packFiles = await ReadPackFilesAsync(stateFiles.States, cancellationToken);
 
         return new CoachPackLibrarySnapshot(
-            entries
+            packFiles.Entries
                 .OrderByDescending(static entry => entry.SavedAtUtc)
                 .ThenBy(static entry => entry.Pack.Name, StringComparer.CurrentCultureIgnoreCase)
                 .ToArray(),
-            invalidFileCount,
-            localStates.ToDictionary(
-                static pair => pair.Key,
-                static pair => pair.Value.State,
+            stateFiles.InvalidFileCount + packFiles.InvalidFileCount,
+            new Dictionary<string, LocalCoachPackState>(
+                stateFiles.States,
                 StringComparer.OrdinalIgnoreCase));
     }
 
@@ -114,17 +64,13 @@ public sealed class LocalCoachPackStore : ICoachPackStore
                 await CoachPackWriter.WriteAsync(packStream, pack, cancellationToken);
             }
 
-            var metadata = new LocalCoachPackMetadata(
-                1,
-                pack.Id,
-                state,
-                DateTimeOffset.UtcNow);
             await using (var stateStream = CreateFile(stateTemporaryPath))
             {
-                await JsonSerializer.SerializeAsync(
+                await LocalCoachPackStateSerializer.WriteAsync(
                     stateStream,
-                    metadata,
-                    StateSerializerOptions,
+                    pack.Id,
+                    state,
+                    DateTimeOffset.UtcNow,
                     cancellationToken);
             }
 
@@ -153,17 +99,13 @@ public sealed class LocalCoachPackStore : ICoachPackStore
 
         try
         {
-            var metadata = new LocalCoachPackMetadata(
-                1,
-                packId,
-                state,
-                DateTimeOffset.UtcNow);
             await using (var stateStream = CreateFile(temporaryPath))
             {
-                await JsonSerializer.SerializeAsync(
+                await LocalCoachPackStateSerializer.WriteAsync(
                     stateStream,
-                    metadata,
-                    StateSerializerOptions,
+                    packId,
+                    state,
+                    DateTimeOffset.UtcNow,
                     cancellationToken);
             }
 
@@ -191,26 +133,64 @@ public sealed class LocalCoachPackStore : ICoachPackStore
         4096,
         FileOptions.Asynchronous | FileOptions.SequentialScan);
 
-    private static async Task<LocalStateReadResult> LoadStateFileAsync(
-        string statePath,
+    private async Task<StateFilesReadResult> ReadStateFilesAsync(
         CancellationToken cancellationToken)
     {
-        await using var stateStream = OpenFile(statePath);
-        var metadata = await JsonSerializer.DeserializeAsync<LocalCoachPackMetadata>(
-            stateStream,
-            StateSerializerOptions,
-            cancellationToken);
-        if (metadata is null
-            || metadata.SchemaVersion != 1
-            || string.IsNullOrWhiteSpace(metadata.PackId)
-            || !Enum.IsDefined(metadata.State))
+        var states = new Dictionary<string, LocalCoachPackState>(
+            StringComparer.OrdinalIgnoreCase);
+        var invalidFileCount = 0;
+        foreach (var statePath in Directory.EnumerateFiles(
+                     _rootDirectory,
+                     "*.state.json",
+                     SearchOption.TopDirectoryOnly))
         {
-            throw new InvalidDataException("Local Coach Pack state is invalid.");
+            cancellationToken.ThrowIfCancellationRequested();
+            try
+            {
+                await using var stateStream = OpenFile(statePath);
+                var state = await LocalCoachPackStateSerializer.ReadAsync(
+                    stateStream,
+                    cancellationToken);
+                states[state.PackId] = state.State;
+            }
+            catch (Exception exception) when (IsInvalidStoredFile(exception))
+            {
+                invalidFileCount++;
+            }
         }
 
-        return new LocalStateReadResult(
-            metadata.PackId,
-            metadata.State);
+        return new StateFilesReadResult(states, invalidFileCount);
+    }
+
+    private async Task<PackFilesReadResult> ReadPackFilesAsync(
+        IReadOnlyDictionary<string, LocalCoachPackState> states,
+        CancellationToken cancellationToken)
+    {
+        var entries = new List<LocalCoachPackEntry>();
+        var invalidFileCount = 0;
+        foreach (var packPath in Directory
+                     .EnumerateFiles(_rootDirectory, "*.json", SearchOption.TopDirectoryOnly)
+                     .Where(static path => !path.EndsWith(
+                         ".state.json",
+                         StringComparison.OrdinalIgnoreCase)))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            try
+            {
+                await using var packStream = OpenFile(packPath);
+                var pack = await CoachPackLoader.LoadAsync(packStream, cancellationToken);
+                entries.Add(new LocalCoachPackEntry(
+                    pack,
+                    states.GetValueOrDefault(pack.Id, LocalCoachPackState.Draft),
+                    File.GetLastWriteTimeUtc(packPath)));
+            }
+            catch (Exception exception) when (IsInvalidStoredFile(exception))
+            {
+                invalidFileCount++;
+            }
+        }
+
+        return new PackFilesReadResult(entries, invalidFileCount);
     }
 
     private static void ValidateState(LocalCoachPackState state)
@@ -243,23 +223,17 @@ public sealed class LocalCoachPackStore : ICoachPackStore
         }
     }
 
-    private static JsonSerializerOptions CreateStateOptions()
-    {
-        var options = new JsonSerializerOptions(JsonSerializerDefaults.Web)
-        {
-            WriteIndented = true
-        };
-        options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
-        return options;
-    }
+    private static bool IsInvalidStoredFile(Exception exception) =>
+        exception is IOException
+            or UnauthorizedAccessException
+            or InvalidDataException
+            or JsonException;
 
-    private sealed record LocalCoachPackMetadata(
-        int SchemaVersion,
-        string PackId,
-        LocalCoachPackState State,
-        DateTimeOffset SavedAtUtc);
+    private sealed record StateFilesReadResult(
+        Dictionary<string, LocalCoachPackState> States,
+        int InvalidFileCount);
 
-    private sealed record LocalStateReadResult(
-        string PackId,
-        LocalCoachPackState State);
+    private sealed record PackFilesReadResult(
+        List<LocalCoachPackEntry> Entries,
+        int InvalidFileCount);
 }
