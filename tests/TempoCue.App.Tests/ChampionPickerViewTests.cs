@@ -37,14 +37,14 @@ public sealed class ChampionPickerViewTests
         context.Window.UpdateLayout();
         Assert.Equal(640d, card.ActualHeight, 1);
         Assert.Equal(980d, card.ActualWidth, 1);
-        context.Window.Width = 1280;
-        context.Window.Height = 720;
+        context.Window.Width = 1310;
+        context.Window.Height = 750;
         context.Window.UpdateLayout();
 
         viewModel.PickerSearch = "urgot";
         WpfTestHost.Pump();
         context.Window.UpdateLayout();
-        Assert.Equal(576d, card.ActualHeight, 1);
+        Assert.Equal(600d, card.ActualHeight, 1);
         viewModel.PickerSearch = string.Empty;
         WpfTestHost.Pump();
         var closeButton = WpfTestHost.Find<Button>(picker, "CloseChampionPickerButton");

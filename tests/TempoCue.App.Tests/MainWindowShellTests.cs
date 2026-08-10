@@ -20,10 +20,10 @@ public sealed class MainWindowShellTests
         var window = context.Window;
 
         Assert.Equal("TempoCue — ассистент для League of Legends", window.Title);
-        Assert.Equal(1280, window.Width);
-        Assert.Equal(720, window.Height);
-        Assert.Equal(1280, window.MinWidth);
-        Assert.Equal(720, window.MinHeight);
+        Assert.Equal(1310, window.Width);
+        Assert.Equal(750, window.Height);
+        Assert.Equal(1310, window.MinWidth);
+        Assert.Equal(750, window.MinHeight);
         Assert.Equal(ResizeMode.CanResize, window.ResizeMode);
         Assert.Equal(WindowStyle.None, window.WindowStyle);
         var windowChrome = WindowChrome.GetWindowChrome(window);

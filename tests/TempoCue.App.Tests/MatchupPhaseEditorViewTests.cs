@@ -52,14 +52,14 @@ public sealed class MatchupPhaseEditorViewTests
         context.Window.UpdateLayout();
         Assert.Equal(640d, card.ActualHeight, 1);
         Assert.Equal(1092d, card.ActualWidth, 1);
-        context.Window.Width = 1280;
-        context.Window.Height = 720;
+        context.Window.Width = 1310;
+        context.Window.Height = 750;
         context.Window.UpdateLayout();
 
         content.ItemPicker.Search = "секира";
         WpfTestHost.Pump();
         context.Window.UpdateLayout();
-        Assert.Equal(576d, card.ActualHeight, 1);
+        Assert.Equal(600d, card.ActualHeight, 1);
         content.ItemPicker.Search = string.Empty;
         WpfTestHost.Pump();
         var searchTextBox = WpfTestHost.Find<TextBox>(picker, "ItemPickerSearchTextBox");
