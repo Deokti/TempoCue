@@ -29,15 +29,10 @@ internal sealed class MainWindowTestContext : IDisposable
         Home = new HomeViewModel(CurrentMatch, Localization);
         Settings = new SettingsViewModel(Localization, new AppSettingsService());
         CoachPackStore = new TestCoachPackStore();
-        Coaching = new CoachingViewModel(
+        Coaching = CoachingViewModelTestFactory.Create(
             CreateCoachPack(),
             Localization,
-            TestGamePatchCatalog.Ready(),
-            TestChampionCatalog.Ready(),
-            TestItemCatalog.Ready(),
-            new SaveCoachPackUseCase(CoachPackStore),
-            new LoadCoachPackLibraryUseCase(CoachPackStore),
-            new SetCoachPackStateUseCase(CoachPackStore));
+            CoachPackStore);
         Window = new MainWindow(CurrentMatch, Home, Settings, Coaching);
     }
 

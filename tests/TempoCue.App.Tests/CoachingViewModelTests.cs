@@ -1,6 +1,5 @@
 using TempoCue.App.Localization;
 using TempoCue.App.ViewModels;
-using TempoCue.Application;
 using TempoCue.Core;
 
 namespace TempoCue.App.Tests;
@@ -13,7 +12,7 @@ public sealed class CoachingViewModelTests
     public async Task CoachingNavigation_OpensOnlyAvailablePackEditor()
     {
         var localization = LocalizationService.Instance;
-        using var viewModel = new CoachingViewModel(
+        using var viewModel = CoachingViewModelTestFactory.Create(
             new CoachPack
             {
                 SchemaVersion = 1,
@@ -22,13 +21,7 @@ public sealed class CoachingViewModelTests
                 Patch = "test",
                 Rules = []
             },
-            localization,
-            TestGamePatchCatalog.Ready(),
-            TestChampionCatalog.Ready(),
-            TestItemCatalog.Ready(),
-            new SaveCoachPackUseCase(new TestCoachPackStore()),
-            new LoadCoachPackLibraryUseCase(new TestCoachPackStore()),
-            new SetCoachPackStateUseCase(new TestCoachPackStore()));
+            localization);
 
         Assert.Equal(CoachingScreen.Library, viewModel.CurrentScreen);
         Assert.True(viewModel.PackTypeSelection.IsMatchupAvailable);
@@ -113,15 +106,9 @@ public sealed class CoachingViewModelTests
                         "Можно играть активнее")
                 ]
             };
-            using var viewModel = new CoachingViewModel(
+            using var viewModel = CoachingViewModelTestFactory.Create(
                 pack,
-                localization,
-                TestGamePatchCatalog.Ready(),
-                TestChampionCatalog.Ready(),
-                TestItemCatalog.Ready(),
-                new SaveCoachPackUseCase(new TestCoachPackStore()),
-                new LoadCoachPackLibraryUseCase(new TestCoachPackStore()),
-                new SetCoachPackStateUseCase(new TestCoachPackStore()));
+                localization);
 
             Assert.Equal("URG", viewModel.PlayerChampionInitials);
             Assert.Equal("SET", viewModel.OpponentChampionInitials);
