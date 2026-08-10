@@ -297,7 +297,7 @@
   <data name="Coaching.MatchupEditor.Content.Status.DraftTitle" xml:space="preserve"><value>Phase draft is filled</value></data>
   <data name="Coaching.MatchupEditor.Content.Status.DraftDescription" xml:space="preserve"><value>Phases remain available when moving between steps. Overlap validation will arrive with advanced conditions.</value></data>
   <data name="Coaching.MatchupEditor.Content.NextIteration.Title" xml:space="preserve"><value>Next iteration</value></data>
-  <data name="Coaching.MatchupEditor.Content.NextIteration.Description" xml:space="preserve"><value>We will add level coverage validation, persistent tips, and build item groups. Phase levels, item conditions, and advice content are available now.</value></data>
+  <data name="Coaching.MatchupEditor.Content.NextIteration.Description" xml:space="preserve"><value>We will add persistent tips and build item groups. Phase levels, item conditions, advice content, and consistency validation are available now.</value></data>
   <data name="Coaching.MatchupEditor.Content.Editor.AddTitle" xml:space="preserve"><value>New phase</value></data>
   <data name="Coaching.MatchupEditor.Content.Editor.EditTitle" xml:space="preserve"><value>Editing phase: {0}</value></data>
   <data name="Coaching.MatchupEditor.Content.Editor.Description" xml:space="preserve"><value>Specify the period and recommendation. Changes reach the list only after you select Done.</value></data>
@@ -409,4 +409,22 @@
   <data name="Coaching.MatchupEditor.Champions.Picker.Search" xml:space="preserve"><value>Search by name</value></data>
   <data name="Coaching.MatchupEditor.Champions.Picker.Empty" xml:space="preserve"><value>No champions found</value></data>
   <data name="Coaching.MatchupEditor.Champions.Picker.EmptyDescription" xml:space="preserve"><value>Try another search query.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.EmptyTitle" xml:space="preserve"><value>Add the first phase</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.EmptyDescription" xml:space="preserve"><value>Coverage will be checked automatically after a phase is saved.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.ValidTitle" xml:space="preserve"><value>Phases are consistent</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.ValidDescription" xml:space="preserve"><value>Exactly one phase applies to every level and relevant item state.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.WarningTitle" xml:space="preserve"><value>Some states have no advice</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.WarningDescription" xml:space="preserve"><value>You can continue, but the player may receive no phase advice in the states listed below.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.ErrorTitle" xml:space="preserve"><value>Phase conflicts found</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.ErrorDescription" xml:space="preserve"><value>Resolve the conflicts before continuing: only one phase may apply to a game state.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.CoverageTitle" xml:space="preserve"><value>Level coverage</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.Issue.InvalidRange" xml:space="preserve"><value>“{0}” has an invalid level range.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.Issue.ConflictingItems" xml:space="preserve"><value>“{0}” requires and excludes the same item.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.Issue.Overlap" xml:space="preserve"><value>“{0}” and “{1}” can both apply at {2}.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.Issue.Gap" xml:space="preserve"><value>No phase covers at least one item state at {0}.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.LevelSingle" xml:space="preserve"><value>level {0}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.LevelRange" xml:space="preserve"><value>levels {0}–{1}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.Coverage.Covered" xml:space="preserve"><value>Level {0}: every state is covered</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.Coverage.Uncovered" xml:space="preserve"><value>Level {0}: at least one state has no phase</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.Coverage.Ambiguous" xml:space="preserve"><value>Level {0}: phases can overlap</value></data>
 </root>

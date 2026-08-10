@@ -90,28 +90,10 @@
                 <views:MatchupPhaseListView x:Name="PhaseListView" />
             </StackPanel>
 
-            <!-- Правая колонка объясняет состояние редактора и границы текущей итерации. -->
+            <!-- Правая колонка фиксирует границы текущей итерации, пока соседние разделы ещё недоступны. -->
             <StackPanel Grid.Column="2">
                 <Border Style="{StaticResource ShellCard}"
-                        BorderBrush="#4FAAE8"
-                        BorderThickness="3,1,1,1"
                         Padding="18">
-                    <StackPanel>
-                        <TextBlock Text="{Binding StatusTitle}"
-                                   Foreground="#DCEAF7"
-                                   FontSize="{StaticResource Typography.FontSize.BodyLarge}"
-                                   FontWeight="SemiBold" />
-                        <TextBlock Text="{Binding StatusDescription}"
-                                   Foreground="#7F93AF"
-                                   FontSize="{StaticResource Typography.FontSize.Caption}"
-                                   TextWrapping="Wrap"
-                                   Margin="0,7,0,0" />
-                    </StackPanel>
-                </Border>
-
-                <Border Style="{StaticResource ShellCard}"
-                        Padding="18"
-                        Margin="0,14,0,0">
                     <StackPanel>
                         <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.NextIteration.Title}"
                                    Foreground="#91A4BD"
@@ -126,5 +108,9 @@
                 </Border>
             </StackPanel>
         </Grid>
+
+        <views:MatchupPhaseValidationView x:Name="PhaseValidationView"
+                                          DataContext="{Binding Validation}"
+                                          Margin="0,16,0,0" />
     </StackPanel>
 </UserControl>

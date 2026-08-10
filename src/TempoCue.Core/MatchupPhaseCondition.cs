@@ -1,0 +1,11 @@
+namespace TempoCue.Core;
+
+/// <summary>
+/// Условия применимости одной фазы матчапа, не зависящие от её отображения и текста совета.
+/// </summary>
+public sealed record MatchupPhaseCondition(
+    string Id,
+    int MinimumLevel,
+    int? MaximumLevel,
+    IReadOnlyCollection<int> RequiredItemIds,
+    IReadOnlyCollection<int> ExcludedItemIds);

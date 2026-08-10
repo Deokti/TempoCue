@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using TempoCue.App.Localization;
 using TempoCue.Application;
+using TempoCue.Core;
 
 namespace TempoCue.App.ViewModels;
 
@@ -22,6 +23,9 @@ public sealed class MatchupContentViewModel : ObservableObject
         Phases = new ReadOnlyObservableCollection<MatchupPhaseViewModel>(_phases);
         Editor = new MatchupPhaseEditorViewModel(localization);
         ItemPicker = new ItemPickerViewModel(itemCatalog, localization);
+        Validation = new MatchupPhaseValidationViewModel(
+            localization,
+            new MatchupPhaseSetValidator());
         ItemPicker.ItemsSelected += ItemPicker_ItemsSelected;
     }
 
@@ -31,22 +35,16 @@ public sealed class MatchupContentViewModel : ObservableObject
 
     public ItemPickerViewModel ItemPicker { get; }
 
+    public MatchupPhaseValidationViewModel Validation { get; }
+
     public bool HasPhases => _phases.Count > 0;
 
     public int PhaseCount => _phases.Count;
 
-    public bool IsComplete => HasPhases;
+    public bool IsComplete => HasPhases && !Validation.HasErrors;
 
     public string PhasesTabLabel =>
         _localization.Format("Coaching.MatchupEditor.Content.Tab.Phases", PhaseCount);
-
-    public string StatusTitle => _localization.Get(HasPhases
-        ? "Coaching.MatchupEditor.Content.Status.DraftTitle"
-        : "Coaching.MatchupEditor.Content.Status.EmptyTitle");
-
-    public string StatusDescription => _localization.Get(HasPhases
-        ? "Coaching.MatchupEditor.Content.Status.DraftDescription"
-        : "Coaching.MatchupEditor.Content.Status.EmptyDescription");
 
     public void BeginAddPhase() => Editor.BeginNew();
 
@@ -200,9 +198,9 @@ public sealed class MatchupContentViewModel : ObservableObject
             phase.UpdateLanguage();
         }
 
+        Validation.UpdateLanguage();
+
         OnPropertyChanged(nameof(PhasesTabLabel));
-        OnPropertyChanged(nameof(StatusTitle));
-        OnPropertyChanged(nameof(StatusDescription));
     }
 
     private void ItemPicker_ItemsSelected(
@@ -230,7 +228,7 @@ public sealed class MatchupContentViewModel : ObservableObject
         }
 
         _phases.Move(currentIndex, targetIndex);
-        UpdatePositions();
+        NotifyCollectionChanged();
         return true;
     }
 
@@ -268,12 +266,11 @@ public sealed class MatchupContentViewModel : ObservableObject
     private void NotifyCollectionChanged()
     {
         UpdatePositions();
+        Validation.Update(_phases.Select(static phase => phase.CreateSnapshot()).ToArray());
         OnPropertyChanged(nameof(HasPhases));
         OnPropertyChanged(nameof(PhaseCount));
         OnPropertyChanged(nameof(IsComplete));
         OnPropertyChanged(nameof(PhasesTabLabel));
-        OnPropertyChanged(nameof(StatusTitle));
-        OnPropertyChanged(nameof(StatusDescription));
     }
 
     private void UpdatePositions()
