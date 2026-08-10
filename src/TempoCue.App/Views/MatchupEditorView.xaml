@@ -262,5 +262,22 @@
                 </Style>
             </views:ChampionPickerDialogView.Style>
         </views:ChampionPickerDialogView>
+
+        <!-- Тот же каталог предметов позднее будет использовать раздел сборок и экспорта. -->
+        <views:ItemPickerDialogView x:Name="ItemPickerDialog"
+                                    Grid.RowSpan="5"
+                                    Panel.ZIndex="20"
+                                    DataContext="{Binding Content.ItemPicker}">
+            <views:ItemPickerDialogView.Style>
+                <Style TargetType="views:ItemPickerDialogView">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsOpen}" Value="True">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </views:ItemPickerDialogView.Style>
+        </views:ItemPickerDialogView>
     </Grid>
 </UserControl>

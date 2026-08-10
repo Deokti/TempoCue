@@ -18,6 +18,7 @@ public partial class App : System.Windows.Application
     private DataDragonClient? _dataDragonClient;
     private DataDragonGamePatchCatalog? _gamePatchCatalog;
     private DataDragonChampionCatalog? _championCatalog;
+    private DataDragonItemCatalog? _itemCatalog;
     private CurrentMatchViewModel? _currentMatchViewModel;
     private HomeViewModel? _homeViewModel;
     private SettingsViewModel? _settingsViewModel;
@@ -58,7 +59,7 @@ public partial class App : System.Windows.Application
             LocalizationService.Instance,
             settingsService);
         // Каталоги Data Dragon используют общий локальный кэш патчей и чемпионов.
-        var championCacheDirectory = Path.Combine(
+        var dataDragonCacheDirectory = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "TempoCue",
             "Cache",
@@ -66,15 +67,19 @@ public partial class App : System.Windows.Application
         _dataDragonClient = new DataDragonClient();
         _gamePatchCatalog = new DataDragonGamePatchCatalog(
             _dataDragonClient,
-            championCacheDirectory);
+            dataDragonCacheDirectory);
         _championCatalog = new DataDragonChampionCatalog(
             _dataDragonClient,
-            championCacheDirectory);
+            dataDragonCacheDirectory);
+        _itemCatalog = new DataDragonItemCatalog(
+            _dataDragonClient,
+            dataDragonCacheDirectory);
         _coachingViewModel = new CoachingViewModel(
             pack,
             LocalizationService.Instance,
             _gamePatchCatalog,
-            _championCatalog);
+            _championCatalog,
+            _itemCatalog);
 
         // Окно получает полностью собранный граф зависимостей и только связывает ViewModel с View.
         MainWindow = new MainWindow(

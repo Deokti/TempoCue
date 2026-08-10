@@ -17,6 +17,8 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
     private string _primaryAdvice = string.Empty;
     private string _whyNow = string.Empty;
     private string _nextGoal = string.Empty;
+    private MatchupItemDraft? _startItem;
+    private MatchupItemDraft? _endItem;
     private IReadOnlyList<MatchupPowerStateOptionViewModel> _powerStateOptions = [];
 
     public MatchupPhaseEditorViewModel(LocalizationService localization)
@@ -160,22 +162,83 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
         }
     }
 
+    public MatchupItemDraft? StartItem
+    {
+        get => _startItem;
+        private set
+        {
+            if (SetProperty(ref _startItem, value))
+            {
+                OnPropertyChanged(nameof(HasStartItem));
+                OnPropertyChanged(nameof(MeaningSummary));
+                OnPropertyChanged(nameof(HasConflictingItemConditions));
+                NotifyValidationChanged();
+            }
+        }
+    }
+
+    public bool HasStartItem => StartItem is not null;
+
+    public MatchupItemDraft? EndItem
+    {
+        get => _endItem;
+        private set
+        {
+            if (SetProperty(ref _endItem, value))
+            {
+                OnPropertyChanged(nameof(HasEndItem));
+                OnPropertyChanged(nameof(MeaningSummary));
+                OnPropertyChanged(nameof(HasConflictingItemConditions));
+                NotifyValidationChanged();
+            }
+        }
+    }
+
+    public bool HasEndItem => EndItem is not null;
+
+    public bool HasConflictingItemConditions =>
+        StartItem is not null
+        && EndItem is not null
+        && StartItem.Id == EndItem.Id;
+
     public bool CanSave =>
         IsWithinLength(Name, 3, 80)
         && IsWithinLength(PrimaryAdvice, 3, 200)
         && WhyNow.Trim().Length <= 240
         && NextGoal.Trim().Length <= 160
+        && !HasConflictingItemConditions
         && MinimumLevel is >= 1 and <= 18
         && (ExtendsToEnd || MaximumLevel is >= 1 and <= 18 && MaximumLevel >= MinimumLevel);
 
-    public string MeaningSummary => ExtendsToEnd
-        ? _localization.Format(
-            "Coaching.MatchupEditor.Content.Editor.MeaningToEnd",
-            MinimumLevel)
-        : _localization.Format(
-            "Coaching.MatchupEditor.Content.Editor.MeaningRange",
-            MinimumLevel,
-            MaximumLevel);
+    public string MeaningSummary
+    {
+        get
+        {
+            var summary = ExtendsToEnd
+                ? _localization.Format(
+                    "Coaching.MatchupEditor.Content.Editor.MeaningToEnd",
+                    MinimumLevel)
+                : _localization.Format(
+                    "Coaching.MatchupEditor.Content.Editor.MeaningRange",
+                    MinimumLevel,
+                    MaximumLevel);
+            if (StartItem is not null)
+            {
+                summary += _localization.Format(
+                    "Coaching.MatchupEditor.Content.Editor.MeaningStartItemSuffix",
+                    StartItem.DisplayName);
+            }
+
+            if (EndItem is not null)
+            {
+                summary += _localization.Format(
+                    "Coaching.MatchupEditor.Content.Editor.MeaningEndItemSuffix",
+                    EndItem.DisplayName);
+            }
+
+            return summary;
+        }
+    }
 
     public void BeginNew()
     {
@@ -188,6 +251,8 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
         PrimaryAdvice = string.Empty;
         WhyNow = string.Empty;
         NextGoal = string.Empty;
+        StartItem = null;
+        EndItem = null;
         IsOpen = true;
     }
 
@@ -203,6 +268,8 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
         PrimaryAdvice = draft.PrimaryAdvice;
         WhyNow = draft.WhyNow;
         NextGoal = draft.NextGoal;
+        StartItem = draft.StartItems.FirstOrDefault();
+        EndItem = draft.EndItems.FirstOrDefault();
         IsOpen = true;
     }
 
@@ -221,8 +288,26 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
             ExtendsToEnd ? null : MaximumLevel,
             PrimaryAdvice.Trim(),
             WhyNow.Trim(),
-            NextGoal.Trim());
+            NextGoal.Trim(),
+            StartItem is null ? [] : [StartItem],
+            EndItem is null ? [] : [EndItem]);
     }
+
+    public void SetStartItem(ItemOptionViewModel item)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        StartItem = new MatchupItemDraft(item.Id, item.DisplayName, item.ImageUri);
+    }
+
+    public void RemoveStartItem() => StartItem = null;
+
+    public void SetEndItem(ItemOptionViewModel item)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        EndItem = new MatchupItemDraft(item.Id, item.DisplayName, item.ImageUri);
+    }
+
+    public void RemoveEndItem() => EndItem = null;
 
     public void Close() => IsOpen = false;
 

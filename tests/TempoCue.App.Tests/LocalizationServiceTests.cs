@@ -120,7 +120,8 @@ public sealed class LocalizationServiceTests
                     CreateCoachPack(),
                     localization,
                     TestGamePatchCatalog.Ready(),
-                    TestChampionCatalog.Ready());
+                    TestChampionCatalog.Ready(),
+                    TestItemCatalog.Ready());
                 var window = new MainWindow(
                     currentMatchViewModel,
                     homeViewModel,
@@ -184,6 +185,8 @@ public sealed class LocalizationServiceTests
                     matchupEditorPage.FindName("MatchupContentPage"));
                 var championPickerDialog = Assert.IsType<TempoCue.App.Views.ChampionPickerDialogView>(
                     matchupEditorPage.FindName("ChampionPickerDialog"));
+                var itemPickerDialog = Assert.IsType<TempoCue.App.Views.ItemPickerDialogView>(
+                    matchupEditorPage.FindName("ItemPickerDialog"));
                 var sharedTextBoxPadding = new Thickness(12, 0, 12, 0);
                 foreach (var textBoxName in new[]
                          {
@@ -478,6 +481,12 @@ public sealed class LocalizationServiceTests
                     Assert.IsType<TextBlock>(
                         matchupEditorPage.FindName("MatchupEditorStepSummaryTextBlock")).Text);
 
+                var content = coachingViewModel.MatchupEditor.Content;
+                content.EnsureItemCatalogLoadedAsync().GetAwaiter().GetResult();
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
+
                 var addPhaseButton = Assert.IsType<Button>(
                     matchupContentPage.FindName("AddPhaseButton"));
                 addPhaseButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
@@ -491,6 +500,36 @@ public sealed class LocalizationServiceTests
                     "Фаза активна на уровнях 1+",
                     Assert.IsType<TextBlock>(
                         matchupContentPage.FindName("PhaseMeaningSummaryTextBlock")).Text);
+                var selectStartItemButton = Assert.IsType<Button>(
+                    matchupContentPage.FindName("SelectStartItemButton"));
+                Assert.True(content.ItemPicker.IsCatalogReady);
+                selectStartItemButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
+                Assert.Equal(Visibility.Visible, itemPickerDialog.Visibility);
+                var itemPickerSearchTextBox = Assert.IsType<TextBox>(
+                    itemPickerDialog.FindName("ItemPickerSearchTextBox"));
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.Input);
+                Assert.Equal(sharedTextBoxPadding, itemPickerSearchTextBox.Padding);
+                Assert.True(itemPickerSearchTextBox.IsKeyboardFocusWithin);
+                Assert.Equal(
+                    Visibility.Collapsed,
+                    Assert.IsType<TextBlock>(
+                        itemPickerDialog.FindName("ItemPickerSearchPlaceholder")).Visibility);
+                var itemPickerItems = Assert.IsType<ItemsControl>(
+                    itemPickerDialog.FindName("ItemPickerItemsControl"));
+                window.UpdateLayout();
+                var cleaverButton = FindVisualDescendants<Button>(itemPickerItems)
+                    .Single(button => button.DataContext is ItemOptionViewModel { Id: 3071 });
+                cleaverButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
+                Assert.Equal(Visibility.Collapsed, itemPickerDialog.Visibility);
+                Assert.Equal(3071, content.Editor.StartItem?.Id);
                 foreach (var inputName in new[]
                          {
                              "PhasePrimaryAdviceTextBox",
@@ -502,7 +541,6 @@ public sealed class LocalizationServiceTests
                     Assert.Equal(36, input.Height);
                     Assert.False(input.AcceptsReturn);
                 }
-                var content = coachingViewModel.MatchupEditor.Content;
                 content.Editor.Name = "Осторожное начало";
                 content.Editor.PrimaryAdvice = "Не ищи размен первым";
                 Dispatcher.CurrentDispatcher.Invoke(
@@ -713,4 +751,5 @@ public sealed class LocalizationServiceTests
             }
         }
     }
+
 }

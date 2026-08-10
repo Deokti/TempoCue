@@ -10,12 +10,39 @@ public partial class MatchupContentView : UserControl
     public MatchupContentView()
     {
         InitializeComponent();
+        IsVisibleChanged += MatchupContentView_IsVisibleChanged;
     }
 
     private MatchupContentViewModel ViewModel =>
         (MatchupContentViewModel)DataContext;
 
     private MatchupPhaseEditorViewModel Editor => ViewModel.Editor;
+
+    // Каталог загружается при входе на шаг, но ошибка не мешает создавать фазу без предметов.
+    private async void MatchupContentView_IsVisibleChanged(
+        object sender,
+        DependencyPropertyChangedEventArgs e)
+    {
+        if (IsVisible && DataContext is MatchupContentViewModel viewModel)
+        {
+            await viewModel.EnsureItemCatalogLoadedAsync();
+        }
+    }
+
+    private async void RetryItemCatalogButton_Click(object sender, RoutedEventArgs e) =>
+        await ViewModel.RetryItemCatalogLoadAsync();
+
+    private void SelectStartItemButton_Click(object sender, RoutedEventArgs e) =>
+        ViewModel.OpenStartItemPicker();
+
+    private void SelectEndItemButton_Click(object sender, RoutedEventArgs e) =>
+        ViewModel.OpenEndItemPicker();
+
+    private void RemoveStartItemButton_Click(object sender, RoutedEventArgs e) =>
+        ViewModel.RemoveStartItem();
+
+    private void RemoveEndItemButton_Click(object sender, RoutedEventArgs e) =>
+        ViewModel.RemoveEndItem();
 
     // Действия с открытым редактором новой или выбранной фазы.
     private void AddPhaseButton_Click(object sender, RoutedEventArgs e) =>

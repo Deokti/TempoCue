@@ -7,13 +7,16 @@ namespace TempoCue.App.ViewModels;
 /// <summary>Черновик пошагового редактора матчапа, пока не сохранённый на диск.</summary>
 public sealed class MatchupEditorViewModel : ObservableObject
 {
+    private readonly LocalizationService _localization;
     private int _currentStep = 1;
 
     public MatchupEditorViewModel(
         LocalizationService localization,
         IGamePatchCatalog gamePatchCatalog,
-        IChampionCatalog championCatalog)
+        IChampionCatalog championCatalog,
+        IItemCatalog itemCatalog)
     {
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         MainInformation = new MatchupMainInformationViewModel(
             localization.CurrentLanguageCode,
             gamePatchCatalog,
@@ -21,7 +24,7 @@ public sealed class MatchupEditorViewModel : ObservableObject
         ChampionsAndRole = new MatchupChampionsAndRoleViewModel(
             championCatalog,
             localization);
-        Content = new MatchupContentViewModel(localization);
+        Content = new MatchupContentViewModel(localization, itemCatalog);
         MainInformation.PropertyChanged += MainInformation_PropertyChanged;
         ChampionsAndRole.PropertyChanged += ChampionsAndRole_PropertyChanged;
         Content.PropertyChanged += Content_PropertyChanged;
@@ -67,6 +70,13 @@ public sealed class MatchupEditorViewModel : ObservableObject
             return false;
         }
 
+        if (CurrentStep == 2)
+        {
+            Content.SetItemCatalogContext(
+                MainInformation.GamePatch,
+                _localization.CurrentLanguageCode);
+        }
+
         CurrentStep++;
         return true;
     }
@@ -86,7 +96,7 @@ public sealed class MatchupEditorViewModel : ObservableObject
     {
         MainInformation.UpdateLanguage();
         ChampionsAndRole.UpdateLanguage(languageCode);
-        Content.UpdateLanguage();
+        Content.UpdateLanguage(languageCode);
     }
 
     private void MainInformation_PropertyChanged(object? sender, PropertyChangedEventArgs e)

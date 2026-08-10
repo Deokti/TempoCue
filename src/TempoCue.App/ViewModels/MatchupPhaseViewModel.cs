@@ -38,6 +38,12 @@ public sealed class MatchupPhaseViewModel : ObservableObject
 
     public string NextGoal => _draft.NextGoal;
 
+    public MatchupItemDraft? StartItem => _draft.StartItems.FirstOrDefault();
+
+    public MatchupItemDraft? EndItem => _draft.EndItems.FirstOrDefault();
+
+    public bool HasItemConditions => StartItem is not null || EndItem is not null;
+
     public bool HasWhyNow => !string.IsNullOrWhiteSpace(WhyNow);
 
     public bool HasNextGoal => !string.IsNullOrWhiteSpace(NextGoal);
@@ -73,6 +79,21 @@ public sealed class MatchupPhaseViewModel : ObservableObject
         ? _localization.Format("Coaching.Rule.LevelRange", MinimumLevel, maximumLevel)
         : _localization.Format("Coaching.Rule.LevelFrom", MinimumLevel);
 
+    public string ItemConditionSummary => (StartItem, EndItem) switch
+    {
+        ({ } startItem, { } endItem) => _localization.Format(
+            "Coaching.MatchupEditor.Content.Phase.Items.Both",
+            startItem.DisplayName,
+            endItem.DisplayName),
+        ({ } startItem, null) => _localization.Format(
+            "Coaching.MatchupEditor.Content.Phase.Items.Start",
+            startItem.DisplayName),
+        (null, { } endItem) => _localization.Format(
+            "Coaching.MatchupEditor.Content.Phase.Items.End",
+            endItem.DisplayName),
+        _ => string.Empty
+    };
+
     internal MatchupPhaseDraft CreateSnapshot() => _draft;
 
     internal void Replace(MatchupPhaseDraft draft)
@@ -93,5 +114,6 @@ public sealed class MatchupPhaseViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(PowerStateLabel));
         OnPropertyChanged(nameof(LevelRange));
+        OnPropertyChanged(nameof(ItemConditionSummary));
     }
 }

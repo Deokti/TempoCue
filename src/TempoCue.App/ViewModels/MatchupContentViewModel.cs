@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using TempoCue.App.Localization;
+using TempoCue.Application;
 
 namespace TempoCue.App.ViewModels;
 
@@ -12,16 +13,23 @@ public sealed class MatchupContentViewModel : ObservableObject
     private readonly ObservableCollection<MatchupPhaseViewModel> _phases = [];
     private int _nextPhaseNumber = 1;
 
-    public MatchupContentViewModel(LocalizationService localization)
+    public MatchupContentViewModel(
+        LocalizationService localization,
+        IItemCatalog itemCatalog)
     {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        ArgumentNullException.ThrowIfNull(itemCatalog);
         Phases = new ReadOnlyObservableCollection<MatchupPhaseViewModel>(_phases);
         Editor = new MatchupPhaseEditorViewModel(localization);
+        ItemPicker = new ItemPickerViewModel(itemCatalog, localization);
+        ItemPicker.ItemSelected += ItemPicker_ItemSelected;
     }
 
     public ReadOnlyObservableCollection<MatchupPhaseViewModel> Phases { get; }
 
     public MatchupPhaseEditorViewModel Editor { get; }
+
+    public ItemPickerViewModel ItemPicker { get; }
 
     public bool HasPhases => _phases.Count > 0;
 
@@ -41,6 +49,23 @@ public sealed class MatchupContentViewModel : ObservableObject
         : "Coaching.MatchupEditor.Content.Status.EmptyDescription");
 
     public void BeginAddPhase() => Editor.BeginNew();
+
+    public void SetItemCatalogContext(string gamePatch, string languageCode) =>
+        ItemPicker.SetContext(gamePatch, languageCode);
+
+    public Task EnsureItemCatalogLoadedAsync(CancellationToken cancellationToken = default) =>
+        ItemPicker.EnsureCatalogLoadedAsync(cancellationToken);
+
+    public Task RetryItemCatalogLoadAsync(CancellationToken cancellationToken = default) =>
+        ItemPicker.RetryCatalogLoadAsync(cancellationToken);
+
+    public void OpenStartItemPicker() => ItemPicker.Open(ItemPickerTarget.PhaseStart);
+
+    public void OpenEndItemPicker() => ItemPicker.Open(ItemPickerTarget.PhaseEnd);
+
+    public void RemoveStartItem() => Editor.RemoveStartItem();
+
+    public void RemoveEndItem() => Editor.RemoveEndItem();
 
     public void BeginEditPhase(MatchupPhaseViewModel phase)
     {
@@ -162,9 +187,10 @@ public sealed class MatchupContentViewModel : ObservableObject
 
     public bool MovePhaseDown(MatchupPhaseViewModel phase) => MovePhase(phase, 1);
 
-    public void UpdateLanguage()
+    public void UpdateLanguage(string languageCode)
     {
         Editor.UpdateLanguage();
+        ItemPicker.UpdateLanguage(languageCode);
         foreach (var phase in _phases)
         {
             phase.UpdateLanguage();
@@ -173,6 +199,20 @@ public sealed class MatchupContentViewModel : ObservableObject
         OnPropertyChanged(nameof(PhasesTabLabel));
         OnPropertyChanged(nameof(StatusTitle));
         OnPropertyChanged(nameof(StatusDescription));
+    }
+
+    private void ItemPicker_ItemSelected(
+        ItemPickerTarget target,
+        ItemOptionViewModel item)
+    {
+        if (target == ItemPickerTarget.PhaseStart)
+        {
+            Editor.SetStartItem(item);
+        }
+        else if (target == ItemPickerTarget.PhaseEnd)
+        {
+            Editor.SetEndItem(item);
+        }
     }
 
     private bool MovePhase(MatchupPhaseViewModel phase, int offset)

@@ -58,7 +58,8 @@ public sealed class CoachingViewModelTests
             },
             localization,
             TestGamePatchCatalog.Ready(),
-            TestChampionCatalog.Ready());
+            TestChampionCatalog.Ready(),
+            TestItemCatalog.Ready());
 
         Assert.Equal(CoachingScreen.Library, viewModel.CurrentScreen);
         Assert.True(viewModel.PackTypeSelection.IsMatchupAvailable);
@@ -121,7 +122,7 @@ public sealed class CoachingViewModelTests
 
         try
         {
-            var content = new MatchupContentViewModel(localization);
+            var content = new MatchupContentViewModel(localization, TestItemCatalog.Ready());
 
             content.BeginAddPhase();
             Assert.True(content.Editor.IsOpen);
@@ -178,7 +179,7 @@ public sealed class CoachingViewModelTests
 
         try
         {
-            var content = new MatchupContentViewModel(localization);
+            var content = new MatchupContentViewModel(localization, TestItemCatalog.Ready());
             content.BeginAddPhase();
             Assert.Equal("Phase is active at levels 1+", content.Editor.MeaningSummary);
             content.Editor.ExtendsToEnd = false;
@@ -205,6 +206,61 @@ public sealed class CoachingViewModelTests
             Assert.Equal("Early lane", original.Name);
             Assert.Equal("Edited only for copy — copy", editedCopy.Name);
             Assert.Equal(editedCopy.Id, content.Editor.EditingPhaseId);
+        }
+        finally
+        {
+            localization.SetLanguage(initialLanguage);
+        }
+    }
+
+    [Fact]
+    public async Task MatchupContent_ItemPickerCreatesStartAndEndConditions()
+    {
+        var localization = LocalizationService.Instance;
+        var initialLanguage = localization.CurrentLanguageCode;
+        localization.SetLanguage("ru-RU");
+
+        try
+        {
+            var content = new MatchupContentViewModel(localization, TestItemCatalog.Ready());
+            content.SetItemCatalogContext("26.15", "ru-RU");
+            await content.EnsureItemCatalogLoadedAsync();
+            content.BeginAddPhase();
+            content.Editor.Name = "Пик силы";
+            content.Editor.PrimaryAdvice = "Можно принимать контролируемый бой";
+
+            content.OpenStartItemPicker();
+            Assert.Equal(ItemPickerTarget.PhaseStart, content.ItemPicker.Target);
+            var cleaver = content.ItemPicker.Items.Single(item => item.Id == 3071);
+            content.ItemPicker.Select(cleaver);
+
+            Assert.Equal(3071, content.Editor.StartItem?.Id);
+            Assert.Contains("после покупки «Чёрная секира»", content.Editor.MeaningSummary);
+
+            content.OpenEndItemPicker();
+            content.ItemPicker.Select(cleaver);
+
+            Assert.True(content.Editor.HasConflictingItemConditions);
+            Assert.False(content.Editor.CanSave);
+
+            content.OpenEndItemPicker();
+            var boots = content.ItemPicker.Items.Single(item => item.Id == 3047);
+            content.ItemPicker.Select(boots);
+
+            Assert.False(content.Editor.HasConflictingItemConditions);
+            Assert.True(content.SaveEditor());
+            var phase = Assert.Single(content.Phases);
+            Assert.Equal(3071, phase.StartItem?.Id);
+            Assert.Equal(3047, phase.EndItem?.Id);
+            Assert.Equal(
+                "Начинается после: Чёрная секира · Заканчивается после: Бронированные сапоги",
+                phase.ItemConditionSummary);
+
+            content.BeginEditPhase(phase);
+            Assert.Equal(3071, content.Editor.StartItem?.Id);
+            Assert.Equal(3047, content.Editor.EndItem?.Id);
+            content.RemoveEndItem();
+            Assert.False(content.Editor.HasEndItem);
         }
         finally
         {
@@ -338,7 +394,8 @@ public sealed class CoachingViewModelTests
                 pack,
                 localization,
                 TestGamePatchCatalog.Ready(),
-                TestChampionCatalog.Ready());
+                TestChampionCatalog.Ready(),
+                TestItemCatalog.Ready());
 
             Assert.Equal("URG", viewModel.PlayerChampionInitials);
             Assert.Equal("SET", viewModel.OpponentChampionInitials);

@@ -25,7 +25,8 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
         CoachPack pack,
         LocalizationService localization,
         IGamePatchCatalog gamePatchCatalog,
-        IChampionCatalog championCatalog)
+        IChampionCatalog championCatalog,
+        IItemCatalog itemCatalog)
     {
         _pack = pack;
         _localization = localization;
@@ -38,7 +39,8 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
         MatchupEditor = new MatchupEditorViewModel(
             localization,
             gamePatchCatalog,
-            championCatalog);
+            championCatalog,
+            itemCatalog);
         RenderLocalizedPresentation();
     }
 

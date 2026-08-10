@@ -374,6 +374,270 @@
                             </StackPanel>
                         </Grid>
 
+                        <!-- Предметы дополняют уровни: один может открыть фазу, другой — завершить её. -->
+                        <Border x:Name="PhaseItemConditionsPanel"
+                                Margin="0,18,0,0"
+                                Background="#0C1420"
+                                BorderBrush="#263750"
+                                BorderThickness="1"
+                                CornerRadius="10"
+                                Padding="16">
+                            <StackPanel>
+                                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.ItemsTitle}"
+                                           Foreground="#F4F7FB"
+                                           FontSize="{StaticResource Typography.FontSize.BodyLarge}"
+                                           FontWeight="SemiBold" />
+                                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.ItemsDescription}"
+                                           Foreground="#7F93AF"
+                                           FontSize="{StaticResource Typography.FontSize.Caption}"
+                                           TextWrapping="Wrap"
+                                           Margin="0,5,0,0" />
+
+                                <StackPanel Margin="0,14,0,0">
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ItemPicker.IsLoading}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+                                    <ProgressBar Height="3"
+                                                 IsIndeterminate="True"
+                                                 Foreground="#4FAAE8"
+                                                 Background="#162238" />
+                                    <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Items.Loading}"
+                                               Foreground="#8EA2BC"
+                                               FontSize="{StaticResource Typography.FontSize.Caption}"
+                                               Margin="0,8,0,0" />
+                                </StackPanel>
+
+                                <Grid Margin="0,14,0,0">
+                                    <Grid.Style>
+                                        <Style TargetType="Grid">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ItemPicker.HasLoadError}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Grid.Style>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Items.ErrorTitle}"
+                                                   Foreground="#F2C66D"
+                                                   FontSize="{StaticResource Typography.FontSize.Body}"
+                                                   FontWeight="SemiBold" />
+                                        <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Items.ErrorDescription}"
+                                                   Foreground="#7F93AF"
+                                                   FontSize="{StaticResource Typography.FontSize.Caption}"
+                                                   TextWrapping="Wrap"
+                                                   Margin="0,4,12,0" />
+                                    </StackPanel>
+                                    <Button Grid.Column="1"
+                                            Content="{localization:Loc Coaching.MatchupEditor.Items.Retry}"
+                                            Style="{StaticResource SecondaryButton}"
+                                            Click="RetryItemCatalogButton_Click" />
+                                </Grid>
+
+                                <Grid Margin="0,14,0,0">
+                                    <Grid.Style>
+                                        <Style TargetType="Grid">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ItemPicker.IsCatalogReady}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Grid.Style>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="16" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Условие начала фазы после появления предмета в инвентаре. -->
+                                    <StackPanel>
+                                        <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.StartItemTitle}"
+                                                   Style="{StaticResource FormFieldLabel}" />
+                                        <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.StartItemDescription}"
+                                                   Style="{StaticResource FormFieldHint}"
+                                                   Margin="0,0,0,9" />
+                                        <Button x:Name="SelectStartItemButton"
+                                                Content="{localization:Loc Coaching.MatchupEditor.Items.Select}"
+                                                HorizontalAlignment="Stretch"
+                                                Click="SelectStartItemButton_Click">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Editor.HasStartItem}" Value="True">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        <Border Background="#152238"
+                                                BorderBrush="#31506C"
+                                                BorderThickness="1"
+                                                CornerRadius="9"
+                                                Padding="10">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Editor.HasStartItem}" Value="True">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <StackPanel>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="42" />
+                                                        <ColumnDefinition Width="10" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border Width="42"
+                                                            Height="42"
+                                                            Background="#0B1726"
+                                                            BorderBrush="#31506C"
+                                                            BorderThickness="1"
+                                                            CornerRadius="7">
+                                                        <Image Source="{Binding Editor.StartItem.ImageUri}" Stretch="UniformToFill" />
+                                                    </Border>
+                                                    <TextBlock Grid.Column="2"
+                                                               Text="{Binding Editor.StartItem.DisplayName}"
+                                                               Foreground="#F4F7FB"
+                                                               FontSize="{StaticResource Typography.FontSize.Body}"
+                                                               FontWeight="SemiBold"
+                                                               VerticalAlignment="Center"
+                                                               TextTrimming="CharacterEllipsis" />
+                                                </Grid>
+                                                <StackPanel Orientation="Horizontal"
+                                                            HorizontalAlignment="Right"
+                                                            Margin="0,8,0,0">
+                                                    <Button Content="{localization:Loc Coaching.MatchupEditor.Items.Change}"
+                                                            Style="{StaticResource SecondaryButton}"
+                                                            Padding="10,6"
+                                                            Click="SelectStartItemButton_Click" />
+                                                    <Button Content="×"
+                                                            Style="{StaticResource SecondaryButton}"
+                                                            Padding="10,6"
+                                                            Margin="6,0,0,0"
+                                                            ToolTip="{localization:Loc Coaching.MatchupEditor.Items.Remove}"
+                                                            Click="RemoveStartItemButton_Click" />
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+
+                                    <!-- Условие завершения фазы после появления предмета в инвентаре. -->
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.EndItemTitle}"
+                                                   Style="{StaticResource FormFieldLabel}" />
+                                        <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.EndItemDescription}"
+                                                   Style="{StaticResource FormFieldHint}"
+                                                   Margin="0,0,0,9" />
+                                        <Button x:Name="SelectEndItemButton"
+                                                Content="{localization:Loc Coaching.MatchupEditor.Items.Select}"
+                                                HorizontalAlignment="Stretch"
+                                                Click="SelectEndItemButton_Click">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Editor.HasEndItem}" Value="True">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        <Border Background="#152238"
+                                                BorderBrush="#4A3345"
+                                                BorderThickness="1"
+                                                CornerRadius="9"
+                                                Padding="10">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Editor.HasEndItem}" Value="True">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <StackPanel>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="42" />
+                                                        <ColumnDefinition Width="10" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border Width="42"
+                                                            Height="42"
+                                                            Background="#0B1726"
+                                                            BorderBrush="#31506C"
+                                                            BorderThickness="1"
+                                                            CornerRadius="7">
+                                                        <Image Source="{Binding Editor.EndItem.ImageUri}" Stretch="UniformToFill" />
+                                                    </Border>
+                                                    <TextBlock Grid.Column="2"
+                                                               Text="{Binding Editor.EndItem.DisplayName}"
+                                                               Foreground="#F4F7FB"
+                                                               FontSize="{StaticResource Typography.FontSize.Body}"
+                                                               FontWeight="SemiBold"
+                                                               VerticalAlignment="Center"
+                                                               TextTrimming="CharacterEllipsis" />
+                                                </Grid>
+                                                <StackPanel Orientation="Horizontal"
+                                                            HorizontalAlignment="Right"
+                                                            Margin="0,8,0,0">
+                                                    <Button Content="{localization:Loc Coaching.MatchupEditor.Items.Change}"
+                                                            Style="{StaticResource SecondaryButton}"
+                                                            Padding="10,6"
+                                                            Click="SelectEndItemButton_Click" />
+                                                    <Button Content="×"
+                                                            Style="{StaticResource SecondaryButton}"
+                                                            Padding="10,6"
+                                                            Margin="6,0,0,0"
+                                                            ToolTip="{localization:Loc Coaching.MatchupEditor.Items.Remove}"
+                                                            Click="RemoveEndItemButton_Click" />
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+                                </Grid>
+
+                                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.ItemConflict}"
+                                           Foreground="#FF7185"
+                                           FontSize="{StaticResource Typography.FontSize.Caption}"
+                                           Margin="0,10,0,0">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Editor.HasConflictingItemConditions}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+
                         <!-- Автоматическое пояснение выбранного диапазона уровней. -->
                         <Border x:Name="PhaseMeaningPanel"
                                 Margin="0,18,0,0"
@@ -637,6 +901,26 @@
                                                 <TextBlock Text="{Binding LevelRange}"
                                                            Foreground="#91A4BD"
                                                            FontSize="{StaticResource Typography.FontSize.Caption}" />
+                                            </Border>
+
+                                            <Border Background="#0C1420"
+                                                    CornerRadius="7"
+                                                    Padding="10,7"
+                                                    Margin="0,8,0,0">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding HasItemConditions}" Value="True">
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+                                                <TextBlock Text="{Binding ItemConditionSummary}"
+                                                           Foreground="#8FBDE0"
+                                                           FontSize="{StaticResource Typography.FontSize.Caption}"
+                                                           TextWrapping="Wrap" />
                                             </Border>
 
                                             <Grid Margin="0,12,0,0">
