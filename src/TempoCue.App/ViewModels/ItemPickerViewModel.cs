@@ -222,12 +222,14 @@ public sealed class ItemPickerViewModel : ObservableObject
     public string Title => _localization.Get(Target switch
     {
         ItemPickerTarget.PhaseRecommendations => "Coaching.MatchupEditor.Items.Picker.RecommendationsTitle",
+        ItemPickerTarget.ItemBlockItems => "Coaching.MatchupEditor.Items.Picker.BlockTitle",
         _ => "Coaching.MatchupEditor.Items.Picker.Title"
     });
 
     public string Description => _localization.Get(Target switch
     {
         ItemPickerTarget.PhaseRecommendations => "Coaching.MatchupEditor.Items.Picker.RecommendationsDescription",
+        ItemPickerTarget.ItemBlockItems => "Coaching.MatchupEditor.Items.Picker.BlockDescription",
         _ => "Coaching.MatchupEditor.Items.Picker.Description"
     });
 

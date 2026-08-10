@@ -72,6 +72,50 @@ public sealed class MatchupItemBlocksViewModelTests
         });
     }
 
+    [Fact]
+    public async Task ItemBlocks_CatalogSelectionPreservesAuthorOrder()
+    {
+        await RunInEnglishAsync(async localization =>
+        {
+            var content = new MatchupContentViewModel(localization, TestItemCatalog.Ready());
+            content.SetItemCatalogContext("26.15", "en-US");
+            await content.EnsureItemCatalogLoadedAsync();
+
+            var blocks = content.ItemBlocks;
+            blocks.BeginAdd();
+            blocks.Editor.Name = "Core build";
+            Assert.True(blocks.SaveEditor());
+            var block = Assert.Single(blocks.Blocks);
+
+            content.OpenItemBlockPicker(block);
+            Assert.Equal(ItemPickerTarget.ItemBlockItems, content.ItemPicker.Target);
+            var cleaver = content.ItemPicker.Items.Single(item => item.Id == 3071);
+            var boots = content.ItemPicker.Items.Single(item => item.Id == 3047);
+            content.ItemPicker.ToggleSelection(cleaver);
+            content.ItemPicker.ToggleSelection(boots);
+            Assert.True(content.ItemPicker.ConfirmSelection());
+            Assert.Equal([3071, 3047], block.Items.Select(item => item.Id));
+
+            Assert.True(blocks.MoveItemRight(block, block.Items[0]));
+            Assert.Equal([3047, 3071], block.Items.Select(item => item.Id));
+
+            content.OpenItemBlockPicker(block);
+            Assert.Equal([3071, 3047], content.ItemPicker.SelectedItems.Select(item => item.Id));
+            content.ItemPicker.ToggleSelection(boots);
+            Assert.True(content.ItemPicker.ConfirmSelection());
+            Assert.Equal(3071, Assert.Single(block.Items).Id);
+
+            blocks.BeginEdit(block);
+            content.OpenEditedItemBlockPicker();
+            content.ItemPicker.ToggleSelection(boots);
+            Assert.True(content.ItemPicker.ConfirmSelection());
+            Assert.Equal([3071, 3047], blocks.Editor.Items.Select(item => item.Id));
+            Assert.True(blocks.Editor.MoveItemLeft(blocks.Editor.Items[1]));
+            Assert.True(blocks.SaveEditor());
+            Assert.Equal([3047, 3071], block.Items.Select(item => item.Id));
+        });
+    }
+
     private static void RunInEnglish(Action<LocalizationService> test)
     {
         ArgumentNullException.ThrowIfNull(test);
@@ -82,6 +126,23 @@ public sealed class MatchupItemBlocksViewModelTests
         try
         {
             test(localization);
+        }
+        finally
+        {
+            localization.SetLanguage(initialLanguage);
+        }
+    }
+
+    private static async Task RunInEnglishAsync(Func<LocalizationService, Task> test)
+    {
+        ArgumentNullException.ThrowIfNull(test);
+        var localization = LocalizationService.Instance;
+        var initialLanguage = localization.CurrentLanguageCode;
+        localization.SetLanguage("en-US");
+
+        try
+        {
+            await test(localization);
         }
         finally
         {

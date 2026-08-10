@@ -68,6 +68,23 @@ public sealed class MatchupItemBlockEditorViewModel : ObservableObject
         }
     }
 
+    public IReadOnlyList<MatchupItemDraft> Items
+    {
+        get => _items;
+        private set
+        {
+            if (SetProperty(ref _items, value))
+            {
+                OnPropertyChanged(nameof(HasItems));
+                OnPropertyChanged(nameof(ItemCount));
+            }
+        }
+    }
+
+    public bool HasItems => Items.Count > 0;
+
+    public int ItemCount => Items.Count;
+
     public TextLengthFeedback NameLengthFeedback => TextLengthFeedback.Create(
         Name,
         3,
@@ -83,7 +100,7 @@ public sealed class MatchupItemBlockEditorViewModel : ObservableObject
         EditingBlockId = null;
         Name = string.Empty;
         WhenToChoose = string.Empty;
-        _items = [];
+        Items = [];
         IsOpen = true;
     }
 
@@ -93,7 +110,7 @@ public sealed class MatchupItemBlockEditorViewModel : ObservableObject
         EditingBlockId = draft.Id;
         Name = draft.Name;
         WhenToChoose = draft.WhenToChoose ?? string.Empty;
-        _items = draft.Items.ToArray();
+        Items = draft.Items.ToArray();
         IsOpen = true;
     }
 
@@ -109,8 +126,39 @@ public sealed class MatchupItemBlockEditorViewModel : ObservableObject
             id,
             Name.Trim(),
             normalizedHint.Length == 0 ? null : normalizedHint,
-            _items.ToArray());
+            Items.ToArray());
     }
+
+    public void SetItems(IEnumerable<ItemOptionViewModel> selectedItems)
+    {
+        ArgumentNullException.ThrowIfNull(selectedItems);
+        var selected = MatchupItemDraftFactory.Create(selectedItems);
+        var selectedById = selected.ToDictionary(static item => item.Id);
+        Items =
+        [
+            .. Items
+                .Where(item => selectedById.ContainsKey(item.Id))
+                .Select(item => selectedById[item.Id]),
+            .. selected.Where(selectedItem => Items.All(item => item.Id != selectedItem.Id))
+        ];
+    }
+
+    public bool RemoveItem(MatchupItemDraft item)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        var updatedItems = Items.Where(existing => existing.Id != item.Id).ToArray();
+        if (updatedItems.Length == Items.Count)
+        {
+            return false;
+        }
+
+        Items = updatedItems;
+        return true;
+    }
+
+    public bool MoveItemLeft(MatchupItemDraft item) => MoveItem(item, -1);
+
+    public bool MoveItemRight(MatchupItemDraft item) => MoveItem(item, 1);
 
     public void Close() => IsOpen = false;
 
@@ -118,5 +166,22 @@ public sealed class MatchupItemBlockEditorViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(Header));
         OnPropertyChanged(nameof(NameLengthFeedback));
+    }
+
+    private bool MoveItem(MatchupItemDraft item, int offset)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        var currentIndex = Items.ToList().FindIndex(existing => existing.Id == item.Id);
+        var targetIndex = currentIndex + offset;
+        if (currentIndex < 0 || targetIndex < 0 || targetIndex >= Items.Count)
+        {
+            return false;
+        }
+
+        var updatedItems = Items.ToList();
+        updatedItems.RemoveAt(currentIndex);
+        updatedItems.Insert(targetIndex, item);
+        Items = updatedItems.ToArray();
+        return true;
     }
 }

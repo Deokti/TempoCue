@@ -10,6 +10,14 @@
                 <ResourceDictionary Source="../Styles/FormControls.xaml" />
                 <ResourceDictionary Source="../Styles/MatchupPhaseControls.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <Style x:Key="ItemChipAction"
+                   TargetType="Button"
+                   BasedOn="{StaticResource PhaseCardMoveButton}">
+                <Setter Property="Width" Value="24" />
+                <Setter Property="Height" Value="24" />
+                <Setter Property="Margin" Value="4,0,0,0" />
+                <Setter Property="FontSize" Value="{StaticResource Typography.FontSize.Caption}" />
+            </Style>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -66,6 +74,79 @@
                              MaxLength="160" />
                     <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Items.Editor.WhenToChooseHint}"
                                Style="{StaticResource FormFieldHint}" />
+
+                    <!-- Предметы редактора остаются частью рабочей копии до сохранения всего блока. -->
+                    <Grid Margin="0,18,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Items.Editor.ItemsTitle}"
+                                       Foreground="#F4F7FB"
+                                       FontSize="{StaticResource Typography.FontSize.BodyLarge}"
+                                       FontWeight="SemiBold" />
+                            <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Items.Editor.ItemsDescription}"
+                                       Foreground="#7F93AF"
+                                       FontSize="{StaticResource Typography.FontSize.Caption}"
+                                       TextWrapping="Wrap"
+                                       Margin="0,5,12,0" />
+                        </StackPanel>
+                        <Button x:Name="SelectEditedBlockItemsButton"
+                                Grid.Column="1"
+                                Content="{localization:Loc Coaching.MatchupEditor.Items.AddItem}"
+                                Style="{StaticResource SecondaryButton}"
+                                VerticalAlignment="Top"
+                                IsEnabled="{Binding ItemPicker.IsCatalogReady}"
+                                Click="SelectEditedBlockItemsButton_Click" />
+                    </Grid>
+
+                    <ItemsControl x:Name="EditedBlockItemsControl"
+                                  ItemsSource="{Binding ItemBlocks.Editor.Items}"
+                                  Margin="0,12,0,0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="#162238"
+                                        BorderBrush="#263750"
+                                        BorderThickness="1"
+                                        CornerRadius="9"
+                                        Padding="8"
+                                        Margin="0,0,0,8">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Width="34" Height="34" Background="#0C1420" CornerRadius="6">
+                                            <Image Source="{Binding ImageUri}" Stretch="UniformToFill" />
+                                        </Border>
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding DisplayName}"
+                                                   Foreground="#DCEAF7"
+                                                   FontSize="{StaticResource Typography.FontSize.Body}"
+                                                   VerticalAlignment="Center"
+                                                   Margin="9,0,10,0" />
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Button Content="◀"
+                                                    Style="{StaticResource ItemChipAction}"
+                                                    ToolTip="{localization:Loc Coaching.MatchupEditor.Items.Item.MoveLeft}"
+                                                    Click="MoveEditedItemLeftButton_Click" />
+                                            <Button Content="▶"
+                                                    Style="{StaticResource ItemChipAction}"
+                                                    ToolTip="{localization:Loc Coaching.MatchupEditor.Items.Item.MoveRight}"
+                                                    Click="MoveEditedItemRightButton_Click" />
+                                            <Button Content="×"
+                                                    Style="{StaticResource ItemChipAction}"
+                                                    Foreground="#FF7186"
+                                                    ToolTip="{localization:Loc Coaching.MatchupEditor.Items.Remove}"
+                                                    Click="RemoveEditedItemButton_Click" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
 
                     <Border Height="1" Background="#263750" Margin="0,18,0,14" />
                     <Grid>
@@ -205,11 +286,78 @@
                                                 CornerRadius="8"
                                                 Padding="12"
                                                 Margin="0,13,0,0">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding ItemCount}" Value="0">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
                                             <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Items.Card.Empty}"
                                                        Foreground="#6F849F"
                                                        FontSize="{StaticResource Typography.FontSize.Caption}"
                                                        TextWrapping="Wrap" />
                                         </Border>
+
+                                        <ItemsControl ItemsSource="{Binding Items}"
+                                                      Margin="0,13,0,0">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border Background="#0C1420"
+                                                            BorderBrush="#263750"
+                                                            BorderThickness="1"
+                                                            CornerRadius="9"
+                                                            Padding="8"
+                                                            Margin="0,0,0,8">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto" />
+                                                                <ColumnDefinition Width="*" />
+                                                                <ColumnDefinition Width="Auto" />
+                                                            </Grid.ColumnDefinitions>
+                                                            <Border Width="34" Height="34" Background="#071019" CornerRadius="6">
+                                                                <Image Source="{Binding ImageUri}" Stretch="UniformToFill" />
+                                                            </Border>
+                                                            <TextBlock Grid.Column="1"
+                                                                       Text="{Binding DisplayName}"
+                                                                       Foreground="#DCEAF7"
+                                                                       FontSize="{StaticResource Typography.FontSize.Body}"
+                                                                       VerticalAlignment="Center"
+                                                                       Margin="9,0,10,0" />
+                                                            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                                                <Button Content="◀"
+                                                                        Style="{StaticResource ItemChipAction}"
+                                                                        Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                        ToolTip="{localization:Loc Coaching.MatchupEditor.Items.Item.MoveLeft}"
+                                                                        Click="MoveSavedItemLeftButton_Click" />
+                                                                <Button Content="▶"
+                                                                        Style="{StaticResource ItemChipAction}"
+                                                                        Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                        ToolTip="{localization:Loc Coaching.MatchupEditor.Items.Item.MoveRight}"
+                                                                        Click="MoveSavedItemRightButton_Click" />
+                                                                <Button Content="×"
+                                                                        Style="{StaticResource ItemChipAction}"
+                                                                        Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                        Foreground="#FF7186"
+                                                                        ToolTip="{localization:Loc Coaching.MatchupEditor.Items.Remove}"
+                                                                        Click="RemoveSavedItemButton_Click" />
+                                                            </StackPanel>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+
+                                        <Button x:Name="AddItemToBlockButton"
+                                                Content="{localization:Loc Coaching.MatchupEditor.Items.AddItem}"
+                                                Style="{StaticResource PhaseCardAction}"
+                                                HorizontalAlignment="Left"
+                                                Margin="0,5,0,0"
+                                                IsEnabled="{Binding DataContext.ItemPicker.IsCatalogReady, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                Click="AddItemToBlockButton_Click" />
 
                                         <Border Height="1" Background="#263750" Margin="0,14,0,12" />
                                         <Grid>

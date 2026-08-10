@@ -362,7 +362,12 @@
   <data name="Coaching.MatchupEditor.Items.Empty" xml:space="preserve"><value>No item blocks yet. Add a starting purchase, boots for a specific situation, a core build, or any category that fits this matchup.</value></data>
   <data name="Coaching.MatchupEditor.Items.Card.ItemCount" xml:space="preserve"><value>{0} items</value></data>
   <data name="Coaching.MatchupEditor.Items.Card.NoHint" xml:space="preserve"><value>No “when to choose” note</value></data>
-  <data name="Coaching.MatchupEditor.Items.Card.Empty" xml:space="preserve"><value>This block is ready. Item selection will be connected in the next iteration.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Card.Empty" xml:space="preserve"><value>No items in this block yet.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.ItemsTitle" xml:space="preserve"><value>Items in this block</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.ItemsDescription" xml:space="preserve"><value>Add purchases and arrange them in the order the player should see in League.</value></data>
+  <data name="Coaching.MatchupEditor.Items.AddItem" xml:space="preserve"><value>+ Item</value></data>
+  <data name="Coaching.MatchupEditor.Items.Item.MoveLeft" xml:space="preserve"><value>Move item left</value></data>
+  <data name="Coaching.MatchupEditor.Items.Item.MoveRight" xml:space="preserve"><value>Move item right</value></data>
   <data name="Coaching.MatchupEditor.Items.MoveUp" xml:space="preserve"><value>Move block up</value></data>
   <data name="Coaching.MatchupEditor.Items.MoveDown" xml:space="preserve"><value>Move block down</value></data>
   <data name="Coaching.MatchupEditor.Items.Help.Title" xml:space="preserve"><value>How item blocks work</value></data>
@@ -381,6 +386,8 @@
   <data name="Coaching.MatchupEditor.Items.Picker.Description" xml:space="preserve"><value>Select one or more items from the chosen patch.</value></data>
   <data name="Coaching.MatchupEditor.Items.Picker.RecommendationsTitle" xml:space="preserve"><value>Select recommended items</value></data>
   <data name="Coaching.MatchupEditor.Items.Picker.RecommendationsDescription" xml:space="preserve"><value>Add only the purchases the player should target during this phase.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.BlockTitle" xml:space="preserve"><value>Select items for the block</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.BlockDescription" xml:space="preserve"><value>Select one or more purchases. Their order can be changed in the block after selection.</value></data>
   <data name="Coaching.MatchupEditor.Items.Picker.Search" xml:space="preserve"><value>Search by item name</value></data>
   <data name="Coaching.MatchupEditor.Items.Picker.Price" xml:space="preserve"><value>{0} gold</value></data>
   <data name="Coaching.MatchupEditor.Items.Picker.Technical" xml:space="preserve"><value>ID {0} · {1} · patch {2}</value></data>

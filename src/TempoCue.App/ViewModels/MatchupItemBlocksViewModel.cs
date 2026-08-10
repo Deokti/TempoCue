@@ -138,6 +138,38 @@ public sealed class MatchupItemBlocksViewModel : ObservableObject
 
     public bool MoveDown(MatchupItemBlockViewModel block) => Move(block, 1);
 
+    public void SetItems(
+        MatchupItemBlockViewModel block,
+        IEnumerable<ItemOptionViewModel> selectedItems)
+    {
+        EnsureOwnedBlock(block);
+        block.SetItems(selectedItems);
+    }
+
+    public bool RemoveItem(
+        MatchupItemBlockViewModel block,
+        MatchupItemDraft item)
+    {
+        EnsureOwnedBlock(block);
+        return block.RemoveItem(item);
+    }
+
+    public bool MoveItemLeft(
+        MatchupItemBlockViewModel block,
+        MatchupItemDraft item)
+    {
+        EnsureOwnedBlock(block);
+        return block.MoveItemLeft(item);
+    }
+
+    public bool MoveItemRight(
+        MatchupItemBlockViewModel block,
+        MatchupItemDraft item)
+    {
+        EnsureOwnedBlock(block);
+        return block.MoveItemRight(item);
+    }
+
     public void UpdateLanguage()
     {
         Editor.UpdateLanguage();

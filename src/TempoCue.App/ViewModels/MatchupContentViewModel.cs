@@ -13,6 +13,7 @@ public sealed class MatchupContentViewModel : ObservableObject
     private readonly LocalizationService _localization;
     private readonly ObservableCollection<MatchupPhaseViewModel> _phases = [];
     private MatchupContentSection _currentSection = MatchupContentSection.Phases;
+    private string? _itemPickerBlockId;
     private int _nextPhaseNumber = 1;
 
     public MatchupContentViewModel(
@@ -105,6 +106,28 @@ public sealed class MatchupContentViewModel : ObservableObject
     public void OpenRecommendedItemPicker() => ItemPicker.Open(
         ItemPickerTarget.PhaseRecommendations,
         Editor.RecommendedItems.Select(static item => item.Id));
+
+    public void OpenEditedItemBlockPicker()
+    {
+        if (!ItemBlocks.Editor.IsOpen)
+        {
+            return;
+        }
+
+        _itemPickerBlockId = null;
+        ItemPicker.Open(
+            ItemPickerTarget.ItemBlockItems,
+            ItemBlocks.Editor.Items.Select(static item => item.Id));
+    }
+
+    public void OpenItemBlockPicker(MatchupItemBlockViewModel block)
+    {
+        ArgumentNullException.ThrowIfNull(block);
+        _itemPickerBlockId = block.Id;
+        ItemPicker.Open(
+            ItemPickerTarget.ItemBlockItems,
+            block.Items.Select(static item => item.Id));
+    }
 
     public void RemoveRecommendedItem(MatchupItemDraft item) =>
         Editor.RemoveRecommendedItem(item);
@@ -254,6 +277,23 @@ public sealed class MatchupContentViewModel : ObservableObject
         if (target == ItemPickerTarget.PhaseRecommendations)
         {
             Editor.SetRecommendedItems(items);
+        }
+        else if (target == ItemPickerTarget.ItemBlockItems)
+        {
+            if (_itemPickerBlockId is string blockId)
+            {
+                var block = ItemBlocks.Blocks.FirstOrDefault(item => item.Id == blockId);
+                if (block is not null)
+                {
+                    ItemBlocks.SetItems(block, items);
+                }
+            }
+            else if (ItemBlocks.Editor.IsOpen)
+            {
+                ItemBlocks.Editor.SetItems(items);
+            }
+
+            _itemPickerBlockId = null;
         }
     }
 

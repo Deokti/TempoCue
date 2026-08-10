@@ -272,7 +272,7 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
     public void SetRecommendedItems(IEnumerable<ItemOptionViewModel> items)
     {
         ArgumentNullException.ThrowIfNull(items);
-        RecommendedItems = CreateItemDrafts(items);
+        RecommendedItems = MatchupItemDraftFactory.Create(items);
     }
 
     public void RemoveRecommendedItem(MatchupItemDraft item)
@@ -322,12 +322,6 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
             OnPropertyChanged(feedbackPropertyName);
         }
     }
-
-    private static IReadOnlyList<MatchupItemDraft> CreateItemDrafts(
-        IEnumerable<ItemOptionViewModel> items) => items
-        .DistinctBy(static item => item.Id)
-        .Select(static item => new MatchupItemDraft(item.Id, item.DisplayName, item.ImageUri))
-        .ToArray();
 
     private static string JoinItemNames(IEnumerable<MatchupItemDraft> items) =>
         string.Join(", ", items.Select(static item => item.DisplayName));

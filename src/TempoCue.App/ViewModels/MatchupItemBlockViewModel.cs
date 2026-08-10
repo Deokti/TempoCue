@@ -65,6 +65,38 @@ public sealed class MatchupItemBlockViewModel : ObservableObject
         OnPropertyChanged(string.Empty);
     }
 
+    internal void SetItems(IEnumerable<ItemOptionViewModel> selectedItems)
+    {
+        ArgumentNullException.ThrowIfNull(selectedItems);
+        var selected = MatchupItemDraftFactory.Create(selectedItems);
+        var selectedById = selected.ToDictionary(static item => item.Id);
+        MatchupItemDraft[] orderedItems =
+        [
+            .. Items
+                .Where(item => selectedById.ContainsKey(item.Id))
+                .Select(item => selectedById[item.Id]),
+            .. selected.Where(selectedItem => Items.All(item => item.Id != selectedItem.Id))
+        ];
+        ReplaceItems(orderedItems);
+    }
+
+    internal bool RemoveItem(MatchupItemDraft item)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        var updatedItems = Items.Where(existing => existing.Id != item.Id).ToArray();
+        if (updatedItems.Length == Items.Count)
+        {
+            return false;
+        }
+
+        ReplaceItems(updatedItems);
+        return true;
+    }
+
+    internal bool MoveItemLeft(MatchupItemDraft item) => MoveItem(item, -1);
+
+    internal bool MoveItemRight(MatchupItemDraft item) => MoveItem(item, 1);
+
     internal void UpdatePosition(int index, int count)
     {
         Order = index + 1;
@@ -76,5 +108,30 @@ public sealed class MatchupItemBlockViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(ItemCountLabel));
         OnPropertyChanged(nameof(WhenToChooseLabel));
+    }
+
+    private bool MoveItem(MatchupItemDraft item, int offset)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        var currentIndex = Items.ToList().FindIndex(existing => existing.Id == item.Id);
+        var targetIndex = currentIndex + offset;
+        if (currentIndex < 0 || targetIndex < 0 || targetIndex >= Items.Count)
+        {
+            return false;
+        }
+
+        var updatedItems = Items.ToList();
+        updatedItems.RemoveAt(currentIndex);
+        updatedItems.Insert(targetIndex, item);
+        ReplaceItems(updatedItems);
+        return true;
+    }
+
+    private void ReplaceItems(IEnumerable<MatchupItemDraft> items)
+    {
+        _draft = _draft with { Items = items.ToArray() };
+        OnPropertyChanged(nameof(Items));
+        OnPropertyChanged(nameof(ItemCount));
+        OnPropertyChanged(nameof(ItemCountLabel));
     }
 }

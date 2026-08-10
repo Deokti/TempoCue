@@ -365,7 +365,12 @@
   <data name="Coaching.MatchupEditor.Items.Empty" xml:space="preserve"><value>Блоков предметов пока нет. Добавьте стартовую покупку, ботинки под ситуацию, ключевую сборку или любую категорию для этого матчапа.</value></data>
   <data name="Coaching.MatchupEditor.Items.Card.ItemCount" xml:space="preserve"><value>Предметов: {0}</value></data>
   <data name="Coaching.MatchupEditor.Items.Card.NoHint" xml:space="preserve"><value>Пояснение «когда выбирать» не добавлено</value></data>
-  <data name="Coaching.MatchupEditor.Items.Card.Empty" xml:space="preserve"><value>Блок готов. Выбор предметов подключим в следующей итерации.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Card.Empty" xml:space="preserve"><value>В этом блоке пока нет предметов.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.ItemsTitle" xml:space="preserve"><value>Предметы блока</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.ItemsDescription" xml:space="preserve"><value>Добавьте покупки и расположите их в том порядке, в котором игрок увидит их в League.</value></data>
+  <data name="Coaching.MatchupEditor.Items.AddItem" xml:space="preserve"><value>+ Предмет</value></data>
+  <data name="Coaching.MatchupEditor.Items.Item.MoveLeft" xml:space="preserve"><value>Переместить предмет влево</value></data>
+  <data name="Coaching.MatchupEditor.Items.Item.MoveRight" xml:space="preserve"><value>Переместить предмет вправо</value></data>
   <data name="Coaching.MatchupEditor.Items.MoveUp" xml:space="preserve"><value>Переместить блок выше</value></data>
   <data name="Coaching.MatchupEditor.Items.MoveDown" xml:space="preserve"><value>Переместить блок ниже</value></data>
   <data name="Coaching.MatchupEditor.Items.Help.Title" xml:space="preserve"><value>Как работают блоки</value></data>
@@ -384,6 +389,8 @@
   <data name="Coaching.MatchupEditor.Items.Picker.Description" xml:space="preserve"><value>Выберите один или несколько предметов из каталога указанного патча.</value></data>
   <data name="Coaching.MatchupEditor.Items.Picker.RecommendationsTitle" xml:space="preserve"><value>Выберите рекомендуемые предметы</value></data>
   <data name="Coaching.MatchupEditor.Items.Picker.RecommendationsDescription" xml:space="preserve"><value>Добавьте только покупки, на которые игроку стоит ориентироваться в этой фазе.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.BlockTitle" xml:space="preserve"><value>Выберите предметы для блока</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.BlockDescription" xml:space="preserve"><value>Выберите одну или несколько покупок. После выбора их порядок можно изменить внутри блока.</value></data>
   <data name="Coaching.MatchupEditor.Items.Picker.Search" xml:space="preserve"><value>Поиск по названию предмета</value></data>
   <data name="Coaching.MatchupEditor.Items.Picker.Price" xml:space="preserve"><value>{0} золота</value></data>
   <data name="Coaching.MatchupEditor.Items.Picker.Technical" xml:space="preserve"><value>ID {0} · {1} · патч {2}</value></data>
