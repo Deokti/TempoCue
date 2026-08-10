@@ -487,6 +487,21 @@ public sealed class LocalizationServiceTests
                 Assert.Equal(
                     Visibility.Visible,
                     Assert.IsType<Border>(matchupContentPage.FindName("PhaseEditorPanel")).Visibility);
+                Assert.Equal(
+                    "Фаза активна на уровнях 1+",
+                    Assert.IsType<TextBlock>(
+                        matchupContentPage.FindName("PhaseMeaningSummaryTextBlock")).Text);
+                foreach (var inputName in new[]
+                         {
+                             "PhasePrimaryAdviceTextBox",
+                             "PhaseWhyNowTextBox",
+                             "PhaseNextGoalTextBox"
+                         })
+                {
+                    var input = Assert.IsType<TextBox>(matchupContentPage.FindName(inputName));
+                    Assert.Equal(36, input.Height);
+                    Assert.False(input.AcceptsReturn);
+                }
                 var content = coachingViewModel.MatchupEditor.Content;
                 content.Editor.Name = "Осторожное начало";
                 content.Editor.PrimaryAdvice = "Не ищи размен первым";

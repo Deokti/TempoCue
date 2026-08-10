@@ -180,6 +180,10 @@ public sealed class CoachingViewModelTests
         {
             var content = new MatchupContentViewModel(localization);
             content.BeginAddPhase();
+            Assert.Equal("Phase is active at levels 1+", content.Editor.MeaningSummary);
+            content.Editor.ExtendsToEnd = false;
+            Assert.Equal("Phase is active at levels 1–18", content.Editor.MeaningSummary);
+            content.Editor.ExtendsToEnd = true;
             content.Editor.Name = "Early lane";
             content.Editor.PrimaryAdvice = "Avoid extended trades";
 

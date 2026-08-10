@@ -302,6 +302,9 @@
   <data name="Coaching.MatchupEditor.Content.Editor.MinimumLevel" xml:space="preserve"><value>Starts at level</value></data>
   <data name="Coaching.MatchupEditor.Content.Editor.MaximumLevel" xml:space="preserve"><value>Ends at level</value></data>
   <data name="Coaching.MatchupEditor.Content.Editor.ToEnd" xml:space="preserve"><value>Until the end of the match</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.MeaningTitle" xml:space="preserve"><value>What it means</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.MeaningRange" xml:space="preserve"><value>Phase is active at levels {0}–{1}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.MeaningToEnd" xml:space="preserve"><value>Phase is active at levels {0}+</value></data>
   <data name="Coaching.MatchupEditor.Content.Editor.PrimaryAdvice" xml:space="preserve"><value>Main advice</value></data>
   <data name="Coaching.MatchupEditor.Content.Editor.PrimaryAdviceHint" xml:space="preserve"><value>(the player sees it first)</value></data>
   <data name="Coaching.MatchupEditor.Content.Editor.WhyNow" xml:space="preserve"><value>Why now</value></data>

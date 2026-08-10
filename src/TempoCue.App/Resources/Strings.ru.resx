@@ -305,6 +305,9 @@
   <data name="Coaching.MatchupEditor.Content.Editor.MinimumLevel" xml:space="preserve"><value>Начинается с уровня</value></data>
   <data name="Coaching.MatchupEditor.Content.Editor.MaximumLevel" xml:space="preserve"><value>Заканчивается на уровне</value></data>
   <data name="Coaching.MatchupEditor.Content.Editor.ToEnd" xml:space="preserve"><value>До конца матча</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.MeaningTitle" xml:space="preserve"><value>Что это значит</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.MeaningRange" xml:space="preserve"><value>Фаза активна на уровнях {0}–{1}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.MeaningToEnd" xml:space="preserve"><value>Фаза активна на уровнях {0}+</value></data>
   <data name="Coaching.MatchupEditor.Content.Editor.PrimaryAdvice" xml:space="preserve"><value>Главный совет</value></data>
   <data name="Coaching.MatchupEditor.Content.Editor.PrimaryAdviceHint" xml:space="preserve"><value>(его видит игрок первым)</value></data>
   <data name="Coaching.MatchupEditor.Content.Editor.WhyNow" xml:space="preserve"><value>Почему сейчас</value></data>

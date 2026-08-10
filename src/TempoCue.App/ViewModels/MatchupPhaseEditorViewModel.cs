@@ -88,6 +88,7 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
                 }
 
                 NotifyValidationChanged();
+                OnPropertyChanged(nameof(MeaningSummary));
             }
         }
     }
@@ -100,6 +101,7 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
             if (SetProperty(ref _maximumLevel, value))
             {
                 NotifyValidationChanged();
+                OnPropertyChanged(nameof(MeaningSummary));
             }
         }
     }
@@ -117,6 +119,7 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
                 }
 
                 NotifyValidationChanged();
+                OnPropertyChanged(nameof(MeaningSummary));
             }
         }
     }
@@ -164,6 +167,15 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
         && NextGoal.Trim().Length <= 160
         && MinimumLevel is >= 1 and <= 18
         && (ExtendsToEnd || MaximumLevel is >= 1 and <= 18 && MaximumLevel >= MinimumLevel);
+
+    public string MeaningSummary => ExtendsToEnd
+        ? _localization.Format(
+            "Coaching.MatchupEditor.Content.Editor.MeaningToEnd",
+            MinimumLevel)
+        : _localization.Format(
+            "Coaching.MatchupEditor.Content.Editor.MeaningRange",
+            MinimumLevel,
+            MaximumLevel);
 
     public void BeginNew()
     {
@@ -230,6 +242,7 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
     {
         RebuildPowerStateOptions();
         OnPropertyChanged(nameof(Header));
+        OnPropertyChanged(nameof(MeaningSummary));
     }
 
     private void RebuildPowerStateOptions() =>
