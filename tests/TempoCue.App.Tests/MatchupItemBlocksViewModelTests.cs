@@ -10,11 +10,7 @@ public sealed class MatchupItemBlocksViewModelTests
     [Fact]
     public void ItemBlocks_ManageIsolatedDraftAndAuthorOrder()
     {
-        var localization = LocalizationService.Instance;
-        var initialLanguage = localization.CurrentLanguageCode;
-        localization.SetLanguage("en-US");
-
-        try
+        RunInEnglish(localization =>
         {
             var content = new MatchupContentViewModel(localization, TestItemCatalog.Ready());
             content.ShowItems();
@@ -53,21 +49,13 @@ public sealed class MatchupItemBlocksViewModelTests
             Assert.Single(blocks.Blocks);
             Assert.False(original.CanMoveUp);
             Assert.False(original.CanMoveDown);
-        }
-        finally
-        {
-            localization.SetLanguage(initialLanguage);
-        }
+        });
     }
 
     [Fact]
     public void ItemBlocks_EditorDuplicatesAndDeletesCurrentBlock()
     {
-        var localization = LocalizationService.Instance;
-        var initialLanguage = localization.CurrentLanguageCode;
-        localization.SetLanguage("en-US");
-
-        try
+        RunInEnglish(localization =>
         {
             var blocks = new MatchupItemBlocksViewModel(localization);
             blocks.BeginAdd();
@@ -81,6 +69,19 @@ public sealed class MatchupItemBlocksViewModelTests
             Assert.True(blocks.DeleteEditor());
             Assert.False(blocks.Editor.IsOpen);
             Assert.Equal("Core build", Assert.Single(blocks.Blocks).Name);
+        });
+    }
+
+    private static void RunInEnglish(Action<LocalizationService> test)
+    {
+        ArgumentNullException.ThrowIfNull(test);
+        var localization = LocalizationService.Instance;
+        var initialLanguage = localization.CurrentLanguageCode;
+        localization.SetLanguage("en-US");
+
+        try
+        {
+            test(localization);
         }
         finally
         {
