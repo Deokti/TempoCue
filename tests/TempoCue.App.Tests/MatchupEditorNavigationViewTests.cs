@@ -15,9 +15,7 @@ public sealed class MatchupEditorNavigationViewTests
         {
             using var context = new MainWindowTestContext();
             context.Show();
-            context.OpenMatchupEditor();
-            context.CompleteMainInformationAndOpenChampions();
-            context.SelectChampionsAndOpenContent();
+            context.OpenMatchupContent();
 
             var content = context.Coaching.MatchupEditor.Content;
             content.BeginAddPhase();

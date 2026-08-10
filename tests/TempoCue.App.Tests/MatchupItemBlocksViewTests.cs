@@ -16,9 +16,7 @@ public sealed class MatchupItemBlocksViewTests
         {
             using var context = new MainWindowTestContext();
             context.Show();
-            context.OpenMatchupEditor();
-            context.CompleteMainInformationAndOpenChampions();
-            context.SelectChampionsAndOpenContent();
+            context.OpenMatchupContent();
 
             WpfTestHost.Click(WpfTestHost.Find<Button>(
                 context.ContentPage,

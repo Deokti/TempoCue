@@ -14,9 +14,7 @@ public sealed class MatchupPhaseValidationViewTests
         {
             using var context = new MainWindowTestContext();
             context.Show();
-            context.OpenMatchupEditor();
-            context.CompleteMainInformationAndOpenChampions();
-            context.SelectChampionsAndOpenContent();
+            context.OpenMatchupContent();
 
             var content = context.Coaching.MatchupEditor.Content;
             var first = SavePhase(content, "Первая фаза");

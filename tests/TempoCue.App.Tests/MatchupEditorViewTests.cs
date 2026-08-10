@@ -176,9 +176,7 @@ public sealed class MatchupEditorViewTests
     {
         using var context = new MainWindowTestContext();
         context.Show();
-        context.OpenMatchupEditor();
-        context.CompleteMainInformationAndOpenChampions();
-        context.SelectChampionsAndOpenContent();
+        context.OpenMatchupContent();
         var page = context.ContentPage;
         var phaseEditor = context.PhaseEditorView;
         var itemRecommendations = context.PhaseItemRecommendationsView;

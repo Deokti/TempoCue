@@ -131,6 +131,13 @@ internal sealed class MainWindowTestContext : IDisposable
         WpfTestHost.Click(WpfTestHost.Find<Button>(MatchupEditorPage, "MatchupEditorNextButton"));
     }
 
+    public void OpenMatchupContent()
+    {
+        OpenMatchupEditor();
+        CompleteMainInformationAndOpenChampions();
+        SelectChampionsAndOpenContent();
+    }
+
     public void Dispose()
     {
         if (_isDisposed)
