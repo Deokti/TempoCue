@@ -6,6 +6,4 @@ namespace TempoCue.Core;
 public sealed record MatchupPhaseCondition(
     string Id,
     int MinimumLevel,
-    int? MaximumLevel,
-    IReadOnlyCollection<int> RequiredItemIds,
-    IReadOnlyCollection<int> ExcludedItemIds);
+    int? MaximumLevel);

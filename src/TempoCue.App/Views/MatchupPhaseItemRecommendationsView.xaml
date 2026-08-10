@@ -1,0 +1,176 @@
+<UserControl x:Class="TempoCue.App.Views.MatchupPhaseItemRecommendationsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:localization="clr-namespace:TempoCue.App.Localization"
+             Background="Transparent"
+             FontFamily="Segoe UI">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Styles/ShellControls.xaml" />
+                <ResourceDictionary Source="../Styles/FormControls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <!-- Предметы описывают ориентир автора, но не определяют применимость фазы. -->
+    <Border x:Name="PhaseItemRecommendationsPanel"
+            Background="#0C1420"
+            BorderBrush="#263750"
+            BorderThickness="1"
+            CornerRadius="10"
+            Padding="16">
+        <StackPanel>
+            <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.ItemsTitle}"
+                       Foreground="#F4F7FB"
+                       FontSize="{StaticResource Typography.FontSize.BodyLarge}"
+                       FontWeight="SemiBold" />
+            <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.ItemsDescription}"
+                       Foreground="#7F93AF"
+                       FontSize="{StaticResource Typography.FontSize.Caption}"
+                       TextWrapping="Wrap"
+                       Margin="0,5,0,0" />
+
+            <StackPanel Margin="0,14,0,0">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ItemPicker.IsLoading}" Value="True">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <ProgressBar Height="3"
+                             IsIndeterminate="True"
+                             Foreground="#4FAAE8"
+                             Background="#162238" />
+                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Items.Loading}"
+                           Foreground="#8EA2BC"
+                           FontSize="{StaticResource Typography.FontSize.Caption}"
+                           Margin="0,8,0,0" />
+            </StackPanel>
+
+            <Grid Margin="0,14,0,0">
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ItemPicker.HasLoadError}" Value="True">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Items.ErrorTitle}"
+                               Foreground="#F2C66D"
+                               FontSize="{StaticResource Typography.FontSize.Body}"
+                               FontWeight="SemiBold" />
+                    <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Items.ErrorDescription}"
+                               Foreground="#7F93AF"
+                               FontSize="{StaticResource Typography.FontSize.Caption}"
+                               TextWrapping="Wrap"
+                               Margin="0,4,12,0" />
+                </StackPanel>
+                <Button Grid.Column="1"
+                        Content="{localization:Loc Coaching.MatchupEditor.Items.Retry}"
+                        Style="{StaticResource SecondaryButton}"
+                        Click="RetryItemCatalogButton_Click" />
+            </Grid>
+
+            <StackPanel Margin="0,14,0,0">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ItemPicker.IsCatalogReady}" Value="True">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+
+                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.RecommendedItemsTitle}"
+                           Style="{StaticResource FormFieldLabel}" />
+                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.RecommendedItemsDescription}"
+                           Style="{StaticResource FormFieldHint}"
+                           Margin="0,0,0,9" />
+
+                <ItemsControl x:Name="RecommendedItemsControl"
+                              ItemsSource="{Binding Editor.RecommendedItems}">
+                    <ItemsControl.Style>
+                        <Style TargetType="ItemsControl">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Editor.HasRecommendedItems}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ItemsControl.Style>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="#152238"
+                                    BorderBrush="#31506C"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="8"
+                                    Margin="0,0,8,8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="34" />
+                                        <ColumnDefinition Width="9" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Border Width="34"
+                                            Height="34"
+                                            Background="#0B1726"
+                                            BorderBrush="#31506C"
+                                            BorderThickness="1"
+                                            CornerRadius="6">
+                                        <Image Source="{Binding ImageUri}" Stretch="UniformToFill" />
+                                    </Border>
+                                    <TextBlock Grid.Column="2"
+                                               Text="{Binding DisplayName}"
+                                               Foreground="#F4F7FB"
+                                               FontSize="{StaticResource Typography.FontSize.Body}"
+                                               FontWeight="SemiBold"
+                                               VerticalAlignment="Center"
+                                               MaxWidth="190"
+                                               TextTrimming="CharacterEllipsis" />
+                                    <Button Grid.Column="3"
+                                            Content="×"
+                                            Width="30"
+                                            Height="30"
+                                            Style="{StaticResource SecondaryButton}"
+                                            Padding="0"
+                                            Margin="8,0,0,0"
+                                            ToolTip="{localization:Loc Coaching.MatchupEditor.Items.Remove}"
+                                            Click="RemoveRecommendedItemButton_Click" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <Button x:Name="SelectRecommendedItemsButton"
+                        Content="{localization:Loc Coaching.MatchupEditor.Items.Select}"
+                        HorizontalAlignment="Left"
+                        Style="{StaticResource SecondaryButton}"
+                        Click="SelectRecommendedItemsButton_Click" />
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</UserControl>

@@ -15,5 +15,4 @@ public sealed record MatchupPhaseDraft(
     string PrimaryAdvice,
     string WhyNow,
     string NextGoal,
-    IReadOnlyList<MatchupItemDraft> StartItems,
-    IReadOnlyList<MatchupItemDraft> EndItems);
+    IReadOnlyList<MatchupItemDraft> RecommendedItems);

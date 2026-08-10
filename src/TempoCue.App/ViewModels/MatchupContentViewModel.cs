@@ -57,17 +57,12 @@ public sealed class MatchupContentViewModel : ObservableObject
     public Task RetryItemCatalogLoadAsync(CancellationToken cancellationToken = default) =>
         ItemPicker.RetryCatalogLoadAsync(cancellationToken);
 
-    public void OpenStartItemPicker() => ItemPicker.Open(
-        ItemPickerTarget.PhaseStart,
-        Editor.StartItems.Select(static item => item.Id));
+    public void OpenRecommendedItemPicker() => ItemPicker.Open(
+        ItemPickerTarget.PhaseRecommendations,
+        Editor.RecommendedItems.Select(static item => item.Id));
 
-    public void OpenEndItemPicker() => ItemPicker.Open(
-        ItemPickerTarget.PhaseEnd,
-        Editor.EndItems.Select(static item => item.Id));
-
-    public void RemoveStartItem(MatchupItemDraft item) => Editor.RemoveStartItem(item);
-
-    public void RemoveEndItem(MatchupItemDraft item) => Editor.RemoveEndItem(item);
+    public void RemoveRecommendedItem(MatchupItemDraft item) =>
+        Editor.RemoveRecommendedItem(item);
 
     public void BeginEditPhase(MatchupPhaseViewModel phase)
     {
@@ -207,13 +202,9 @@ public sealed class MatchupContentViewModel : ObservableObject
         ItemPickerTarget target,
         IReadOnlyList<ItemOptionViewModel> items)
     {
-        if (target == ItemPickerTarget.PhaseStart)
+        if (target == ItemPickerTarget.PhaseRecommendations)
         {
-            Editor.SetStartItems(items);
-        }
-        else if (target == ItemPickerTarget.PhaseEnd)
-        {
-            Editor.SetEndItems(items);
+            Editor.SetRecommendedItems(items);
         }
     }
 

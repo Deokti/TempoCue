@@ -17,8 +17,7 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
     private string _primaryAdvice = string.Empty;
     private string _whyNow = string.Empty;
     private string _nextGoal = string.Empty;
-    private IReadOnlyList<MatchupItemDraft> _startItems = [];
-    private IReadOnlyList<MatchupItemDraft> _endItems = [];
+    private IReadOnlyList<MatchupItemDraft> _recommendedItems = [];
     private IReadOnlyList<MatchupPowerStateOptionViewModel> _powerStateOptions = [];
 
     public MatchupPhaseEditorViewModel(LocalizationService localization)
@@ -162,44 +161,20 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
         }
     }
 
-    public IReadOnlyList<MatchupItemDraft> StartItems
+    public IReadOnlyList<MatchupItemDraft> RecommendedItems
     {
-        get => _startItems;
+        get => _recommendedItems;
         private set
         {
-            if (SetProperty(ref _startItems, value))
+            if (SetProperty(ref _recommendedItems, value))
             {
-                OnPropertyChanged(nameof(HasStartItems));
+                OnPropertyChanged(nameof(HasRecommendedItems));
                 OnPropertyChanged(nameof(MeaningSummary));
-                OnPropertyChanged(nameof(HasConflictingItemConditions));
-                NotifyValidationChanged();
             }
         }
     }
 
-    public bool HasStartItems => StartItems.Count > 0;
-
-    public IReadOnlyList<MatchupItemDraft> EndItems
-    {
-        get => _endItems;
-        private set
-        {
-            if (SetProperty(ref _endItems, value))
-            {
-                OnPropertyChanged(nameof(HasEndItems));
-                OnPropertyChanged(nameof(MeaningSummary));
-                OnPropertyChanged(nameof(HasConflictingItemConditions));
-                NotifyValidationChanged();
-            }
-        }
-    }
-
-    public bool HasEndItems => EndItems.Count > 0;
-
-    public bool HasConflictingItemConditions =>
-        StartItems.Select(static item => item.Id)
-            .Intersect(EndItems.Select(static item => item.Id))
-            .Any();
+    public bool HasRecommendedItems => RecommendedItems.Count > 0;
 
     public TextLengthFeedback NameLengthFeedback => TextLengthFeedback.Create(
         Name,
@@ -218,7 +193,6 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
         && TextLengthFeedback.IsWithin(PrimaryAdvice, 3, 200)
         && WhyNow.Trim().Length <= 240
         && NextGoal.Trim().Length <= 160
-        && !HasConflictingItemConditions
         && MinimumLevel is >= 1 and <= 18
         && (ExtendsToEnd || MaximumLevel is >= 1 and <= 18 && MaximumLevel >= MinimumLevel);
 
@@ -234,18 +208,11 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
                     "Coaching.MatchupEditor.Content.Editor.MeaningRange",
                     MinimumLevel,
                     MaximumLevel);
-            if (HasStartItems)
+            if (HasRecommendedItems)
             {
                 summary += _localization.Format(
-                    "Coaching.MatchupEditor.Content.Editor.MeaningStartItemSuffix",
-                    JoinItemNames(StartItems));
-            }
-
-            if (HasEndItems)
-            {
-                summary += _localization.Format(
-                    "Coaching.MatchupEditor.Content.Editor.MeaningEndItemSuffix",
-                    JoinItemNames(EndItems));
+                    "Coaching.MatchupEditor.Content.Editor.MeaningRecommendedItemsSuffix",
+                    JoinItemNames(RecommendedItems));
             }
 
             return summary;
@@ -263,8 +230,7 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
         PrimaryAdvice = string.Empty;
         WhyNow = string.Empty;
         NextGoal = string.Empty;
-        StartItems = [];
-        EndItems = [];
+        RecommendedItems = [];
         IsOpen = true;
     }
 
@@ -280,8 +246,7 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
         PrimaryAdvice = draft.PrimaryAdvice;
         WhyNow = draft.WhyNow;
         NextGoal = draft.NextGoal;
-        StartItems = draft.StartItems.ToArray();
-        EndItems = draft.EndItems.ToArray();
+        RecommendedItems = draft.RecommendedItems.ToArray();
         IsOpen = true;
     }
 
@@ -301,32 +266,21 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
             PrimaryAdvice.Trim(),
             WhyNow.Trim(),
             NextGoal.Trim(),
-            StartItems.ToArray(),
-            EndItems.ToArray());
+            RecommendedItems.ToArray());
     }
 
-    public void SetStartItems(IEnumerable<ItemOptionViewModel> items)
+    public void SetRecommendedItems(IEnumerable<ItemOptionViewModel> items)
     {
         ArgumentNullException.ThrowIfNull(items);
-        StartItems = CreateItemDrafts(items);
+        RecommendedItems = CreateItemDrafts(items);
     }
 
-    public void RemoveStartItem(MatchupItemDraft item)
+    public void RemoveRecommendedItem(MatchupItemDraft item)
     {
         ArgumentNullException.ThrowIfNull(item);
-        StartItems = StartItems.Where(existing => existing.Id != item.Id).ToArray();
-    }
-
-    public void SetEndItems(IEnumerable<ItemOptionViewModel> items)
-    {
-        ArgumentNullException.ThrowIfNull(items);
-        EndItems = CreateItemDrafts(items);
-    }
-
-    public void RemoveEndItem(MatchupItemDraft item)
-    {
-        ArgumentNullException.ThrowIfNull(item);
-        EndItems = EndItems.Where(existing => existing.Id != item.Id).ToArray();
+        RecommendedItems = RecommendedItems
+            .Where(existing => existing.Id != item.Id)
+            .ToArray();
     }
 
     public void Close() => IsOpen = false;

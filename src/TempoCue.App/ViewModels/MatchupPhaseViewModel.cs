@@ -38,11 +38,9 @@ public sealed class MatchupPhaseViewModel : ObservableObject
 
     public string NextGoal => _draft.NextGoal;
 
-    public IReadOnlyList<MatchupItemDraft> StartItems => _draft.StartItems;
+    public IReadOnlyList<MatchupItemDraft> RecommendedItems => _draft.RecommendedItems;
 
-    public IReadOnlyList<MatchupItemDraft> EndItems => _draft.EndItems;
-
-    public bool HasItemConditions => StartItems.Count > 0 || EndItems.Count > 0;
+    public bool HasRecommendedItems => RecommendedItems.Count > 0;
 
     public bool HasWhyNow => !string.IsNullOrWhiteSpace(WhyNow);
 
@@ -79,20 +77,11 @@ public sealed class MatchupPhaseViewModel : ObservableObject
         ? _localization.Format("Coaching.Rule.LevelRange", MinimumLevel, maximumLevel)
         : _localization.Format("Coaching.Rule.LevelFrom", MinimumLevel);
 
-    public string ItemConditionSummary => (StartItems.Count, EndItems.Count) switch
-    {
-        (> 0, > 0) => _localization.Format(
-            "Coaching.MatchupEditor.Content.Phase.Items.Both",
-            JoinItemNames(StartItems),
-            JoinItemNames(EndItems)),
-        (> 0, 0) => _localization.Format(
-            "Coaching.MatchupEditor.Content.Phase.Items.Start",
-            JoinItemNames(StartItems)),
-        (0, > 0) => _localization.Format(
-            "Coaching.MatchupEditor.Content.Phase.Items.End",
-            JoinItemNames(EndItems)),
-        _ => string.Empty
-    };
+    public string RecommendedItemsSummary => HasRecommendedItems
+        ? _localization.Format(
+            "Coaching.MatchupEditor.Content.Phase.RecommendedItems",
+            JoinItemNames(RecommendedItems))
+        : string.Empty;
 
     internal MatchupPhaseDraft CreateSnapshot() => _draft;
 
@@ -114,7 +103,7 @@ public sealed class MatchupPhaseViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(PowerStateLabel));
         OnPropertyChanged(nameof(LevelRange));
-        OnPropertyChanged(nameof(ItemConditionSummary));
+        OnPropertyChanged(nameof(RecommendedItemsSummary));
     }
 
     private static string JoinItemNames(IEnumerable<MatchupItemDraft> items) =>

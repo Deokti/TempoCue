@@ -231,7 +231,7 @@ public sealed class CoachingViewModelTests
     }
 
     [Fact]
-    public async Task MatchupContent_ItemPickerCreatesMultipleStartAndEndConditions()
+    public async Task MatchupContent_ItemPickerCreatesRecommendedItemTargets()
     {
         var localization = LocalizationService.Instance;
         var initialLanguage = localization.CurrentLanguageCode;
@@ -246,8 +246,8 @@ public sealed class CoachingViewModelTests
             content.Editor.Name = "Пик силы";
             content.Editor.PrimaryAdvice = "Можно принимать контролируемый бой";
 
-            content.OpenStartItemPicker();
-            Assert.Equal(ItemPickerTarget.PhaseStart, content.ItemPicker.Target);
+            content.OpenRecommendedItemPicker();
+            Assert.Equal(ItemPickerTarget.PhaseRecommendations, content.ItemPicker.Target);
             var cleaver = content.ItemPicker.Items.Single(item => item.Id == 3071);
             var boots = content.ItemPicker.Items.Single(item => item.Id == 3047);
             content.ItemPicker.ToggleSelection(cleaver);
@@ -256,50 +256,33 @@ public sealed class CoachingViewModelTests
             Assert.Equal(2, content.ItemPicker.SelectedItems.Count);
             Assert.True(content.ItemPicker.ConfirmSelection());
 
-            Assert.Equal([3071, 3047], content.Editor.StartItems.Select(item => item.Id));
+            Assert.Equal([3071, 3047], content.Editor.RecommendedItems.Select(item => item.Id));
             Assert.Contains(
-                "после покупки всех предметов: Чёрная секира, Бронированные сапоги",
+                "Ориентир по предметам: Чёрная секира, Бронированные сапоги",
                 content.Editor.MeaningSummary);
 
-            content.OpenEndItemPicker();
-            content.ItemPicker.ToggleSelection(cleaver);
-            Assert.True(content.ItemPicker.ConfirmSelection());
-
-            Assert.True(content.Editor.HasConflictingItemConditions);
-            Assert.False(content.Editor.CanSave);
-
-            content.OpenStartItemPicker();
+            content.OpenRecommendedItemPicker();
             Assert.All(content.ItemPicker.SelectedItems, item => Assert.True(item.IsSelected));
             content.ItemPicker.ToggleSelection(boots);
             Assert.True(content.ItemPicker.ConfirmSelection());
 
-            content.OpenEndItemPicker();
-            Assert.Equal(3071, Assert.Single(content.ItemPicker.SelectedItems).Id);
-            content.ItemPicker.ToggleSelection(cleaver);
-            content.ItemPicker.ToggleSelection(boots);
-            Assert.True(content.ItemPicker.ConfirmSelection());
-
-            Assert.False(content.Editor.HasConflictingItemConditions);
             Assert.True(content.SaveEditor());
             var phase = Assert.Single(content.Phases);
-            Assert.Equal(3071, Assert.Single(phase.StartItems).Id);
-            Assert.Equal(3047, Assert.Single(phase.EndItems).Id);
+            Assert.Equal(3071, Assert.Single(phase.RecommendedItems).Id);
             Assert.Equal(
-                "Для начала нужны все: Чёрная секира · Завершается после любого: Бронированные сапоги",
-                phase.ItemConditionSummary);
+                "Рекомендуемые предметы: Чёрная секира",
+                phase.RecommendedItemsSummary);
 
             content.BeginEditPhase(phase);
-            Assert.Equal(3071, Assert.Single(content.Editor.StartItems).Id);
-            content.OpenStartItemPicker();
+            Assert.Equal(3071, Assert.Single(content.Editor.RecommendedItems).Id);
+            content.OpenRecommendedItemPicker();
             content.ItemPicker.ToggleSelection(cleaver);
             Assert.False(content.ItemPicker.HasSelectedItems);
             content.ItemPicker.Close();
-            Assert.Equal(3071, Assert.Single(content.Editor.StartItems).Id);
+            Assert.Equal(3071, Assert.Single(content.Editor.RecommendedItems).Id);
 
-            var savedEndItem = Assert.Single(content.Editor.EndItems);
-            Assert.Equal(3047, savedEndItem.Id);
-            content.RemoveEndItem(savedEndItem);
-            Assert.False(content.Editor.HasEndItems);
+            content.RemoveRecommendedItem(content.Editor.RecommendedItems[0]);
+            Assert.False(content.Editor.HasRecommendedItems);
         }
         finally
         {
@@ -319,7 +302,7 @@ public sealed class CoachingViewModelTests
             var content = new MatchupContentViewModel(localization, TestItemCatalog.Ready());
             content.SetItemCatalogContext("26.15", "ru-RU");
             await content.EnsureItemCatalogLoadedAsync();
-            content.OpenStartItemPicker();
+            content.OpenRecommendedItemPicker();
 
             Assert.Equal(6, content.ItemPicker.CategoryOptions.Count);
             content.ItemPicker.SelectCategory(content.ItemPicker.CategoryOptions.Single(

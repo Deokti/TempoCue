@@ -76,9 +76,7 @@ public sealed class MatchupPhaseValidationViewModel : ObservableObject
             new MatchupPhaseCondition(
                 phase.Id,
                 phase.MinimumLevel,
-                phase.MaximumLevel,
-                phase.StartItems.Select(static item => item.Id).ToArray(),
-                phase.EndItems.Select(static item => item.Id).ToArray())).ToArray());
+                phase.MaximumLevel)).ToArray());
         RefreshPresentation();
     }
 
@@ -90,18 +88,11 @@ public sealed class MatchupPhaseValidationViewModel : ObservableObject
             static phase => phase.Id,
             static phase => phase.Name,
             StringComparer.Ordinal);
-        var itemNames = _phases
-            .SelectMany(static phase => phase.StartItems.Concat(phase.EndItems))
-            .GroupBy(static item => item.Id)
-            .ToDictionary(
-                static group => group.Key,
-                static group => group.First().DisplayName);
-
         _issues.Clear();
         foreach (var issue in _result.Issues)
         {
             _issues.Add(new MatchupPhaseValidationIssueViewModel(
-                CreateIssueMessage(issue, phaseNames, itemNames),
+                CreateIssueMessage(issue, phaseNames),
                 issue.Severity));
         }
 
@@ -124,8 +115,7 @@ public sealed class MatchupPhaseValidationViewModel : ObservableObject
 
     private string CreateIssueMessage(
         MatchupPhaseValidationIssue issue,
-        IReadOnlyDictionary<string, string> phaseNames,
-        IReadOnlyDictionary<int, string> itemNames)
+        IReadOnlyDictionary<string, string> phaseNames)
     {
         var levelRange = FormatLevelRange(issue.MinimumLevel, issue.MaximumLevel);
         return issue.Kind switch
@@ -133,62 +123,16 @@ public sealed class MatchupPhaseValidationViewModel : ObservableObject
             MatchupPhaseValidationIssueKind.InvalidLevelRange => _localization.Format(
                 "Coaching.MatchupEditor.Content.Validation.Issue.InvalidRange",
                 FindPhaseName(issue.PhaseIds[0], phaseNames)),
-            MatchupPhaseValidationIssueKind.ConflictingItemConditions => _localization.Format(
-                "Coaching.MatchupEditor.Content.Validation.Issue.ConflictingItems",
-                FindPhaseName(issue.PhaseIds[0], phaseNames)),
             MatchupPhaseValidationIssueKind.OverlappingPhases => _localization.Format(
                 "Coaching.MatchupEditor.Content.Validation.Issue.Overlap",
                 FindPhaseName(issue.PhaseIds[0], phaseNames),
                 FindPhaseName(issue.PhaseIds[1], phaseNames),
                 levelRange),
-            MatchupPhaseValidationIssueKind.UncoveredState => CreateGapMessage(
-                issue,
-                levelRange,
-                itemNames),
+            MatchupPhaseValidationIssueKind.UncoveredLevels => _localization.Format(
+                "Coaching.MatchupEditor.Content.Validation.Issue.Gap",
+                levelRange),
             _ => throw new ArgumentOutOfRangeException()
         };
-    }
-
-    private string CreateGapMessage(
-        MatchupPhaseValidationIssue issue,
-        string levelRange,
-        IReadOnlyDictionary<int, string> itemNames)
-    {
-        var presentItems = FormatItemNames(
-            issue.ItemStateWitness?.PresentItemIds ?? [],
-            itemNames);
-        var absentItems = FormatItemNames(
-            issue.ItemStateWitness?.AbsentItemIds ?? [],
-            itemNames);
-
-        if (presentItems.Length > 0 && absentItems.Length > 0)
-        {
-            return _localization.Format(
-                "Coaching.MatchupEditor.Content.Validation.Issue.GapWithAndWithoutItems",
-                levelRange,
-                presentItems,
-                absentItems);
-        }
-
-        if (presentItems.Length > 0)
-        {
-            return _localization.Format(
-                "Coaching.MatchupEditor.Content.Validation.Issue.GapWithItems",
-                levelRange,
-                presentItems);
-        }
-
-        if (absentItems.Length > 0)
-        {
-            return _localization.Format(
-                "Coaching.MatchupEditor.Content.Validation.Issue.GapWithoutItems",
-                levelRange,
-                absentItems);
-        }
-
-        return _localization.Format(
-            "Coaching.MatchupEditor.Content.Validation.Issue.Gap",
-            levelRange);
     }
 
     private string CreateCoverageTooltip(MatchupLevelCoverage coverage) => _localization.Format(
@@ -215,14 +159,6 @@ public sealed class MatchupPhaseValidationViewModel : ObservableObject
         string phaseId,
         IReadOnlyDictionary<string, string> phaseNames) =>
         phaseNames.TryGetValue(phaseId, out var phaseName) ? phaseName : phaseId;
-
-    private static string FormatItemNames(
-        IEnumerable<int> itemIds,
-        IReadOnlyDictionary<int, string> itemNames) => string.Join(
-            ", ",
-            itemIds.Select(itemId => itemNames.TryGetValue(itemId, out var itemName)
-                ? itemName
-                : $"ID {itemId}"));
 }
 
 public sealed record MatchupPhaseValidationIssueViewModel(

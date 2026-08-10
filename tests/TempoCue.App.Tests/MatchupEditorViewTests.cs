@@ -181,7 +181,7 @@ public sealed class MatchupEditorViewTests
         context.SelectChampionsAndOpenContent();
         var page = context.ContentPage;
         var phaseEditor = context.PhaseEditorView;
-        var itemConditions = context.PhaseItemConditionsView;
+        var itemRecommendations = context.PhaseItemRecommendationsView;
         var phaseList = context.PhaseListView;
         var editorPage = context.MatchupEditorPage;
         var content = context.Coaching.MatchupEditor.Content;
@@ -203,7 +203,9 @@ public sealed class MatchupEditorViewTests
             WpfTestHost.Find<TextBlock>(phaseEditor, "PhasePrimaryAdviceLengthFeedback").Text);
 
         Assert.True(content.ItemPicker.IsCatalogReady);
-        WpfTestHost.Click(WpfTestHost.Find<Button>(itemConditions, "SelectStartItemButton"));
+        WpfTestHost.Click(WpfTestHost.Find<Button>(
+            itemRecommendations,
+            "SelectRecommendedItemsButton"));
         var picker = context.ItemPickerDialog;
         Assert.Equal(Visibility.Visible, picker.Visibility);
         context.Window.UpdateLayout();
@@ -255,8 +257,12 @@ public sealed class MatchupEditorViewTests
         Assert.Equal("Применить · 2", confirmButton.Content);
         WpfTestHost.Click(confirmButton);
         Assert.Equal(Visibility.Collapsed, picker.Visibility);
-        Assert.Equal([3071, 3047], content.Editor.StartItems.Select(item => item.Id));
-        Assert.Equal(2, WpfTestHost.Find<ItemsControl>(itemConditions, "StartItemsControl").Items.Count);
+        Assert.Equal([3071, 3047], content.Editor.RecommendedItems.Select(item => item.Id));
+        Assert.Equal(
+            2,
+            WpfTestHost.Find<ItemsControl>(
+                itemRecommendations,
+                "RecommendedItemsControl").Items.Count);
 
         foreach (var inputName in new[]
                  {

@@ -169,13 +169,13 @@
                                         <Style TargetType="Border">
                                             <Setter Property="Visibility" Value="Collapsed" />
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding HasItemConditions}" Value="True">
+                                                <DataTrigger Binding="{Binding HasRecommendedItems}" Value="True">
                                                     <Setter Property="Visibility" Value="Visible" />
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </Border.Style>
-                                    <TextBlock Text="{Binding ItemConditionSummary}"
+                                    <TextBlock Text="{Binding RecommendedItemsSummary}"
                                                Foreground="#8FBDE0"
                                                FontSize="{StaticResource Typography.FontSize.Caption}"
                                                TextWrapping="Wrap" />

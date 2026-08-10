@@ -60,7 +60,7 @@ public sealed class MatchupPhaseValidationViewModelTests
     }
 
     [Fact]
-    public async Task RequiredItems_ExplainSeparateGapBeforeEachPurchase()
+    public async Task RecommendedItems_DoNotRestrictLevelCoverage()
     {
         var localization = LocalizationService.Instance;
         var initialLanguage = localization.CurrentLanguageCode;
@@ -77,20 +77,10 @@ public sealed class MatchupPhaseValidationViewModelTests
             SavePhase(content, "Ранняя игра", 1, 8, [cleaver, boots]);
             SavePhase(content, "Поздняя игра", 9, null, [cleaver]);
 
-            Assert.Collection(
-                content.Validation.Issues,
-                issue =>
-                {
-                    Assert.Contains("уровнях 1–8", issue.Message);
-                    Assert.Contains("Бронированные сапоги", issue.Message);
-                    Assert.Contains("уберите требование предмета", issue.Message);
-                },
-                issue =>
-                {
-                    Assert.Contains("уровнях 9–18", issue.Message);
-                    Assert.Contains("Чёрная секира", issue.Message);
-                    Assert.Contains("уберите требование предмета", issue.Message);
-                });
+            Assert.Equal(MatchupPhaseValidationState.Valid, content.Validation.State);
+            Assert.Empty(content.Validation.Issues);
+            Assert.All(content.Validation.LevelCoverage, level =>
+                Assert.Equal(MatchupLevelCoverageStatus.Covered, level.Status));
         }
         finally
         {
@@ -103,7 +93,7 @@ public sealed class MatchupPhaseValidationViewModelTests
         string name,
         int minimumLevel,
         int? maximumLevel,
-        IReadOnlyList<ItemOptionViewModel>? startItems = null)
+        IReadOnlyList<ItemOptionViewModel>? recommendedItems = null)
     {
         content.BeginAddPhase();
         content.Editor.Name = name;
@@ -123,7 +113,7 @@ public sealed class MatchupPhaseValidationViewModelTests
             }
         }
 
-        content.Editor.SetStartItems(startItems ?? []);
+        content.Editor.SetRecommendedItems(recommendedItems ?? []);
 
         Assert.True(content.SaveEditor());
         return content.Phases[^1];

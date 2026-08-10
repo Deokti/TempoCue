@@ -207,8 +207,8 @@
                 </StackPanel>
             </Grid>
 
-            <views:MatchupPhaseItemConditionsView x:Name="ItemConditionsView"
-                                                   Margin="0,18,0,0" />
+            <views:MatchupPhaseItemRecommendationsView x:Name="ItemRecommendationsView"
+                                                        Margin="0,18,0,0" />
 
             <!-- Автоматическое пояснение выбранного диапазона уровней. -->
             <Border x:Name="PhaseMeaningPanel"
