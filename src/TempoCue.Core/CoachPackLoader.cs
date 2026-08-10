@@ -7,15 +7,6 @@ namespace TempoCue.Core;
 /// </summary>
 public static class CoachPackLoader
 {
-    /// <summary>Открывает Coach Pack по указанному пути и загружает его.</summary>
-    public static CoachPack LoadFromFile(string path)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(path);
-
-        using var stream = File.OpenRead(path);
-        return Load(stream);
-    }
-
     /// <summary>
     /// Загружает Coach Pack из потока. Отдельный метод с потоком упрощает тестирование:
     /// тест может передать JSON из памяти, не создавая временный файл.

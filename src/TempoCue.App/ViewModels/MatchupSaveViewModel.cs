@@ -11,7 +11,7 @@ public sealed class MatchupSaveViewModel : ObservableObject
 {
     private readonly LocalizationService _localization;
     private readonly SaveCoachPackUseCase _saveCoachPack;
-    private readonly string _instanceId = Guid.NewGuid().ToString("N")[..8];
+    private readonly MatchupCoachPackFactory _packFactory = new();
     private MatchupMainInformationViewModel? _mainInformation;
     private MatchupChampionsAndRoleViewModel? _championsAndRole;
     private MatchupContentViewModel? _content;
@@ -287,93 +287,16 @@ public sealed class MatchupSaveViewModel : ObservableObject
             ?? throw new InvalidOperationException("Чемпионы не подготовлены.");
         var content = _content
             ?? throw new InvalidOperationException("Содержание матчапа не подготовлено.");
-        var playerChampion = champions.SelectedPlayerChampion
-            ?? throw new InvalidOperationException("Чемпион игрока не выбран.");
-        var opponentChampion = champions.SelectedOpponentChampion
-            ?? throw new InvalidOperationException("Чемпион противника не выбран.");
-        var source = CreateSource();
-        var sourceSummary = CreateRuleSource(source, mainInformation.AdviceLanguageCode);
-
-        return new CoachPack
-        {
-            SchemaVersion = 2,
-            Id = $"matchup.{NormalizeId(playerChampion.Id)}-vs-{NormalizeId(opponentChampion.Id)}.{_instanceId}",
-            Name = mainInformation.PackName.Trim(),
-            Patch = mainInformation.GamePatch,
-            Description = mainInformation.ShortDescription.Trim(),
-            Author = mainInformation.Author.Trim(),
-            ContentLanguage = mainInformation.AdviceLanguageCode,
-            PlayerChampion = playerChampion.Id,
-            OpponentChampion = opponentChampion.Id,
-            LaneRole = champions.SelectedRole.ToString().ToLowerInvariant(),
-            VerifiedOn = DateOnly.FromDateTime(mainInformation.VerifiedOn),
-            Source = source,
-            Rules = content.Phases.Select((phase, index) => new CoachRuleDefinition
-            {
-                Id = phase.Id,
-                PlayerChampion = playerChampion.Id,
-                OpponentChampion = opponentChampion.Id,
-                MinimumLevel = phase.MinimumLevel,
-                MaximumLevel = phase.MaximumLevel,
-                PowerState = phase.PowerState,
-                Priority = 1000 - index,
-                Title = phase.Name,
-                Message = phase.PrimaryAdvice,
-                WhyNow = phase.WhyNow,
-                NextGoal = phase.NextGoal,
-                RecommendedItemIds = phase.RecommendedItems.Select(static item => item.Id).ToArray(),
-                Source = sourceSummary
-            }).ToArray(),
-            PersistentTips = content.PersistentTips.Tips.Select(tip => new CoachPersistentTipDefinition
-            {
-                Id = tip.Id,
-                Title = tip.Title,
-                Message = tip.Text,
-                ApplicableRuleId = tip.ApplicablePhaseId,
-                Source = tip.CustomSource
-            }).ToArray(),
-            ItemBlocks = content.ItemBlocks.Blocks.Select(block => new CoachItemBlockDefinition
-            {
-                Id = block.Id,
-                Name = block.Name,
-                WhenToChoose = block.WhenToChoose,
-                ItemIds = block.Items.Select(static item => item.Id).ToArray()
-            }).ToArray()
-        };
-    }
-
-    private CoachPackSource CreateSource() => new()
-    {
-        Kind = SelectedSourceKind switch
-        {
-            MatchupSourceKind.PersonalExperience => CoachPackSourceKind.PersonalExperience,
-            MatchupSourceKind.Article => CoachPackSourceKind.Article,
-            MatchupSourceKind.Video => CoachPackSourceKind.Video,
-            MatchupSourceKind.Guide => CoachPackSourceKind.CommunityGuide,
-            _ => throw new ArgumentOutOfRangeException()
-        },
-        Title = SourceTitle.Trim(),
-        Url = SourceUrl.Trim(),
-        Author = SourceAuthor.Trim(),
-        Permission = IsPersonalExperience
-            ? CoachPackSourcePermission.NotRequired
-            : AuthorPermissionGranted
-                ? CoachPackSourcePermission.Granted
-                : CoachPackSourcePermission.NotConfirmed
-    };
-
-    private static string CreateRuleSource(CoachPackSource source, string languageCode)
-    {
-        if (source.Kind == CoachPackSourceKind.PersonalExperience)
-        {
-            return languageCode.StartsWith("ru", StringComparison.OrdinalIgnoreCase)
-                ? "Личный опыт автора"
-                : "Author's personal experience";
-        }
-
-        return string.IsNullOrWhiteSpace(source.Author)
-            ? source.Title
-            : $"{source.Title} — {source.Author}";
+        return _packFactory.Create(
+            mainInformation,
+            champions,
+            content,
+            new MatchupSourceDraft(
+                SelectedSourceKind,
+                SourceTitle,
+                SourceUrl,
+                SourceAuthor,
+                AuthorPermissionGranted));
     }
 
     private void NotifySourceChanged()
@@ -439,9 +362,4 @@ public sealed class MatchupSaveViewModel : ObservableObject
         Uri.TryCreate(value.Trim(), UriKind.Absolute, out var uri)
         && uri.Scheme is "http" or "https";
 
-    private static string NormalizeId(string value) => new(
-        value
-            .Where(static character => char.IsLetterOrDigit(character))
-            .Select(static character => char.ToLowerInvariant(character))
-            .ToArray());
 }

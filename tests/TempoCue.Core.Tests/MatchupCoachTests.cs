@@ -104,7 +104,8 @@ public sealed class MatchupCoachTests
             "CoachPacks",
             "urgot-vs-sett.json");
 
-        var pack = CoachPackLoader.LoadFromFile(packPath);
+        using var packStream = File.OpenRead(packPath);
+        var pack = CoachPackLoader.Load(packStream);
 
         Assert.Equal("top.urgot-vs-sett.prototype", pack.Id);
         Assert.Equal(3, pack.Rules.Count);

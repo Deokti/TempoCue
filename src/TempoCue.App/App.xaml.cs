@@ -42,7 +42,8 @@ public partial class App : System.Windows.Application
             "Assets",
             "CoachPacks",
             "urgot-vs-sett.json");
-        var pack = CoachPackLoader.LoadFromFile(packPath);
+        using var packStream = File.OpenRead(packPath);
+        var pack = CoachPackLoader.Load(packStream);
         var coach = new MatchupCoach(pack.Rules);
 
         // Инфраструктура матча создаётся здесь, чтобы View и ViewModel не конструировали HTTP-клиенты.

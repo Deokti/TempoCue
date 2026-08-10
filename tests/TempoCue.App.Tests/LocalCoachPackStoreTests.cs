@@ -23,7 +23,8 @@ public sealed class LocalCoachPackStoreTests
             var result = await store.SaveAsync(pack, LocalCoachPackState.Enabled);
 
             Assert.True(File.Exists(result.DisplayPath));
-            Assert.Equal(pack.Id, CoachPackLoader.LoadFromFile(result.DisplayPath).Id);
+            await using var savedPackStream = File.OpenRead(result.DisplayPath);
+            Assert.Equal(pack.Id, CoachPackLoader.Load(savedPackStream).Id);
             var statePath = Path.Combine(root, $"{pack.Id}.state.json");
             Assert.True(File.Exists(statePath));
             using var state = JsonDocument.Parse(await File.ReadAllTextAsync(statePath));
