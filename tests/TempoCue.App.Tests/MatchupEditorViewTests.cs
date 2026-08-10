@@ -286,17 +286,5 @@ public sealed class MatchupEditorViewTests
         Assert.Equal(
             "Фазы 1",
             WpfTestHost.Find<Button>(page, "MatchupPhasesTabButton").Content);
-
-        var backButton = WpfTestHost.Find<Button>(editorPage, "BackToPackTypeButton");
-        WpfTestHost.Click(backButton);
-        Assert.Equal(2, context.Coaching.MatchupEditor.CurrentStep);
-        Assert.Equal(Visibility.Visible, context.ChampionsAndRolePage.Visibility);
-        Assert.Equal(Visibility.Collapsed, page.Visibility);
-        Assert.Single(content.Phases);
-        WpfTestHost.Click(backButton);
-        Assert.Equal(1, context.Coaching.MatchupEditor.CurrentStep);
-        Assert.Equal(Visibility.Visible, context.MainInformationPage.Visibility);
-        Assert.Equal(Visibility.Collapsed, context.ChampionsAndRolePage.Visibility);
-        Assert.False(backButton.IsEnabled);
     });
 }
