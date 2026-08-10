@@ -288,7 +288,7 @@
   <data name="Coaching.MatchupEditor.StepSummary.Content" xml:space="preserve"><value>Шаг 3 из 5 · Содержание матчапа</value></data>
   <data name="Coaching.MatchupEditor.Content.Tab.Phases" xml:space="preserve"><value>Фазы {0}</value></data>
   <data name="Coaching.MatchupEditor.Content.Tab.Persistent" xml:space="preserve"><value>Постоянные подсказки {0}</value></data>
-  <data name="Coaching.MatchupEditor.Content.Tab.Items" xml:space="preserve"><value>Предметы 0</value></data>
+  <data name="Coaching.MatchupEditor.Content.Tab.Items" xml:space="preserve"><value>Предметы {0}</value></data>
   <data name="Coaching.MatchupEditor.Content.FutureSection" xml:space="preserve"><value>Будет доступно в следующей итерации шага 3</value></data>
   <data name="Coaching.MatchupEditor.Content.PhasesTitle" xml:space="preserve"><value>Фазы матчапа</value></data>
   <data name="Coaching.MatchupEditor.Content.PhasesDescription" xml:space="preserve"><value>Разделите матчап на понятные периоды. Порядок карточек задаёт последовательность чтения и будущий стабильный порядок правил.</value></data>
@@ -352,6 +352,26 @@
   <data name="Coaching.MatchupEditor.Persistent.Difference.Phase.Text" xml:space="preserve"><value>Активна в конкретный момент. Показывается как главный совет и может попасть в оверлей.</value></data>
   <data name="Coaching.MatchupEditor.Persistent.Difference.Persistent.Title" xml:space="preserve"><value>Постоянная подсказка</value></data>
   <data name="Coaching.MatchupEditor.Persistent.Difference.Persistent.Text" xml:space="preserve"><value>Доступна в деталях матчапа по запросу. В оверлей не выводится и главный совет не подменяет.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.AddTitle" xml:space="preserve"><value>Новый блок предметов</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.EditTitle" xml:space="preserve"><value>Редактирование блока: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.Description" xml:space="preserve"><value>Назовите блок и при необходимости объясните, когда его выбирать. Предметы добавляются отдельно.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.Name" xml:space="preserve"><value>Название блока</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.WhenToChoose" xml:space="preserve"><value>Когда выбирать (необязательно)</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.WhenToChooseHint" xml:space="preserve"><value>Например: когда у противников преимущественно физический урон.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.Delete" xml:space="preserve"><value>Удалить блок</value></data>
+  <data name="Coaching.MatchupEditor.Items.ListTitle" xml:space="preserve"><value>Блоки предметов</value></data>
+  <data name="Coaching.MatchupEditor.Items.Description" xml:space="preserve"><value>Создавайте собственные категории. Их названия и порядок сохранятся при будущем экспорте набора предметов в League.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Add" xml:space="preserve"><value>+ Добавить блок</value></data>
+  <data name="Coaching.MatchupEditor.Items.Empty" xml:space="preserve"><value>Блоков предметов пока нет. Добавьте стартовую покупку, ботинки под ситуацию, ключевую сборку или любую категорию для этого матчапа.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Card.ItemCount" xml:space="preserve"><value>Предметов: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Items.Card.NoHint" xml:space="preserve"><value>Пояснение «когда выбирать» не добавлено</value></data>
+  <data name="Coaching.MatchupEditor.Items.Card.Empty" xml:space="preserve"><value>Блок готов. Выбор предметов подключим в следующей итерации.</value></data>
+  <data name="Coaching.MatchupEditor.Items.MoveUp" xml:space="preserve"><value>Переместить блок выше</value></data>
+  <data name="Coaching.MatchupEditor.Items.MoveDown" xml:space="preserve"><value>Переместить блок ниже</value></data>
+  <data name="Coaching.MatchupEditor.Items.Help.Title" xml:space="preserve"><value>Как работают блоки</value></data>
+  <data name="Coaching.MatchupEditor.Items.Help.Text" xml:space="preserve"><value>Блоки не являются фиксированными системными категориями. Автор сам задаёт название, необязательный сценарий выбора, порядок и позже — предметы внутри.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Export.Title" xml:space="preserve"><value>Что попадёт в League</value></data>
+  <data name="Coaching.MatchupEditor.Items.Export.Text" xml:space="preserve"><value>League понимает названия блоков, их порядок и ID предметов. Фазы матчапа, советы и условия остаются в TempoCue.</value></data>
   <data name="Coaching.MatchupEditor.Items.Loading" xml:space="preserve"><value>Загружаем предметы выбранного патча…</value></data>
   <data name="Coaching.MatchupEditor.Items.ErrorTitle" xml:space="preserve"><value>Каталог предметов недоступен</value></data>
   <data name="Coaching.MatchupEditor.Items.ErrorDescription" xml:space="preserve"><value>Можно сохранить фазу без рекомендаций предметов или повторить загрузку.</value></data>

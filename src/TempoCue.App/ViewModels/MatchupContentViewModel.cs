@@ -25,6 +25,8 @@ public sealed class MatchupContentViewModel : ObservableObject
         Editor = new MatchupPhaseEditorViewModel(localization);
         PersistentTips = new MatchupPersistentTipsViewModel(localization);
         PersistentTips.PropertyChanged += PersistentTips_PropertyChanged;
+        ItemBlocks = new MatchupItemBlocksViewModel(localization);
+        ItemBlocks.PropertyChanged += ItemBlocks_PropertyChanged;
         ItemPicker = new ItemPickerViewModel(itemCatalog, localization);
         Validation = new MatchupPhaseValidationViewModel(
             localization,
@@ -37,6 +39,8 @@ public sealed class MatchupContentViewModel : ObservableObject
     public MatchupPhaseEditorViewModel Editor { get; }
 
     public MatchupPersistentTipsViewModel PersistentTips { get; }
+
+    public MatchupItemBlocksViewModel ItemBlocks { get; }
 
     public ItemPickerViewModel ItemPicker { get; }
 
@@ -57,6 +61,7 @@ public sealed class MatchupContentViewModel : ObservableObject
             {
                 OnPropertyChanged(nameof(IsPhasesSection));
                 OnPropertyChanged(nameof(IsPersistentTipsSection));
+                OnPropertyChanged(nameof(IsItemsSection));
             }
         }
     }
@@ -64,6 +69,8 @@ public sealed class MatchupContentViewModel : ObservableObject
     public bool IsPhasesSection => CurrentSection == MatchupContentSection.Phases;
 
     public bool IsPersistentTipsSection => CurrentSection == MatchupContentSection.PersistentTips;
+
+    public bool IsItemsSection => CurrentSection == MatchupContentSection.Items;
 
     public string PhasesTabLabel =>
         _localization.Format("Coaching.MatchupEditor.Content.Tab.Phases", PhaseCount);
@@ -73,9 +80,16 @@ public sealed class MatchupContentViewModel : ObservableObject
             "Coaching.MatchupEditor.Content.Tab.Persistent",
             PersistentTips.Count);
 
+    public string ItemsTabLabel =>
+        _localization.Format(
+            "Coaching.MatchupEditor.Content.Tab.Items",
+            ItemBlocks.Count);
+
     public void ShowPhases() => CurrentSection = MatchupContentSection.Phases;
 
     public void ShowPersistentTips() => CurrentSection = MatchupContentSection.PersistentTips;
+
+    public void ShowItems() => CurrentSection = MatchupContentSection.Items;
 
     public void BeginAddPhase() => Editor.BeginNew();
 
@@ -226,9 +240,11 @@ public sealed class MatchupContentViewModel : ObservableObject
 
         Validation.UpdateLanguage();
         PersistentTips.UpdateLanguage();
+        ItemBlocks.UpdateLanguage();
 
         OnPropertyChanged(nameof(PhasesTabLabel));
         OnPropertyChanged(nameof(PersistentTipsTabLabel));
+        OnPropertyChanged(nameof(ItemsTabLabel));
     }
 
     private void ItemPicker_ItemsSelected(
@@ -305,6 +321,16 @@ public sealed class MatchupContentViewModel : ObservableObject
         if (e.PropertyName == nameof(MatchupPersistentTipsViewModel.Count))
         {
             OnPropertyChanged(nameof(PersistentTipsTabLabel));
+        }
+    }
+
+    private void ItemBlocks_PropertyChanged(
+        object? sender,
+        System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MatchupItemBlocksViewModel.Count))
+        {
+            OnPropertyChanged(nameof(ItemsTabLabel));
         }
     }
 

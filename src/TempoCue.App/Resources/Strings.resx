@@ -285,7 +285,7 @@
   <data name="Coaching.MatchupEditor.StepSummary.Content" xml:space="preserve"><value>Step 3 of 5 · Matchup content</value></data>
   <data name="Coaching.MatchupEditor.Content.Tab.Phases" xml:space="preserve"><value>Phases {0}</value></data>
   <data name="Coaching.MatchupEditor.Content.Tab.Persistent" xml:space="preserve"><value>Persistent tips {0}</value></data>
-  <data name="Coaching.MatchupEditor.Content.Tab.Items" xml:space="preserve"><value>Items 0</value></data>
+  <data name="Coaching.MatchupEditor.Content.Tab.Items" xml:space="preserve"><value>Items {0}</value></data>
   <data name="Coaching.MatchupEditor.Content.FutureSection" xml:space="preserve"><value>Available in the next iteration of step 3</value></data>
   <data name="Coaching.MatchupEditor.Content.PhasesTitle" xml:space="preserve"><value>Matchup phases</value></data>
   <data name="Coaching.MatchupEditor.Content.PhasesDescription" xml:space="preserve"><value>Split the matchup into clear periods. Card order defines the reading sequence and the future stable rule order.</value></data>
@@ -349,6 +349,26 @@
   <data name="Coaching.MatchupEditor.Persistent.Difference.Phase.Text" xml:space="preserve"><value>Active at a specific moment. It is shown as the main advice and can appear in the overlay.</value></data>
   <data name="Coaching.MatchupEditor.Persistent.Difference.Persistent.Title" xml:space="preserve"><value>Persistent tip</value></data>
   <data name="Coaching.MatchupEditor.Persistent.Difference.Persistent.Text" xml:space="preserve"><value>Available in matchup details on demand. It does not appear in the overlay or replace the main advice.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.AddTitle" xml:space="preserve"><value>New item block</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.EditTitle" xml:space="preserve"><value>Editing item block: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.Description" xml:space="preserve"><value>Name the block and optionally explain when the player should choose it. Items will be added separately.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.Name" xml:space="preserve"><value>Block name</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.WhenToChoose" xml:space="preserve"><value>When to choose (optional)</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.WhenToChooseHint" xml:space="preserve"><value>For example: when the enemy team has mostly physical damage.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.Delete" xml:space="preserve"><value>Delete block</value></data>
+  <data name="Coaching.MatchupEditor.Items.ListTitle" xml:space="preserve"><value>Item blocks</value></data>
+  <data name="Coaching.MatchupEditor.Items.Description" xml:space="preserve"><value>Create your own categories. Their names and order will be preserved in the future League item set export.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Add" xml:space="preserve"><value>+ Add block</value></data>
+  <data name="Coaching.MatchupEditor.Items.Empty" xml:space="preserve"><value>No item blocks yet. Add a starting purchase, boots for a specific situation, a core build, or any category that fits this matchup.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Card.ItemCount" xml:space="preserve"><value>{0} items</value></data>
+  <data name="Coaching.MatchupEditor.Items.Card.NoHint" xml:space="preserve"><value>No “when to choose” note</value></data>
+  <data name="Coaching.MatchupEditor.Items.Card.Empty" xml:space="preserve"><value>This block is ready. Item selection will be connected in the next iteration.</value></data>
+  <data name="Coaching.MatchupEditor.Items.MoveUp" xml:space="preserve"><value>Move block up</value></data>
+  <data name="Coaching.MatchupEditor.Items.MoveDown" xml:space="preserve"><value>Move block down</value></data>
+  <data name="Coaching.MatchupEditor.Items.Help.Title" xml:space="preserve"><value>How item blocks work</value></data>
+  <data name="Coaching.MatchupEditor.Items.Help.Text" xml:space="preserve"><value>Blocks are not fixed system categories. The author chooses the name, optional use case, order, and later the items inside each block.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Export.Title" xml:space="preserve"><value>What goes to League</value></data>
+  <data name="Coaching.MatchupEditor.Items.Export.Text" xml:space="preserve"><value>League understands block names, their order, and item IDs. Matchup phases, advice, and conditions remain in TempoCue.</value></data>
   <data name="Coaching.MatchupEditor.Items.Loading" xml:space="preserve"><value>Loading items for the selected patch…</value></data>
   <data name="Coaching.MatchupEditor.Items.ErrorTitle" xml:space="preserve"><value>Item catalog is unavailable</value></data>
   <data name="Coaching.MatchupEditor.Items.ErrorDescription" xml:space="preserve"><value>You can save a phase without item recommendations or retry loading.</value></data>

@@ -21,6 +21,9 @@ public partial class MatchupContentView : UserControl
     private void MatchupPersistentTipsTabButton_Click(object sender, RoutedEventArgs e) =>
         ViewModel.ShowPersistentTips();
 
+    private void MatchupItemsTabButton_Click(object sender, RoutedEventArgs e) =>
+        ViewModel.ShowItems();
+
     // Каталог загружается при входе на шаг, но ошибка не мешает создавать фазу без предметов.
     private async void MatchupContentView_IsVisibleChanged(
         object sender,
