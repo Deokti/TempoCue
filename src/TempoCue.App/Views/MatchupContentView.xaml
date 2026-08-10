@@ -218,6 +218,10 @@
                                      Text="{Binding Editor.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                      Style="{StaticResource FormTextBox}"
                                      MaxLength="80" />
+                            <TextBlock x:Name="PhaseNameLengthFeedback"
+                                       DataContext="{Binding Editor.NameLengthFeedback}"
+                                       Text="{Binding Text}"
+                                       Style="{StaticResource FormLengthFeedback}" />
                         </StackPanel>
 
                         <!-- Уровень опасности определяет цвет и смысл фазы в наборе. -->
@@ -686,6 +690,10 @@
                                      Style="{StaticResource FormTextBox}"
                                      MaxLength="200"
                                      TextWrapping="NoWrap" />
+                            <TextBlock x:Name="PhasePrimaryAdviceLengthFeedback"
+                                       DataContext="{Binding Editor.PrimaryAdviceLengthFeedback}"
+                                       Text="{Binding Text}"
+                                       Style="{StaticResource FormLengthFeedback}" />
                         </StackPanel>
 
                         <!-- Дополнительный контекст: причина текущего совета и следующая цель. -->

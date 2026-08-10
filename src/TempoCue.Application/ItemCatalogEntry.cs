@@ -7,4 +7,6 @@ public sealed record ItemCatalogEntry(
     string Description,
     Uri ImageUri,
     int Price,
-    IReadOnlyList<string> Tags);
+    IReadOnlyList<string> Tags,
+    ItemCatalogCategory Category,
+    IReadOnlyList<ItemStatEntry> Stats);

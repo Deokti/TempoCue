@@ -26,6 +26,16 @@ public sealed class CoachingViewModelTests
             Assert.Equal("ru-RU", viewModel.AdviceLanguageCode);
             Assert.False(viewModel.IsComplete);
             Assert.Equal("Новый матчап", viewModel.DisplayTitle);
+            Assert.Equal("От 3 до 80 символов.", viewModel.PackNameLengthFeedback.Text);
+            Assert.False(viewModel.PackNameLengthFeedback.HasError);
+
+            viewModel.ShortDescription = "3213123";
+
+            Assert.Equal(
+                "7 из минимум 10 символов. Максимум: 240.",
+                viewModel.ShortDescriptionLengthFeedback.Text);
+            Assert.True(viewModel.ShortDescriptionLengthFeedback.HasError);
+            Assert.False(viewModel.IsComplete);
 
             viewModel.PackName = "Urgot против Sett";
             viewModel.ShortDescription = "Как пережить раннюю линию и найти момент для боя.";
@@ -127,6 +137,13 @@ public sealed class CoachingViewModelTests
             content.BeginAddPhase();
             Assert.True(content.Editor.IsOpen);
             Assert.False(content.Editor.CanSave);
+            Assert.Equal("От 3 до 80 символов.", content.Editor.NameLengthFeedback.Text);
+            Assert.Equal("От 3 до 200 символов.", content.Editor.PrimaryAdviceLengthFeedback.Text);
+            content.Editor.PrimaryAdvice = "Не";
+            Assert.True(content.Editor.PrimaryAdviceLengthFeedback.HasError);
+            Assert.Equal(
+                "2 из минимум 3 символов. Максимум: 200.",
+                content.Editor.PrimaryAdviceLengthFeedback.Text);
             content.Editor.Name = "Осторожное начало";
             content.Editor.PrimaryAdvice = "Не ищи размен первым";
             content.Editor.WhyNow = "Sett сильнее на первых уровнях";
@@ -232,20 +249,24 @@ public sealed class CoachingViewModelTests
             content.OpenStartItemPicker();
             Assert.Equal(ItemPickerTarget.PhaseStart, content.ItemPicker.Target);
             var cleaver = content.ItemPicker.Items.Single(item => item.Id == 3071);
-            content.ItemPicker.Select(cleaver);
+            content.ItemPicker.Preview(cleaver);
+            Assert.Equal(3000, content.ItemPicker.SelectedItem?.Price);
+            Assert.True(content.ItemPicker.ConfirmSelection());
 
             Assert.Equal(3071, content.Editor.StartItem?.Id);
             Assert.Contains("после покупки «Чёрная секира»", content.Editor.MeaningSummary);
 
             content.OpenEndItemPicker();
-            content.ItemPicker.Select(cleaver);
+            content.ItemPicker.Preview(cleaver);
+            Assert.True(content.ItemPicker.ConfirmSelection());
 
             Assert.True(content.Editor.HasConflictingItemConditions);
             Assert.False(content.Editor.CanSave);
 
             content.OpenEndItemPicker();
             var boots = content.ItemPicker.Items.Single(item => item.Id == 3047);
-            content.ItemPicker.Select(boots);
+            content.ItemPicker.Preview(boots);
+            Assert.True(content.ItemPicker.ConfirmSelection());
 
             Assert.False(content.Editor.HasConflictingItemConditions);
             Assert.True(content.SaveEditor());
@@ -261,6 +282,47 @@ public sealed class CoachingViewModelTests
             Assert.Equal(3047, content.Editor.EndItem?.Id);
             content.RemoveEndItem();
             Assert.False(content.Editor.HasEndItem);
+        }
+        finally
+        {
+            localization.SetLanguage(initialLanguage);
+        }
+    }
+
+    [Fact]
+    public async Task ItemPicker_FiltersSortsAndShowsConfirmedCatalogDetails()
+    {
+        var localization = LocalizationService.Instance;
+        var initialLanguage = localization.CurrentLanguageCode;
+        localization.SetLanguage("ru-RU");
+
+        try
+        {
+            var content = new MatchupContentViewModel(localization, TestItemCatalog.Ready());
+            content.SetItemCatalogContext("26.15", "ru-RU");
+            await content.EnsureItemCatalogLoadedAsync();
+            content.OpenStartItemPicker();
+
+            Assert.Equal(6, content.ItemPicker.CategoryOptions.Count);
+            content.ItemPicker.SelectCategory(content.ItemPicker.CategoryOptions.Single(
+                option => option.Category == ItemFilterCategory.Boots));
+            Assert.Equal(3047, Assert.Single(content.ItemPicker.FilteredItems).Id);
+
+            content.ItemPicker.SelectCategory(content.ItemPicker.CategoryOptions.Single(
+                option => option.Category == ItemFilterCategory.All));
+            content.ItemPicker.SelectedSortOption = content.ItemPicker.SortOptions.Single(
+                option => option.Mode == ItemSortMode.PriceDescending);
+            Assert.Equal([3071, 3047], content.ItemPicker.FilteredItems.Select(item => item.Id));
+
+            content.ItemPicker.Search = "сапоги";
+            var boots = Assert.Single(content.ItemPicker.FilteredItems);
+            content.ItemPicker.Preview(boots);
+
+            Assert.Equal("1200 золота", content.ItemPicker.SelectedItemPriceText);
+            Assert.Contains(
+                content.ItemPicker.SelectedItemStats,
+                stat => stat.Name == "Броня" && stat.Value == "+25");
+            Assert.Contains("ID 3047", content.ItemPicker.SelectedItemTechnicalText);
         }
         finally
         {

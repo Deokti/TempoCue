@@ -342,6 +342,20 @@ public sealed class LocalizationServiceTests
                     "Основная информация",
                     Assert.IsType<TextBlock>(
                         matchupMainInformationPage.FindName("MatchupEditorStepTitleTextBlock")).Text);
+                Assert.Equal(
+                    "От 3 до 80 символов.",
+                    Assert.IsType<TextBlock>(
+                        matchupMainInformationPage.FindName(
+                            "MatchupPackNameLengthFeedback")).Text);
+                coachingViewModel.MatchupEditor.MainInformation.ShortDescription = "3213123";
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
+                Assert.Equal(
+                    "7 из минимум 10 символов. Максимум: 240.",
+                    Assert.IsType<TextBlock>(
+                        matchupMainInformationPage.FindName(
+                            "MatchupDescriptionLengthFeedback")).Text);
                 coachingViewModel.MatchupEditor.MainInformation.PackName = "Urgot против Sett";
                 coachingViewModel.MatchupEditor.MainInformation.ShortDescription =
                     "Как пережить раннюю линию и найти момент для боя.";
@@ -412,6 +426,30 @@ public sealed class LocalizationServiceTests
                 Assert.Equal(Visibility.Visible, championPickerDialog.Visibility);
                 Assert.Equal(ChampionPickerTarget.Player, championsAndRole.PickerTarget);
                 window.UpdateLayout();
+                var championPickerDialogCard = Assert.IsType<Border>(
+                    championPickerDialog.FindName("ChampionPickerDialogCard"));
+                var championPickerDialogHeight = Math.Clamp(window.ActualHeight * 0.80, 520, 760);
+                var championPickerDialogWidth = Math.Clamp(window.ActualWidth * 0.70, 760, 1000);
+                Assert.Equal(championPickerDialogHeight, championPickerDialogCard.ActualHeight, 1);
+                Assert.Equal(championPickerDialogWidth, championPickerDialogCard.ActualWidth, 1);
+                window.Width = 1400;
+                window.Height = 800;
+                window.UpdateLayout();
+                Assert.Equal(640d, championPickerDialogCard.ActualHeight, 1);
+                Assert.Equal(980d, championPickerDialogCard.ActualWidth, 1);
+                window.Width = 1280;
+                window.Height = 720;
+                window.UpdateLayout();
+                championsAndRole.PickerSearch = "urgot";
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
+                window.UpdateLayout();
+                Assert.Equal(championPickerDialogHeight, championPickerDialogCard.ActualHeight, 1);
+                championsAndRole.PickerSearch = string.Empty;
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
                 var closePickerButton = Assert.IsType<Button>(
                     championPickerDialog.FindName("CloseChampionPickerButton"));
                 Assert.Equal(new Thickness(0), closePickerButton.Padding);
@@ -500,6 +538,14 @@ public sealed class LocalizationServiceTests
                     "Фаза активна на уровнях 1+",
                     Assert.IsType<TextBlock>(
                         matchupContentPage.FindName("PhaseMeaningSummaryTextBlock")).Text);
+                Assert.Equal(
+                    "От 3 до 80 символов.",
+                    Assert.IsType<TextBlock>(
+                        matchupContentPage.FindName("PhaseNameLengthFeedback")).Text);
+                Assert.Equal(
+                    "От 3 до 200 символов.",
+                    Assert.IsType<TextBlock>(
+                        matchupContentPage.FindName("PhasePrimaryAdviceLengthFeedback")).Text);
                 var selectStartItemButton = Assert.IsType<Button>(
                     matchupContentPage.FindName("SelectStartItemButton"));
                 Assert.True(content.ItemPicker.IsCatalogReady);
@@ -508,6 +554,31 @@ public sealed class LocalizationServiceTests
                     static () => { },
                     DispatcherPriority.DataBind);
                 Assert.Equal(Visibility.Visible, itemPickerDialog.Visibility);
+                window.UpdateLayout();
+                var itemPickerDialogCard = Assert.IsType<Border>(
+                    itemPickerDialog.FindName("ItemPickerDialogCard"));
+                var itemPickerDialogHeight = Math.Clamp(window.ActualHeight * 0.80, 520, 760);
+                var itemPickerDialogWidth = Math.Clamp(window.ActualWidth * 0.78, 880, 1180);
+                Assert.Equal(itemPickerDialogHeight, itemPickerDialogCard.ActualHeight, 1);
+                Assert.Equal(itemPickerDialogWidth, itemPickerDialogCard.ActualWidth, 1);
+                window.Width = 1400;
+                window.Height = 800;
+                window.UpdateLayout();
+                Assert.Equal(640d, itemPickerDialogCard.ActualHeight, 1);
+                Assert.Equal(1092d, itemPickerDialogCard.ActualWidth, 1);
+                window.Width = 1280;
+                window.Height = 720;
+                window.UpdateLayout();
+                content.ItemPicker.Search = "секира";
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
+                window.UpdateLayout();
+                Assert.Equal(itemPickerDialogHeight, itemPickerDialogCard.ActualHeight, 1);
+                content.ItemPicker.Search = string.Empty;
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
                 var itemPickerSearchTextBox = Assert.IsType<TextBox>(
                     itemPickerDialog.FindName("ItemPickerSearchTextBox"));
                 Dispatcher.CurrentDispatcher.Invoke(
@@ -521,10 +592,27 @@ public sealed class LocalizationServiceTests
                         itemPickerDialog.FindName("ItemPickerSearchPlaceholder")).Visibility);
                 var itemPickerItems = Assert.IsType<ItemsControl>(
                     itemPickerDialog.FindName("ItemPickerItemsControl"));
+                Assert.Equal(
+                    6,
+                    Assert.IsType<ItemsControl>(
+                        itemPickerDialog.FindName("ItemCategoryItemsControl")).Items.Count);
+                var itemSortComboBox = Assert.IsType<ComboBox>(
+                    itemPickerDialog.FindName("ItemSortComboBox"));
+                Assert.Equal(3, itemSortComboBox.Items.Count);
+                Assert.Equal("По названию", itemSortComboBox.Text);
                 window.UpdateLayout();
                 var cleaverButton = FindVisualDescendants<Button>(itemPickerItems)
                     .Single(button => button.DataContext is ItemOptionViewModel { Id: 3071 });
                 cleaverButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
+                Assert.Equal(Visibility.Visible, itemPickerDialog.Visibility);
+                Assert.Equal(3071, content.ItemPicker.SelectedItem?.Id);
+                var confirmItemSelectionButton = Assert.IsType<Button>(
+                    itemPickerDialog.FindName("ConfirmItemSelectionButton"));
+                Assert.True(confirmItemSelectionButton.IsEnabled);
+                confirmItemSelectionButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
                 Dispatcher.CurrentDispatcher.Invoke(
                     static () => { },
                     DispatcherPriority.DataBind);

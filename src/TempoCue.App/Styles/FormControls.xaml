@@ -19,6 +19,17 @@
         <Setter Property="Margin" Value="0,6,0,0" />
     </Style>
 
+    <!-- Счётчик обязательного поля становится ошибкой только после невалидного ввода. -->
+    <Style x:Key="FormLengthFeedback"
+           TargetType="TextBlock"
+           BasedOn="{StaticResource FormFieldHint}">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding HasError}" Value="True">
+                <Setter Property="Foreground" Value="#FF7285" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
     <!-- Общий чекбокс TempoCue с одинаковой геометрией во всех редакторах. -->
     <Style TargetType="{x:Type controls:TempoCheckBox}">
         <Setter Property="Foreground" Value="#F4F7FB" />

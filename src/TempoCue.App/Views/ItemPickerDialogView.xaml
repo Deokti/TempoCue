@@ -1,6 +1,7 @@
 <UserControl x:Class="TempoCue.App.Views.ItemPickerDialogView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:TempoCue.App.Converters"
              xmlns:localization="clr-namespace:TempoCue.App.Localization"
              Background="Transparent"
              FontFamily="Segoe UI"
@@ -13,12 +14,14 @@
                 <ResourceDictionary Source="../Styles/FormControls.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- Карточка предмета сохраняет одинаковый размер при разных названиях. -->
+            <converters:ScaleValueConverter x:Key="ScaleValueConverter" />
+
+            <!-- Карточка показывает краткие данные, а полный состав выбранного предмета остаётся справа. -->
             <Style x:Key="ItemPickerCard" TargetType="Button">
-                <Setter Property="Width" Value="116" />
-                <Setter Property="Height" Value="112" />
+                <Setter Property="Width" Value="108" />
+                <Setter Property="Height" Value="118" />
                 <Setter Property="Margin" Value="0,0,10,10" />
-                <Setter Property="Padding" Value="10" />
+                <Setter Property="Padding" Value="9" />
                 <Setter Property="Background" Value="#101B2B" />
                 <Setter Property="BorderBrush" Value="#263750" />
                 <Setter Property="BorderThickness" Value="1" />
@@ -30,7 +33,7 @@
                                     Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="{TemplateBinding BorderThickness}"
-                                    CornerRadius="10"
+                                    CornerRadius="9"
                                     Padding="{TemplateBinding Padding}">
                                 <ContentPresenter HorizontalAlignment="Center"
                                                   VerticalAlignment="Center" />
@@ -40,6 +43,47 @@
                                     <Setter TargetName="CardBorder" Property="Background" Value="#162A43" />
                                     <Setter TargetName="CardBorder" Property="BorderBrush" Value="#4FAAE8" />
                                 </Trigger>
+                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                    <Setter TargetName="CardBorder" Property="Background" Value="#18304A" />
+                                    <Setter TargetName="CardBorder" Property="BorderBrush" Value="#55B8F3" />
+                                    <Setter TargetName="CardBorder" Property="BorderThickness" Value="2" />
+                                </DataTrigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="ItemCategoryButton" TargetType="Button">
+                <Setter Property="Padding" Value="12,7" />
+                <Setter Property="Margin" Value="0,0,8,0" />
+                <Setter Property="Background" Value="#111D2D" />
+                <Setter Property="BorderBrush" Value="#263750" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="Foreground" Value="#8EA2BC" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="CategoryBorder"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="15"
+                                    Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="CategoryBorder" Property="Background" Value="#17263A" />
+                                    <Setter Property="Foreground" Value="#C9D8E9" />
+                                </Trigger>
+                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                    <Setter TargetName="CategoryBorder" Property="Background" Value="#18304A" />
+                                    <Setter TargetName="CategoryBorder" Property="BorderBrush" Value="#55B8F3" />
+                                    <Setter Property="Foreground" Value="#F4F7FB" />
+                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                </DataTrigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Setter.Value>
@@ -48,10 +92,15 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <!-- Затемнённый модальный слой переиспользуется всеми сценариями выбора предмета. -->
+    <!-- Затемнённый слой блокирует редактор до подтверждения или отмены выбора. -->
     <Grid Background="#D9080D14">
-        <Border Width="760"
-                MaxHeight="650"
+        <Border x:Name="ItemPickerDialogCard"
+                Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource ScaleValueConverter}, ConverterParameter=0.78}"
+                Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource ScaleValueConverter}, ConverterParameter=0.80}"
+                MinWidth="880"
+                MaxWidth="1180"
+                MinHeight="520"
+                MaxHeight="760"
                 Background="#101827"
                 BorderBrush="#31506C"
                 BorderThickness="1"
@@ -63,10 +112,14 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="1" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="1" />
                     <RowDefinition Height="*" />
+                    <RowDefinition Height="1" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <!-- Заголовок зависит от того, начинает или завершает предмет фазу. -->
+                <!-- Заголовок уточняет, начинает или завершает выбранный предмет фазу. -->
                 <Grid Margin="20,16">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -96,10 +149,12 @@
 
                 <Border Grid.Row="1" Background="#263750" />
 
-                <!-- Поиск работает по локализованному названию уже загруженных предметов. -->
-                <Grid Grid.Row="2" Margin="20,14">
+                <!-- Поиск и сортировка применяются к уже загруженному локальному каталогу. -->
+                <Grid Grid.Row="2" Margin="20,14,20,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="12" />
+                        <ColumnDefinition Width="190" />
                         <ColumnDefinition Width="14" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
@@ -131,58 +186,265 @@
                             </TextBlock.Style>
                         </TextBlock>
                     </Grid>
-                    <TextBlock Grid.Column="2"
+                    <ComboBox x:Name="ItemSortComboBox"
+                              Grid.Column="2"
+                              Height="36"
+                              ItemsSource="{Binding SortOptions}"
+                              SelectedItem="{Binding SelectedSortOption, Mode=TwoWay}"
+                              Style="{StaticResource FormComboBox}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DisplayName}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <TextBlock Grid.Column="4"
                                Text="{Binding ResultCountText}"
                                Foreground="#8EA2BC"
                                FontSize="{StaticResource Typography.FontSize.Body}"
                                VerticalAlignment="Center" />
                 </Grid>
 
-                <!-- Полный каталог предметов патча; описание доступно в подсказке карточки. -->
-                <ScrollViewer Grid.Row="3"
-                              Margin="20,0,10,18"
-                              VerticalScrollBarVisibility="Auto"
-                              HorizontalScrollBarVisibility="Disabled">
-                    <ScrollViewer.Resources>
-                        <Style TargetType="ScrollBar" BasedOn="{StaticResource ShellScrollBar}" />
-                    </ScrollViewer.Resources>
-                    <ItemsControl x:Name="ItemPickerItemsControl"
-                                  ItemsSource="{Binding FilteredItems}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Button Style="{StaticResource ItemPickerCard}"
-                                        Click="ItemButton_Click"
-                                        ToolTip="{Binding Description}">
-                                    <StackPanel HorizontalAlignment="Center">
-                                        <Border Width="56"
-                                                Height="56"
-                                                Background="#0B1726"
-                                                BorderBrush="#31506C"
-                                                BorderThickness="1"
-                                                CornerRadius="8">
-                                            <Image Source="{Binding ImageUri}"
-                                                   Width="54"
-                                                   Height="54"
-                                                   Stretch="UniformToFill" />
-                                        </Border>
-                                        <TextBlock Text="{Binding DisplayName}"
-                                                   Foreground="#C9D8E9"
-                                                   FontSize="{StaticResource Typography.FontSize.Caption}"
-                                                   TextAlignment="Center"
-                                                   TextTrimming="CharacterEllipsis"
-                                                   MaxWidth="94"
-                                                   Margin="0,7,0,0" />
+                <!-- Категории нормализуются из тегов, глубины сборки и состава предмета Data Dragon. -->
+                <ItemsControl x:Name="ItemCategoryItemsControl"
+                              Grid.Row="3"
+                              ItemsSource="{Binding CategoryOptions}"
+                              Margin="20,0,20,12">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Content="{Binding DisplayName}"
+                                    Style="{StaticResource ItemCategoryButton}"
+                                    Click="CategoryButton_Click" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <Border Grid.Row="4" Background="#263750" />
+
+                <!-- Каталог и подробности разделены, чтобы одиночный клик не подтверждал выбор случайно. -->
+                <Grid Grid.Row="5" MinHeight="350">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="1" />
+                        <ColumnDefinition Width="270" />
+                    </Grid.ColumnDefinitions>
+
+                    <Grid>
+                        <ScrollViewer Margin="20,16,10,12"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled">
+                            <ScrollViewer.Resources>
+                                <Style TargetType="ScrollBar" BasedOn="{StaticResource ShellScrollBar}" />
+                            </ScrollViewer.Resources>
+                            <ItemsControl x:Name="ItemPickerItemsControl"
+                                          ItemsSource="{Binding FilteredItems}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button Style="{StaticResource ItemPickerCard}"
+                                                Click="ItemButton_Click">
+                                            <StackPanel HorizontalAlignment="Center">
+                                                <Border Width="54"
+                                                        Height="54"
+                                                        Background="#0B1726"
+                                                        BorderBrush="#31506C"
+                                                        BorderThickness="1"
+                                                        CornerRadius="7">
+                                                    <Image Source="{Binding ImageUri}"
+                                                           Width="52"
+                                                           Height="52"
+                                                           Stretch="UniformToFill" />
+                                                </Border>
+                                                <TextBlock Text="{Binding DisplayName}"
+                                                           Foreground="#C9D8E9"
+                                                           FontSize="{StaticResource Typography.FontSize.Caption}"
+                                                           TextAlignment="Center"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           MaxWidth="90"
+                                                           Margin="0,6,0,0" />
+                                                <TextBlock Text="{Binding Price}"
+                                                           Foreground="#E5C86A"
+                                                           FontSize="{StaticResource Typography.FontSize.Caption}"
+                                                           FontWeight="SemiBold"
+                                                           Margin="0,3,0,0" />
+                                            </StackPanel>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+
+                        <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Items.Picker.NoResults}"
+                                   Foreground="#7F93AF"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasResults}" Value="False">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+
+                    <Border Grid.Column="1" Background="#263750" />
+
+                    <Grid Grid.Column="2" Margin="16">
+                        <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Items.Picker.SelectForDetails}"
+                                   Foreground="#6F849F"
+                                   TextAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   MaxWidth="210">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasSelectedItem}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <ScrollViewer.Style>
+                                <Style TargetType="ScrollViewer">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasSelectedItem}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ScrollViewer.Style>
+                            <StackPanel>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="64" />
+                                        <ColumnDefinition Width="12" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Border Width="64"
+                                            Height="64"
+                                            Background="#0B1726"
+                                            BorderBrush="#31506C"
+                                            BorderThickness="1"
+                                            CornerRadius="8">
+                                        <Image Source="{Binding SelectedItem.ImageUri}"
+                                               Width="62"
+                                               Height="62"
+                                               Stretch="UniformToFill" />
+                                    </Border>
+                                    <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding SelectedItem.DisplayName}"
+                                                   Foreground="#F4F7FB"
+                                                   FontSize="{StaticResource Typography.FontSize.BodyLarge}"
+                                                   FontWeight="SemiBold"
+                                                   TextWrapping="Wrap" />
+                                        <TextBlock Text="{Binding SelectedItemPriceText}"
+                                                   Foreground="#E5C86A"
+                                                   FontSize="{StaticResource Typography.FontSize.Body}"
+                                                   FontWeight="SemiBold"
+                                                   Margin="0,4,0,0" />
                                     </StackPanel>
-                                </Button>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
+                                </Grid>
+
+                                <ItemsControl ItemsSource="{Binding SelectedItemStats}"
+                                              Margin="0,16,0,0">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0,0,0,6">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding Name}"
+                                                           Foreground="#C9D8E9"
+                                                           FontSize="{StaticResource Typography.FontSize.Body}" />
+                                                <TextBlock Grid.Column="1"
+                                                           Text="{Binding Value}"
+                                                           Foreground="#70DDB8"
+                                                           FontSize="{StaticResource Typography.FontSize.Body}"
+                                                           FontWeight="SemiBold" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Items.Picker.NoStats}"
+                                           Foreground="#6F849F"
+                                           FontSize="{StaticResource Typography.FontSize.Caption}"
+                                           Margin="0,16,0,0">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding HasSelectedItem}" Value="True" />
+                                                        <Condition Binding="{Binding HasSelectedItemStats}" Value="False" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+
+                                <Border Height="1" Background="#263750" Margin="0,12" />
+                                <TextBlock Text="{Binding SelectedItem.Description}"
+                                           Foreground="#9CB0C9"
+                                           FontSize="{StaticResource Typography.FontSize.Body}"
+                                           TextWrapping="Wrap" />
+                                <TextBlock Text="{Binding SelectedItemTechnicalText}"
+                                           Foreground="#526A88"
+                                           FontSize="{StaticResource Typography.FontSize.Caption}"
+                                           TextWrapping="Wrap"
+                                           Margin="0,14,0,0" />
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+                </Grid>
+
+                <Border Grid.Row="6" Background="#263750" />
+
+                <Grid Grid.Row="7" Margin="20,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Items.Picker.SourceNote}"
+                               Foreground="#526A88"
+                               FontSize="{StaticResource Typography.FontSize.Caption}"
+                               VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <Button Content="{localization:Loc Coaching.MatchupEditor.Items.Picker.Cancel}"
+                                Style="{StaticResource SecondaryButton}"
+                                Click="CloseButton_Click" />
+                        <Button x:Name="ConfirmItemSelectionButton"
+                                Content="{localization:Loc Coaching.MatchupEditor.Items.Picker.Confirm}"
+                                Style="{StaticResource PrimaryButton}"
+                                IsEnabled="{Binding HasSelectedItem}"
+                                Margin="10,0,0,0"
+                                Click="ConfirmButton_Click" />
+                    </StackPanel>
+                </Grid>
             </Grid>
         </Border>
     </Grid>

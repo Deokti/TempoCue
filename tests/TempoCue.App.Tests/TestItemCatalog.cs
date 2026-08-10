@@ -13,14 +13,24 @@ internal sealed class TestItemCatalog(ItemCatalogLoadResult result) : IItemCatal
                     "Предмет для затяжных физических сражений.",
                     new Uri("https://example.test/3071.png"),
                     3000,
-                    ["Damage"]),
+                    ["Damage"],
+                    ItemCatalogCategory.Legendary,
+                    [
+                        new ItemStatEntry(ItemStatKind.Health, 400),
+                        new ItemStatEntry(ItemStatKind.AttackDamage, 40)
+                    ]),
                 new ItemCatalogEntry(
                     3047,
                     "Бронированные сапоги",
                     "Снижают получаемый физический урон.",
                     new Uri("https://example.test/3047.png"),
                     1200,
-                    ["Boots", "Armor"])
+                    ["Boots", "Armor"],
+                    ItemCatalogCategory.Boots,
+                    [
+                        new ItemStatEntry(ItemStatKind.Armor, 25),
+                        new ItemStatEntry(ItemStatKind.MoveSpeed, 45)
+                    ])
             ],
             ItemCatalogSource.Network));
 

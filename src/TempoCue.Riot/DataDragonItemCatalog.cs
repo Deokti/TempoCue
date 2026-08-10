@@ -104,18 +104,24 @@ public sealed class DataDragonItemCatalog : IItemCatalog
                 && pair.Value.Gold?.Purchasable == true
                 && pair.Value.InStore is not false
                 && pair.Value.Maps?.GetValueOrDefault("11") == true)
-            .Select(pair => new ItemCatalogEntry(
-                int.Parse(pair.Key, CultureInfo.InvariantCulture),
-                pair.Value.Name!,
-                pair.Value.PlainText?.Trim() ?? string.Empty,
-                DataDragonClient.CreateResourceUri(
-                    $"cdn/{Uri.EscapeDataString(version)}/img/item/{Uri.EscapeDataString(pair.Value.Image!.Full!)}"),
-                Math.Max(0, pair.Value.Gold?.Total ?? 0),
-                pair.Value.Tags?
+            .Select(pair =>
+            {
+                var tags = pair.Value.Tags?
                     .Where(static tag => !string.IsNullOrWhiteSpace(tag))
                     .Distinct(StringComparer.OrdinalIgnoreCase)
                     .ToArray()
-                    ?? []))
+                    ?? [];
+                return new ItemCatalogEntry(
+                    int.Parse(pair.Key, CultureInfo.InvariantCulture),
+                    pair.Value.Name!,
+                    pair.Value.PlainText?.Trim() ?? string.Empty,
+                    DataDragonClient.CreateResourceUri(
+                        $"cdn/{Uri.EscapeDataString(version)}/img/item/{Uri.EscapeDataString(pair.Value.Image!.Full!)}"),
+                    Math.Max(0, pair.Value.Gold?.Total ?? 0),
+                    tags,
+                    ResolveCategory(pair.Value, tags),
+                    MapStats(pair.Value.Stats));
+            })
             .OrderBy(item => item.DisplayName, StringComparer.Create(culture, true))
             .ThenBy(item => item.Id)
             .ToArray();
@@ -145,7 +151,15 @@ public sealed class DataDragonItemCatalog : IItemCatalog
                         Description = item.Description,
                         ImageUrl = item.ImageUri.AbsoluteUri,
                         Price = item.Price,
-                        Tags = item.Tags.ToList()
+                        Tags = item.Tags.ToList(),
+                        Category = item.Category,
+                        Stats = item.Stats
+                            .Select(stat => new DataDragonCachedItemStatDto
+                            {
+                                Kind = stat.Kind,
+                                Value = stat.Value
+                            })
+                            .ToList()
                     })
                     .ToList()
             };
@@ -209,7 +223,13 @@ public sealed class DataDragonItemCatalog : IItemCatalog
                     item.Description ?? string.Empty,
                     new Uri(item.ImageUrl!, UriKind.Absolute),
                     Math.Max(0, item.Price),
-                    item.Tags?.ToArray() ?? []))
+                    item.Tags?.ToArray() ?? [],
+                    item.Category,
+                    item.Stats?
+                        .Where(static stat => stat.Value != 0)
+                        .Select(static stat => new ItemStatEntry(stat.Kind, stat.Value))
+                        .ToArray()
+                        ?? []))
                 .ToArray();
 
             return items.Length == 0
@@ -231,6 +251,90 @@ public sealed class DataDragonItemCatalog : IItemCatalog
         var patchKey = string.Concat(gamePatch.Where(static character =>
             char.IsLetterOrDigit(character) || character is '.' or '-'));
         return Path.Combine(_cacheDirectory, $"items-{patchKey}-{locale}.json");
+    }
+
+    private static ItemCatalogCategory ResolveCategory(
+        DataDragonItemDto item,
+        IReadOnlyList<string> tags)
+    {
+        if (tags.Contains("Boots", StringComparer.OrdinalIgnoreCase))
+        {
+            return ItemCatalogCategory.Boots;
+        }
+
+        var isStarter = (tags.Contains("Lane", StringComparer.OrdinalIgnoreCase)
+                         || tags.Contains("Jungle", StringComparer.OrdinalIgnoreCase)
+                         || tags.Contains("Consumable", StringComparer.OrdinalIgnoreCase))
+                        && item.From is not { Count: > 0 }
+                        && (item.Gold?.Total ?? 0) <= 500;
+        if (isStarter)
+        {
+            return ItemCatalogCategory.Starter;
+        }
+
+        return item.Depth switch
+        {
+            >= 3 => ItemCatalogCategory.Legendary,
+            2 => ItemCatalogCategory.Epic,
+            _ => ItemCatalogCategory.Basic
+        };
+    }
+
+    private static IReadOnlyList<ItemStatEntry> MapStats(
+        IReadOnlyDictionary<string, double>? stats)
+    {
+        if (stats is null)
+        {
+            return [];
+        }
+
+        var result = new List<ItemStatEntry>();
+        foreach (var stat in stats)
+        {
+            if (TryMapStat(stat.Key, stat.Value, out var mappedStat))
+            {
+                result.Add(mappedStat);
+            }
+        }
+
+        return result
+            .OrderBy(static stat => stat.Kind)
+            .ToArray();
+    }
+
+    private static bool TryMapStat(
+        string sourceName,
+        double sourceValue,
+        out ItemStatEntry mappedStat)
+    {
+        var mapping = sourceName switch
+        {
+            "FlatHPPoolMod" => (ItemStatKind.Health, 1d),
+            "FlatMPPoolMod" => (ItemStatKind.Mana, 1d),
+            "FlatPhysicalDamageMod" => (ItemStatKind.AttackDamage, 1d),
+            "FlatMagicDamageMod" => (ItemStatKind.AbilityPower, 1d),
+            "FlatArmorMod" => (ItemStatKind.Armor, 1d),
+            "FlatSpellBlockMod" => (ItemStatKind.MagicResistance, 1d),
+            "FlatMovementSpeedMod" => (ItemStatKind.MoveSpeed, 1d),
+            "PercentMovementSpeedMod" => (ItemStatKind.MoveSpeedPercent, 100d),
+            "PercentAttackSpeedMod" => (ItemStatKind.AttackSpeedPercent, 100d),
+            "PercentLifeStealMod" => (ItemStatKind.LifeStealPercent, 100d),
+            "FlatCritChanceMod" or "PercentCritChanceMod" =>
+                (ItemStatKind.CriticalStrikeChancePercent, 100d),
+            "FlatHPRegenMod" => (ItemStatKind.HealthRegen, 1d),
+            "FlatMPRegenMod" => (ItemStatKind.ManaRegen, 1d),
+            _ => ((ItemStatKind)(-1), 0d)
+        };
+
+        var value = sourceValue * mapping.Item2;
+        if ((int)mapping.Item1 < 0 || Math.Abs(value) < double.Epsilon)
+        {
+            mappedStat = new ItemStatEntry(default, 0);
+            return false;
+        }
+
+        mappedStat = new ItemStatEntry(mapping.Item1, value);
+        return true;
     }
 
     private static bool IsExpectedCacheFailure(Exception exception) =>

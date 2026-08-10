@@ -54,7 +54,7 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
             if (SetProperty(ref _packName, value ?? string.Empty))
             {
                 OnPropertyChanged(nameof(DisplayTitle));
-                NotifyFormStateChanged();
+                NotifyFormStateChanged(nameof(PackNameLengthFeedback));
             }
         }
     }
@@ -66,7 +66,7 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
         {
             if (SetProperty(ref _shortDescription, value ?? string.Empty))
             {
-                NotifyFormStateChanged();
+                NotifyFormStateChanged(nameof(ShortDescriptionLengthFeedback));
             }
         }
     }
@@ -78,7 +78,7 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
         {
             if (SetProperty(ref _author, value ?? string.Empty))
             {
-                NotifyFormStateChanged();
+                NotifyFormStateChanged(nameof(AuthorLengthFeedback));
             }
         }
     }
@@ -113,6 +113,24 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
 
     public string GamePatch => SelectedGamePatch?.Patch ?? string.Empty;
 
+    public TextLengthFeedback PackNameLengthFeedback => TextLengthFeedback.Create(
+        PackName,
+        3,
+        80,
+        _localization);
+
+    public TextLengthFeedback ShortDescriptionLengthFeedback => TextLengthFeedback.Create(
+        ShortDescription,
+        10,
+        240,
+        _localization);
+
+    public TextLengthFeedback AuthorLengthFeedback => TextLengthFeedback.Create(
+        Author,
+        2,
+        40,
+        _localization);
+
     public CatalogViewState GamePatchCatalogState
     {
         get => _gamePatchCatalogState;
@@ -142,9 +160,9 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
         GamePatchCatalogState == CatalogViewState.Cached;
 
     public bool IsComplete =>
-        IsWithinLength(PackName, 3, 80)
-        && IsWithinLength(ShortDescription, 10, 240)
-        && IsWithinLength(Author, 2, 40)
+        TextLengthFeedback.IsWithin(PackName, 3, 80)
+        && TextLengthFeedback.IsWithin(ShortDescription, 10, 240)
+        && TextLengthFeedback.IsWithin(Author, 2, 40)
         && IsGamePatchCatalogReady
         && SelectedGamePatch is not null
         && AdviceLanguages.Any(language => language.Code == AdviceLanguageCode);
@@ -190,6 +208,9 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(DisplayTitle));
         OnPropertyChanged(nameof(VerifiedOnDisplayName));
+        OnPropertyChanged(nameof(PackNameLengthFeedback));
+        OnPropertyChanged(nameof(ShortDescriptionLengthFeedback));
+        OnPropertyChanged(nameof(AuthorLengthFeedback));
 
         if (_gamePatches.Count == 0)
         {
@@ -204,9 +225,13 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
         SelectedGamePatch = FindPatch(selectedPatch);
     }
 
-    private void NotifyFormStateChanged()
+    private void NotifyFormStateChanged(string? feedbackPropertyName = null)
     {
         OnPropertyChanged(nameof(IsComplete));
+        if (feedbackPropertyName is not null)
+        {
+            OnPropertyChanged(feedbackPropertyName);
+        }
     }
 
     private IReadOnlyList<GamePatchOptionViewModel> CreatePatchOptions(
@@ -227,11 +252,5 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
             ? null
             : _gamePatches.FirstOrDefault(option =>
                 string.Equals(option.Patch, patch, StringComparison.OrdinalIgnoreCase));
-
-    private static bool IsWithinLength(string value, int minimumLength, int maximumLength)
-    {
-        var length = value.Trim().Length;
-        return length >= minimumLength && length <= maximumLength;
-    }
 
 }

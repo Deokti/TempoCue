@@ -24,9 +24,20 @@ public partial class ItemPickerDialogView : UserControl
     {
         if (sender is Button { DataContext: ItemOptionViewModel item })
         {
-            ViewModel.Select(item);
+            ViewModel.Preview(item);
         }
     }
+
+    private void CategoryButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { DataContext: ItemCategoryOptionViewModel option })
+        {
+            ViewModel.SelectCategory(option);
+        }
+    }
+
+    private void ConfirmButton_Click(object sender, RoutedEventArgs e) =>
+        ViewModel.ConfirmSelection();
 
     private void ItemPickerDialogView_PreviewKeyDown(object sender, KeyEventArgs e)
     {

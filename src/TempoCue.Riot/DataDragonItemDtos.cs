@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using TempoCue.Application;
 
 namespace TempoCue.Riot;
 
@@ -16,6 +17,12 @@ internal sealed class DataDragonItemDto
     [JsonPropertyName("plaintext")]
     public string? PlainText { get; init; }
 
+    [JsonPropertyName("depth")]
+    public int? Depth { get; init; }
+
+    [JsonPropertyName("from")]
+    public List<string>? From { get; init; }
+
     [JsonPropertyName("image")]
     public DataDragonImageDto? Image { get; init; }
 
@@ -24,6 +31,9 @@ internal sealed class DataDragonItemDto
 
     [JsonPropertyName("tags")]
     public List<string>? Tags { get; init; }
+
+    [JsonPropertyName("stats")]
+    public Dictionary<string, double>? Stats { get; init; }
 
     [JsonPropertyName("maps")]
     public Dictionary<string, bool>? Maps { get; init; }
@@ -67,4 +77,15 @@ internal sealed class DataDragonCachedItemDto
     public int Price { get; init; }
 
     public List<string>? Tags { get; init; }
+
+    public ItemCatalogCategory Category { get; init; }
+
+    public List<DataDragonCachedItemStatDto>? Stats { get; init; }
+}
+
+internal sealed class DataDragonCachedItemStatDto
+{
+    public ItemStatKind Kind { get; init; }
+
+    public double Value { get; init; }
 }

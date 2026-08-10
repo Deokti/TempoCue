@@ -39,6 +39,10 @@
                                  Text="{Binding PackName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                  Style="{StaticResource FormTextBox}"
                                  MaxLength="80" />
+                        <TextBlock x:Name="MatchupPackNameLengthFeedback"
+                                   DataContext="{Binding PackNameLengthFeedback}"
+                                   Text="{Binding Text}"
+                                   Style="{StaticResource FormLengthFeedback}" />
                     </StackPanel>
 
                     <StackPanel Margin="0,16,0,0">
@@ -53,6 +57,10 @@
                                  AcceptsReturn="True"
                                  TextWrapping="Wrap"
                                  VerticalContentAlignment="Top" />
+                        <TextBlock x:Name="MatchupDescriptionLengthFeedback"
+                                   DataContext="{Binding ShortDescriptionLengthFeedback}"
+                                   Text="{Binding Text}"
+                                   Style="{StaticResource FormLengthFeedback}" />
                     </StackPanel>
 
                     <!-- Автор содержимого и язык самих советов не зависят от языка интерфейса. -->
@@ -69,6 +77,10 @@
                                      Text="{Binding Author, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                      Style="{StaticResource FormTextBox}"
                                      MaxLength="40" />
+                            <TextBlock x:Name="MatchupAuthorLengthFeedback"
+                                       DataContext="{Binding AuthorLengthFeedback}"
+                                       Text="{Binding Text}"
+                                       Style="{StaticResource FormLengthFeedback}" />
                         </StackPanel>
                         <StackPanel Grid.Column="2">
                             <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.AdviceLanguage}"

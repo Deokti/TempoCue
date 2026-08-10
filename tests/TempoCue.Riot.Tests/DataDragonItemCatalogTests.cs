@@ -43,6 +43,13 @@ public sealed class DataDragonItemCatalogTests
             Assert.Equal("Чёрная секира", cleaver.DisplayName);
             Assert.Equal(3000, cleaver.Price);
             Assert.Contains("Damage", cleaver.Tags);
+            Assert.Equal(ItemCatalogCategory.Legendary, cleaver.Category);
+            Assert.Contains(
+                cleaver.Stats,
+                stat => stat.Kind == ItemStatKind.Health && stat.Value == 400);
+            Assert.Contains(
+                cleaver.Stats,
+                stat => stat.Kind == ItemStatKind.AttackDamage && stat.Value == 40);
             Assert.Equal(
                 "https://ddragon.leagueoflegends.com/cdn/26.15.1/img/item/3071.png",
                 cleaver.ImageUri.AbsoluteUri);
@@ -67,6 +74,13 @@ public sealed class DataDragonItemCatalogTests
                     Assert.Equal("Скорость и пробивание брони", item.Description);
                     Assert.Equal(3000, item.Price);
                     Assert.Equal(["Damage", "CooldownReduction"], item.Tags);
+                    Assert.Equal(ItemCatalogCategory.Legendary, item.Category);
+                    Assert.Equal(
+                        [
+                            new ItemStatEntry(ItemStatKind.Health, 400),
+                            new ItemStatEntry(ItemStatKind.AttackDamage, 40)
+                        ],
+                        item.Stats);
                 });
         }
         finally
@@ -91,6 +105,37 @@ public sealed class DataDragonItemCatalogTests
 
             Assert.False(result.IsAvailable);
             Assert.Equal(ItemCatalogSource.Unavailable, result.Source);
+        }
+        finally
+        {
+            Directory.Delete(cacheDirectory, recursive: true);
+        }
+    }
+
+    [Fact]
+    public async Task LoadAsync_ClassifiesItemsFromTagsAndBuildDepth()
+    {
+        var cacheDirectory = CreateTestCacheDirectory();
+
+        try
+        {
+            using var httpClient = CreateHttpClient(request => JsonResponse(
+                request.RequestUri?.AbsolutePath == "/api/versions.json"
+                    ? "[\"26.15.1\"]"
+                    : CategoryItemJson));
+            using var dataDragonClient = new DataDragonClient(httpClient);
+            var catalog = new DataDragonItemCatalog(dataDragonClient, cacheDirectory);
+
+            var result = await catalog.LoadAsync("26.15", "en-US");
+            var items = result.Items.ToDictionary(item => item.Id);
+
+            Assert.Equal(ItemCatalogCategory.Starter, items[1055].Category);
+            Assert.Equal(ItemCatalogCategory.Boots, items[3006].Category);
+            Assert.Equal(ItemCatalogCategory.Epic, items[3133].Category);
+            Assert.Equal(ItemCatalogCategory.Basic, items[1036].Category);
+            Assert.Contains(
+                items[3006].Stats,
+                stat => stat.Kind == ItemStatKind.AttackSpeedPercent && stat.Value == 25);
         }
         finally
         {
@@ -126,6 +171,13 @@ public sealed class DataDragonItemCatalogTests
               "image": { "full": "3071.png" },
               "gold": { "purchasable": true, "total": 3000 },
               "tags": ["Damage", "CooldownReduction"],
+              "depth": 3,
+              "from": ["1036", "2021", "3067"],
+              "stats": {
+                "FlatHPPoolMod": 400,
+                "FlatPhysicalDamageMod": 40,
+                "UnsupportedStat": 25
+              },
               "maps": { "11": true }
             },
             "9998": {
@@ -143,6 +195,39 @@ public sealed class DataDragonItemCatalogTests
               "gold": { "purchasable": false, "total": 0 },
               "tags": [],
               "maps": { "11": true }
+            }
+          }
+        }
+        """;
+
+    private const string CategoryItemJson = """
+        {
+          "data": {
+            "1055": {
+              "name": "Doran's Blade", "plaintext": "Starter item", "depth": 1,
+              "image": { "full": "1055.png" },
+              "gold": { "purchasable": true, "total": 450 },
+              "tags": ["Damage", "Lane"], "stats": {}, "maps": { "11": true }
+            },
+            "3006": {
+              "name": "Berserker's Greaves", "plaintext": "Attack speed boots", "depth": 2,
+              "from": ["1001", "1042"], "image": { "full": "3006.png" },
+              "gold": { "purchasable": true, "total": 1100 },
+              "tags": ["Boots", "AttackSpeed"],
+              "stats": { "PercentAttackSpeedMod": 0.25, "FlatMovementSpeedMod": 45 },
+              "maps": { "11": true }
+            },
+            "3133": {
+              "name": "Caulfield's Warhammer", "plaintext": "Epic item", "depth": 2,
+              "from": ["1036", "1036"], "image": { "full": "3133.png" },
+              "gold": { "purchasable": true, "total": 1050 },
+              "tags": ["Damage"], "stats": {}, "maps": { "11": true }
+            },
+            "1036": {
+              "name": "Long Sword", "plaintext": "Basic item", "depth": 1,
+              "image": { "full": "1036.png" },
+              "gold": { "purchasable": true, "total": 350 },
+              "tags": ["Damage"], "stats": {}, "maps": { "11": true }
             }
           }
         }

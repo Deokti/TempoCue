@@ -60,7 +60,7 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
             if (SetProperty(ref _name, value ?? string.Empty))
             {
                 OnPropertyChanged(nameof(Header));
-                NotifyValidationChanged();
+                NotifyValidationChanged(nameof(NameLengthFeedback));
             }
         }
     }
@@ -133,7 +133,7 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
         {
             if (SetProperty(ref _primaryAdvice, value ?? string.Empty))
             {
-                NotifyValidationChanged();
+                NotifyValidationChanged(nameof(PrimaryAdviceLengthFeedback));
             }
         }
     }
@@ -201,9 +201,21 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
         && EndItem is not null
         && StartItem.Id == EndItem.Id;
 
+    public TextLengthFeedback NameLengthFeedback => TextLengthFeedback.Create(
+        Name,
+        3,
+        80,
+        _localization);
+
+    public TextLengthFeedback PrimaryAdviceLengthFeedback => TextLengthFeedback.Create(
+        PrimaryAdvice,
+        3,
+        200,
+        _localization);
+
     public bool CanSave =>
-        IsWithinLength(Name, 3, 80)
-        && IsWithinLength(PrimaryAdvice, 3, 200)
+        TextLengthFeedback.IsWithin(Name, 3, 80)
+        && TextLengthFeedback.IsWithin(PrimaryAdvice, 3, 200)
         && WhyNow.Trim().Length <= 240
         && NextGoal.Trim().Length <= 160
         && !HasConflictingItemConditions
@@ -328,6 +340,8 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
         RebuildPowerStateOptions();
         OnPropertyChanged(nameof(Header));
         OnPropertyChanged(nameof(MeaningSummary));
+        OnPropertyChanged(nameof(NameLengthFeedback));
+        OnPropertyChanged(nameof(PrimaryAdviceLengthFeedback));
     }
 
     private void RebuildPowerStateOptions() =>
@@ -338,12 +352,13 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
             new(PowerState.Playable, _localization.Get("Coaching.Power.Playable"))
         ];
 
-    private void NotifyValidationChanged() => OnPropertyChanged(nameof(CanSave));
-
-    private static bool IsWithinLength(string value, int minimumLength, int maximumLength)
+    private void NotifyValidationChanged(string? feedbackPropertyName = null)
     {
-        var length = value.Trim().Length;
-        return length >= minimumLength && length <= maximumLength;
+        OnPropertyChanged(nameof(CanSave));
+        if (feedbackPropertyName is not null)
+        {
+            OnPropertyChanged(feedbackPropertyName);
+        }
     }
 }
 

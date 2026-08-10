@@ -9,6 +9,10 @@
   <data name="Header.Subtitle" xml:space="preserve"><value>Technical build · simulator and live match connection</value></data>
   <data name="Header.CoachPackLoaded" xml:space="preserve"><value>COACH PACK LOADED</value></data>
   <data name="Language.Tooltip" xml:space="preserve"><value>Interface language</value></data>
+  <data name="Validation.Length.Requirement" xml:space="preserve"><value>From {0} to {1} characters.</value></data>
+  <data name="Validation.Length.TooShort" xml:space="preserve"><value>{0} of at least {1} characters. Maximum: {2}.</value></data>
+  <data name="Validation.Length.Valid" xml:space="preserve"><value>{0} of {1} characters.</value></data>
+  <data name="Validation.Length.TooLong" xml:space="preserve"><value>{0} characters; maximum is {1}.</value></data>
   <data name="Connection.WaitingMatch" xml:space="preserve"><value>WAITING FOR MATCH</value></data>
   <data name="Connection.PollingEverySecond" xml:space="preserve"><value>Checking Live Client Data every 1 s</value></data>
   <data name="Connection.NextPoll" xml:space="preserve"><value>Next request in 1 s</value></data>
@@ -343,6 +347,36 @@
   <data name="Coaching.MatchupEditor.Items.Picker.EndTitle" xml:space="preserve"><value>Select an item that ends the phase</value></data>
   <data name="Coaching.MatchupEditor.Items.Picker.EndDescription" xml:space="preserve"><value>The phase stops applying when this item appears in the inventory.</value></data>
   <data name="Coaching.MatchupEditor.Items.Picker.Search" xml:space="preserve"><value>Search by item name</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.Price" xml:space="preserve"><value>{0} gold</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.Technical" xml:space="preserve"><value>ID {0} · {1} · patch {2}</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.SelectForDetails" xml:space="preserve"><value>Select an item to view its price, stats, and description.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.NoResults" xml:space="preserve"><value>No items match the selected filters.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.NoStats" xml:space="preserve"><value>Data Dragon does not provide numeric stats for this item.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.SourceNote" xml:space="preserve"><value>Items available for purchase on Summoner's Rift in the selected patch</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.Confirm" xml:space="preserve"><value>Select</value></data>
+  <data name="Coaching.MatchupEditor.Items.Category.All" xml:space="preserve"><value>All</value></data>
+  <data name="Coaching.MatchupEditor.Items.Category.Starter" xml:space="preserve"><value>Starter</value></data>
+  <data name="Coaching.MatchupEditor.Items.Category.Boots" xml:space="preserve"><value>Boots</value></data>
+  <data name="Coaching.MatchupEditor.Items.Category.Basic" xml:space="preserve"><value>Basic</value></data>
+  <data name="Coaching.MatchupEditor.Items.Category.Epic" xml:space="preserve"><value>Epic</value></data>
+  <data name="Coaching.MatchupEditor.Items.Category.Legendary" xml:space="preserve"><value>Legendary</value></data>
+  <data name="Coaching.MatchupEditor.Items.Sort.Name" xml:space="preserve"><value>By name</value></data>
+  <data name="Coaching.MatchupEditor.Items.Sort.PriceAscending" xml:space="preserve"><value>Cheapest first</value></data>
+  <data name="Coaching.MatchupEditor.Items.Sort.PriceDescending" xml:space="preserve"><value>Most expensive first</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.Health" xml:space="preserve"><value>Health</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.Mana" xml:space="preserve"><value>Mana</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.AttackDamage" xml:space="preserve"><value>Attack damage</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.AbilityPower" xml:space="preserve"><value>Ability power</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.Armor" xml:space="preserve"><value>Armor</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.MagicResistance" xml:space="preserve"><value>Magic resistance</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.MoveSpeed" xml:space="preserve"><value>Move speed</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.MoveSpeedPercent" xml:space="preserve"><value>Move speed</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.AttackSpeed" xml:space="preserve"><value>Attack speed</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.LifeSteal" xml:space="preserve"><value>Life steal</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.CriticalStrikeChance" xml:space="preserve"><value>Critical strike chance</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.HealthRegen" xml:space="preserve"><value>Health regeneration</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.ManaRegen" xml:space="preserve"><value>Mana regeneration</value></data>
   <data name="Coaching.MatchupEditor.Content.Delete" xml:space="preserve"><value>Delete</value></data>
   <data name="Coaching.MatchupEditor.Content.DuplicateName" xml:space="preserve"><value>{0} — copy</value></data>
   <data name="Coaching.MatchupEditor.Champions.Description" xml:space="preserve"><value>This advice pack applies only to this matchup: your champion against the selected opponent in the same lane.</value></data>

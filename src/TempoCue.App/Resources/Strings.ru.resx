@@ -9,6 +9,10 @@
   <data name="Header.Subtitle" xml:space="preserve"><value>Техническая версия · симулятор и подключение к активному матчу</value></data>
   <data name="Header.CoachPackLoaded" xml:space="preserve"><value>COACH PACK ЗАГРУЖЕН</value></data>
   <data name="Language.Tooltip" xml:space="preserve"><value>Язык интерфейса</value></data>
+  <data name="Validation.Length.Requirement" xml:space="preserve"><value>От {0} до {1} символов.</value></data>
+  <data name="Validation.Length.TooShort" xml:space="preserve"><value>{0} из минимум {1} символов. Максимум: {2}.</value></data>
+  <data name="Validation.Length.Valid" xml:space="preserve"><value>{0} из {1} символов.</value></data>
+  <data name="Validation.Length.TooLong" xml:space="preserve"><value>{0} символов; максимум — {1}.</value></data>
   <data name="Connection.WaitingMatch" xml:space="preserve"><value>ОЖИДАНИЕ МАТЧА</value></data>
   <data name="Connection.PollingEverySecond" xml:space="preserve"><value>Проверка Live Client Data каждую 1 с</value></data>
   <data name="Connection.NextPoll" xml:space="preserve"><value>Следующий запрос через 1 с</value></data>
@@ -346,6 +350,36 @@
   <data name="Coaching.MatchupEditor.Items.Picker.EndTitle" xml:space="preserve"><value>Выберите предмет, который завершает фазу</value></data>
   <data name="Coaching.MatchupEditor.Items.Picker.EndDescription" xml:space="preserve"><value>Фаза перестанет применяться после появления этого предмета в инвентаре.</value></data>
   <data name="Coaching.MatchupEditor.Items.Picker.Search" xml:space="preserve"><value>Поиск по названию предмета</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.Price" xml:space="preserve"><value>{0} золота</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.Technical" xml:space="preserve"><value>ID {0} · {1} · патч {2}</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.SelectForDetails" xml:space="preserve"><value>Выберите предмет, чтобы увидеть его стоимость, характеристики и описание.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.NoResults" xml:space="preserve"><value>По выбранным фильтрам предметы не найдены.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.NoStats" xml:space="preserve"><value>Data Dragon не передаёт числовые характеристики этого предмета.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.SourceNote" xml:space="preserve"><value>Предметы, доступные для покупки на Ущелье призывателей в выбранном патче</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.Cancel" xml:space="preserve"><value>Отмена</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.Confirm" xml:space="preserve"><value>Выбрать</value></data>
+  <data name="Coaching.MatchupEditor.Items.Category.All" xml:space="preserve"><value>Все</value></data>
+  <data name="Coaching.MatchupEditor.Items.Category.Starter" xml:space="preserve"><value>Стартовые</value></data>
+  <data name="Coaching.MatchupEditor.Items.Category.Boots" xml:space="preserve"><value>Ботинки</value></data>
+  <data name="Coaching.MatchupEditor.Items.Category.Basic" xml:space="preserve"><value>Базовые</value></data>
+  <data name="Coaching.MatchupEditor.Items.Category.Epic" xml:space="preserve"><value>Эпические</value></data>
+  <data name="Coaching.MatchupEditor.Items.Category.Legendary" xml:space="preserve"><value>Легендарные</value></data>
+  <data name="Coaching.MatchupEditor.Items.Sort.Name" xml:space="preserve"><value>По названию</value></data>
+  <data name="Coaching.MatchupEditor.Items.Sort.PriceAscending" xml:space="preserve"><value>Сначала дешёвые</value></data>
+  <data name="Coaching.MatchupEditor.Items.Sort.PriceDescending" xml:space="preserve"><value>Сначала дорогие</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.Health" xml:space="preserve"><value>Здоровье</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.Mana" xml:space="preserve"><value>Мана</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.AttackDamage" xml:space="preserve"><value>Сила атаки</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.AbilityPower" xml:space="preserve"><value>Сила умений</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.Armor" xml:space="preserve"><value>Броня</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.MagicResistance" xml:space="preserve"><value>Сопротивление магии</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.MoveSpeed" xml:space="preserve"><value>Скорость передвижения</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.MoveSpeedPercent" xml:space="preserve"><value>Скорость передвижения</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.AttackSpeed" xml:space="preserve"><value>Скорость атаки</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.LifeSteal" xml:space="preserve"><value>Вампиризм</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.CriticalStrikeChance" xml:space="preserve"><value>Шанс критического удара</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.HealthRegen" xml:space="preserve"><value>Восстановление здоровья</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.ManaRegen" xml:space="preserve"><value>Восстановление маны</value></data>
   <data name="Coaching.MatchupEditor.Content.Delete" xml:space="preserve"><value>Удалить</value></data>
   <data name="Coaching.MatchupEditor.Content.DuplicateName" xml:space="preserve"><value>{0} — копия</value></data>
   <data name="Coaching.MatchupEditor.Champions.Description" xml:space="preserve"><value>Набор советов работает только в этом матчапе: ваш чемпион против выбранного противника на одной линии.</value></data>
