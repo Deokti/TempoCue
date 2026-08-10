@@ -1,0 +1,331 @@
+<UserControl x:Class="TempoCue.App.Views.MatchupPhaseEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:TempoCue.App.Controls"
+             xmlns:core="clr-namespace:TempoCue.Core;assembly=TempoCue.Core"
+             xmlns:localization="clr-namespace:TempoCue.App.Localization"
+             xmlns:views="clr-namespace:TempoCue.App.Views"
+             Background="Transparent"
+             FontFamily="Segoe UI">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Styles/FormControls.xaml" />
+                <ResourceDictionary Source="../Styles/MatchupPhaseControls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <!-- Рабочая копия скрыта, пока пользователь не создаёт или не изменяет фазу. -->
+    <Border x:Name="PhaseEditorPanel" Padding="20" Margin="0,0,0,14">
+        <Border.Style>
+            <Style TargetType="Border" BasedOn="{StaticResource ShellCard}">
+                <Setter Property="Visibility" Value="Collapsed" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Editor.IsOpen}" Value="True">
+                        <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
+        <StackPanel>
+            <TextBlock x:Name="PhaseEditorTitleTextBlock"
+                       Text="{Binding Editor.Header}"
+                       Foreground="#F4F7FB"
+                       FontSize="{StaticResource Typography.FontSize.CardTitle}"
+                       FontWeight="SemiBold" />
+            <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.Description}"
+                       Foreground="#7F93AF"
+                       FontSize="{StaticResource Typography.FontSize.Caption}"
+                       TextWrapping="Wrap"
+                       Margin="0,6,0,0" />
+
+            <!-- Название фазы. -->
+            <StackPanel Margin="0,18,0,0">
+                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.Name}"
+                           Style="{StaticResource FormFieldLabel}" />
+                <TextBox x:Name="PhaseNameTextBox"
+                         Text="{Binding Editor.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FormTextBox}"
+                         MaxLength="80" />
+                <TextBlock x:Name="PhaseNameLengthFeedback"
+                           DataContext="{Binding Editor.NameLengthFeedback}"
+                           Text="{Binding Text}"
+                           Style="{StaticResource FormLengthFeedback}" />
+            </StackPanel>
+
+            <!-- Оценка опасности задаёт цвет и смысл фазы. -->
+            <StackPanel Margin="0,16,0,0">
+                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.PowerState}"
+                           Style="{StaticResource FormFieldLabel}" />
+                <ListBox x:Name="PhasePowerStateListBox"
+                         ItemsSource="{Binding Editor.PowerStateOptions}"
+                         SelectedValuePath="Value"
+                         SelectedValue="{Binding Editor.SelectedPowerState, Mode=TwoWay}"
+                         ItemContainerStyle="{StaticResource PhaseRiskOption}"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <!-- У Segoe UI оптический центр глифов ниже геометрического центра строки. -->
+                            <Grid VerticalAlignment="Center">
+                                <Grid.RenderTransform>
+                                    <TranslateTransform Y="-2" />
+                                </Grid.RenderTransform>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="8" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Border x:Name="RiskIndicator"
+                                        Width="8"
+                                        Height="8"
+                                        BorderThickness="1"
+                                        CornerRadius="4"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center">
+                                    <Border.RenderTransform>
+                                        <TranslateTransform Y="2" />
+                                    </Border.RenderTransform>
+                                </Border>
+                                <TextBlock Grid.Column="2"
+                                           Text="{Binding DisplayName}"
+                                           Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
+                                           VerticalAlignment="Center"
+                                           LineHeight="20"
+                                           LineStackingStrategy="BlockLineHeight" />
+                            </Grid>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding Value}" Value="{x:Static core:PowerState.Dangerous}">
+                                    <Setter TargetName="RiskIndicator" Property="Background" Value="#FF7185" />
+                                    <Setter TargetName="RiskIndicator" Property="BorderBrush" Value="#FF7185" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Value}" Value="{x:Static core:PowerState.Cautious}">
+                                    <Setter TargetName="RiskIndicator" Property="Background" Value="Transparent" />
+                                    <Setter TargetName="RiskIndicator" Property="BorderBrush" Value="#F2C66D" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Value}" Value="{x:Static core:PowerState.Playable}">
+                                    <Setter TargetName="RiskIndicator" Property="Background" Value="#55D6A3" />
+                                    <Setter TargetName="RiskIndicator" Property="BorderBrush" Value="#55D6A3" />
+                                    <Setter TargetName="RiskIndicator" Property="CornerRadius" Value="2" />
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </StackPanel>
+
+            <!-- Диапазон уровней, на котором действует фаза. -->
+            <Grid Margin="0,16,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="16" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.MinimumLevel}"
+                               Style="{StaticResource FormFieldLabel}" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Button Content="−"
+                                Style="{StaticResource PhaseStepperButton}"
+                                Click="DecreaseMinimumLevelButton_Click" />
+                        <Border Grid.Column="1"
+                                Background="#0C1420"
+                                BorderBrush="#263750"
+                                BorderThickness="1"
+                                Margin="6,0"
+                                CornerRadius="9">
+                            <TextBlock Text="{Binding Editor.MinimumLevel}"
+                                       Foreground="#F4F7FB"
+                                       FontSize="{StaticResource Typography.FontSize.BodyLarge}"
+                                       FontWeight="SemiBold"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                        </Border>
+                        <Button Grid.Column="2"
+                                Content="+"
+                                Style="{StaticResource PhaseStepperButton}"
+                                Click="IncreaseMinimumLevelButton_Click" />
+                    </Grid>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.MaximumLevel}"
+                               Style="{StaticResource FormFieldLabel}" />
+                    <Grid>
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Setter Property="IsEnabled" Value="True" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Editor.ExtendsToEnd}" Value="True">
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Button Content="−"
+                                Style="{StaticResource PhaseStepperButton}"
+                                Click="DecreaseMaximumLevelButton_Click" />
+                        <Border Grid.Column="1"
+                                Background="#0C1420"
+                                BorderBrush="#263750"
+                                BorderThickness="1"
+                                Margin="6,0"
+                                CornerRadius="9">
+                            <TextBlock Text="{Binding Editor.MaximumLevel}"
+                                       Foreground="#F4F7FB"
+                                       FontSize="{StaticResource Typography.FontSize.BodyLarge}"
+                                       FontWeight="SemiBold"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                        </Border>
+                        <Button Grid.Column="2"
+                                Content="+"
+                                Style="{StaticResource PhaseStepperButton}"
+                                Click="IncreaseMaximumLevelButton_Click" />
+                    </Grid>
+                    <controls:TempoCheckBox Content="{localization:Loc Coaching.MatchupEditor.Content.Editor.ToEnd}"
+                                            IsChecked="{Binding Editor.ExtendsToEnd, Mode=TwoWay}"
+                                            Margin="0,8,0,0" />
+                </StackPanel>
+            </Grid>
+
+            <views:MatchupPhaseItemConditionsView x:Name="ItemConditionsView"
+                                                   Margin="0,18,0,0" />
+
+            <!-- Автоматическое пояснение выбранного диапазона уровней. -->
+            <Border x:Name="PhaseMeaningPanel"
+                    Margin="0,18,0,0"
+                    Background="#0C1420"
+                    BorderBrush="#263750"
+                    BorderThickness="1"
+                    CornerRadius="9"
+                    Padding="14,12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2" />
+                        <ColumnDefinition Width="12" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border Background="#4FAAE8" CornerRadius="1" />
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.MeaningTitle}"
+                                   Foreground="#7F93AF"
+                                   FontSize="{StaticResource Typography.FontSize.Caption}" />
+                        <TextBlock x:Name="PhaseMeaningSummaryTextBlock"
+                                   Text="{Binding Editor.MeaningSummary}"
+                                   Foreground="#F4F7FB"
+                                   FontSize="{StaticResource Typography.FontSize.BodyLarge}"
+                                   FontWeight="SemiBold"
+                                   TextWrapping="Wrap"
+                                   Margin="0,5,0,0" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Главный совет, который игрок увидит первым. -->
+            <StackPanel Margin="0,18,0,0">
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,7">
+                    <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.PrimaryAdvice}"
+                               Foreground="#91A4BD"
+                               FontSize="{StaticResource Typography.FontSize.Body}" />
+                    <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.PrimaryAdviceHint}"
+                               Foreground="#91A4BD"
+                               FontSize="{StaticResource Typography.FontSize.Body}"
+                               Opacity="0.62"
+                               Margin="5,0,0,0" />
+                </StackPanel>
+                <TextBox x:Name="PhasePrimaryAdviceTextBox"
+                         Text="{Binding Editor.PrimaryAdvice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FormTextBox}"
+                         MaxLength="200"
+                         TextWrapping="NoWrap" />
+                <TextBlock x:Name="PhasePrimaryAdviceLengthFeedback"
+                           DataContext="{Binding Editor.PrimaryAdviceLengthFeedback}"
+                           Text="{Binding Text}"
+                           Style="{StaticResource FormLengthFeedback}" />
+            </StackPanel>
+
+            <!-- Дополнительный контекст: причина текущего совета и следующая цель. -->
+            <StackPanel Margin="0,16,0,0">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,7">
+                        <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.WhyNow}"
+                                   Foreground="#91A4BD"
+                                   FontSize="{StaticResource Typography.FontSize.Body}" />
+                        <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.WhyNowHint}"
+                                   Foreground="#91A4BD"
+                                   FontSize="{StaticResource Typography.FontSize.Body}"
+                                   Opacity="0.62"
+                                   Margin="5,0,0,0" />
+                    </StackPanel>
+                    <TextBox x:Name="PhaseWhyNowTextBox"
+                             Text="{Binding Editor.WhyNow, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FormTextBox}"
+                             MaxLength="240"
+                             TextWrapping="NoWrap" />
+                </StackPanel>
+                <StackPanel Margin="0,16,0,0">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,7">
+                        <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.NextGoal}"
+                                   Foreground="#91A4BD"
+                                   FontSize="{StaticResource Typography.FontSize.Body}" />
+                        <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.NextGoalHint}"
+                                   Foreground="#91A4BD"
+                                   FontSize="{StaticResource Typography.FontSize.Body}"
+                                   Opacity="0.62"
+                                   Margin="5,0,0,0" />
+                    </StackPanel>
+                    <TextBox x:Name="PhaseNextGoalTextBox"
+                             Text="{Binding Editor.NextGoal, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource FormTextBox}"
+                             MaxLength="160"
+                             TextWrapping="NoWrap" />
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Действия над открытой фазой. -->
+            <Grid Margin="0,18,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal">
+                    <Button x:Name="SavePhaseButton"
+                            Content="{localization:Loc Coaching.MatchupEditor.Content.Editor.Done}"
+                            Style="{StaticResource PrimaryButton}"
+                            IsEnabled="{Binding Editor.CanSave}"
+                            Click="SavePhaseButton_Click" />
+                    <Button x:Name="DuplicateEditedPhaseButton"
+                            Content="{localization:Loc Coaching.MatchupEditor.Content.Duplicate}"
+                            Style="{StaticResource SecondaryButton}"
+                            IsEnabled="{Binding Editor.CanSave}"
+                            Margin="10,0,0,0"
+                            Click="DuplicateEditedPhaseButton_Click" />
+                </StackPanel>
+                <Button Grid.Column="1"
+                        x:Name="DeleteEditedPhaseButton"
+                        Content="{localization:Loc Coaching.MatchupEditor.Content.Editor.DeletePhase}"
+                        Style="{StaticResource PhaseDeleteButton}"
+                        Click="DeleteEditedPhaseButton_Click" />
+            </Grid>
+        </StackPanel>
+    </Border>
+</UserControl>

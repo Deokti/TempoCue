@@ -180,25 +180,30 @@ public sealed class MatchupEditorViewTests
         context.CompleteMainInformationAndOpenChampions();
         context.SelectChampionsAndOpenContent();
         var page = context.ContentPage;
+        var phaseEditor = context.PhaseEditorView;
+        var itemConditions = context.PhaseItemConditionsView;
+        var phaseList = context.PhaseListView;
         var editorPage = context.MatchupEditorPage;
         var content = context.Coaching.MatchupEditor.Content;
         content.EnsureItemCatalogLoadedAsync().GetAwaiter().GetResult();
         WpfTestHost.Pump();
 
-        WpfTestHost.Click(WpfTestHost.Find<Button>(page, "AddPhaseButton"));
-        Assert.Equal(Visibility.Visible, WpfTestHost.Find<Border>(page, "PhaseEditorPanel").Visibility);
+        WpfTestHost.Click(WpfTestHost.Find<Button>(phaseList, "AddPhaseButton"));
+        Assert.Equal(
+            Visibility.Visible,
+            WpfTestHost.Find<Border>(phaseEditor, "PhaseEditorPanel").Visibility);
         Assert.Equal(
             "Фаза активна на уровнях 1+",
-            WpfTestHost.Find<TextBlock>(page, "PhaseMeaningSummaryTextBlock").Text);
+            WpfTestHost.Find<TextBlock>(phaseEditor, "PhaseMeaningSummaryTextBlock").Text);
         Assert.Equal(
             "От 3 до 80 символов.",
-            WpfTestHost.Find<TextBlock>(page, "PhaseNameLengthFeedback").Text);
+            WpfTestHost.Find<TextBlock>(phaseEditor, "PhaseNameLengthFeedback").Text);
         Assert.Equal(
             "От 3 до 200 символов.",
-            WpfTestHost.Find<TextBlock>(page, "PhasePrimaryAdviceLengthFeedback").Text);
+            WpfTestHost.Find<TextBlock>(phaseEditor, "PhasePrimaryAdviceLengthFeedback").Text);
 
         Assert.True(content.ItemPicker.IsCatalogReady);
-        WpfTestHost.Click(WpfTestHost.Find<Button>(page, "SelectStartItemButton"));
+        WpfTestHost.Click(WpfTestHost.Find<Button>(itemConditions, "SelectStartItemButton"));
         var picker = context.ItemPickerDialog;
         Assert.Equal(Visibility.Visible, picker.Visibility);
         context.Window.UpdateLayout();
@@ -254,7 +259,7 @@ public sealed class MatchupEditorViewTests
                      "PhaseNextGoalTextBox"
                  })
         {
-            var input = WpfTestHost.Find<TextBox>(page, inputName);
+            var input = WpfTestHost.Find<TextBox>(phaseEditor, inputName);
             Assert.Equal(36, input.Height);
             Assert.False(input.AcceptsReturn);
         }
@@ -262,7 +267,7 @@ public sealed class MatchupEditorViewTests
         content.Editor.Name = "Осторожное начало";
         content.Editor.PrimaryAdvice = "Не ищи размен первым";
         WpfTestHost.Pump();
-        var saveButton = WpfTestHost.Find<Button>(page, "SavePhaseButton");
+        var saveButton = WpfTestHost.Find<Button>(phaseEditor, "SavePhaseButton");
         Assert.True(saveButton.IsEnabled);
         WpfTestHost.Click(saveButton);
         Assert.Single(content.Phases);
