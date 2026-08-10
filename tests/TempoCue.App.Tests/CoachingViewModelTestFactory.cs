@@ -14,14 +14,24 @@ internal static class CoachingViewModelTestFactory
         TestCoachPackStore? store = null)
     {
         var resolvedStore = store ?? new TestCoachPackStore();
-        return new CoachingViewModel(
+        var resolvedLocalization = localization ?? LocalizationService.Instance;
+        var championCatalog = TestChampionCatalog.Ready();
+        var library = new CoachingLibraryViewModel(
             pack,
-            localization ?? LocalizationService.Instance,
-            TestGamePatchCatalog.Ready(),
-            TestChampionCatalog.Ready(),
-            TestItemCatalog.Ready(),
-            new SaveCoachPackUseCase(resolvedStore),
+            resolvedLocalization,
+            championCatalog,
             new LoadCoachPackLibraryUseCase(resolvedStore),
             new SetCoachPackStateUseCase(resolvedStore));
+        var editor = new MatchupEditorViewModel(
+            resolvedLocalization,
+            TestGamePatchCatalog.Ready(),
+            championCatalog,
+            TestItemCatalog.Ready(),
+            new SaveCoachPackUseCase(resolvedStore));
+        return new CoachingViewModel(
+            resolvedLocalization,
+            library,
+            new PackTypeSelectionViewModel(),
+            editor);
     }
 }

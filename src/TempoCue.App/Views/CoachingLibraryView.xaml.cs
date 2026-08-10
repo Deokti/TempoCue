@@ -15,10 +15,10 @@ public partial class CoachingLibraryView : UserControl
 
     public event EventHandler? CreateRequested;
 
-    private CoachingViewModel ViewModel => (CoachingViewModel)DataContext;
+    private CoachingLibraryViewModel ViewModel => (CoachingLibraryViewModel)DataContext;
 
     private async void CoachingLibraryView_Loaded(object sender, RoutedEventArgs e) =>
-        await ViewModel.EnsureLibraryLoadedAsync();
+        await ViewModel.EnsureLoadedAsync();
 
     private void CreatePackButton_Click(object sender, RoutedEventArgs e) =>
         CreateRequested?.Invoke(this, EventArgs.Empty);

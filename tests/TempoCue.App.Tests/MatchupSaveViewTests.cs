@@ -55,8 +55,8 @@ public sealed class MatchupSaveViewTests
             Assert.Equal("Включён", context.Coaching.MatchupEditor.Save.PackStateLabel);
             Assert.Equal(CoachingScreen.Library, context.Coaching.CurrentScreen);
             Assert.Equal(Visibility.Collapsed, editor.Visibility);
-            Assert.Equal(2, context.Coaching.MatchupCards.Count);
-            var createdCard = Assert.Single(context.Coaching.MyPackCards);
+            Assert.Equal(2, context.Coaching.Library.MatchupCards.Count);
+            var createdCard = Assert.Single(context.Coaching.Library.MyPackCards);
             Assert.Equal(savedPack.Id, createdCard.Pack.Id);
             Assert.True(createdCard.IsEnabled);
             Assert.Contains("Urgot", createdCard.Title);

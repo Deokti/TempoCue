@@ -76,7 +76,7 @@ public sealed class CoachingViewModelTests
     }
 
     [Fact]
-    public void LanguageChange_UpdatesSystemLabelsButPreservesPackContent()
+    public async Task LanguageChange_UpdatesLibraryLabelsButPreservesPackContent()
     {
         var localization = LocalizationService.Instance;
         var initialLanguage = localization.CurrentLanguageCode;
@@ -109,21 +109,23 @@ public sealed class CoachingViewModelTests
             using var viewModel = CoachingViewModelTestFactory.Create(
                 pack,
                 localization);
+            await viewModel.Library.EnsureLoadedAsync();
 
-            Assert.Equal("URG", viewModel.PlayerChampionInitials);
-            Assert.Equal("SET", viewModel.OpponentChampionInitials);
-            Assert.Equal("2 правил", viewModel.RulesSummary);
-            Assert.Equal("Опасно", viewModel.Rules[0].PowerStateLabel);
-            Assert.Equal("ур. 1–8", viewModel.Rules[0].LevelRange);
-            Assert.Equal("ур. 9+", viewModel.Rules[1].LevelRange);
+            var russianCard = Assert.Single(viewModel.Library.MatchupCards);
+            Assert.Equal("URG", russianCard.PlayerChampionInitials);
+            Assert.Equal("SET", russianCard.OpponentChampionInitials);
+            Assert.Equal("Urgot против Sett", russianCard.Title);
+            Assert.Equal("2 совета", russianCard.AdviceCount);
+            Assert.Equal("Включён", russianCard.StateLabel);
 
             localization.SetLanguage("en-US");
 
-            Assert.Equal("2 rules", viewModel.RulesSummary);
-            Assert.Equal("Danger", viewModel.Rules[0].PowerStateLabel);
-            Assert.Equal("lvl. 1–8", viewModel.Rules[0].LevelRange);
-            Assert.Equal("Не принимай ранний бой", viewModel.Rules[0].Title);
-            Assert.Equal("Urgot vs Sett — авторский текст", viewModel.PackName);
+            var englishCard = Assert.Single(viewModel.Library.MatchupCards);
+            Assert.Equal("Urgot vs Sett", englishCard.Title);
+            Assert.Equal("2 pieces of advice", englishCard.AdviceCount);
+            Assert.Equal("Enabled", englishCard.StateLabel);
+            Assert.Equal("Urgot vs Sett — авторский текст", englishCard.Pack.Name);
+            Assert.Equal("Не принимай ранний бой", englishCard.Pack.Rules[0].Title);
         }
         finally
         {

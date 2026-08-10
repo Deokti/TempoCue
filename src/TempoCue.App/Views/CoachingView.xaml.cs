@@ -31,6 +31,6 @@ public partial class CoachingView : UserControl
     private async void MatchupEditorPage_SaveCompleted(object? sender, EventArgs e)
     {
         ViewModel.OpenLibrary();
-        await ViewModel.RefreshLibraryAsync();
+        await ViewModel.Library.RefreshAsync();
     }
 }

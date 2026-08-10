@@ -84,15 +84,23 @@ public partial class App : System.Windows.Application
         var saveCoachPack = new SaveCoachPackUseCase(coachPackStore);
         var loadCoachPackLibrary = new LoadCoachPackLibraryUseCase(coachPackStore);
         var setCoachPackState = new SetCoachPackStateUseCase(coachPackStore);
-        _coachingViewModel = new CoachingViewModel(
+        var coachingLibraryViewModel = new CoachingLibraryViewModel(
             pack,
+            LocalizationService.Instance,
+            _championCatalog,
+            loadCoachPackLibrary,
+            setCoachPackState);
+        var matchupEditorViewModel = new MatchupEditorViewModel(
             LocalizationService.Instance,
             _gamePatchCatalog,
             _championCatalog,
             _itemCatalog,
-            saveCoachPack,
-            loadCoachPackLibrary,
-            setCoachPackState);
+            saveCoachPack);
+        _coachingViewModel = new CoachingViewModel(
+            LocalizationService.Instance,
+            coachingLibraryViewModel,
+            new PackTypeSelectionViewModel(),
+            matchupEditorViewModel);
 
         // Окно получает полностью собранный граф зависимостей и только связывает ViewModel с View.
         MainWindow = new MainWindow(

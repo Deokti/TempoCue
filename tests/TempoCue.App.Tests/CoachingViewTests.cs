@@ -20,9 +20,9 @@ public sealed class CoachingViewTests
             "MatchupLibraryScrollViewer");
 
         AssertLibraryStyles(libraryPage, matchupScrollViewer);
-        Assert.Single(context.Coaching.MatchupCards);
-        Assert.Empty(context.Coaching.MyPackCards);
-        Assert.Contains("1 набор советов", context.Coaching.LibrarySummary);
+        Assert.Single(context.Coaching.Library.MatchupCards);
+        Assert.Empty(context.Coaching.Library.MyPackCards);
+        Assert.Contains("1 набор советов", context.Coaching.Library.LibrarySummary);
 
         var searchTextBox = WpfTestHost.Find<TextBox>(libraryPage, "CoachingSearchTextBox");
         var searchPlaceholder = WpfTestHost.Find<TextBlock>(
@@ -35,10 +35,10 @@ public sealed class CoachingViewTests
 
         AssertResponsiveLayout(context, libraryPage, matchupScrollViewer);
 
-        context.Coaching.SearchText = "Sett";
-        Assert.Single(context.Coaching.MatchupCards);
-        context.Coaching.SearchText = "неизвестный матчап";
-        Assert.Empty(context.Coaching.MatchupCards);
+        context.Coaching.Library.SearchText = "Sett";
+        Assert.Single(context.Coaching.Library.MatchupCards);
+        context.Coaching.Library.SearchText = "неизвестный матчап";
+        Assert.Empty(context.Coaching.Library.MatchupCards);
     });
 
     [Fact]
@@ -72,10 +72,10 @@ public sealed class CoachingViewTests
         WpfTestHost.Click(toggle);
         WpfTestHost.Pump(DispatcherPriority.ApplicationIdle);
 
-        var card = Assert.Single(context.Coaching.MatchupCards);
+        var card = Assert.Single(context.Coaching.Library.MatchupCards);
         Assert.True(card.IsDisabled);
         Assert.False(card.IsEnabled);
-        Assert.Contains("0 включено", context.Coaching.LibrarySummary);
+        Assert.Contains("0 включено", context.Coaching.Library.LibrarySummary);
         var refreshedToggle = Assert.Single(
             WpfTestHost.FindVisualDescendants<ToggleButton>(libraryPage),
             candidate => candidate.Name == "PackEnabledToggle");
@@ -120,7 +120,7 @@ public sealed class CoachingViewTests
     {
         context.Show();
         WpfTestHost.Click(WpfTestHost.Find<Button>(context.Window, "CoachingNavigationButton"));
-        context.Coaching.EnsureLibraryLoadedAsync().GetAwaiter().GetResult();
+        context.Coaching.Library.EnsureLoadedAsync().GetAwaiter().GetResult();
         WpfTestHost.Pump(DispatcherPriority.ApplicationIdle);
         return context.CoachingLibraryPage;
     }
