@@ -79,6 +79,9 @@ internal sealed class MainWindowTestContext : IDisposable
     public MatchupPhaseListView PhaseListView =>
         WpfTestHost.Find<MatchupPhaseListView>(ContentPage, "PhaseListView");
 
+    public MatchupPersistentTipsView PersistentTipsView =>
+        WpfTestHost.Find<MatchupPersistentTipsView>(ContentPage, "PersistentTipsView");
+
     public ChampionPickerDialogView ChampionPickerDialog =>
         WpfTestHost.Find<ChampionPickerDialogView>(MatchupEditorPage, "ChampionPickerDialog");
 

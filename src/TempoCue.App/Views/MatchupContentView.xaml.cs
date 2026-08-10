@@ -13,6 +13,14 @@ public partial class MatchupContentView : UserControl
         IsVisibleChanged += MatchupContentView_IsVisibleChanged;
     }
 
+    private MatchupContentViewModel ViewModel => (MatchupContentViewModel)DataContext;
+
+    private void MatchupPhasesTabButton_Click(object sender, RoutedEventArgs e) =>
+        ViewModel.ShowPhases();
+
+    private void MatchupPersistentTipsTabButton_Click(object sender, RoutedEventArgs e) =>
+        ViewModel.ShowPersistentTips();
+
     // Каталог загружается при входе на шаг, но ошибка не мешает создавать фазу без предметов.
     private async void MatchupContentView_IsVisibleChanged(
         object sender,

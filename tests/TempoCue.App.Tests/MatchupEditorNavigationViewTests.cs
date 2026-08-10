@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using TempoCue.App.ViewModels;
 
 namespace TempoCue.App.Tests;
 
@@ -37,7 +38,10 @@ public sealed class MatchupEditorNavigationViewTests
             Assert.Equal(1, context.Coaching.MatchupEditor.CurrentStep);
             Assert.Equal(Visibility.Visible, context.MainInformationPage.Visibility);
             Assert.Equal(Visibility.Collapsed, context.ChampionsAndRolePage.Visibility);
-            Assert.False(backButton.IsEnabled);
+            Assert.True(backButton.IsEnabled);
+
+            WpfTestHost.Click(backButton);
+            Assert.Equal(CoachingScreen.PackTypeSelection, context.Coaching.CurrentScreen);
         });
     }
 }

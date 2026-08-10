@@ -284,7 +284,7 @@
   <data name="Coaching.MatchupEditor.StepSummary.Champions" xml:space="preserve"><value>Step 2 of 5 · Champions and role</value></data>
   <data name="Coaching.MatchupEditor.StepSummary.Content" xml:space="preserve"><value>Step 3 of 5 · Matchup content</value></data>
   <data name="Coaching.MatchupEditor.Content.Tab.Phases" xml:space="preserve"><value>Phases {0}</value></data>
-  <data name="Coaching.MatchupEditor.Content.Tab.Persistent" xml:space="preserve"><value>Persistent tips 0</value></data>
+  <data name="Coaching.MatchupEditor.Content.Tab.Persistent" xml:space="preserve"><value>Persistent tips {0}</value></data>
   <data name="Coaching.MatchupEditor.Content.Tab.Items" xml:space="preserve"><value>Items 0</value></data>
   <data name="Coaching.MatchupEditor.Content.FutureSection" xml:space="preserve"><value>Available in the next iteration of step 3</value></data>
   <data name="Coaching.MatchupEditor.Content.PhasesTitle" xml:space="preserve"><value>Matchup phases</value></data>
@@ -326,6 +326,29 @@
   <data name="Coaching.MatchupEditor.Content.Edit" xml:space="preserve"><value>Edit</value></data>
   <data name="Coaching.MatchupEditor.Content.Duplicate" xml:space="preserve"><value>Duplicate</value></data>
   <data name="Coaching.MatchupEditor.Content.Phase.RecommendedItems" xml:space="preserve"><value>Recommended items: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Editor.AddTitle" xml:space="preserve"><value>New tip</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Editor.EditTitle" xml:space="preserve"><value>Editing tip: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Editor.Progress" xml:space="preserve"><value>Tip {0} of {1}</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.DefaultTitle" xml:space="preserve"><value>New tip</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Title" xml:space="preserve"><value>Title</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Text" xml:space="preserve"><value>Tip text</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Scope" xml:space="preserve"><value>Where it applies</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Scope.WholeMatch" xml:space="preserve"><value>Whole match</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Scope.Phase" xml:space="preserve"><value>Phase {0}: {1}</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Source" xml:space="preserve"><value>Source</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Source.UseCustom" xml:space="preserve"><value>Specify a separate source</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Source.InheritedHint" xml:space="preserve"><value>The tip will use the Coach Pack source specified at the save step.</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Source.Inherited" xml:space="preserve"><value>Source: Coach Pack source</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Source.Custom" xml:space="preserve"><value>Source: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.ListTitle" xml:space="preserve"><value>Persistent tips</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Description" xml:space="preserve"><value>Mechanical knowledge that cannot be tied to an exact moment through Live Client Data. It is available in matchup details and does not replace the active phase advice.</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Add" xml:space="preserve"><value>+ Add tip</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Empty" xml:space="preserve"><value>No persistent tips yet. Add knowledge that remains useful throughout the match or within a selected phase.</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Difference.Title" xml:space="preserve"><value>How this differs from a phase</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Difference.Phase.Title" xml:space="preserve"><value>Phase</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Difference.Phase.Text" xml:space="preserve"><value>Active at a specific moment. It is shown as the main advice and can appear in the overlay.</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Difference.Persistent.Title" xml:space="preserve"><value>Persistent tip</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Difference.Persistent.Text" xml:space="preserve"><value>Available in matchup details on demand. It does not appear in the overlay or replace the main advice.</value></data>
   <data name="Coaching.MatchupEditor.Items.Loading" xml:space="preserve"><value>Loading items for the selected patch…</value></data>
   <data name="Coaching.MatchupEditor.Items.ErrorTitle" xml:space="preserve"><value>Item catalog is unavailable</value></data>
   <data name="Coaching.MatchupEditor.Items.ErrorDescription" xml:space="preserve"><value>You can save a phase without item recommendations or retry loading.</value></data>

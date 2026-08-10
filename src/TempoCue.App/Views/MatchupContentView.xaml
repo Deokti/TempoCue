@@ -43,19 +43,33 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-            <Style x:Key="ContentSectionTabActive"
+            <Style x:Key="ContentSectionPhasesTab"
                    TargetType="Button"
                    BasedOn="{StaticResource ContentSectionTab}">
-                <Setter Property="Background" Value="#1B2A42" />
-                <Setter Property="Foreground" Value="#F4F7FB" />
-                <Setter Property="FontWeight" Value="SemiBold" />
-                <Setter Property="IsHitTestVisible" Value="False" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsPhasesSection}" Value="True">
+                        <Setter Property="Background" Value="#1B2A42" />
+                        <Setter Property="Foreground" Value="#F4F7FB" />
+                        <Setter Property="FontWeight" Value="SemiBold" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+            <Style x:Key="ContentSectionPersistentTab"
+                   TargetType="Button"
+                   BasedOn="{StaticResource ContentSectionTab}">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsPersistentTipsSection}" Value="True">
+                        <Setter Property="Background" Value="#1B2A42" />
+                        <Setter Property="Foreground" Value="#F4F7FB" />
+                        <Setter Property="FontWeight" Value="SemiBold" />
+                    </DataTrigger>
+                </Style.Triggers>
             </Style>
         </ResourceDictionary>
     </UserControl.Resources>
 
     <StackPanel>
-        <!-- Фазы доступны сейчас, остальные разделы подготовлены к следующим итерациям. -->
+        <!-- Вкладки переключают самостоятельные разделы; предметы остаются следующей итерацией. -->
         <Border Background="#101827"
                 BorderBrush="#263750"
                 BorderThickness="1"
@@ -65,11 +79,12 @@
             <StackPanel Orientation="Horizontal">
                 <Button x:Name="MatchupPhasesTabButton"
                         Content="{Binding PhasesTabLabel}"
-                        Style="{StaticResource ContentSectionTabActive}" />
-                <Button Content="{localization:Loc Coaching.MatchupEditor.Content.Tab.Persistent}"
-                        Style="{StaticResource ContentSectionTab}"
-                        IsEnabled="False"
-                        ToolTip="{localization:Loc Coaching.MatchupEditor.Content.FutureSection}" />
+                        Style="{StaticResource ContentSectionPhasesTab}"
+                        Click="MatchupPhasesTabButton_Click" />
+                <Button x:Name="MatchupPersistentTipsTabButton"
+                        Content="{Binding PersistentTipsTabLabel}"
+                        Style="{StaticResource ContentSectionPersistentTab}"
+                        Click="MatchupPersistentTipsTabButton_Click" />
                 <Button Content="{localization:Loc Coaching.MatchupEditor.Content.Tab.Items}"
                         Style="{StaticResource ContentSectionTab}"
                         IsEnabled="False"
@@ -79,22 +94,47 @@
 
         <!-- Шаг компонует самостоятельные представления и общую информационную колонку. -->
         <Grid Margin="0,16,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*" />
-                <ColumnDefinition Width="16" />
-                <ColumnDefinition Width="1*" />
-            </Grid.ColumnDefinitions>
+            <Grid x:Name="MatchupPhasesSection">
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsPhasesSection}" Value="True">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="16" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Column="0">
-                <views:MatchupPhaseEditorView x:Name="PhaseEditorView" />
-                <views:MatchupPhaseListView x:Name="PhaseListView" />
-            </StackPanel>
+                <StackPanel Grid.Column="0">
+                    <views:MatchupPhaseEditorView x:Name="PhaseEditorView" />
+                    <views:MatchupPhaseListView x:Name="PhaseListView" />
+                </StackPanel>
 
-            <!-- Как в макете, проверка остаётся рядом со списком и не растягивает страницу по ширине. -->
-            <StackPanel Grid.Column="2">
-                <views:MatchupPhaseValidationView x:Name="PhaseValidationView"
-                                                  DataContext="{Binding Validation}" />
-            </StackPanel>
+                <!-- Как в макете, проверка остаётся рядом со списком и не растягивает страницу по ширине. -->
+                <StackPanel Grid.Column="2">
+                    <views:MatchupPhaseValidationView x:Name="PhaseValidationView"
+                                                      DataContext="{Binding Validation}" />
+                </StackPanel>
+            </Grid>
+
+            <views:MatchupPersistentTipsView x:Name="PersistentTipsView">
+                <views:MatchupPersistentTipsView.Style>
+                    <Style TargetType="views:MatchupPersistentTipsView">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsPersistentTipsSection}" Value="True">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </views:MatchupPersistentTipsView.Style>
+            </views:MatchupPersistentTipsView>
         </Grid>
     </StackPanel>
 </UserControl>

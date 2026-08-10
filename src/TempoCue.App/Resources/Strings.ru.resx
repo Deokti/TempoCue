@@ -287,7 +287,7 @@
   <data name="Coaching.MatchupEditor.StepSummary.Champions" xml:space="preserve"><value>Шаг 2 из 5 · Чемпионы и роль</value></data>
   <data name="Coaching.MatchupEditor.StepSummary.Content" xml:space="preserve"><value>Шаг 3 из 5 · Содержание матчапа</value></data>
   <data name="Coaching.MatchupEditor.Content.Tab.Phases" xml:space="preserve"><value>Фазы {0}</value></data>
-  <data name="Coaching.MatchupEditor.Content.Tab.Persistent" xml:space="preserve"><value>Постоянные подсказки 0</value></data>
+  <data name="Coaching.MatchupEditor.Content.Tab.Persistent" xml:space="preserve"><value>Постоянные подсказки {0}</value></data>
   <data name="Coaching.MatchupEditor.Content.Tab.Items" xml:space="preserve"><value>Предметы 0</value></data>
   <data name="Coaching.MatchupEditor.Content.FutureSection" xml:space="preserve"><value>Будет доступно в следующей итерации шага 3</value></data>
   <data name="Coaching.MatchupEditor.Content.PhasesTitle" xml:space="preserve"><value>Фазы матчапа</value></data>
@@ -329,6 +329,29 @@
   <data name="Coaching.MatchupEditor.Content.Edit" xml:space="preserve"><value>Редактировать</value></data>
   <data name="Coaching.MatchupEditor.Content.Duplicate" xml:space="preserve"><value>Дублировать</value></data>
   <data name="Coaching.MatchupEditor.Content.Phase.RecommendedItems" xml:space="preserve"><value>Рекомендуемые предметы: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Editor.AddTitle" xml:space="preserve"><value>Новая подсказка</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Editor.EditTitle" xml:space="preserve"><value>Редактирование подсказки: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Editor.Progress" xml:space="preserve"><value>Подсказка {0} из {1}</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.DefaultTitle" xml:space="preserve"><value>Новая подсказка</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Title" xml:space="preserve"><value>Заголовок</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Text" xml:space="preserve"><value>Текст подсказки</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Scope" xml:space="preserve"><value>Где применима</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Scope.WholeMatch" xml:space="preserve"><value>Весь матч</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Scope.Phase" xml:space="preserve"><value>Фаза {0}: {1}</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Source" xml:space="preserve"><value>Источник</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Source.UseCustom" xml:space="preserve"><value>Указать отдельный источник</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Source.InheritedHint" xml:space="preserve"><value>Подсказка будет использовать источник набора, указанный на шаге сохранения.</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Source.Inherited" xml:space="preserve"><value>Источник: источник набора</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Source.Custom" xml:space="preserve"><value>Источник: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.ListTitle" xml:space="preserve"><value>Постоянные подсказки</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Description" xml:space="preserve"><value>Механические знания, которые нельзя привязать к точному моменту через Live Client Data. Они доступны в деталях матчапа и не заменяют совет активной фазы.</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Add" xml:space="preserve"><value>+ Добавить подсказку</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Empty" xml:space="preserve"><value>Постоянных подсказок пока нет. Добавьте знание, полезное весь матч или в выбранной фазе.</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Difference.Title" xml:space="preserve"><value>Чем это отличается от фазы</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Difference.Phase.Title" xml:space="preserve"><value>Фаза</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Difference.Phase.Text" xml:space="preserve"><value>Активна в конкретный момент. Показывается как главный совет и может попасть в оверлей.</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Difference.Persistent.Title" xml:space="preserve"><value>Постоянная подсказка</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Difference.Persistent.Text" xml:space="preserve"><value>Доступна в деталях матчапа по запросу. В оверлей не выводится и главный совет не подменяет.</value></data>
   <data name="Coaching.MatchupEditor.Items.Loading" xml:space="preserve"><value>Загружаем предметы выбранного патча…</value></data>
   <data name="Coaching.MatchupEditor.Items.ErrorTitle" xml:space="preserve"><value>Каталог предметов недоступен</value></data>
   <data name="Coaching.MatchupEditor.Items.ErrorDescription" xml:space="preserve"><value>Можно сохранить фазу без рекомендаций предметов или повторить загрузку.</value></data>

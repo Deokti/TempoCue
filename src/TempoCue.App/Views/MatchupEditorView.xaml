@@ -154,7 +154,6 @@
                 <Button x:Name="BackToPackTypeButton"
                         Content="{localization:Loc Coaching.MatchupEditor.Back}"
                         Style="{StaticResource SecondaryButton}"
-                        IsEnabled="{Binding CanMovePrevious}"
                         Click="BackToPackTypeButton_Click" />
                 <Button x:Name="MatchupEditorNextButton"
                         Content="{localization:Loc Coaching.MatchupEditor.Next}"

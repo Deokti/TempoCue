@@ -12,6 +12,7 @@ public sealed class MatchupContentViewModel : ObservableObject
 {
     private readonly LocalizationService _localization;
     private readonly ObservableCollection<MatchupPhaseViewModel> _phases = [];
+    private MatchupContentSection _currentSection = MatchupContentSection.Phases;
     private int _nextPhaseNumber = 1;
 
     public MatchupContentViewModel(
@@ -22,6 +23,8 @@ public sealed class MatchupContentViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(itemCatalog);
         Phases = new ReadOnlyObservableCollection<MatchupPhaseViewModel>(_phases);
         Editor = new MatchupPhaseEditorViewModel(localization);
+        PersistentTips = new MatchupPersistentTipsViewModel(localization);
+        PersistentTips.PropertyChanged += PersistentTips_PropertyChanged;
         ItemPicker = new ItemPickerViewModel(itemCatalog, localization);
         Validation = new MatchupPhaseValidationViewModel(
             localization,
@@ -33,6 +36,8 @@ public sealed class MatchupContentViewModel : ObservableObject
 
     public MatchupPhaseEditorViewModel Editor { get; }
 
+    public MatchupPersistentTipsViewModel PersistentTips { get; }
+
     public ItemPickerViewModel ItemPicker { get; }
 
     public MatchupPhaseValidationViewModel Validation { get; }
@@ -43,8 +48,34 @@ public sealed class MatchupContentViewModel : ObservableObject
 
     public bool IsComplete => HasPhases && !Validation.HasErrors;
 
+    public MatchupContentSection CurrentSection
+    {
+        get => _currentSection;
+        private set
+        {
+            if (SetProperty(ref _currentSection, value))
+            {
+                OnPropertyChanged(nameof(IsPhasesSection));
+                OnPropertyChanged(nameof(IsPersistentTipsSection));
+            }
+        }
+    }
+
+    public bool IsPhasesSection => CurrentSection == MatchupContentSection.Phases;
+
+    public bool IsPersistentTipsSection => CurrentSection == MatchupContentSection.PersistentTips;
+
     public string PhasesTabLabel =>
         _localization.Format("Coaching.MatchupEditor.Content.Tab.Phases", PhaseCount);
+
+    public string PersistentTipsTabLabel =>
+        _localization.Format(
+            "Coaching.MatchupEditor.Content.Tab.Persistent",
+            PersistentTips.Count);
+
+    public void ShowPhases() => CurrentSection = MatchupContentSection.Phases;
+
+    public void ShowPersistentTips() => CurrentSection = MatchupContentSection.PersistentTips;
 
     public void BeginAddPhase() => Editor.BeginNew();
 
@@ -194,8 +225,10 @@ public sealed class MatchupContentViewModel : ObservableObject
         }
 
         Validation.UpdateLanguage();
+        PersistentTips.UpdateLanguage();
 
         OnPropertyChanged(nameof(PhasesTabLabel));
+        OnPropertyChanged(nameof(PersistentTipsTabLabel));
     }
 
     private void ItemPicker_ItemsSelected(
@@ -258,10 +291,21 @@ public sealed class MatchupContentViewModel : ObservableObject
     {
         UpdatePositions();
         Validation.Update(_phases.Select(static phase => phase.CreateSnapshot()).ToArray());
+        PersistentTips.UpdatePhases(_phases);
         OnPropertyChanged(nameof(HasPhases));
         OnPropertyChanged(nameof(PhaseCount));
         OnPropertyChanged(nameof(IsComplete));
         OnPropertyChanged(nameof(PhasesTabLabel));
+    }
+
+    private void PersistentTips_PropertyChanged(
+        object? sender,
+        System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MatchupPersistentTipsViewModel.Count))
+        {
+            OnPropertyChanged(nameof(PersistentTipsTabLabel));
+        }
     }
 
     private void UpdatePositions()
