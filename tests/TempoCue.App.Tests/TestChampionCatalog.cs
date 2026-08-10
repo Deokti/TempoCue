@@ -9,10 +9,12 @@ internal sealed class TestChampionCatalog(ChampionCatalogLoadResult result) : IC
             [
                 new ChampionCatalogEntry(
                     "Urgot",
+                    6,
                     "Urgot",
                     new Uri("https://example.test/Urgot.png")),
                 new ChampionCatalogEntry(
                     "Sett",
+                    875,
                     "Sett",
                     new Uri("https://example.test/Sett.png"))
             ],

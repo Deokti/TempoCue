@@ -19,6 +19,20 @@ public partial class CoachingView : UserControl
     private void CoachingLibraryPage_CreateRequested(object? sender, EventArgs e) =>
         ViewModel.OpenPackTypeSelection();
 
+    private async void CoachingLibraryPage_PackOpenRequested(
+        object? sender,
+        CoachingPackEventArgs e) =>
+        await ViewModel.OpenPackDetailsAsync(e.Card);
+
+    private void CoachingPackDetailsPage_BackRequested(object? sender, EventArgs e)
+    {
+        ViewModel.Details.Export.Close();
+        ViewModel.OpenLibrary();
+    }
+
+    private async void CoachingPackDetailsPage_StateChangeRequested(object? sender, EventArgs e) =>
+        await ViewModel.SetSelectedPackEnabledAsync(!ViewModel.Details.IsEnabled);
+
     private void PackTypeSelectionPage_BackRequested(object? sender, EventArgs e) =>
         ViewModel.OpenLibrary();
 

@@ -9,6 +9,8 @@ public sealed record CoachingPackCardViewModel(
     CoachingPackOrigin Origin,
     LocalCoachPackState State,
     string Title,
+    string PlayerChampionName,
+    string OpponentChampionName,
     string PlayerChampionInitials,
     string OpponentChampionInitials,
     Uri? PlayerChampionImageUri,

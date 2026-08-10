@@ -88,10 +88,13 @@ public sealed class DataDragonChampionCatalog : IChampionCatalog
             .Where(static champion =>
                 !string.IsNullOrWhiteSpace(champion.Id)
                 && IsSummonersRiftChampion(champion.Id)
+                && int.TryParse(champion.Key, NumberStyles.None, CultureInfo.InvariantCulture, out var numericId)
+                && numericId > 0
                 && !string.IsNullOrWhiteSpace(champion.Name)
                 && !string.IsNullOrWhiteSpace(champion.Image?.Full))
             .Select(champion => new ChampionCatalogEntry(
                 champion.Id!,
+                int.Parse(champion.Key!, CultureInfo.InvariantCulture),
                 champion.Name!,
                 DataDragonClient.CreateResourceUri(
                     $"cdn/{Uri.EscapeDataString(version)}/img/champion/{Uri.EscapeDataString(champion.Image!.Full!)}")))
@@ -117,6 +120,7 @@ public sealed class DataDragonChampionCatalog : IChampionCatalog
                     .Select(champion => new DataDragonCachedChampionDto
                     {
                         Id = champion.Id,
+                        NumericId = champion.NumericId,
                         DisplayName = champion.DisplayName,
                         ImageUrl = champion.ImageUri.AbsoluteUri
                     })
@@ -174,10 +178,12 @@ public sealed class DataDragonChampionCatalog : IChampionCatalog
                 .Where(static champion =>
                     !string.IsNullOrWhiteSpace(champion.Id)
                     && IsSummonersRiftChampion(champion.Id)
+                    && champion.NumericId > 0
                     && !string.IsNullOrWhiteSpace(champion.DisplayName)
                     && Uri.TryCreate(champion.ImageUrl, UriKind.Absolute, out _))
                 .Select(champion => new ChampionCatalogEntry(
                     champion.Id!,
+                    champion.NumericId,
                     champion.DisplayName!,
                     new Uri(champion.ImageUrl!, UriKind.Absolute)))
                 .ToArray();

@@ -195,10 +195,10 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <Button Content="{localization:Loc Coaching.Library.Open}"
+                                    x:Name="OpenCoachingPackButton"
                                     Style="{StaticResource SecondaryButton}"
                                     HorizontalAlignment="Left"
-                                    IsEnabled="False"
-                                    ToolTip="{localization:Loc Coaching.Library.Open.Planned}" />
+                                    Click="OpenCoachingPackButton_Click" />
                             <ToggleButton x:Name="PackEnabledToggle"
                                           Grid.Column="1"
                                           Style="{StaticResource TempoSwitch}"

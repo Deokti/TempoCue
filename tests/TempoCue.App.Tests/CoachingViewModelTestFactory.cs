@@ -22,15 +22,21 @@ internal static class CoachingViewModelTestFactory
             championCatalog,
             new LoadCoachPackLibraryUseCase(resolvedStore),
             new SetCoachPackStateUseCase(resolvedStore));
+        var itemCatalog = TestItemCatalog.Ready();
         var editor = new MatchupEditorViewModel(
             resolvedLocalization,
             TestGamePatchCatalog.Ready(),
             championCatalog,
-            TestItemCatalog.Ready(),
+            itemCatalog,
             new SaveCoachPackUseCase(resolvedStore));
+        var details = new CoachingPackDetailsViewModel(
+            resolvedLocalization,
+            itemCatalog,
+            new BuildLeagueItemSetExportUseCase(championCatalog, itemCatalog));
         return new CoachingViewModel(
             resolvedLocalization,
             library,
+            details,
             new PackTypeSelectionViewModel(),
             editor);
     }

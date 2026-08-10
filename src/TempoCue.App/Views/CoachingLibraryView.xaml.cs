@@ -15,6 +15,8 @@ public partial class CoachingLibraryView : UserControl
 
     public event EventHandler? CreateRequested;
 
+    public event EventHandler<CoachingPackEventArgs>? PackOpenRequested;
+
     private CoachingLibraryViewModel ViewModel => (CoachingLibraryViewModel)DataContext;
 
     private async void CoachingLibraryView_Loaded(object sender, RoutedEventArgs e) =>
@@ -22,6 +24,14 @@ public partial class CoachingLibraryView : UserControl
 
     private void CreatePackButton_Click(object sender, RoutedEventArgs e) =>
         CreateRequested?.Invoke(this, EventArgs.Empty);
+
+    private void OpenCoachingPackButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { DataContext: CoachingPackCardViewModel card })
+        {
+            PackOpenRequested?.Invoke(this, new CoachingPackEventArgs(card));
+        }
+    }
 
     private async void PackEnabledToggle_Click(object sender, RoutedEventArgs e)
     {

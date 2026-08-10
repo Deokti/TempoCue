@@ -46,6 +46,7 @@ public sealed class MatchupChampionsAndRoleViewModelTests
                 [
                     new ChampionCatalogEntry(
                         "Urgot",
+                        6,
                         "Urgot",
                         new Uri("https://example.test/Urgot.png"))
                 ],

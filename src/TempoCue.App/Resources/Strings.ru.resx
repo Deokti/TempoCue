@@ -583,4 +583,75 @@
   <data name="Coaching.MatchupEditor.Save.Status.EnabledSaved" xml:space="preserve"><value>Набор сохранён и включён. Подключение к движку будет завершено в следующей итерации библиотеки.</value></data>
   <data name="Coaching.MatchupEditor.Save.Status.Failed" xml:space="preserve"><value>Не удалось сохранить набор. Проверьте доступ к локальной папке приложения.</value></data>
   <data name="Coaching.MatchupEditor.Save.Status.Saved" xml:space="preserve"><value>Набор сохранён локально.</value></data>
+  <data name="Count.ItemBlock.One" xml:space="preserve"><value>{0} блок</value></data>
+  <data name="Count.ItemBlock.Few" xml:space="preserve"><value>{0} блока</value></data>
+  <data name="Count.ItemBlock.Many" xml:space="preserve"><value>{0} блоков</value></data>
+  <data name="Coaching.Details.Back" xml:space="preserve"><value>← Назад к библиотеке</value></data>
+  <data name="Coaching.Details.Versus" xml:space="preserve"><value>vs</value></data>
+  <data name="Coaching.Details.Disable" xml:space="preserve"><value>Отключить</value></data>
+  <data name="Coaching.Details.Enable" xml:space="preserve"><value>Включить</value></data>
+  <data name="Coaching.Details.Header" xml:space="preserve"><value>Матчап · {0} · {1} · {2}</value></data>
+  <data name="Coaching.Details.Edit" xml:space="preserve"><value>Редактировать</value></data>
+  <data name="Coaching.Details.Edit.Planned" xml:space="preserve"><value>Редактирование сохранённого набора появится в следующей итерации.</value></data>
+  <data name="Coaching.Details.Tab.Overview" xml:space="preserve"><value>Обзор</value></data>
+  <data name="Coaching.Details.Tab.Advice" xml:space="preserve"><value>Советы</value></data>
+  <data name="Coaching.Details.Tab.Items" xml:space="preserve"><value>Предметы</value></data>
+  <data name="Coaching.Details.Overview.Description" xml:space="preserve"><value>Краткое описание</value></data>
+  <data name="Coaching.Details.Overview.Description.Empty" xml:space="preserve"><value>Автор не добавил описание.</value></data>
+  <data name="Coaching.Details.Overview.AppliesWhen" xml:space="preserve"><value>Когда применяется</value></data>
+  <data name="Coaching.Details.Overview.Value.MyChampion" xml:space="preserve"><value>Мой чемпион: {0}</value></data>
+  <data name="Coaching.Details.Overview.Value.Opponent" xml:space="preserve"><value>Противник: {0}</value></data>
+  <data name="Coaching.Details.Overview.Value.Role" xml:space="preserve"><value>Роль: {0}</value></data>
+  <data name="Coaching.Details.Overview.About" xml:space="preserve"><value>О наборе</value></data>
+  <data name="Coaching.Details.Overview.Type" xml:space="preserve"><value>Тип набора</value></data>
+  <data name="Coaching.Details.Overview.Type.Matchup" xml:space="preserve"><value>Матчап</value></data>
+  <data name="Coaching.Details.Overview.Author" xml:space="preserve"><value>Автор</value></data>
+  <data name="Coaching.Details.Overview.Language" xml:space="preserve"><value>Язык содержимого</value></data>
+  <data name="Coaching.Details.Overview.Patch" xml:space="preserve"><value>Игровой патч</value></data>
+  <data name="Coaching.Details.Overview.VerifiedOn" xml:space="preserve"><value>Дата проверки</value></data>
+  <data name="Coaching.Details.Overview.Source" xml:space="preserve"><value>Источник</value></data>
+  <data name="Coaching.Details.Overview.Role" xml:space="preserve"><value>Роль</value></data>
+  <data name="Coaching.Details.Overview.NotSpecified" xml:space="preserve"><value>Не указано</value></data>
+  <data name="Coaching.Details.Source.PersonalExperience" xml:space="preserve"><value>Личный опыт автора</value></data>
+  <data name="Coaching.Details.Advice.Phases" xml:space="preserve"><value>Фазы матчапа</value></data>
+  <data name="Coaching.Details.Advice.ReadOnly" xml:space="preserve"><value>Только для чтения. Чтобы изменить советы, откройте редактор набора.</value></data>
+  <data name="Coaching.Details.Advice.Persistent" xml:space="preserve"><value>Постоянные подсказки</value></data>
+  <data name="Coaching.Details.Advice.Persistent.Empty" xml:space="preserve"><value>Автор не добавил постоянные подсказки.</value></data>
+  <data name="Coaching.Details.Items.Title" xml:space="preserve"><value>Блоки предметов</value></data>
+  <data name="Coaching.Details.Items.Description" xml:space="preserve"><value>Названия и порядок заданы автором. Экспорт не изменяет Coach Pack.</value></data>
+  <data name="Coaching.Details.Items.Export" xml:space="preserve"><value>Экспортировать в League</value></data>
+  <data name="Coaching.Details.Items.ExportHint" xml:space="preserve"><value>Если автор обновит блоки предметов, экспортируйте набор заново, чтобы обновить его в League.</value></data>
+  <data name="Coaching.Details.Items.CatalogUnavailable" xml:space="preserve"><value>Каталог предметов Data Dragon недоступен. Показаны технические ID, а экспорт заблокирован до проверки совместимости.</value></data>
+  <data name="Coaching.Details.Items.NoHint" xml:space="preserve"><value>Без пояснения выбора</value></data>
+  <data name="Coaching.Details.Items.Unknown" xml:space="preserve"><value>Предмет №{0}</value></data>
+  <data name="Coaching.Details.Items.EmptyBlock" xml:space="preserve"><value>Автор пока не добавил предметы.</value></data>
+  <data name="Coaching.Export.DefaultTitle" xml:space="preserve"><value>TempoCue — {0}</value></data>
+  <data name="Coaching.Export.Title" xml:space="preserve"><value>Экспорт в League of Legends</value></data>
+  <data name="Coaching.Export.Close" xml:space="preserve"><value>Закрыть экспорт</value></data>
+  <data name="Coaching.Export.Name" xml:space="preserve"><value>Название набора в League</value></data>
+  <data name="Coaching.Export.Champion" xml:space="preserve"><value>Чемпион</value></data>
+  <data name="Coaching.Export.Map" xml:space="preserve"><value>Карта</value></data>
+  <data name="Coaching.Export.Map.SummonersRift" xml:space="preserve"><value>Ущелье призывателей</value></data>
+  <data name="Coaching.Export.Blocks" xml:space="preserve"><value>Блоки для экспорта</value></data>
+  <data name="Coaching.Export.Preview" xml:space="preserve"><value>Предпросмотр набора</value></data>
+  <data name="Coaching.Export.Warning.Matchup" xml:space="preserve"><value>League привязывает набор к чемпиону и карте, но не умеет выбирать его по вражескому чемпиону.</value></data>
+  <data name="Coaching.Export.Warning.Content" xml:space="preserve"><value>В League уходят только названия блоков и предметы. Фазы, советы и условия остаются в TempoCue.</value></data>
+  <data name="Coaching.Export.Install" xml:space="preserve"><value>Установить в League Client</value></data>
+  <data name="Coaching.Export.Install.Planned" xml:space="preserve"><value>Станет доступно после регистрации продукта.</value></data>
+  <data name="Coaching.Export.Download" xml:space="preserve"><value>Скачать .json</value></data>
+  <data name="Coaching.Export.Copy" xml:space="preserve"><value>Скопировать JSON</value></data>
+  <data name="Coaching.Export.Status.TitleRequired" xml:space="preserve"><value>Укажите название набора.</value></data>
+  <data name="Coaching.Export.Status.EmptyBlock" xml:space="preserve"><value>Выбран пустой блок. Снимите его отметку, чтобы продолжить.</value></data>
+  <data name="Coaching.Export.Status.Building" xml:space="preserve"><value>Проверяем совместимость с Data Dragon…</value></data>
+  <data name="Coaching.Export.Status.Ready" xml:space="preserve"><value>Готово: {0} · {1}. Все предметы найдены в каталоге выбранного патча.</value></data>
+  <data name="Coaching.Export.Status.Copied" xml:space="preserve"><value>JSON скопирован. Импортируйте файл или его содержимое через инструменты наборов предметов League.</value></data>
+  <data name="Coaching.Export.Status.ClipboardFailed" xml:space="preserve"><value>Буфер обмена занят. Повторите копирование JSON.</value></data>
+  <data name="Coaching.Export.Status.Downloaded" xml:space="preserve"><value>JSON набора предметов сохранён.</value></data>
+  <data name="Coaching.Export.Status.FileWriteFailed" xml:space="preserve"><value>Не удалось сохранить файл. Выберите другую папку и повторите попытку.</value></data>
+  <data name="Coaching.Export.Status.NoBlocks" xml:space="preserve"><value>Выберите хотя бы один непустой блок.</value></data>
+  <data name="Coaching.Export.Status.ChampionCatalogUnavailable" xml:space="preserve"><value>Каталог чемпионов недоступен, поэтому ID чемпиона League нельзя проверить.</value></data>
+  <data name="Coaching.Export.Status.ChampionNotFound" xml:space="preserve"><value>Чемпион набора не найден в текущем каталоге Data Dragon.</value></data>
+  <data name="Coaching.Export.Status.ItemCatalogUnavailable" xml:space="preserve"><value>Каталог предметов недоступен. Экспорт заблокирован до проверки совместимости предметов.</value></data>
+  <data name="Coaching.Export.Status.ItemsNotFound" xml:space="preserve"><value>В каталоге выбранного патча нет предметов с ID: {0}.</value></data>
+  <data name="Coaching.Export.Status.Failed" xml:space="preserve"><value>Не удалось собрать набор предметов.</value></data>
 </root>

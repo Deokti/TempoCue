@@ -1,0 +1,498 @@
+<UserControl x:Class="TempoCue.App.Views.CoachingPackDetailsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:localization="clr-namespace:TempoCue.App.Localization"
+             xmlns:core="clr-namespace:TempoCue.Core;assembly=TempoCue.Core"
+             xmlns:viewModels="clr-namespace:TempoCue.App.ViewModels"
+             xmlns:views="clr-namespace:TempoCue.App.Views"
+             Background="#080D14"
+             FontFamily="Segoe UI">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Styles/ShellControls.xaml" />
+                <ResourceDictionary Source="../Styles/FormControls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Кнопки вкладок повторяют компактный сегментированный контрол макета. -->
+            <Style x:Key="DetailsTabButton" TargetType="Button">
+                <Setter Property="Height" Value="34" />
+                <Setter Property="Padding" Value="17,6" />
+                <Setter Property="Foreground" Value="#7F93AF" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="FontSize" Value="{StaticResource Typography.FontSize.BodyLarge}" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="TabBorder"
+                                    Background="{TemplateBinding Background}"
+                                    CornerRadius="14"
+                                    Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="TabBorder" Property="Background" Value="#16243A" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="DetailsStateBadge" TargetType="Border">
+                <Setter Property="Background" Value="#19362F" />
+                <Setter Property="CornerRadius" Value="10" />
+                <Setter Property="Padding" Value="9,4" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Card.IsDraft}" Value="True">
+                        <Setter Property="Background" Value="#3B3421" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Card.IsDisabled}" Value="True">
+                        <Setter Property="Background" Value="#202B3A" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style x:Key="DetailsStateText" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="#76D7A8" />
+                <Setter Property="FontSize" Value="{StaticResource Typography.FontSize.Caption}" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Card.IsDraft}" Value="True">
+                        <Setter Property="Foreground" Value="#F3C969" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Card.IsDisabled}" Value="True">
+                        <Setter Property="Foreground" Value="#91A4BD" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <!-- Цвет фазы задаётся доменным PowerState и не вычисляется в XAML-тексте. -->
+            <Style x:Key="PhaseDetailsCard" TargetType="Border" BasedOn="{StaticResource ShellCard}">
+                <Setter Property="BorderBrush" Value="#F3C969" />
+                <Setter Property="BorderThickness" Value="3,1,1,1" />
+                <Setter Property="Margin" Value="0,0,0,12" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding PowerState}" Value="{x:Static core:PowerState.Dangerous}">
+                        <Setter Property="BorderBrush" Value="#FF7185" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding PowerState}" Value="{x:Static core:PowerState.Playable}">
+                        <Setter Property="BorderBrush" Value="#63D9B0" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding PowerState}" Value="{x:Static core:PowerState.Favorable}">
+                        <Setter Property="BorderBrush" Value="#62B8F1" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style TargetType="ScrollBar" BasedOn="{StaticResource ShellScrollBar}" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <!-- Основной экран просмотра находится под собственным модальным слоем экспорта. -->
+        <Grid Margin="24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="14" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="14" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Заголовок: возврат, участники матчапа, состояние и доступные действия. -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="18" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="14" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Button x:Name="BackToCoachingLibraryButton"
+                        Content="{localization:Loc Coaching.Details.Back}"
+                        Style="{StaticResource SecondaryButton}"
+                        Click="BackButton_Click" />
+
+                <Grid Grid.Column="2" VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="42" />
+                        <ColumnDefinition Width="24" />
+                        <ColumnDefinition Width="42" />
+                    </Grid.ColumnDefinitions>
+                    <Border Width="42" Height="42" Background="#102036" BorderBrush="#29435F" BorderThickness="1" CornerRadius="8">
+                        <Grid>
+                            <TextBlock Text="{Binding PlayerChampionInitials}" Foreground="#6FC4EF" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <Image Source="{Binding PlayerChampionImageUri}" Stretch="UniformToFill" />
+                        </Grid>
+                    </Border>
+                    <TextBlock Grid.Column="1" Text="{localization:Loc Coaching.Details.Versus}" Foreground="#6F849F" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <Border Grid.Column="2" Width="42" Height="42" Background="#151D30" BorderBrush="#3A354B" BorderThickness="1" CornerRadius="8">
+                        <Grid>
+                            <TextBlock Text="{Binding OpponentChampionInitials}" Foreground="#C1A7B5" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <Image Source="{Binding OpponentChampionImageUri}" Stretch="UniformToFill" />
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <StackPanel Grid.Column="4" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Title}"
+                                   Foreground="#F4F7FB"
+                                   FontSize="{StaticResource Typography.FontSize.PageTitle}"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center" />
+                        <Border Style="{StaticResource DetailsStateBadge}" Margin="10,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding StateLabel}" Style="{StaticResource DetailsStateText}" />
+                        </Border>
+                    </StackPanel>
+                    <TextBlock Text="{Binding HeaderDetails}" Style="{StaticResource ShellCaption}" Margin="0,3,0,0" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="5" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button x:Name="PackStateActionButton"
+                            Content="{Binding StateActionLabel}"
+                            Style="{StaticResource SecondaryButton}"
+                            Click="StateActionButton_Click" />
+                    <Button Content="{localization:Loc Coaching.Details.Edit}"
+                            Margin="10,0,0,0"
+                            IsEnabled="False"
+                            ToolTip="{localization:Loc Coaching.Details.Edit.Planned}">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Card.IsCreatedByUser}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+            <!-- Вкладки содержат только данные выбранного набора и не открывают редактор. -->
+            <Border Grid.Row="2"
+                    Background="#0D1625"
+                    BorderBrush="#263750"
+                    BorderThickness="1"
+                    CornerRadius="18"
+                    Padding="3"
+                    HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal">
+                    <Button x:Name="PackOverviewTabButton"
+                            Content="{localization:Loc Coaching.Details.Tab.Overview}"
+                            Click="OverviewTabButton_Click">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource DetailsTabButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsOverviewTab}" Value="True">
+                                        <Setter Property="Foreground" Value="#F4F7FB" />
+                                        <Setter Property="Background" Value="#1B2A42" />
+                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button x:Name="PackAdviceTabButton"
+                            Content="{localization:Loc Coaching.Details.Tab.Advice}"
+                            Click="AdviceTabButton_Click">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource DetailsTabButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsAdviceTab}" Value="True">
+                                        <Setter Property="Foreground" Value="#F4F7FB" />
+                                        <Setter Property="Background" Value="#1B2A42" />
+                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button x:Name="PackItemsTabButton"
+                            Content="{localization:Loc Coaching.Details.Tab.Items}"
+                            Click="ItemsTabButton_Click">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource DetailsTabButton}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HasItemBlocks}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding HasItemBlocks}" Value="True" />
+                                            <Condition Binding="{Binding IsItemsTab}" Value="True" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Foreground" Value="#F4F7FB" />
+                                        <Setter Property="Background" Value="#1B2A42" />
+                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
+            </Border>
+
+            <ScrollViewer x:Name="PackDetailsScrollViewer"
+                          Grid.Row="4"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled"
+                          Padding="0,0,10,0">
+                <Grid>
+                    <!-- Обзор объясняет назначение и происхождение набора. -->
+                    <Grid x:Name="PackOverviewContent">
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsOverviewTab}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*" />
+                            <ColumnDefinition Width="14" />
+                            <ColumnDefinition Width="2*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <Border Style="{StaticResource ShellCard}">
+                                <StackPanel>
+                                    <TextBlock Text="{localization:Loc Coaching.Details.Overview.Description}"
+                                               Foreground="#F4F7FB"
+                                               FontSize="{StaticResource Typography.FontSize.CardTitle}"
+                                               FontWeight="SemiBold" />
+                                    <TextBlock Text="{Binding Description}"
+                                               Foreground="#A8B9CC"
+                                               FontSize="{StaticResource Typography.FontSize.BodyEmphasis}"
+                                               TextWrapping="Wrap"
+                                               LineHeight="21"
+                                               Margin="0,10,0,0" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource ShellCard}" Margin="0,14,0,0">
+                                <StackPanel>
+                                    <TextBlock Text="{localization:Loc Coaching.Details.Overview.AppliesWhen}"
+                                               Foreground="#F4F7FB"
+                                               FontSize="{StaticResource Typography.FontSize.CardTitle}"
+                                               FontWeight="SemiBold" />
+                                    <WrapPanel Margin="0,12,0,0">
+                                        <Border Background="#14253C" CornerRadius="9" Padding="10,6" Margin="0,0,8,8">
+                                            <TextBlock Text="{Binding PlayerChampionApplicability}" Foreground="#8FC5E9" />
+                                        </Border>
+                                        <Border Background="#241D2B" CornerRadius="9" Padding="10,6" Margin="0,0,8,8">
+                                            <TextBlock Text="{Binding OpponentChampionApplicability}" Foreground="#D0A8BB" />
+                                        </Border>
+                                        <Border Background="#121E30" CornerRadius="9" Padding="10,6" Margin="0,0,8,8">
+                                            <TextBlock Text="{Binding RoleApplicability}" Foreground="#91A4BD" />
+                                        </Border>
+                                    </WrapPanel>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <Border Grid.Column="2" Style="{StaticResource ShellCard}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="18" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="12" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="10" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="10" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="10" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="10" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="10" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="10" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.ColumnSpan="3" Text="{localization:Loc Coaching.Details.Overview.About}" Foreground="#F4F7FB" FontSize="{StaticResource Typography.FontSize.CardTitle}" FontWeight="SemiBold" />
+                                <TextBlock Grid.Row="2" Text="{localization:Loc Coaching.Details.Overview.Type}" Foreground="#7086A2" FontSize="{StaticResource Typography.FontSize.Body}" />
+                                <TextBlock Grid.Row="2" Grid.Column="2" Text="{localization:Loc Coaching.Details.Overview.Type.Matchup}" Foreground="#D9E5F2" FontSize="{StaticResource Typography.FontSize.BodyLarge}" TextWrapping="Wrap" />
+                                <TextBlock Grid.Row="4" Text="{localization:Loc Coaching.Details.Overview.Author}" Foreground="#7086A2" FontSize="{StaticResource Typography.FontSize.Body}" />
+                                <TextBlock Grid.Row="4" Grid.Column="2" Text="{Binding AuthorLabel}" Foreground="#D9E5F2" FontSize="{StaticResource Typography.FontSize.BodyLarge}" TextWrapping="Wrap" />
+                                <TextBlock Grid.Row="6" Text="{localization:Loc Coaching.Details.Overview.Language}" Foreground="#7086A2" FontSize="{StaticResource Typography.FontSize.Body}" />
+                                <TextBlock Grid.Row="6" Grid.Column="2" Text="{Binding ContentLanguageLabel}" Foreground="#D9E5F2" FontSize="{StaticResource Typography.FontSize.BodyLarge}" TextWrapping="Wrap" />
+                                <TextBlock Grid.Row="8" Text="{localization:Loc Coaching.Details.Overview.Patch}" Foreground="#7086A2" FontSize="{StaticResource Typography.FontSize.Body}" />
+                                <TextBlock Grid.Row="8" Grid.Column="2" Text="{Binding PatchLabel}" Foreground="#D9E5F2" FontSize="{StaticResource Typography.FontSize.BodyLarge}" TextWrapping="Wrap" />
+                                <TextBlock Grid.Row="10" Text="{localization:Loc Coaching.Details.Overview.VerifiedOn}" Foreground="#7086A2" FontSize="{StaticResource Typography.FontSize.Body}" />
+                                <TextBlock Grid.Row="10" Grid.Column="2" Text="{Binding VerifiedOnLabel}" Foreground="#D9E5F2" FontSize="{StaticResource Typography.FontSize.BodyLarge}" TextWrapping="Wrap" />
+                                <TextBlock Grid.Row="12" Text="{localization:Loc Coaching.Details.Overview.Source}" Foreground="#7086A2" FontSize="{StaticResource Typography.FontSize.Body}" />
+                                <TextBlock Grid.Row="12" Grid.Column="2" Text="{Binding SourceLabel}" Foreground="#D9E5F2" FontSize="{StaticResource Typography.FontSize.BodyLarge}" TextWrapping="Wrap" />
+                                <TextBlock Grid.Row="14" Text="{localization:Loc Coaching.Details.Overview.Role}" Foreground="#7086A2" FontSize="{StaticResource Typography.FontSize.Body}" />
+                                <TextBlock Grid.Row="14" Grid.Column="2" Text="{Binding RoleLabel}" Foreground="#D9E5F2" FontSize="{StaticResource Typography.FontSize.BodyLarge}" TextWrapping="Wrap" />
+                            </Grid>
+                        </Border>
+                    </Grid>
+
+                    <!-- Советы отображаются только для чтения: фазы слева, постоянные знания справа. -->
+                    <Grid x:Name="PackAdviceContent">
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsAdviceTab}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="14" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Style="{StaticResource ShellCard}">
+                            <StackPanel>
+                                <TextBlock Text="{localization:Loc Coaching.Details.Advice.Phases}" Foreground="#F4F7FB" FontSize="{StaticResource Typography.FontSize.CardTitle}" FontWeight="SemiBold" />
+                                <TextBlock Text="{localization:Loc Coaching.Details.Advice.ReadOnly}" Style="{StaticResource ShellCaption}" Margin="0,4,0,12" />
+                                <ItemsControl ItemsSource="{Binding Phases}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Style="{StaticResource PhaseDetailsCard}">
+                                                <StackPanel>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="{Binding Title}" Foreground="#F4F7FB" FontSize="{StaticResource Typography.FontSize.BodyEmphasis}" FontWeight="SemiBold" />
+                                                            <Border Background="#202D42" CornerRadius="9" Padding="8,3" Margin="10,0,0,0">
+                                                                <TextBlock Text="{Binding PowerStateLabel}" Foreground="#AFC1D7" FontSize="{StaticResource Typography.FontSize.Body}" />
+                                                            </Border>
+                                                        </StackPanel>
+                                                        <TextBlock Grid.Column="1" Text="{Binding LevelRange}" Foreground="#7F93AF" />
+                                                    </Grid>
+                                                    <TextBlock Text="{Binding PrimaryAdvice}" Foreground="#F0F5FB" FontSize="{StaticResource Typography.FontSize.BodyLarge}" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,12,0,0" />
+                                                    <TextBlock Text="{Binding WhyNow}" Foreground="#91A4BD" FontSize="{StaticResource Typography.FontSize.Body}" TextWrapping="Wrap" Margin="0,5,0,0">
+                                                        <TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding HasWhyNow}" Value="True"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style></TextBlock.Style>
+                                                    </TextBlock>
+                                                    <TextBlock Text="{Binding NextGoal}" Foreground="#8FBDE0" FontSize="{StaticResource Typography.FontSize.Body}" TextWrapping="Wrap" Margin="0,5,0,0">
+                                                        <TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding HasNextGoal}" Value="True"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style></TextBlock.Style>
+                                                    </TextBlock>
+                                                    <ItemsControl ItemsSource="{Binding RecommendedItems}" Margin="0,9,0,0">
+                                                        <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                                        <ItemsControl.ItemTemplate><DataTemplate><Border Background="#14253C" CornerRadius="8" Padding="7,4" Margin="0,0,6,6"><StackPanel Orientation="Horizontal"><Image Source="{Binding ImageUri}" Width="20" Height="20" /><TextBlock Text="{Binding DisplayName}" Foreground="#B9CBE0" Margin="6,0,0,0" VerticalAlignment="Center" /></StackPanel></Border></DataTemplate></ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="2" Style="{StaticResource ShellCard}">
+                            <StackPanel>
+                                <TextBlock Text="{localization:Loc Coaching.Details.Advice.Persistent}" Foreground="#F4F7FB" FontSize="{StaticResource Typography.FontSize.CardTitle}" FontWeight="SemiBold" />
+                                <ItemsControl ItemsSource="{Binding PersistentTips}" Margin="0,10,0,0">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Margin="0,0,0,12">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding Title}" Foreground="#F4F7FB" FontSize="{StaticResource Typography.FontSize.BodyLarge}" FontWeight="SemiBold" />
+                                                    <Border Background="#202D42" CornerRadius="9" Padding="8,3" Margin="8,0,0,0">
+                                                        <TextBlock Text="{Binding ScopeLabel}" Foreground="#91A4BD" FontSize="{StaticResource Typography.FontSize.Body}" />
+                                                    </Border>
+                                                </StackPanel>
+                                                <TextBlock Text="{Binding Message}" Foreground="#91A4BD" FontSize="{StaticResource Typography.FontSize.Body}" TextWrapping="Wrap" Margin="0,5,0,0" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <TextBlock Text="{localization:Loc Coaching.Details.Advice.Persistent.Empty}" Foreground="#7086A2" TextWrapping="Wrap" Margin="0,12,0,0">
+                                    <TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding HasPersistentTips}" Value="False"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style></TextBlock.Style>
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- Предметы сохраняют произвольные названия и порядок автора. -->
+                    <StackPanel x:Name="PackItemsContent">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers><DataTrigger Binding="{Binding IsItemsTab}" Value="True"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <Grid Margin="0,0,0,12">
+                            <StackPanel>
+                                <TextBlock Text="{localization:Loc Coaching.Details.Items.Title}" Foreground="#F4F7FB" FontSize="{StaticResource Typography.FontSize.CardTitle}" FontWeight="SemiBold" />
+                                <TextBlock Text="{localization:Loc Coaching.Details.Items.Description}" Style="{StaticResource ShellCaption}" Margin="0,4,0,0" />
+                            </StackPanel>
+                            <Button x:Name="ExportToLeagueButton" Content="{localization:Loc Coaching.Details.Items.Export}" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Right" Click="ExportButton_Click" />
+                        </Grid>
+                        <Border Background="#10212A" BorderBrush="#27414F" BorderThickness="1" CornerRadius="10" Padding="12,9" Margin="0,0,0,12">
+                            <TextBlock Text="{localization:Loc Coaching.Details.Items.ExportHint}" Foreground="#8FA8BB" TextWrapping="Wrap" />
+                        </Border>
+                        <TextBlock Text="{Binding ItemCatalogMessage}" Foreground="#F1D274" TextWrapping="Wrap" Margin="0,0,0,10">
+                            <TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding HasItemCatalogMessage}" Value="True"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style></TextBlock.Style>
+                        </TextBlock>
+                        <ItemsControl ItemsSource="{Binding ItemBlocks}">
+                            <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="3" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource ShellCard}" Margin="0,0,12,12" MinHeight="150">
+                                        <StackPanel>
+                                            <Grid>
+                                                <TextBlock Text="{Binding Name}" Foreground="#F4F7FB" FontSize="{StaticResource Typography.FontSize.BodyLarge}" FontWeight="SemiBold" />
+                                                <TextBlock Text="{Binding ItemCountLabel}" Foreground="#7F93AF" HorizontalAlignment="Right" />
+                                            </Grid>
+                                            <TextBlock Text="{Binding WhenToChoose}" Foreground="#7F93AF" TextWrapping="Wrap" Margin="0,6,0,10" />
+                                            <ItemsControl ItemsSource="{Binding Items}">
+                                                <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Border Background="#142238" BorderBrush="#263750" BorderThickness="1" CornerRadius="8" Padding="6,4" Margin="0,0,6,6">
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <Border Width="28" Height="28" Background="#0B1421" CornerRadius="5"><Image Source="{Binding ImageUri}" Stretch="UniformToFill" /></Border>
+                                                                <TextBlock Text="{Binding DisplayName}" Foreground="#C8D6E7" Margin="7,0,0,0" VerticalAlignment="Center" />
+                                                            </StackPanel>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                            <TextBlock Text="{localization:Loc Coaching.Details.Items.EmptyBlock}" Foreground="#647A96" FontStyle="Italic">
+                                                <TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding HasItems}" Value="False"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style></TextBlock.Style>
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Grid>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- Экспорт блокирует экран деталей, но не меняет исходный Coach Pack. -->
+        <views:LeagueItemSetExportDialogView x:Name="LeagueItemSetExportDialog"
+                                             DataContext="{Binding Export}">
+            <views:LeagueItemSetExportDialogView.Style>
+                <Style TargetType="views:LeagueItemSetExportDialogView">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsOpen}" Value="True">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </views:LeagueItemSetExportDialogView.Style>
+        </views:LeagueItemSetExportDialogView>
+    </Grid>
+</UserControl>

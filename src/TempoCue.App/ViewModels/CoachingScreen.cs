@@ -4,6 +4,7 @@ namespace TempoCue.App.ViewModels;
 public enum CoachingScreen
 {
     Library,
+    PackDetails,
     PackTypeSelection,
     MatchupEditor
 }

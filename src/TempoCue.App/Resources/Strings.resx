@@ -574,4 +574,74 @@
   <data name="Coaching.MatchupEditor.Save.Status.EnabledSaved" xml:space="preserve"><value>Pack saved and enabled. Engine integration will be completed in the next library iteration.</value></data>
   <data name="Coaching.MatchupEditor.Save.Status.Failed" xml:space="preserve"><value>Could not save the pack. Check access to the local application folder.</value></data>
   <data name="Coaching.MatchupEditor.Save.Status.Saved" xml:space="preserve"><value>Pack saved locally.</value></data>
+  <data name="Count.ItemBlock.One" xml:space="preserve"><value>{0} block</value></data>
+  <data name="Count.ItemBlock.Other" xml:space="preserve"><value>{0} blocks</value></data>
+  <data name="Coaching.Details.Back" xml:space="preserve"><value>← Back to library</value></data>
+  <data name="Coaching.Details.Versus" xml:space="preserve"><value>vs</value></data>
+  <data name="Coaching.Details.Disable" xml:space="preserve"><value>Disable</value></data>
+  <data name="Coaching.Details.Enable" xml:space="preserve"><value>Enable</value></data>
+  <data name="Coaching.Details.Header" xml:space="preserve"><value>Matchup · {0} · {1} · {2}</value></data>
+  <data name="Coaching.Details.Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Coaching.Details.Edit.Planned" xml:space="preserve"><value>Editing a saved pack will be added in a later iteration.</value></data>
+  <data name="Coaching.Details.Tab.Overview" xml:space="preserve"><value>Overview</value></data>
+  <data name="Coaching.Details.Tab.Advice" xml:space="preserve"><value>Advice</value></data>
+  <data name="Coaching.Details.Tab.Items" xml:space="preserve"><value>Items</value></data>
+  <data name="Coaching.Details.Overview.Description" xml:space="preserve"><value>Short description</value></data>
+  <data name="Coaching.Details.Overview.Description.Empty" xml:space="preserve"><value>The author did not add a description.</value></data>
+  <data name="Coaching.Details.Overview.AppliesWhen" xml:space="preserve"><value>When it applies</value></data>
+  <data name="Coaching.Details.Overview.Value.MyChampion" xml:space="preserve"><value>My champion: {0}</value></data>
+  <data name="Coaching.Details.Overview.Value.Opponent" xml:space="preserve"><value>Opponent: {0}</value></data>
+  <data name="Coaching.Details.Overview.Value.Role" xml:space="preserve"><value>Role: {0}</value></data>
+  <data name="Coaching.Details.Overview.About" xml:space="preserve"><value>About this pack</value></data>
+  <data name="Coaching.Details.Overview.Type" xml:space="preserve"><value>Pack type</value></data>
+  <data name="Coaching.Details.Overview.Type.Matchup" xml:space="preserve"><value>Matchup</value></data>
+  <data name="Coaching.Details.Overview.Author" xml:space="preserve"><value>Author</value></data>
+  <data name="Coaching.Details.Overview.Language" xml:space="preserve"><value>Content language</value></data>
+  <data name="Coaching.Details.Overview.Patch" xml:space="preserve"><value>Game patch</value></data>
+  <data name="Coaching.Details.Overview.VerifiedOn" xml:space="preserve"><value>Last verified</value></data>
+  <data name="Coaching.Details.Overview.Source" xml:space="preserve"><value>Source</value></data>
+  <data name="Coaching.Details.Overview.Role" xml:space="preserve"><value>Role</value></data>
+  <data name="Coaching.Details.Overview.NotSpecified" xml:space="preserve"><value>Not specified</value></data>
+  <data name="Coaching.Details.Source.PersonalExperience" xml:space="preserve"><value>Author's personal experience</value></data>
+  <data name="Coaching.Details.Advice.Phases" xml:space="preserve"><value>Matchup phases</value></data>
+  <data name="Coaching.Details.Advice.ReadOnly" xml:space="preserve"><value>Read-only. Open the pack editor to change advice.</value></data>
+  <data name="Coaching.Details.Advice.Persistent" xml:space="preserve"><value>Persistent tips</value></data>
+  <data name="Coaching.Details.Advice.Persistent.Empty" xml:space="preserve"><value>The author did not add persistent tips.</value></data>
+  <data name="Coaching.Details.Items.Title" xml:space="preserve"><value>Item blocks</value></data>
+  <data name="Coaching.Details.Items.Description" xml:space="preserve"><value>Names and order are defined by the author. Export does not change the Coach Pack.</value></data>
+  <data name="Coaching.Details.Items.Export" xml:space="preserve"><value>Export to League</value></data>
+  <data name="Coaching.Details.Items.ExportHint" xml:space="preserve"><value>If the author updates item blocks, export the item set again to refresh it in League.</value></data>
+  <data name="Coaching.Details.Items.CatalogUnavailable" xml:space="preserve"><value>The Data Dragon item catalog is unavailable. Technical item IDs are shown and export is blocked until compatibility can be verified.</value></data>
+  <data name="Coaching.Details.Items.NoHint" xml:space="preserve"><value>No selection note</value></data>
+  <data name="Coaching.Details.Items.Unknown" xml:space="preserve"><value>Item #{0}</value></data>
+  <data name="Coaching.Details.Items.EmptyBlock" xml:space="preserve"><value>The author has not added items yet.</value></data>
+  <data name="Coaching.Export.DefaultTitle" xml:space="preserve"><value>TempoCue — {0}</value></data>
+  <data name="Coaching.Export.Title" xml:space="preserve"><value>Export to League of Legends</value></data>
+  <data name="Coaching.Export.Close" xml:space="preserve"><value>Close export</value></data>
+  <data name="Coaching.Export.Name" xml:space="preserve"><value>Item set name in League</value></data>
+  <data name="Coaching.Export.Champion" xml:space="preserve"><value>Champion</value></data>
+  <data name="Coaching.Export.Map" xml:space="preserve"><value>Map</value></data>
+  <data name="Coaching.Export.Map.SummonersRift" xml:space="preserve"><value>Summoner's Rift</value></data>
+  <data name="Coaching.Export.Blocks" xml:space="preserve"><value>Blocks to export</value></data>
+  <data name="Coaching.Export.Preview" xml:space="preserve"><value>Item set preview</value></data>
+  <data name="Coaching.Export.Warning.Matchup" xml:space="preserve"><value>League associates an item set with a champion and map, but cannot select it by enemy champion.</value></data>
+  <data name="Coaching.Export.Warning.Content" xml:space="preserve"><value>Only block names and items are exported. Phases, advice, and conditions stay in TempoCue.</value></data>
+  <data name="Coaching.Export.Install" xml:space="preserve"><value>Install in League Client</value></data>
+  <data name="Coaching.Export.Install.Planned" xml:space="preserve"><value>Available after product registration.</value></data>
+  <data name="Coaching.Export.Download" xml:space="preserve"><value>Download .json</value></data>
+  <data name="Coaching.Export.Copy" xml:space="preserve"><value>Copy JSON</value></data>
+  <data name="Coaching.Export.Status.TitleRequired" xml:space="preserve"><value>Enter an item set name.</value></data>
+  <data name="Coaching.Export.Status.EmptyBlock" xml:space="preserve"><value>A selected block has no items. Deselect it to continue.</value></data>
+  <data name="Coaching.Export.Status.Building" xml:space="preserve"><value>Checking Data Dragon compatibility…</value></data>
+  <data name="Coaching.Export.Status.Ready" xml:space="preserve"><value>Ready: {0} · {1}. All items were found in the selected patch catalog.</value></data>
+  <data name="Coaching.Export.Status.Copied" xml:space="preserve"><value>JSON copied. Import the file or its contents through League item set tools.</value></data>
+  <data name="Coaching.Export.Status.ClipboardFailed" xml:space="preserve"><value>The clipboard is busy. Try copying the JSON again.</value></data>
+  <data name="Coaching.Export.Status.Downloaded" xml:space="preserve"><value>The item set JSON was saved.</value></data>
+  <data name="Coaching.Export.Status.FileWriteFailed" xml:space="preserve"><value>The file could not be saved. Choose another folder and try again.</value></data>
+  <data name="Coaching.Export.Status.NoBlocks" xml:space="preserve"><value>Select at least one non-empty block.</value></data>
+  <data name="Coaching.Export.Status.ChampionCatalogUnavailable" xml:space="preserve"><value>The champion catalog is unavailable, so the League champion ID cannot be verified.</value></data>
+  <data name="Coaching.Export.Status.ChampionNotFound" xml:space="preserve"><value>The pack champion was not found in the current Data Dragon catalog.</value></data>
+  <data name="Coaching.Export.Status.ItemCatalogUnavailable" xml:space="preserve"><value>The item catalog is unavailable. Export is blocked until item compatibility can be verified.</value></data>
+  <data name="Coaching.Export.Status.ItemsNotFound" xml:space="preserve"><value>These item IDs are absent from the selected patch catalog: {0}.</value></data>
+  <data name="Coaching.Export.Status.Failed" xml:space="preserve"><value>The item set could not be built.</value></data>
 </root>

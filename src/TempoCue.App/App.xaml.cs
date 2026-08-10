@@ -91,6 +91,13 @@ public partial class App : System.Windows.Application
             _championCatalog,
             loadCoachPackLibrary,
             setCoachPackState);
+        var buildLeagueItemSetExport = new BuildLeagueItemSetExportUseCase(
+            _championCatalog,
+            _itemCatalog);
+        var coachingPackDetailsViewModel = new CoachingPackDetailsViewModel(
+            LocalizationService.Instance,
+            _itemCatalog,
+            buildLeagueItemSetExport);
         var matchupEditorViewModel = new MatchupEditorViewModel(
             LocalizationService.Instance,
             _gamePatchCatalog,
@@ -100,6 +107,7 @@ public partial class App : System.Windows.Application
         _coachingViewModel = new CoachingViewModel(
             LocalizationService.Instance,
             coachingLibraryViewModel,
+            coachingPackDetailsViewModel,
             new PackTypeSelectionViewModel(),
             matchupEditorViewModel);
 

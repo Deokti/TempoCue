@@ -1,8 +1,10 @@
 using System.Runtime.ExceptionServices;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
 namespace TempoCue.App.Tests;
@@ -71,5 +73,35 @@ internal static class WpfTestHost
                 yield return descendant;
             }
         }
+    }
+
+    /// <summary>Сохраняет фактически отрисованный WPF-элемент для ручной сверки с макетом.</summary>
+    public static void SavePng(FrameworkElement element, string filePath)
+    {
+        ArgumentNullException.ThrowIfNull(element);
+        ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
+        element.UpdateLayout();
+        Pump(DispatcherPriority.Render);
+        var dpi = VisualTreeHelper.GetDpi(element);
+        var width = Math.Max(1, (int)Math.Ceiling(element.ActualWidth * dpi.DpiScaleX));
+        var height = Math.Max(1, (int)Math.Ceiling(element.ActualHeight * dpi.DpiScaleY));
+        var bitmap = new RenderTargetBitmap(
+            width,
+            height,
+            dpi.PixelsPerInchX,
+            dpi.PixelsPerInchY,
+            PixelFormats.Pbgra32);
+        bitmap.Render(element);
+
+        var directory = Path.GetDirectoryName(filePath);
+        if (!string.IsNullOrWhiteSpace(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        var encoder = new PngBitmapEncoder();
+        encoder.Frames.Add(BitmapFrame.Create(bitmap));
+        using var stream = File.Create(filePath);
+        encoder.Save(stream);
     }
 }

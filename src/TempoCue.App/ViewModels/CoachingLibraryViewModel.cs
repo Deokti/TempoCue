@@ -121,6 +121,12 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
             ? Task.CompletedTask
             : RefreshAsync(cancellationToken);
 
+    public CoachingPackCardViewModel? FindCard(string packId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(packId);
+        return _allCards.FirstOrDefault(card => card.Pack.Id == packId);
+    }
+
     public async Task RefreshAsync(CancellationToken cancellationToken = default)
     {
         IsLibraryLoading = true;

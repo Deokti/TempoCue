@@ -13,6 +13,9 @@ internal sealed class DataDragonChampionDto
     [JsonPropertyName("id")]
     public string? Id { get; init; }
 
+    [JsonPropertyName("key")]
+    public string? Key { get; init; }
+
     [JsonPropertyName("name")]
     public string? Name { get; init; }
 
@@ -40,6 +43,8 @@ internal sealed class DataDragonChampionCacheDto
 internal sealed class DataDragonCachedChampionDto
 {
     public string? Id { get; init; }
+
+    public int NumericId { get; init; }
 
     public string? DisplayName { get; init; }
 

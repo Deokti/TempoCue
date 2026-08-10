@@ -13,11 +13,13 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
     public CoachingViewModel(
         LocalizationService localization,
         CoachingLibraryViewModel library,
+        CoachingPackDetailsViewModel details,
         PackTypeSelectionViewModel packTypeSelection,
         MatchupEditorViewModel matchupEditor)
     {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         Library = library ?? throw new ArgumentNullException(nameof(library));
+        Details = details ?? throw new ArgumentNullException(nameof(details));
         PackTypeSelection = packTypeSelection
             ?? throw new ArgumentNullException(nameof(packTypeSelection));
         MatchupEditor = matchupEditor ?? throw new ArgumentNullException(nameof(matchupEditor));
@@ -25,6 +27,8 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
     }
 
     public CoachingLibraryViewModel Library { get; }
+
+    public CoachingPackDetailsViewModel Details { get; }
 
     public PackTypeSelectionViewModel PackTypeSelection { get; }
 
@@ -38,6 +42,35 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
 
     public void OpenPackTypeSelection() =>
         CurrentScreen = CoachingScreen.PackTypeSelection;
+
+    public async Task OpenPackDetailsAsync(
+        CoachingPackCardViewModel card,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(card);
+        CurrentScreen = CoachingScreen.PackDetails;
+        await Details.OpenAsync(card, cancellationToken);
+    }
+
+    public async Task<bool> SetSelectedPackEnabledAsync(
+        bool isEnabled,
+        CancellationToken cancellationToken = default)
+    {
+        var card = Details.Card;
+        if (card is null
+            || !await Library.SetPackEnabledAsync(card, isEnabled, cancellationToken))
+        {
+            return false;
+        }
+
+        var refreshedCard = Library.FindCard(card.Pack.Id);
+        if (refreshedCard is not null)
+        {
+            Details.UpdateCard(refreshedCard);
+        }
+
+        return true;
+    }
 
     public void OpenMatchupEditor() =>
         CurrentScreen = CoachingScreen.MatchupEditor;
@@ -54,9 +87,17 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
 
         _isDisposed = true;
         _localization.PropertyChanged -= Localization_PropertyChanged;
+        Details.Dispose();
         Library.Dispose();
     }
 
-    private void Localization_PropertyChanged(object? sender, PropertyChangedEventArgs e) =>
+    private void Localization_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
         MatchupEditor.UpdateLanguage(_localization.CurrentLanguageCode);
+        if (Details.Pack is { } pack
+            && Library.FindCard(pack.Id) is { } refreshedCard)
+        {
+            Details.UpdateCard(refreshedCard);
+        }
+    }
 }

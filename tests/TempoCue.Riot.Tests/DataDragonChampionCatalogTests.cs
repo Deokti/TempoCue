@@ -46,6 +46,7 @@ public sealed class DataDragonChampionCatalogTests
                     path == "/cdn/26.15.1/data/ru_RU/champion.json"));
             Assert.Equal(["Aatrox", "Urgot"], onlineResult.Champions.Select(x => x.Id));
             Assert.Equal("Ургот", onlineResult.Champions[1].DisplayName);
+            Assert.Equal(6, onlineResult.Champions[1].NumericId);
             Assert.Equal(
                 "https://ddragon.leagueoflegends.com/cdn/26.15.1/img/champion/Urgot.png",
                 onlineResult.Champions[1].ImageUri.AbsoluteUri);
@@ -117,16 +118,19 @@ public sealed class DataDragonChampionCatalogTests
           "data": {
             "Urgot": {
               "id": "Urgot",
+              "key": "6",
               "name": "Ургот",
               "image": { "full": "Urgot.png" }
             },
             "Aatrox": {
               "id": "Aatrox",
+              "key": "266",
               "name": "Атрокс",
               "image": { "full": "Aatrox.png" }
             },
             "Jade_Urgot": {
               "id": "Jade_Urgot",
+              "key": "6",
               "name": "Ургот",
               "image": { "full": "Jade_Urgot.png" }
             }

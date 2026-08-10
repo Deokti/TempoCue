@@ -9,7 +9,8 @@
     <Grid>
         <views:CoachingLibraryView x:Name="CoachingLibraryPage"
                                    DataContext="{Binding Library}"
-                                   CreateRequested="CoachingLibraryPage_CreateRequested">
+                                   CreateRequested="CoachingLibraryPage_CreateRequested"
+                                   PackOpenRequested="CoachingLibraryPage_PackOpenRequested">
             <views:CoachingLibraryView.Style>
                 <Style TargetType="views:CoachingLibraryView">
                     <Setter Property="Visibility" Value="Collapsed" />
@@ -22,6 +23,23 @@
                 </Style>
             </views:CoachingLibraryView.Style>
         </views:CoachingLibraryView>
+
+        <views:CoachingPackDetailsView x:Name="CoachingPackDetailsPage"
+                                       DataContext="{Binding Details}"
+                                       BackRequested="CoachingPackDetailsPage_BackRequested"
+                                       StateChangeRequested="CoachingPackDetailsPage_StateChangeRequested">
+            <views:CoachingPackDetailsView.Style>
+                <Style TargetType="views:CoachingPackDetailsView">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding DataContext.CurrentScreen, RelativeSource={RelativeSource AncestorType=views:CoachingView}}"
+                                     Value="{x:Static viewModels:CoachingScreen.PackDetails}">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </views:CoachingPackDetailsView.Style>
+        </views:CoachingPackDetailsView>
 
         <views:PackTypeSelectionView x:Name="PackTypeSelectionPage"
                                      DataContext="{Binding PackTypeSelection}"

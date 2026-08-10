@@ -43,6 +43,8 @@ internal sealed class CoachingPackCardFactory
             origin,
             state,
             _localization.Format("Coaching.Library.Matchup", playerName, opponentName),
+            playerName,
+            opponentName,
             GetInitials(playerName),
             GetInitials(opponentName),
             playerChampion?.ImageUri,
