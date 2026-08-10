@@ -416,15 +416,21 @@
   <data name="Coaching.MatchupEditor.Content.Validation.EmptyDescription" xml:space="preserve"><value>Покрытие будет проверено автоматически после сохранения фазы.</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.ValidTitle" xml:space="preserve"><value>Фазы согласованы</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.ValidDescription" xml:space="preserve"><value>Для каждого уровня и учитываемого состояния предметов подходит ровно одна фаза.</value></data>
-  <data name="Coaching.MatchupEditor.Content.Validation.WarningTitle" xml:space="preserve"><value>Некоторые состояния остались без совета</value></data>
-  <data name="Coaching.MatchupEditor.Content.Validation.WarningDescription" xml:space="preserve"><value>Можно продолжить, но в перечисленных ниже состояниях игрок может остаться без совета фазы.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.WarningTitle" xml:space="preserve"><value>Есть состояния предметов без совета</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.WarningDescription" xml:space="preserve"><value>Уровни — только часть условия. Если фаза требует предмет, нужна отдельная фаза до его покупки.</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.ErrorTitle" xml:space="preserve"><value>Найдены конфликты фаз</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.ErrorDescription" xml:space="preserve"><value>Устраните конфликты перед продолжением: одному состоянию игры должна соответствовать только одна фаза.</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.CoverageTitle" xml:space="preserve"><value>Покрытие уровней</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.CoverageHint" xml:space="preserve"><value>Учитываются и уровни, и условия предметов. Наведите на сегмент для подробностей.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.CoverageStart" xml:space="preserve"><value>ур. 1</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.CoverageEnd" xml:space="preserve"><value>ур. 18</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.Issue.InvalidRange" xml:space="preserve"><value>У фазы «{0}» указан неверный диапазон уровней.</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.Issue.ConflictingItems" xml:space="preserve"><value>Фаза «{0}» одновременно требует и исключает один предмет.</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.Issue.Overlap" xml:space="preserve"><value>Фазы «{0}» и «{1}» могут примениться одновременно на {2}.</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.Issue.Gap" xml:space="preserve"><value>На {0} есть хотя бы одно состояние предметов без подходящей фазы.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.Issue.GapWithoutItems" xml:space="preserve"><value>На {0} нет подходящей фазы, например, без предмета: {1}. Добавьте фазу для этого состояния или уберите требование предмета.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.Issue.GapWithItems" xml:space="preserve"><value>На {0} нет подходящей фазы, например, при наличии: {1}. Добавьте фазу для этого состояния или измените условие завершения.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.Issue.GapWithAndWithoutItems" xml:space="preserve"><value>На {0} нет подходящей фазы, например, при наличии {1}, но без {2}. Добавьте фазу для этого состояния или измените условия предметов.</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.LevelSingle" xml:space="preserve"><value>{0}-м уровне</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.LevelRange" xml:space="preserve"><value>уровнях {0}–{1}</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.Coverage.Covered" xml:space="preserve"><value>Уровень {0}: все состояния покрыты</value></data>

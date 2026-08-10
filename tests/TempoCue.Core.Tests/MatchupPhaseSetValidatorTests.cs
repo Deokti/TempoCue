@@ -116,8 +116,35 @@ public sealed class MatchupPhaseSetValidatorTests
         var gap = Assert.Single(result.Issues, issue =>
             issue.Kind == MatchupPhaseValidationIssueKind.UncoveredState);
         Assert.Equal((1, 18), (gap.MinimumLevel, gap.MaximumLevel));
+        Assert.Equal([3047], gap.ItemStateWitness?.AbsentItemIds);
+        Assert.Empty(gap.ItemStateWitness?.PresentItemIds ?? []);
         Assert.All(result.LevelCoverage, coverage =>
             Assert.Equal(MatchupLevelCoverageStatus.Uncovered, coverage.Status));
+    }
+
+    [Fact]
+    public void Validate_DifferentRequiredItems_SplitsGapByActionableWitness()
+    {
+        var result = _validator.Validate([
+            Phase("early", 1, 8, requiredItems: [2003, 1055]),
+            Phase("late", 9, null, requiredItems: [3071])
+        ]);
+
+        var gaps = result.Issues
+            .Where(issue => issue.Kind == MatchupPhaseValidationIssueKind.UncoveredState)
+            .ToArray();
+        Assert.Collection(
+            gaps,
+            gap =>
+            {
+                Assert.Equal((1, 8), (gap.MinimumLevel, gap.MaximumLevel));
+                Assert.Equal([1055], gap.ItemStateWitness?.AbsentItemIds);
+            },
+            gap =>
+            {
+                Assert.Equal((9, 18), (gap.MinimumLevel, gap.MaximumLevel));
+                Assert.Equal([3071], gap.ItemStateWitness?.AbsentItemIds);
+            });
     }
 
     private static MatchupPhaseCondition Phase(

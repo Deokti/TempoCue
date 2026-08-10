@@ -55,18 +55,20 @@ public sealed class MatchupPhaseSetValidator
         AddOverlapIssues(validPhases, issues);
 
         var coverage = new List<MatchupLevelCoverage>(MaximumGameLevel);
-        var uncoveredLevels = new List<int>();
+        var uncoveredLevels = new List<UncoveredLevel>();
         for (var level = MinimumGameLevel; level <= MaximumGameLevel; level++)
         {
             var levelPhases = validPhases
                 .Where(phase => phase.AppliesToLevel(level))
                 .ToArray();
             var isAmbiguous = HasCompatiblePair(levelPhases);
-            var isUncovered = HasUncoveredItemState(levelPhases);
+            var isUncovered = TryFindUncoveredItemState(
+                levelPhases,
+                out var itemStateWitness);
 
             if (isUncovered)
             {
-                uncoveredLevels.Add(level);
+                uncoveredLevels.Add(new UncoveredLevel(level, itemStateWitness));
             }
 
             coverage.Add(new MatchupLevelCoverage(
@@ -143,19 +145,20 @@ public sealed class MatchupPhaseSetValidator
         left.RequiredItemIds.Overlaps(right.ExcludedItemIds) ||
         right.RequiredItemIds.Overlaps(left.ExcludedItemIds);
 
-    private static bool HasUncoveredItemState(IReadOnlyList<NormalizedPhase> phases)
+    private static bool TryFindUncoveredItemState(
+        IReadOnlyList<NormalizedPhase> phases,
+        out MatchupItemStateWitness witness)
     {
-        if (phases.Count == 0)
-        {
-            return true;
-        }
-
-        return HasUncoveredItemState(phases, new Dictionary<int, bool>());
+        return TryFindUncoveredItemState(
+            phases,
+            new Dictionary<int, bool>(),
+            out witness);
     }
 
-    private static bool HasUncoveredItemState(
+    private static bool TryFindUncoveredItemState(
         IReadOnlyList<NormalizedPhase> phases,
-        Dictionary<int, bool> assignment)
+        Dictionary<int, bool> assignment,
+        out MatchupItemStateWitness witness)
     {
         var possiblePhases = new List<NormalizedPhase>(phases.Count);
         foreach (var phase in phases)
@@ -163,6 +166,7 @@ public sealed class MatchupPhaseSetValidator
             var evaluation = Evaluate(phase, assignment);
             if (evaluation == PhaseEvaluation.Satisfied)
             {
+                witness = EmptyWitness();
                 return false;
             }
 
@@ -174,19 +178,23 @@ public sealed class MatchupPhaseSetValidator
 
         if (possiblePhases.Count == 0)
         {
+            witness = CreateWitness(assignment);
             return true;
         }
 
         var nextItemId = FindUnassignedItem(possiblePhases, assignment);
         assignment[nextItemId] = false;
-        if (HasUncoveredItemState(possiblePhases, assignment))
+        if (TryFindUncoveredItemState(possiblePhases, assignment, out witness))
         {
             assignment.Remove(nextItemId);
             return true;
         }
 
         assignment[nextItemId] = true;
-        var hasUncoveredState = HasUncoveredItemState(possiblePhases, assignment);
+        var hasUncoveredState = TryFindUncoveredItemState(
+            possiblePhases,
+            assignment,
+            out witness);
         assignment.Remove(nextItemId);
         return hasUncoveredState;
     }
@@ -229,22 +237,14 @@ public sealed class MatchupPhaseSetValidator
         IEnumerable<NormalizedPhase> phases,
         IReadOnlyDictionary<int, bool> assignment)
     {
-        foreach (var phase in phases)
-        {
-            foreach (var itemId in phase.RequiredItemIds.Concat(phase.ExcludedItemIds))
-            {
-                if (!assignment.ContainsKey(itemId))
-                {
-                    return itemId;
-                }
-            }
-        }
-
-        throw new InvalidOperationException("Для возможной фазы не найдено непроверенное условие предмета.");
+        return phases
+            .SelectMany(static phase => phase.RequiredItemIds.Concat(phase.ExcludedItemIds))
+            .Where(itemId => !assignment.ContainsKey(itemId))
+            .Min();
     }
 
     private static void AddUncoveredRangeIssues(
-        IReadOnlyList<int> uncoveredLevels,
+        IReadOnlyList<UncoveredLevel> uncoveredLevels,
         ICollection<MatchupPhaseValidationIssue> issues)
     {
         if (uncoveredLevels.Count == 0)
@@ -252,13 +252,16 @@ public sealed class MatchupPhaseSetValidator
             return;
         }
 
-        var rangeStart = uncoveredLevels[0];
+        var rangeStart = uncoveredLevels[0].Level;
         var rangeEnd = rangeStart;
+        var witness = uncoveredLevels[0].Witness;
         for (var index = 1; index <= uncoveredLevels.Count; index++)
         {
-            if (index < uncoveredLevels.Count && uncoveredLevels[index] == rangeEnd + 1)
+            if (index < uncoveredLevels.Count &&
+                uncoveredLevels[index].Level == rangeEnd + 1 &&
+                WitnessesEqual(uncoveredLevels[index].Witness, witness))
             {
-                rangeEnd = uncoveredLevels[index];
+                rangeEnd = uncoveredLevels[index].Level;
                 continue;
             }
 
@@ -267,15 +270,38 @@ public sealed class MatchupPhaseSetValidator
                 MatchupPhaseValidationSeverity.Warning,
                 [],
                 rangeStart,
-                rangeEnd));
+                rangeEnd,
+                witness));
 
             if (index < uncoveredLevels.Count)
             {
-                rangeStart = uncoveredLevels[index];
+                rangeStart = uncoveredLevels[index].Level;
                 rangeEnd = rangeStart;
+                witness = uncoveredLevels[index].Witness;
             }
         }
     }
+
+    private static MatchupItemStateWitness CreateWitness(
+        IReadOnlyDictionary<int, bool> assignment) => new(
+            assignment
+                .Where(static pair => pair.Value)
+                .Select(static pair => pair.Key)
+                .Order()
+                .ToArray(),
+            assignment
+                .Where(static pair => !pair.Value)
+                .Select(static pair => pair.Key)
+                .Order()
+                .ToArray());
+
+    private static MatchupItemStateWitness EmptyWitness() => new([], []);
+
+    private static bool WitnessesEqual(
+        MatchupItemStateWitness left,
+        MatchupItemStateWitness right) =>
+        left.PresentItemIds.SequenceEqual(right.PresentItemIds) &&
+        left.AbsentItemIds.SequenceEqual(right.AbsentItemIds);
 
     private enum PhaseEvaluation
     {
@@ -294,4 +320,8 @@ public sealed class MatchupPhaseSetValidator
         public bool AppliesToLevel(int level) =>
             level >= MinimumLevel && level <= MaximumLevel;
     }
+
+    private sealed record UncoveredLevel(
+        int Level,
+        MatchupItemStateWitness Witness);
 }

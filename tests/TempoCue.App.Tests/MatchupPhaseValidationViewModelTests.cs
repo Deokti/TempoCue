@@ -59,11 +59,51 @@ public sealed class MatchupPhaseValidationViewModelTests
         });
     }
 
+    [Fact]
+    public async Task RequiredItems_ExplainSeparateGapBeforeEachPurchase()
+    {
+        var localization = LocalizationService.Instance;
+        var initialLanguage = localization.CurrentLanguageCode;
+        localization.SetLanguage("ru-RU");
+
+        try
+        {
+            var content = new MatchupContentViewModel(localization, TestItemCatalog.Ready());
+            content.SetItemCatalogContext("26.15", "ru-RU");
+            await content.EnsureItemCatalogLoadedAsync();
+            var cleaver = content.ItemPicker.Items.Single(item => item.Id == 3071);
+            var boots = content.ItemPicker.Items.Single(item => item.Id == 3047);
+
+            SavePhase(content, "Ранняя игра", 1, 8, [cleaver, boots]);
+            SavePhase(content, "Поздняя игра", 9, null, [cleaver]);
+
+            Assert.Collection(
+                content.Validation.Issues,
+                issue =>
+                {
+                    Assert.Contains("уровнях 1–8", issue.Message);
+                    Assert.Contains("Бронированные сапоги", issue.Message);
+                    Assert.Contains("уберите требование предмета", issue.Message);
+                },
+                issue =>
+                {
+                    Assert.Contains("уровнях 9–18", issue.Message);
+                    Assert.Contains("Чёрная секира", issue.Message);
+                    Assert.Contains("уберите требование предмета", issue.Message);
+                });
+        }
+        finally
+        {
+            localization.SetLanguage(initialLanguage);
+        }
+    }
+
     private static MatchupPhaseViewModel SavePhase(
         MatchupContentViewModel content,
         string name,
         int minimumLevel,
-        int? maximumLevel)
+        int? maximumLevel,
+        IReadOnlyList<ItemOptionViewModel>? startItems = null)
     {
         content.BeginAddPhase();
         content.Editor.Name = name;
@@ -82,6 +122,8 @@ public sealed class MatchupPhaseValidationViewModelTests
                 content.Editor.DecreaseMaximumLevel();
             }
         }
+
+        content.Editor.SetStartItems(startItems ?? []);
 
         Assert.True(content.SaveEditor());
         return content.Phases[^1];

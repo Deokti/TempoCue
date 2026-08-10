@@ -413,15 +413,21 @@
   <data name="Coaching.MatchupEditor.Content.Validation.EmptyDescription" xml:space="preserve"><value>Coverage will be checked automatically after a phase is saved.</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.ValidTitle" xml:space="preserve"><value>Phases are consistent</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.ValidDescription" xml:space="preserve"><value>Exactly one phase applies to every level and relevant item state.</value></data>
-  <data name="Coaching.MatchupEditor.Content.Validation.WarningTitle" xml:space="preserve"><value>Some states have no advice</value></data>
-  <data name="Coaching.MatchupEditor.Content.Validation.WarningDescription" xml:space="preserve"><value>You can continue, but the player may receive no phase advice in the states listed below.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.WarningTitle" xml:space="preserve"><value>Some item states have no advice</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.WarningDescription" xml:space="preserve"><value>Levels are only part of a condition. If a phase requires an item, another phase is needed before that item is purchased.</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.ErrorTitle" xml:space="preserve"><value>Phase conflicts found</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.ErrorDescription" xml:space="preserve"><value>Resolve the conflicts before continuing: only one phase may apply to a game state.</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.CoverageTitle" xml:space="preserve"><value>Level coverage</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.CoverageHint" xml:space="preserve"><value>Both levels and item conditions are considered. Hover over a segment for details.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.CoverageStart" xml:space="preserve"><value>lvl. 1</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.CoverageEnd" xml:space="preserve"><value>lvl. 18</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.Issue.InvalidRange" xml:space="preserve"><value>“{0}” has an invalid level range.</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.Issue.ConflictingItems" xml:space="preserve"><value>“{0}” requires and excludes the same item.</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.Issue.Overlap" xml:space="preserve"><value>“{0}” and “{1}” can both apply at {2}.</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.Issue.Gap" xml:space="preserve"><value>No phase covers at least one item state at {0}.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.Issue.GapWithoutItems" xml:space="preserve"><value>At {0}, no phase applies, for example, without: {1}. Add a phase for this state or remove the item requirement.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.Issue.GapWithItems" xml:space="preserve"><value>At {0}, no phase applies, for example, with: {1}. Add a phase for this state or change the end condition.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.Issue.GapWithAndWithoutItems" xml:space="preserve"><value>At {0}, no phase applies, for example, with {1} but without {2}. Add a phase for this state or change its item conditions.</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.LevelSingle" xml:space="preserve"><value>level {0}</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.LevelRange" xml:space="preserve"><value>levels {0}–{1}</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.Coverage.Covered" xml:space="preserve"><value>Level {0}: every state is covered</value></data>

@@ -14,31 +14,31 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <!-- Результат проверки остаётся самостоятельным блоком, чтобы его можно было повторить на шаге проверки. -->
-    <Border x:Name="PhaseValidationCard"
-            BorderThickness="3,1,1,1"
-            Padding="18">
-        <Border.Style>
-            <Style TargetType="Border" BasedOn="{StaticResource ShellCard}">
-                <Setter Property="BorderBrush" Value="#263750" />
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding State}"
-                                 Value="{x:Static viewModels:MatchupPhaseValidationState.Valid}">
-                        <Setter Property="BorderBrush" Value="#4FD1A1" />
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding State}"
-                                 Value="{x:Static viewModels:MatchupPhaseValidationState.Warning}">
-                        <Setter Property="BorderBrush" Value="#D9B44A" />
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding State}"
-                                 Value="{x:Static viewModels:MatchupPhaseValidationState.Error}">
-                        <Setter Property="BorderBrush" Value="#FF667D" />
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-        </Border.Style>
+    <!-- Макет разделяет общий результат и подробное покрытие на две карточки правой колонки. -->
+    <StackPanel>
+        <Border x:Name="PhaseValidationCard"
+                BorderThickness="3,1,1,1"
+                Padding="16">
+            <Border.Style>
+                <Style TargetType="Border" BasedOn="{StaticResource ShellCard}">
+                    <Setter Property="BorderBrush" Value="#263750" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding State}"
+                                     Value="{x:Static viewModels:MatchupPhaseValidationState.Valid}">
+                            <Setter Property="BorderBrush" Value="#4FD1A1" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding State}"
+                                     Value="{x:Static viewModels:MatchupPhaseValidationState.Warning}">
+                            <Setter Property="BorderBrush" Value="#D9B44A" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding State}"
+                                     Value="{x:Static viewModels:MatchupPhaseValidationState.Error}">
+                            <Setter Property="BorderBrush" Value="#FF667D" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
 
-        <StackPanel>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -47,8 +47,8 @@
                 <Ellipse Width="9"
                          Height="9"
                          Fill="{Binding BorderBrush, ElementName=PhaseValidationCard}"
-                         VerticalAlignment="Center"
-                         Margin="0,0,10,0" />
+                         VerticalAlignment="Top"
+                         Margin="0,5,10,0" />
                 <StackPanel Grid.Column="1">
                     <TextBlock x:Name="ValidationStatusTitleTextBlock"
                                Text="{Binding StatusTitle}"
@@ -62,25 +62,31 @@
                                Margin="0,5,0,0" />
                 </StackPanel>
             </Grid>
+        </Border>
 
-            <!-- Восемнадцать сегментов позволяют сразу увидеть пробел или конфликт на конкретном уровне. -->
-            <StackPanel Margin="0,16,0,0">
-                <StackPanel.Style>
-                    <Style TargetType="StackPanel">
-                        <Setter Property="Visibility" Value="Collapsed" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding HasPhases}" Value="True">
-                                <Setter Property="Visibility" Value="Visible" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </StackPanel.Style>
+        <!-- Полоса показывает результат для уровней, а сообщения ниже объясняют предметное состояние. -->
+        <Border Padding="16"
+                Margin="0,14,0,0">
+            <Border.Style>
+                <Style TargetType="Border" BasedOn="{StaticResource ShellCard}">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding HasPhases}" Value="True">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+
+            <StackPanel>
                 <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Validation.CoverageTitle}"
                            Foreground="#91A4BD"
-                           FontSize="{StaticResource Typography.FontSize.Caption}"
-                           Margin="0,0,0,7" />
+                           FontSize="{StaticResource Typography.FontSize.Body}"
+                           FontWeight="SemiBold" />
+
                 <ItemsControl x:Name="LevelCoverageItemsControl"
-                              ItemsSource="{Binding LevelCoverage}">
+                              ItemsSource="{Binding LevelCoverage}"
+                              Margin="0,12,0,0">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <UniformGrid Columns="18" />
@@ -88,10 +94,10 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border Height="28"
-                                    CornerRadius="5"
+                            <Border Height="27"
+                                    CornerRadius="3"
                                     BorderThickness="1"
-                                    Margin="0,0,4,0"
+                                    Margin="0,0,3,0"
                                     ToolTip="{Binding Tooltip}">
                                 <Border.Style>
                                     <Style TargetType="Border">
@@ -116,57 +122,68 @@
                                         </Style.Triggers>
                                     </Style>
                                 </Border.Style>
-                                <TextBlock Text="{Binding Level}"
-                                           Foreground="#DCEAF7"
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <Grid Margin="0,6,3,0">
+                    <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Validation.CoverageStart}"
+                               Foreground="#6F849F"
+                               FontSize="{StaticResource Typography.FontSize.Caption}" />
+                    <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Validation.CoverageEnd}"
+                               Foreground="#6F849F"
+                               FontSize="{StaticResource Typography.FontSize.Caption}"
+                               HorizontalAlignment="Right" />
+                </Grid>
+
+                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Validation.CoverageHint}"
+                           Foreground="#6F849F"
+                           FontSize="{StaticResource Typography.FontSize.Caption}"
+                           TextWrapping="Wrap"
+                           Margin="0,12,0,0" />
+
+                <!-- Каждое сообщение содержит пример состояния, которое автору нужно покрыть. -->
+                <ItemsControl x:Name="ValidationIssuesItemsControl"
+                              ItemsSource="{Binding Issues}"
+                              Margin="0,12,0,0">
+                    <ItemsControl.Style>
+                        <Style TargetType="ItemsControl">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding HasIssues}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ItemsControl.Style>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="#0C1420"
+                                    BorderThickness="2,0,0,0"
+                                    CornerRadius="5"
+                                    Padding="9,7"
+                                    Margin="0,0,0,7">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="BorderBrush" Value="#D9B44A" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Severity}"
+                                                         Value="{x:Static core:MatchupPhaseValidationSeverity.Error}">
+                                                <Setter Property="BorderBrush" Value="#FF667D" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <TextBlock Text="{Binding Message}"
+                                           Foreground="#C8D5E5"
                                            FontSize="{StaticResource Typography.FontSize.Caption}"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center" />
+                                           TextWrapping="Wrap" />
                             </Border>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </StackPanel>
-
-            <!-- Сообщения называют конкретные фазы, чтобы автору не приходилось искать конфликт вручную. -->
-            <ItemsControl x:Name="ValidationIssuesItemsControl"
-                          ItemsSource="{Binding Issues}"
-                          Margin="0,12,0,0">
-                <ItemsControl.Style>
-                    <Style TargetType="ItemsControl">
-                        <Setter Property="Visibility" Value="Collapsed" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding HasIssues}" Value="True">
-                                <Setter Property="Visibility" Value="Visible" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </ItemsControl.Style>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border Background="#0C1420"
-                                BorderThickness="2,0,0,0"
-                                CornerRadius="5"
-                                Padding="10,7"
-                                Margin="0,0,0,6">
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Setter Property="BorderBrush" Value="#D9B44A" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Severity}"
-                                                     Value="{x:Static core:MatchupPhaseValidationSeverity.Error}">
-                                            <Setter Property="BorderBrush" Value="#FF667D" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Border.Style>
-                            <TextBlock Text="{Binding Message}"
-                                       Foreground="#C8D5E5"
-                                       FontSize="{StaticResource Typography.FontSize.Caption}"
-                                       TextWrapping="Wrap" />
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </StackPanel>
-    </Border>
+        </Border>
+    </StackPanel>
 </UserControl>

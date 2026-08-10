@@ -90,27 +90,11 @@
                 <views:MatchupPhaseListView x:Name="PhaseListView" />
             </StackPanel>
 
-            <!-- Правая колонка фиксирует границы текущей итерации, пока соседние разделы ещё недоступны. -->
+            <!-- Как в макете, проверка остаётся рядом со списком и не растягивает страницу по ширине. -->
             <StackPanel Grid.Column="2">
-                <Border Style="{StaticResource ShellCard}"
-                        Padding="18">
-                    <StackPanel>
-                        <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.NextIteration.Title}"
-                                   Foreground="#91A4BD"
-                                   FontSize="{StaticResource Typography.FontSize.BodyLarge}"
-                                   FontWeight="SemiBold" />
-                        <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.NextIteration.Description}"
-                                   Foreground="#7F93AF"
-                                   FontSize="{StaticResource Typography.FontSize.Caption}"
-                                   TextWrapping="Wrap"
-                                   Margin="0,7,0,0" />
-                    </StackPanel>
-                </Border>
+                <views:MatchupPhaseValidationView x:Name="PhaseValidationView"
+                                                  DataContext="{Binding Validation}" />
             </StackPanel>
         </Grid>
-
-        <views:MatchupPhaseValidationView x:Name="PhaseValidationView"
-                                          DataContext="{Binding Validation}"
-                                          Margin="0,16,0,0" />
     </StackPanel>
 </UserControl>
