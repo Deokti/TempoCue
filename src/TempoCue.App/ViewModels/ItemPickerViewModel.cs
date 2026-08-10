@@ -487,16 +487,17 @@ public sealed class ItemPickerViewModel : ObservableObject
 
     private static bool MatchesCategory(
         ItemOptionViewModel item,
-        ItemFilterCategory category) => category switch
-    {
-        ItemFilterCategory.All => true,
-        ItemFilterCategory.Starter => item.Category == ItemCatalogCategory.Starter,
-        ItemFilterCategory.Boots => item.Category == ItemCatalogCategory.Boots,
-        ItemFilterCategory.Basic => item.Category == ItemCatalogCategory.Basic,
-        ItemFilterCategory.Epic => item.Category == ItemCatalogCategory.Epic,
-        ItemFilterCategory.Legendary => item.Category == ItemCatalogCategory.Legendary,
-        _ => false
-    };
+        ItemFilterCategory category) =>
+        category switch
+        {
+            ItemFilterCategory.All => true,
+            ItemFilterCategory.Starter => item.Category == ItemCatalogCategory.Starter,
+            ItemFilterCategory.Boots => item.Category == ItemCatalogCategory.Boots,
+            ItemFilterCategory.Basic => item.Category == ItemCatalogCategory.Basic,
+            ItemFilterCategory.Epic => item.Category == ItemCatalogCategory.Epic,
+            ItemFilterCategory.Legendary => item.Category == ItemCatalogCategory.Legendary,
+            _ => false
+        };
 
     private static string GetFilterCategoryResourceKey(ItemFilterCategory category) => category switch
     {
