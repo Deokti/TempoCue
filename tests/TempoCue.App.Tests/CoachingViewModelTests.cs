@@ -231,7 +231,7 @@ public sealed class CoachingViewModelTests
     }
 
     [Fact]
-    public async Task MatchupContent_ItemPickerCreatesStartAndEndConditions()
+    public async Task MatchupContent_ItemPickerCreatesMultipleStartAndEndConditions()
     {
         var localization = LocalizationService.Instance;
         var initialLanguage = localization.CurrentLanguageCode;
@@ -249,39 +249,57 @@ public sealed class CoachingViewModelTests
             content.OpenStartItemPicker();
             Assert.Equal(ItemPickerTarget.PhaseStart, content.ItemPicker.Target);
             var cleaver = content.ItemPicker.Items.Single(item => item.Id == 3071);
-            content.ItemPicker.Preview(cleaver);
-            Assert.Equal(3000, content.ItemPicker.SelectedItem?.Price);
+            var boots = content.ItemPicker.Items.Single(item => item.Id == 3047);
+            content.ItemPicker.ToggleSelection(cleaver);
+            Assert.Equal(3000, content.ItemPicker.PreviewedItem?.Price);
+            content.ItemPicker.ToggleSelection(boots);
+            Assert.Equal(2, content.ItemPicker.SelectedItems.Count);
             Assert.True(content.ItemPicker.ConfirmSelection());
 
-            Assert.Equal(3071, content.Editor.StartItem?.Id);
-            Assert.Contains("после покупки «Чёрная секира»", content.Editor.MeaningSummary);
+            Assert.Equal([3071, 3047], content.Editor.StartItems.Select(item => item.Id));
+            Assert.Contains(
+                "после покупки всех предметов: Чёрная секира, Бронированные сапоги",
+                content.Editor.MeaningSummary);
 
             content.OpenEndItemPicker();
-            content.ItemPicker.Preview(cleaver);
+            content.ItemPicker.ToggleSelection(cleaver);
             Assert.True(content.ItemPicker.ConfirmSelection());
 
             Assert.True(content.Editor.HasConflictingItemConditions);
             Assert.False(content.Editor.CanSave);
 
+            content.OpenStartItemPicker();
+            Assert.All(content.ItemPicker.SelectedItems, item => Assert.True(item.IsSelected));
+            content.ItemPicker.ToggleSelection(boots);
+            Assert.True(content.ItemPicker.ConfirmSelection());
+
             content.OpenEndItemPicker();
-            var boots = content.ItemPicker.Items.Single(item => item.Id == 3047);
-            content.ItemPicker.Preview(boots);
+            Assert.Equal(3071, Assert.Single(content.ItemPicker.SelectedItems).Id);
+            content.ItemPicker.ToggleSelection(cleaver);
+            content.ItemPicker.ToggleSelection(boots);
             Assert.True(content.ItemPicker.ConfirmSelection());
 
             Assert.False(content.Editor.HasConflictingItemConditions);
             Assert.True(content.SaveEditor());
             var phase = Assert.Single(content.Phases);
-            Assert.Equal(3071, phase.StartItem?.Id);
-            Assert.Equal(3047, phase.EndItem?.Id);
+            Assert.Equal(3071, Assert.Single(phase.StartItems).Id);
+            Assert.Equal(3047, Assert.Single(phase.EndItems).Id);
             Assert.Equal(
-                "Начинается после: Чёрная секира · Заканчивается после: Бронированные сапоги",
+                "Для начала нужны все: Чёрная секира · Завершается после любого: Бронированные сапоги",
                 phase.ItemConditionSummary);
 
             content.BeginEditPhase(phase);
-            Assert.Equal(3071, content.Editor.StartItem?.Id);
-            Assert.Equal(3047, content.Editor.EndItem?.Id);
-            content.RemoveEndItem();
-            Assert.False(content.Editor.HasEndItem);
+            Assert.Equal(3071, Assert.Single(content.Editor.StartItems).Id);
+            content.OpenStartItemPicker();
+            content.ItemPicker.ToggleSelection(cleaver);
+            Assert.False(content.ItemPicker.HasSelectedItems);
+            content.ItemPicker.Close();
+            Assert.Equal(3071, Assert.Single(content.Editor.StartItems).Id);
+
+            var savedEndItem = Assert.Single(content.Editor.EndItems);
+            Assert.Equal(3047, savedEndItem.Id);
+            content.RemoveEndItem(savedEndItem);
+            Assert.False(content.Editor.HasEndItems);
         }
         finally
         {
@@ -318,11 +336,11 @@ public sealed class CoachingViewModelTests
             var boots = Assert.Single(content.ItemPicker.FilteredItems);
             content.ItemPicker.Preview(boots);
 
-            Assert.Equal("1200 золота", content.ItemPicker.SelectedItemPriceText);
+            Assert.Equal("1200 золота", content.ItemPicker.PreviewedItemPriceText);
             Assert.Contains(
-                content.ItemPicker.SelectedItemStats,
+                content.ItemPicker.PreviewedItemStats,
                 stat => stat.Name == "Броня" && stat.Value == "+25");
-            Assert.Contains("ID 3047", content.ItemPicker.SelectedItemTechnicalText);
+            Assert.Contains("ID 3047", content.ItemPicker.PreviewedItemTechnicalText);
         }
         finally
         {

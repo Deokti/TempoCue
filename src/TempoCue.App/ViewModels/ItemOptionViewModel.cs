@@ -43,6 +43,7 @@ public sealed class ItemOptionViewModel : ObservableObject
 
     public IReadOnlyList<ItemStatEntry> Stats { get; }
 
+    /// <summary>Предмет включён в текущий подтверждаемый набор модального окна.</summary>
     public bool IsSelected
     {
         get => _isSelected;

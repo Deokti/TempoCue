@@ -17,8 +17,8 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
     private string _primaryAdvice = string.Empty;
     private string _whyNow = string.Empty;
     private string _nextGoal = string.Empty;
-    private MatchupItemDraft? _startItem;
-    private MatchupItemDraft? _endItem;
+    private IReadOnlyList<MatchupItemDraft> _startItems = [];
+    private IReadOnlyList<MatchupItemDraft> _endItems = [];
     private IReadOnlyList<MatchupPowerStateOptionViewModel> _powerStateOptions = [];
 
     public MatchupPhaseEditorViewModel(LocalizationService localization)
@@ -162,14 +162,14 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
         }
     }
 
-    public MatchupItemDraft? StartItem
+    public IReadOnlyList<MatchupItemDraft> StartItems
     {
-        get => _startItem;
+        get => _startItems;
         private set
         {
-            if (SetProperty(ref _startItem, value))
+            if (SetProperty(ref _startItems, value))
             {
-                OnPropertyChanged(nameof(HasStartItem));
+                OnPropertyChanged(nameof(HasStartItems));
                 OnPropertyChanged(nameof(MeaningSummary));
                 OnPropertyChanged(nameof(HasConflictingItemConditions));
                 NotifyValidationChanged();
@@ -177,16 +177,16 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
         }
     }
 
-    public bool HasStartItem => StartItem is not null;
+    public bool HasStartItems => StartItems.Count > 0;
 
-    public MatchupItemDraft? EndItem
+    public IReadOnlyList<MatchupItemDraft> EndItems
     {
-        get => _endItem;
+        get => _endItems;
         private set
         {
-            if (SetProperty(ref _endItem, value))
+            if (SetProperty(ref _endItems, value))
             {
-                OnPropertyChanged(nameof(HasEndItem));
+                OnPropertyChanged(nameof(HasEndItems));
                 OnPropertyChanged(nameof(MeaningSummary));
                 OnPropertyChanged(nameof(HasConflictingItemConditions));
                 NotifyValidationChanged();
@@ -194,12 +194,12 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
         }
     }
 
-    public bool HasEndItem => EndItem is not null;
+    public bool HasEndItems => EndItems.Count > 0;
 
     public bool HasConflictingItemConditions =>
-        StartItem is not null
-        && EndItem is not null
-        && StartItem.Id == EndItem.Id;
+        StartItems.Select(static item => item.Id)
+            .Intersect(EndItems.Select(static item => item.Id))
+            .Any();
 
     public TextLengthFeedback NameLengthFeedback => TextLengthFeedback.Create(
         Name,
@@ -234,18 +234,18 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
                     "Coaching.MatchupEditor.Content.Editor.MeaningRange",
                     MinimumLevel,
                     MaximumLevel);
-            if (StartItem is not null)
+            if (HasStartItems)
             {
                 summary += _localization.Format(
                     "Coaching.MatchupEditor.Content.Editor.MeaningStartItemSuffix",
-                    StartItem.DisplayName);
+                    JoinItemNames(StartItems));
             }
 
-            if (EndItem is not null)
+            if (HasEndItems)
             {
                 summary += _localization.Format(
                     "Coaching.MatchupEditor.Content.Editor.MeaningEndItemSuffix",
-                    EndItem.DisplayName);
+                    JoinItemNames(EndItems));
             }
 
             return summary;
@@ -263,8 +263,8 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
         PrimaryAdvice = string.Empty;
         WhyNow = string.Empty;
         NextGoal = string.Empty;
-        StartItem = null;
-        EndItem = null;
+        StartItems = [];
+        EndItems = [];
         IsOpen = true;
     }
 
@@ -280,8 +280,8 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
         PrimaryAdvice = draft.PrimaryAdvice;
         WhyNow = draft.WhyNow;
         NextGoal = draft.NextGoal;
-        StartItem = draft.StartItems.FirstOrDefault();
-        EndItem = draft.EndItems.FirstOrDefault();
+        StartItems = draft.StartItems.ToArray();
+        EndItems = draft.EndItems.ToArray();
         IsOpen = true;
     }
 
@@ -301,25 +301,33 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
             PrimaryAdvice.Trim(),
             WhyNow.Trim(),
             NextGoal.Trim(),
-            StartItem is null ? [] : [StartItem],
-            EndItem is null ? [] : [EndItem]);
+            StartItems.ToArray(),
+            EndItems.ToArray());
     }
 
-    public void SetStartItem(ItemOptionViewModel item)
+    public void SetStartItems(IEnumerable<ItemOptionViewModel> items)
+    {
+        ArgumentNullException.ThrowIfNull(items);
+        StartItems = CreateItemDrafts(items);
+    }
+
+    public void RemoveStartItem(MatchupItemDraft item)
     {
         ArgumentNullException.ThrowIfNull(item);
-        StartItem = new MatchupItemDraft(item.Id, item.DisplayName, item.ImageUri);
+        StartItems = StartItems.Where(existing => existing.Id != item.Id).ToArray();
     }
 
-    public void RemoveStartItem() => StartItem = null;
+    public void SetEndItems(IEnumerable<ItemOptionViewModel> items)
+    {
+        ArgumentNullException.ThrowIfNull(items);
+        EndItems = CreateItemDrafts(items);
+    }
 
-    public void SetEndItem(ItemOptionViewModel item)
+    public void RemoveEndItem(MatchupItemDraft item)
     {
         ArgumentNullException.ThrowIfNull(item);
-        EndItem = new MatchupItemDraft(item.Id, item.DisplayName, item.ImageUri);
+        EndItems = EndItems.Where(existing => existing.Id != item.Id).ToArray();
     }
-
-    public void RemoveEndItem() => EndItem = null;
 
     public void Close() => IsOpen = false;
 
@@ -360,6 +368,15 @@ public sealed class MatchupPhaseEditorViewModel : ObservableObject
             OnPropertyChanged(feedbackPropertyName);
         }
     }
+
+    private static IReadOnlyList<MatchupItemDraft> CreateItemDrafts(
+        IEnumerable<ItemOptionViewModel> items) => items
+        .DistinctBy(static item => item.Id)
+        .Select(static item => new MatchupItemDraft(item.Id, item.DisplayName, item.ImageUri))
+        .ToArray();
+
+    private static string JoinItemNames(IEnumerable<MatchupItemDraft> items) =>
+        string.Join(", ", items.Select(static item => item.DisplayName));
 }
 
 public sealed record MatchupPowerStateOptionViewModel(

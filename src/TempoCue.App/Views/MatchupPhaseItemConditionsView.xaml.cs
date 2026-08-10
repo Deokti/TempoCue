@@ -23,9 +23,19 @@ public partial class MatchupPhaseItemConditionsView : UserControl
     private void SelectEndItemButton_Click(object sender, RoutedEventArgs e) =>
         ViewModel.OpenEndItemPicker();
 
-    private void RemoveStartItemButton_Click(object sender, RoutedEventArgs e) =>
-        ViewModel.RemoveStartItem();
+    private void RemoveStartItemButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { DataContext: MatchupItemDraft item })
+        {
+            ViewModel.RemoveStartItem(item);
+        }
+    }
 
-    private void RemoveEndItemButton_Click(object sender, RoutedEventArgs e) =>
-        ViewModel.RemoveEndItem();
+    private void RemoveEndItemButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { DataContext: MatchupItemDraft item })
+        {
+            ViewModel.RemoveEndItem(item);
+        }
+    }
 }

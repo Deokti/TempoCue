@@ -38,11 +38,11 @@ public sealed class MatchupPhaseViewModel : ObservableObject
 
     public string NextGoal => _draft.NextGoal;
 
-    public MatchupItemDraft? StartItem => _draft.StartItems.FirstOrDefault();
+    public IReadOnlyList<MatchupItemDraft> StartItems => _draft.StartItems;
 
-    public MatchupItemDraft? EndItem => _draft.EndItems.FirstOrDefault();
+    public IReadOnlyList<MatchupItemDraft> EndItems => _draft.EndItems;
 
-    public bool HasItemConditions => StartItem is not null || EndItem is not null;
+    public bool HasItemConditions => StartItems.Count > 0 || EndItems.Count > 0;
 
     public bool HasWhyNow => !string.IsNullOrWhiteSpace(WhyNow);
 
@@ -79,18 +79,18 @@ public sealed class MatchupPhaseViewModel : ObservableObject
         ? _localization.Format("Coaching.Rule.LevelRange", MinimumLevel, maximumLevel)
         : _localization.Format("Coaching.Rule.LevelFrom", MinimumLevel);
 
-    public string ItemConditionSummary => (StartItem, EndItem) switch
+    public string ItemConditionSummary => (StartItems.Count, EndItems.Count) switch
     {
-        ({ } startItem, { } endItem) => _localization.Format(
+        (> 0, > 0) => _localization.Format(
             "Coaching.MatchupEditor.Content.Phase.Items.Both",
-            startItem.DisplayName,
-            endItem.DisplayName),
-        ({ } startItem, null) => _localization.Format(
+            JoinItemNames(StartItems),
+            JoinItemNames(EndItems)),
+        (> 0, 0) => _localization.Format(
             "Coaching.MatchupEditor.Content.Phase.Items.Start",
-            startItem.DisplayName),
-        (null, { } endItem) => _localization.Format(
+            JoinItemNames(StartItems)),
+        (0, > 0) => _localization.Format(
             "Coaching.MatchupEditor.Content.Phase.Items.End",
-            endItem.DisplayName),
+            JoinItemNames(EndItems)),
         _ => string.Empty
     };
 
@@ -116,4 +116,7 @@ public sealed class MatchupPhaseViewModel : ObservableObject
         OnPropertyChanged(nameof(LevelRange));
         OnPropertyChanged(nameof(ItemConditionSummary));
     }
+
+    private static string JoinItemNames(IEnumerable<MatchupItemDraft> items) =>
+        string.Join(", ", items.Select(static item => item.DisplayName));
 }

@@ -101,160 +101,144 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <!-- Предмет начала делает фазу применимой после появления в инвентаре. -->
+                <!-- Все выбранные предметы начала должны одновременно находиться в инвентаре. -->
                 <StackPanel>
                     <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.StartItemTitle}"
                                Style="{StaticResource FormFieldLabel}" />
                     <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.StartItemDescription}"
                                Style="{StaticResource FormFieldHint}"
                                Margin="0,0,0,9" />
-                    <Button x:Name="SelectStartItemButton"
-                            Content="{localization:Loc Coaching.MatchupEditor.Items.Select}"
-                            HorizontalAlignment="Stretch"
-                            Click="SelectStartItemButton_Click">
-                        <Button.Style>
-                            <Style TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
-                                <Setter Property="Visibility" Value="Visible" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Editor.HasStartItem}" Value="True">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                    <Border Background="#152238"
-                            BorderBrush="#31506C"
-                            BorderThickness="1"
-                            CornerRadius="9"
-                            Padding="10">
-                        <Border.Style>
-                            <Style TargetType="Border">
+                    <ItemsControl x:Name="StartItemsControl"
+                                  ItemsSource="{Binding Editor.StartItems}">
+                        <ItemsControl.Style>
+                            <Style TargetType="ItemsControl">
                                 <Setter Property="Visibility" Value="Collapsed" />
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Editor.HasStartItem}" Value="True">
+                                    <DataTrigger Binding="{Binding Editor.HasStartItems}" Value="True">
                                         <Setter Property="Visibility" Value="Visible" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
-                        </Border.Style>
-                        <StackPanel>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="42" />
-                                    <ColumnDefinition Width="10" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <Border Width="42"
-                                        Height="42"
-                                        Background="#0B1726"
+                        </ItemsControl.Style>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="#152238"
                                         BorderBrush="#31506C"
                                         BorderThickness="1"
-                                        CornerRadius="7">
-                                    <Image Source="{Binding Editor.StartItem.ImageUri}" Stretch="UniformToFill" />
+                                        CornerRadius="8"
+                                        Padding="8"
+                                        Margin="0,0,0,6">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="34" />
+                                            <ColumnDefinition Width="9" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Width="34"
+                                                Height="34"
+                                                Background="#0B1726"
+                                                BorderBrush="#31506C"
+                                                BorderThickness="1"
+                                                CornerRadius="6">
+                                            <Image Source="{Binding ImageUri}" Stretch="UniformToFill" />
+                                        </Border>
+                                        <TextBlock Grid.Column="2"
+                                                   Text="{Binding DisplayName}"
+                                                   Foreground="#F4F7FB"
+                                                   FontSize="{StaticResource Typography.FontSize.Body}"
+                                                   FontWeight="SemiBold"
+                                                   VerticalAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <Button Grid.Column="3"
+                                                Content="×"
+                                                Width="30"
+                                                Height="30"
+                                                Style="{StaticResource SecondaryButton}"
+                                                Padding="0"
+                                                Margin="8,0,0,0"
+                                                ToolTip="{localization:Loc Coaching.MatchupEditor.Items.Remove}"
+                                                Click="RemoveStartItemButton_Click" />
+                                    </Grid>
                                 </Border>
-                                <TextBlock Grid.Column="2"
-                                           Text="{Binding Editor.StartItem.DisplayName}"
-                                           Foreground="#F4F7FB"
-                                           FontSize="{StaticResource Typography.FontSize.Body}"
-                                           FontWeight="SemiBold"
-                                           VerticalAlignment="Center"
-                                           TextTrimming="CharacterEllipsis" />
-                            </Grid>
-                            <StackPanel Orientation="Horizontal"
-                                        HorizontalAlignment="Right"
-                                        Margin="0,8,0,0">
-                                <Button Content="{localization:Loc Coaching.MatchupEditor.Items.Change}"
-                                        Style="{StaticResource SecondaryButton}"
-                                        Padding="10,6"
-                                        Click="SelectStartItemButton_Click" />
-                                <Button Content="×"
-                                        Style="{StaticResource SecondaryButton}"
-                                        Padding="10,6"
-                                        Margin="6,0,0,0"
-                                        ToolTip="{localization:Loc Coaching.MatchupEditor.Items.Remove}"
-                                        Click="RemoveStartItemButton_Click" />
-                            </StackPanel>
-                        </StackPanel>
-                    </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <Button x:Name="SelectStartItemButton"
+                            Content="{localization:Loc Coaching.MatchupEditor.Items.Select}"
+                            HorizontalAlignment="Stretch"
+                            Style="{StaticResource SecondaryButton}"
+                            Click="SelectStartItemButton_Click" />
                 </StackPanel>
 
-                <!-- Предмет завершения закрывает фазу после появления в инвентаре. -->
+                <!-- Любой выбранный предмет завершения закрывает фазу после покупки. -->
                 <StackPanel Grid.Column="2">
                     <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.EndItemTitle}"
                                Style="{StaticResource FormFieldLabel}" />
                     <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.EndItemDescription}"
                                Style="{StaticResource FormFieldHint}"
                                Margin="0,0,0,9" />
-                    <Button x:Name="SelectEndItemButton"
-                            Content="{localization:Loc Coaching.MatchupEditor.Items.Select}"
-                            HorizontalAlignment="Stretch"
-                            Click="SelectEndItemButton_Click">
-                        <Button.Style>
-                            <Style TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
-                                <Setter Property="Visibility" Value="Visible" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Editor.HasEndItem}" Value="True">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                    <Border Background="#152238"
-                            BorderBrush="#4A3345"
-                            BorderThickness="1"
-                            CornerRadius="9"
-                            Padding="10">
-                        <Border.Style>
-                            <Style TargetType="Border">
+                    <ItemsControl x:Name="EndItemsControl"
+                                  ItemsSource="{Binding Editor.EndItems}">
+                        <ItemsControl.Style>
+                            <Style TargetType="ItemsControl">
                                 <Setter Property="Visibility" Value="Collapsed" />
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Editor.HasEndItem}" Value="True">
+                                    <DataTrigger Binding="{Binding Editor.HasEndItems}" Value="True">
                                         <Setter Property="Visibility" Value="Visible" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
-                        </Border.Style>
-                        <StackPanel>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="42" />
-                                    <ColumnDefinition Width="10" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <Border Width="42"
-                                        Height="42"
-                                        Background="#0B1726"
-                                        BorderBrush="#31506C"
+                        </ItemsControl.Style>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="#152238"
+                                        BorderBrush="#4A3345"
                                         BorderThickness="1"
-                                        CornerRadius="7">
-                                    <Image Source="{Binding Editor.EndItem.ImageUri}" Stretch="UniformToFill" />
+                                        CornerRadius="8"
+                                        Padding="8"
+                                        Margin="0,0,0,6">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="34" />
+                                            <ColumnDefinition Width="9" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Width="34"
+                                                Height="34"
+                                                Background="#0B1726"
+                                                BorderBrush="#4A3345"
+                                                BorderThickness="1"
+                                                CornerRadius="6">
+                                            <Image Source="{Binding ImageUri}" Stretch="UniformToFill" />
+                                        </Border>
+                                        <TextBlock Grid.Column="2"
+                                                   Text="{Binding DisplayName}"
+                                                   Foreground="#F4F7FB"
+                                                   FontSize="{StaticResource Typography.FontSize.Body}"
+                                                   FontWeight="SemiBold"
+                                                   VerticalAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <Button Grid.Column="3"
+                                                Content="×"
+                                                Width="30"
+                                                Height="30"
+                                                Style="{StaticResource SecondaryButton}"
+                                                Padding="0"
+                                                Margin="8,0,0,0"
+                                                ToolTip="{localization:Loc Coaching.MatchupEditor.Items.Remove}"
+                                                Click="RemoveEndItemButton_Click" />
+                                    </Grid>
                                 </Border>
-                                <TextBlock Grid.Column="2"
-                                           Text="{Binding Editor.EndItem.DisplayName}"
-                                           Foreground="#F4F7FB"
-                                           FontSize="{StaticResource Typography.FontSize.Body}"
-                                           FontWeight="SemiBold"
-                                           VerticalAlignment="Center"
-                                           TextTrimming="CharacterEllipsis" />
-                            </Grid>
-                            <StackPanel Orientation="Horizontal"
-                                        HorizontalAlignment="Right"
-                                        Margin="0,8,0,0">
-                                <Button Content="{localization:Loc Coaching.MatchupEditor.Items.Change}"
-                                        Style="{StaticResource SecondaryButton}"
-                                        Padding="10,6"
-                                        Click="SelectEndItemButton_Click" />
-                                <Button Content="×"
-                                        Style="{StaticResource SecondaryButton}"
-                                        Padding="10,6"
-                                        Margin="6,0,0,0"
-                                        ToolTip="{localization:Loc Coaching.MatchupEditor.Items.Remove}"
-                                        Click="RemoveEndItemButton_Click" />
-                            </StackPanel>
-                        </StackPanel>
-                    </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <Button x:Name="SelectEndItemButton"
+                            Content="{localization:Loc Coaching.MatchupEditor.Items.Select}"
+                            HorizontalAlignment="Stretch"
+                            Style="{StaticResource SecondaryButton}"
+                            Click="SelectEndItemButton_Click" />
                 </StackPanel>
             </Grid>
 

@@ -24,7 +24,7 @@ public partial class ItemPickerDialogView : UserControl
     {
         if (sender is Button { DataContext: ItemOptionViewModel item })
         {
-            ViewModel.Preview(item);
+            ViewModel.ToggleSelection(item);
         }
     }
 

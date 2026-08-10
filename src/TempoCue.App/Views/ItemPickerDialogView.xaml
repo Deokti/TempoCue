@@ -252,7 +252,8 @@
                                     <DataTemplate>
                                         <Button Style="{StaticResource ItemPickerCard}"
                                                 Click="ItemButton_Click">
-                                            <StackPanel HorizontalAlignment="Center">
+                                            <Grid>
+                                                <StackPanel HorizontalAlignment="Center">
                                                 <Border Width="54"
                                                         Height="54"
                                                         Background="#0B1726"
@@ -276,7 +277,32 @@
                                                            FontSize="{StaticResource Typography.FontSize.Caption}"
                                                            FontWeight="SemiBold"
                                                            Margin="0,3,0,0" />
-                                            </StackPanel>
+                                                </StackPanel>
+                                                <Border Width="20"
+                                                        Height="20"
+                                                        Background="#55B8F3"
+                                                        CornerRadius="10"
+                                                        HorizontalAlignment="Right"
+                                                        VerticalAlignment="Top"
+                                                        Margin="0,-4,-4,0">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                    <Setter Property="Visibility" Value="Visible" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <TextBlock Text="✓"
+                                                               Foreground="#07111D"
+                                                               FontSize="12"
+                                                               FontWeight="Bold"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center" />
+                                                </Border>
+                                            </Grid>
                                         </Button>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
@@ -314,7 +340,7 @@
                                 <Style TargetType="TextBlock">
                                     <Setter Property="Visibility" Value="Visible" />
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding HasSelectedItem}" Value="True">
+                                        <DataTrigger Binding="{Binding HasPreviewedItem}" Value="True">
                                             <Setter Property="Visibility" Value="Collapsed" />
                                         </DataTrigger>
                                     </Style.Triggers>
@@ -327,7 +353,7 @@
                                 <Style TargetType="ScrollViewer">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding HasSelectedItem}" Value="True">
+                                        <DataTrigger Binding="{Binding HasPreviewedItem}" Value="True">
                                             <Setter Property="Visibility" Value="Visible" />
                                         </DataTrigger>
                                     </Style.Triggers>
@@ -346,18 +372,18 @@
                                             BorderBrush="#31506C"
                                             BorderThickness="1"
                                             CornerRadius="8">
-                                        <Image Source="{Binding SelectedItem.ImageUri}"
+                                        <Image Source="{Binding PreviewedItem.ImageUri}"
                                                Width="62"
                                                Height="62"
                                                Stretch="UniformToFill" />
                                     </Border>
                                     <StackPanel Grid.Column="2" VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding SelectedItem.DisplayName}"
+                                        <TextBlock Text="{Binding PreviewedItem.DisplayName}"
                                                    Foreground="#F4F7FB"
                                                    FontSize="{StaticResource Typography.FontSize.BodyLarge}"
                                                    FontWeight="SemiBold"
                                                    TextWrapping="Wrap" />
-                                        <TextBlock Text="{Binding SelectedItemPriceText}"
+                                        <TextBlock Text="{Binding PreviewedItemPriceText}"
                                                    Foreground="#E5C86A"
                                                    FontSize="{StaticResource Typography.FontSize.Body}"
                                                    FontWeight="SemiBold"
@@ -365,7 +391,7 @@
                                     </StackPanel>
                                 </Grid>
 
-                                <ItemsControl ItemsSource="{Binding SelectedItemStats}"
+                                <ItemsControl ItemsSource="{Binding PreviewedItemStats}"
                                               Margin="0,16,0,0">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
@@ -397,8 +423,8 @@
                                             <Style.Triggers>
                                                 <MultiDataTrigger>
                                                     <MultiDataTrigger.Conditions>
-                                                        <Condition Binding="{Binding HasSelectedItem}" Value="True" />
-                                                        <Condition Binding="{Binding HasSelectedItemStats}" Value="False" />
+                                                        <Condition Binding="{Binding HasPreviewedItem}" Value="True" />
+                                                        <Condition Binding="{Binding HasPreviewedItemStats}" Value="False" />
                                                     </MultiDataTrigger.Conditions>
                                                     <Setter Property="Visibility" Value="Visible" />
                                                 </MultiDataTrigger>
@@ -408,11 +434,11 @@
                                 </TextBlock>
 
                                 <Border Height="1" Background="#263750" Margin="0,12" />
-                                <TextBlock Text="{Binding SelectedItem.Description}"
+                                <TextBlock Text="{Binding PreviewedItem.Description}"
                                            Foreground="#9CB0C9"
                                            FontSize="{StaticResource Typography.FontSize.Body}"
                                            TextWrapping="Wrap" />
-                                <TextBlock Text="{Binding SelectedItemTechnicalText}"
+                                <TextBlock Text="{Binding PreviewedItemTechnicalText}"
                                            Foreground="#526A88"
                                            FontSize="{StaticResource Typography.FontSize.Caption}"
                                            TextWrapping="Wrap"
@@ -429,18 +455,23 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Items.Picker.SourceNote}"
-                               Foreground="#526A88"
-                               FontSize="{StaticResource Typography.FontSize.Caption}"
-                               VerticalAlignment="Center" />
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Items.Picker.SourceNote}"
+                                   Foreground="#526A88"
+                                   FontSize="{StaticResource Typography.FontSize.Caption}" />
+                        <TextBlock Text="{Binding SelectedItemCountText}"
+                                   Foreground="#8FBDE0"
+                                   FontSize="{StaticResource Typography.FontSize.Caption}"
+                                   Margin="0,3,0,0" />
+                    </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal">
                         <Button Content="{localization:Loc Coaching.MatchupEditor.Items.Picker.Cancel}"
                                 Style="{StaticResource SecondaryButton}"
                                 Click="CloseButton_Click" />
                         <Button x:Name="ConfirmItemSelectionButton"
-                                Content="{localization:Loc Coaching.MatchupEditor.Items.Picker.Confirm}"
+                                Content="{Binding ConfirmSelectionText}"
                                 Style="{StaticResource PrimaryButton}"
-                                IsEnabled="{Binding HasSelectedItem}"
+                                IsEnabled="{Binding HasSelectedItems}"
                                 Margin="10,0,0,0"
                                 Click="ConfirmButton_Click" />
                     </StackPanel>

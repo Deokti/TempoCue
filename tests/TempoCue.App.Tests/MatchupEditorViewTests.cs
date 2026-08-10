@@ -243,14 +243,20 @@ public sealed class MatchupEditorViewTests
         context.Window.UpdateLayout();
         var cleaverButton = WpfTestHost.FindVisualDescendants<Button>(pickerItems)
             .Single(button => button.DataContext is ItemOptionViewModel { Id: 3071 });
+        var bootsButton = WpfTestHost.FindVisualDescendants<Button>(pickerItems)
+            .Single(button => button.DataContext is ItemOptionViewModel { Id: 3047 });
         WpfTestHost.Click(cleaverButton);
+        WpfTestHost.Click(bootsButton);
         Assert.Equal(Visibility.Visible, picker.Visibility);
-        Assert.Equal(3071, content.ItemPicker.SelectedItem?.Id);
+        Assert.Equal(3047, content.ItemPicker.PreviewedItem?.Id);
+        Assert.Equal([3071, 3047], content.ItemPicker.SelectedItems.Select(item => item.Id));
         var confirmButton = WpfTestHost.Find<Button>(picker, "ConfirmItemSelectionButton");
         Assert.True(confirmButton.IsEnabled);
+        Assert.Equal("Применить · 2", confirmButton.Content);
         WpfTestHost.Click(confirmButton);
         Assert.Equal(Visibility.Collapsed, picker.Visibility);
-        Assert.Equal(3071, content.Editor.StartItem?.Id);
+        Assert.Equal([3071, 3047], content.Editor.StartItems.Select(item => item.Id));
+        Assert.Equal(2, WpfTestHost.Find<ItemsControl>(itemConditions, "StartItemsControl").Items.Count);
 
         foreach (var inputName in new[]
                  {

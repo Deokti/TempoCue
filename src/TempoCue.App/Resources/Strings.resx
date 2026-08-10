@@ -309,14 +309,14 @@
   <data name="Coaching.MatchupEditor.Content.Editor.MeaningTitle" xml:space="preserve"><value>What it means</value></data>
   <data name="Coaching.MatchupEditor.Content.Editor.MeaningRange" xml:space="preserve"><value>Phase is active at levels {0}–{1}</value></data>
   <data name="Coaching.MatchupEditor.Content.Editor.MeaningToEnd" xml:space="preserve"><value>Phase is active at levels {0}+</value></data>
-  <data name="Coaching.MatchupEditor.Content.Editor.MeaningStartItemSuffix" xml:space="preserve"><value> after purchasing “{0}”</value></data>
-  <data name="Coaching.MatchupEditor.Content.Editor.MeaningEndItemSuffix" xml:space="preserve"><value> until “{0}” is purchased</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.MeaningStartItemSuffix" xml:space="preserve"><value> after purchasing all items: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.MeaningEndItemSuffix" xml:space="preserve"><value> until any of these items is purchased: {0}</value></data>
   <data name="Coaching.MatchupEditor.Content.Editor.ItemsTitle" xml:space="preserve"><value>Item conditions</value></data>
   <data name="Coaching.MatchupEditor.Content.Editor.ItemsDescription" xml:space="preserve"><value>Items can additionally start or end this phase. Both fields are optional.</value></data>
-  <data name="Coaching.MatchupEditor.Content.Editor.StartItemTitle" xml:space="preserve"><value>Phase starts after purchase</value></data>
-  <data name="Coaching.MatchupEditor.Content.Editor.StartItemDescription" xml:space="preserve"><value>The advice appears when this item is in the inventory.</value></data>
-  <data name="Coaching.MatchupEditor.Content.Editor.EndItemTitle" xml:space="preserve"><value>Phase ends after purchase</value></data>
-  <data name="Coaching.MatchupEditor.Content.Editor.EndItemDescription" xml:space="preserve"><value>The phase stops applying after this item is purchased.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.StartItemTitle" xml:space="preserve"><value>Required to start the phase</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.StartItemDescription" xml:space="preserve"><value>The advice appears only after all selected items have been purchased.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.EndItemTitle" xml:space="preserve"><value>The phase ends after purchasing</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.EndItemDescription" xml:space="preserve"><value>Purchasing any selected item ends this phase.</value></data>
   <data name="Coaching.MatchupEditor.Content.Editor.ItemConflict" xml:space="preserve"><value>The same item cannot both start and end a phase.</value></data>
   <data name="Coaching.MatchupEditor.Content.Editor.PrimaryAdvice" xml:space="preserve"><value>Main advice</value></data>
   <data name="Coaching.MatchupEditor.Content.Editor.PrimaryAdviceHint" xml:space="preserve"><value>(the player sees it first)</value></data>
@@ -329,23 +329,23 @@
   <data name="Coaching.MatchupEditor.Content.Editor.DeletePhase" xml:space="preserve"><value>Delete phase</value></data>
   <data name="Coaching.MatchupEditor.Content.Edit" xml:space="preserve"><value>Edit</value></data>
   <data name="Coaching.MatchupEditor.Content.Duplicate" xml:space="preserve"><value>Duplicate</value></data>
-  <data name="Coaching.MatchupEditor.Content.Phase.Items.Start" xml:space="preserve"><value>Starts after: {0}</value></data>
-  <data name="Coaching.MatchupEditor.Content.Phase.Items.End" xml:space="preserve"><value>Ends after: {0}</value></data>
-  <data name="Coaching.MatchupEditor.Content.Phase.Items.Both" xml:space="preserve"><value>Starts after: {0} · Ends after: {1}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Phase.Items.Start" xml:space="preserve"><value>All required to start: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Phase.Items.End" xml:space="preserve"><value>Ends after any: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Phase.Items.Both" xml:space="preserve"><value>All required to start: {0} · Ends after any: {1}</value></data>
   <data name="Coaching.MatchupEditor.Items.Loading" xml:space="preserve"><value>Loading items for the selected patch…</value></data>
   <data name="Coaching.MatchupEditor.Items.ErrorTitle" xml:space="preserve"><value>Item catalog is unavailable</value></data>
   <data name="Coaching.MatchupEditor.Items.ErrorDescription" xml:space="preserve"><value>You can save a phase without item conditions or retry loading.</value></data>
   <data name="Coaching.MatchupEditor.Items.Retry" xml:space="preserve"><value>Retry</value></data>
-  <data name="Coaching.MatchupEditor.Items.Select" xml:space="preserve"><value>Select item</value></data>
+  <data name="Coaching.MatchupEditor.Items.Select" xml:space="preserve"><value>Select items</value></data>
   <data name="Coaching.MatchupEditor.Items.Change" xml:space="preserve"><value>Change</value></data>
   <data name="Coaching.MatchupEditor.Items.Remove" xml:space="preserve"><value>Remove item</value></data>
   <data name="Coaching.MatchupEditor.Items.CatalogLoaded" xml:space="preserve"><value>{0} items loaded</value></data>
   <data name="Coaching.MatchupEditor.Items.Picker.Title" xml:space="preserve"><value>Select item</value></data>
-  <data name="Coaching.MatchupEditor.Items.Picker.Description" xml:space="preserve"><value>Select one item from the chosen patch.</value></data>
-  <data name="Coaching.MatchupEditor.Items.Picker.StartTitle" xml:space="preserve"><value>Select an item that starts the phase</value></data>
-  <data name="Coaching.MatchupEditor.Items.Picker.StartDescription" xml:space="preserve"><value>The phase can apply only after this item appears in the inventory.</value></data>
-  <data name="Coaching.MatchupEditor.Items.Picker.EndTitle" xml:space="preserve"><value>Select an item that ends the phase</value></data>
-  <data name="Coaching.MatchupEditor.Items.Picker.EndDescription" xml:space="preserve"><value>The phase stops applying when this item appears in the inventory.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.Description" xml:space="preserve"><value>Select one or more items from the chosen patch.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.StartTitle" xml:space="preserve"><value>Select items required to start the phase</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.StartDescription" xml:space="preserve"><value>The phase can apply only after all selected items appear in the inventory.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.EndTitle" xml:space="preserve"><value>Select items that end the phase</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.EndDescription" xml:space="preserve"><value>The phase stops applying when any selected item appears in the inventory.</value></data>
   <data name="Coaching.MatchupEditor.Items.Picker.Search" xml:space="preserve"><value>Search by item name</value></data>
   <data name="Coaching.MatchupEditor.Items.Picker.Price" xml:space="preserve"><value>{0} gold</value></data>
   <data name="Coaching.MatchupEditor.Items.Picker.Technical" xml:space="preserve"><value>ID {0} · {1} · patch {2}</value></data>
@@ -355,6 +355,8 @@
   <data name="Coaching.MatchupEditor.Items.Picker.SourceNote" xml:space="preserve"><value>Items available for purchase on Summoner's Rift in the selected patch</value></data>
   <data name="Coaching.MatchupEditor.Items.Picker.Cancel" xml:space="preserve"><value>Cancel</value></data>
   <data name="Coaching.MatchupEditor.Items.Picker.Confirm" xml:space="preserve"><value>Select</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.SelectedCount" xml:space="preserve"><value>Selected: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.ConfirmMultiple" xml:space="preserve"><value>Apply · {0}</value></data>
   <data name="Coaching.MatchupEditor.Items.Category.All" xml:space="preserve"><value>All</value></data>
   <data name="Coaching.MatchupEditor.Items.Category.Starter" xml:space="preserve"><value>Starter</value></data>
   <data name="Coaching.MatchupEditor.Items.Category.Boots" xml:space="preserve"><value>Boots</value></data>

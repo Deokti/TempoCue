@@ -312,15 +312,15 @@
   <data name="Coaching.MatchupEditor.Content.Editor.MeaningTitle" xml:space="preserve"><value>Что это значит</value></data>
   <data name="Coaching.MatchupEditor.Content.Editor.MeaningRange" xml:space="preserve"><value>Фаза активна на уровнях {0}–{1}</value></data>
   <data name="Coaching.MatchupEditor.Content.Editor.MeaningToEnd" xml:space="preserve"><value>Фаза активна на уровнях {0}+</value></data>
-  <data name="Coaching.MatchupEditor.Content.Editor.MeaningStartItemSuffix" xml:space="preserve"><value> после покупки «{0}»</value></data>
-  <data name="Coaching.MatchupEditor.Content.Editor.MeaningEndItemSuffix" xml:space="preserve"><value> до покупки «{0}»</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.MeaningStartItemSuffix" xml:space="preserve"><value> после покупки всех предметов: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.MeaningEndItemSuffix" xml:space="preserve"><value> до покупки любого из предметов: {0}</value></data>
   <data name="Coaching.MatchupEditor.Content.Editor.ItemsTitle" xml:space="preserve"><value>Условия по предметам</value></data>
   <data name="Coaching.MatchupEditor.Content.Editor.ItemsDescription" xml:space="preserve"><value>Предметы могут дополнительно начинать или завершать фазу. Оба поля необязательны.</value></data>
-  <data name="Coaching.MatchupEditor.Content.Editor.StartItemTitle" xml:space="preserve"><value>Фаза начинается после покупки</value></data>
-  <data name="Coaching.MatchupEditor.Content.Editor.StartItemDescription" xml:space="preserve"><value>Совет появится, когда этот предмет окажется в инвентаре.</value></data>
-  <data name="Coaching.MatchupEditor.Content.Editor.EndItemTitle" xml:space="preserve"><value>Фаза заканчивается после покупки</value></data>
-  <data name="Coaching.MatchupEditor.Content.Editor.EndItemDescription" xml:space="preserve"><value>После покупки этого предмета фаза перестанет применяться.</value></data>
-  <data name="Coaching.MatchupEditor.Content.Editor.ItemConflict" xml:space="preserve"><value>Один предмет не может одновременно начинать и завершать фазу.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.StartItemTitle" xml:space="preserve"><value>Для начала фазы нужны</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.StartItemDescription" xml:space="preserve"><value>Совет появится только после покупки всех выбранных предметов.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.EndItemTitle" xml:space="preserve"><value>Фаза завершится после покупки</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.EndItemDescription" xml:space="preserve"><value>Покупка любого выбранного предмета завершит эту фазу.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.ItemConflict" xml:space="preserve"><value>Один и тот же предмет не может одновременно начинать и завершать фазу.</value></data>
   <data name="Coaching.MatchupEditor.Content.Editor.PrimaryAdvice" xml:space="preserve"><value>Главный совет</value></data>
   <data name="Coaching.MatchupEditor.Content.Editor.PrimaryAdviceHint" xml:space="preserve"><value>(его видит игрок первым)</value></data>
   <data name="Coaching.MatchupEditor.Content.Editor.WhyNow" xml:space="preserve"><value>Почему сейчас</value></data>
@@ -332,23 +332,23 @@
   <data name="Coaching.MatchupEditor.Content.Editor.DeletePhase" xml:space="preserve"><value>Удалить фазу</value></data>
   <data name="Coaching.MatchupEditor.Content.Edit" xml:space="preserve"><value>Редактировать</value></data>
   <data name="Coaching.MatchupEditor.Content.Duplicate" xml:space="preserve"><value>Дублировать</value></data>
-  <data name="Coaching.MatchupEditor.Content.Phase.Items.Start" xml:space="preserve"><value>Начинается после: {0}</value></data>
-  <data name="Coaching.MatchupEditor.Content.Phase.Items.End" xml:space="preserve"><value>Заканчивается после: {0}</value></data>
-  <data name="Coaching.MatchupEditor.Content.Phase.Items.Both" xml:space="preserve"><value>Начинается после: {0} · Заканчивается после: {1}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Phase.Items.Start" xml:space="preserve"><value>Для начала нужны все: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Phase.Items.End" xml:space="preserve"><value>Завершается после любого: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Phase.Items.Both" xml:space="preserve"><value>Для начала нужны все: {0} · Завершается после любого: {1}</value></data>
   <data name="Coaching.MatchupEditor.Items.Loading" xml:space="preserve"><value>Загружаем предметы выбранного патча…</value></data>
   <data name="Coaching.MatchupEditor.Items.ErrorTitle" xml:space="preserve"><value>Каталог предметов недоступен</value></data>
   <data name="Coaching.MatchupEditor.Items.ErrorDescription" xml:space="preserve"><value>Можно сохранить фазу без условий предметов или повторить загрузку.</value></data>
   <data name="Coaching.MatchupEditor.Items.Retry" xml:space="preserve"><value>Повторить</value></data>
-  <data name="Coaching.MatchupEditor.Items.Select" xml:space="preserve"><value>Выбрать предмет</value></data>
+  <data name="Coaching.MatchupEditor.Items.Select" xml:space="preserve"><value>Выбрать предметы</value></data>
   <data name="Coaching.MatchupEditor.Items.Change" xml:space="preserve"><value>Изменить</value></data>
   <data name="Coaching.MatchupEditor.Items.Remove" xml:space="preserve"><value>Убрать предмет</value></data>
   <data name="Coaching.MatchupEditor.Items.CatalogLoaded" xml:space="preserve"><value>Загружено предметов: {0}</value></data>
   <data name="Coaching.MatchupEditor.Items.Picker.Title" xml:space="preserve"><value>Выберите предмет</value></data>
-  <data name="Coaching.MatchupEditor.Items.Picker.Description" xml:space="preserve"><value>Выберите один предмет из каталога указанного патча.</value></data>
-  <data name="Coaching.MatchupEditor.Items.Picker.StartTitle" xml:space="preserve"><value>Выберите предмет, который начинает фазу</value></data>
-  <data name="Coaching.MatchupEditor.Items.Picker.StartDescription" xml:space="preserve"><value>Фаза сможет применяться только после появления этого предмета в инвентаре.</value></data>
-  <data name="Coaching.MatchupEditor.Items.Picker.EndTitle" xml:space="preserve"><value>Выберите предмет, который завершает фазу</value></data>
-  <data name="Coaching.MatchupEditor.Items.Picker.EndDescription" xml:space="preserve"><value>Фаза перестанет применяться после появления этого предмета в инвентаре.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.Description" xml:space="preserve"><value>Выберите один или несколько предметов из каталога указанного патча.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.StartTitle" xml:space="preserve"><value>Выберите предметы для начала фазы</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.StartDescription" xml:space="preserve"><value>Фаза сможет применяться только после появления всех выбранных предметов в инвентаре.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.EndTitle" xml:space="preserve"><value>Выберите предметы, завершающие фазу</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.EndDescription" xml:space="preserve"><value>Фаза перестанет применяться после появления любого выбранного предмета в инвентаре.</value></data>
   <data name="Coaching.MatchupEditor.Items.Picker.Search" xml:space="preserve"><value>Поиск по названию предмета</value></data>
   <data name="Coaching.MatchupEditor.Items.Picker.Price" xml:space="preserve"><value>{0} золота</value></data>
   <data name="Coaching.MatchupEditor.Items.Picker.Technical" xml:space="preserve"><value>ID {0} · {1} · патч {2}</value></data>
@@ -358,6 +358,8 @@
   <data name="Coaching.MatchupEditor.Items.Picker.SourceNote" xml:space="preserve"><value>Предметы, доступные для покупки на Ущелье призывателей в выбранном патче</value></data>
   <data name="Coaching.MatchupEditor.Items.Picker.Cancel" xml:space="preserve"><value>Отмена</value></data>
   <data name="Coaching.MatchupEditor.Items.Picker.Confirm" xml:space="preserve"><value>Выбрать</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.SelectedCount" xml:space="preserve"><value>Выбрано: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.ConfirmMultiple" xml:space="preserve"><value>Применить · {0}</value></data>
   <data name="Coaching.MatchupEditor.Items.Category.All" xml:space="preserve"><value>Все</value></data>
   <data name="Coaching.MatchupEditor.Items.Category.Starter" xml:space="preserve"><value>Стартовые</value></data>
   <data name="Coaching.MatchupEditor.Items.Category.Boots" xml:space="preserve"><value>Ботинки</value></data>

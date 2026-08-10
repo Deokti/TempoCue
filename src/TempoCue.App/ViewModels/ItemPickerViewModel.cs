@@ -24,7 +24,7 @@ public sealed class ItemPickerViewModel : ObservableObject
     private string _search = string.Empty;
     private ItemFilterCategory _selectedCategory = ItemFilterCategory.All;
     private ItemSortOptionViewModel? _selectedSortOption;
-    private ItemOptionViewModel? _selectedItem;
+    private ItemOptionViewModel? _previewedItem;
 
     public ItemPickerViewModel(
         IItemCatalog itemCatalog,
@@ -36,7 +36,7 @@ public sealed class ItemPickerViewModel : ObservableObject
         RebuildFilterOptions();
     }
 
-    public event Action<ItemPickerTarget, ItemOptionViewModel>? ItemSelected;
+    public event Action<ItemPickerTarget, IReadOnlyList<ItemOptionViewModel>>? ItemsSelected;
 
     public IReadOnlyList<ItemOptionViewModel> Items => _items;
 
@@ -140,7 +140,7 @@ public sealed class ItemPickerViewModel : ObservableObject
                 option.IsSelected = option.Category == value;
             }
 
-            SelectedItem = null;
+            PreviewedItem = null;
             NotifyFilteredItemsChanged();
         }
     }
@@ -157,55 +157,58 @@ public sealed class ItemPickerViewModel : ObservableObject
         }
     }
 
-    public ItemOptionViewModel? SelectedItem
+    public ItemOptionViewModel? PreviewedItem
     {
-        get => _selectedItem;
+        get => _previewedItem;
         private set
         {
-            if (ReferenceEquals(_selectedItem, value))
+            if (ReferenceEquals(_previewedItem, value))
             {
                 return;
             }
 
-            if (_selectedItem is not null)
-            {
-                _selectedItem.IsSelected = false;
-            }
-
-            _selectedItem = value;
-            if (_selectedItem is not null)
-            {
-                _selectedItem.IsSelected = true;
-            }
-
+            _previewedItem = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(HasSelectedItem));
-            OnPropertyChanged(nameof(SelectedItemStats));
-            OnPropertyChanged(nameof(HasSelectedItemStats));
-            OnPropertyChanged(nameof(SelectedItemPriceText));
-            OnPropertyChanged(nameof(SelectedItemTechnicalText));
+            OnPropertyChanged(nameof(HasPreviewedItem));
+            OnPropertyChanged(nameof(PreviewedItemStats));
+            OnPropertyChanged(nameof(HasPreviewedItemStats));
+            OnPropertyChanged(nameof(PreviewedItemPriceText));
+            OnPropertyChanged(nameof(PreviewedItemTechnicalText));
         }
     }
 
-    public bool HasSelectedItem => SelectedItem is not null;
+    public bool HasPreviewedItem => PreviewedItem is not null;
 
-    public IReadOnlyList<ItemStatViewModel> SelectedItemStats =>
-        SelectedItem?.Stats.Select(CreateStatViewModel).ToArray() ?? [];
+    public IReadOnlyList<ItemOptionViewModel> SelectedItems =>
+        Items.Where(static item => item.IsSelected).ToArray();
 
-    public bool HasSelectedItemStats => SelectedItemStats.Count > 0;
+    public bool HasSelectedItems => SelectedItems.Count > 0;
 
-    public string SelectedItemPriceText => SelectedItem is null
+    public string SelectedItemCountText => _localization.Format(
+        "Coaching.MatchupEditor.Items.Picker.SelectedCount",
+        SelectedItems.Count);
+
+    public string ConfirmSelectionText => _localization.Format(
+        "Coaching.MatchupEditor.Items.Picker.ConfirmMultiple",
+        SelectedItems.Count);
+
+    public IReadOnlyList<ItemStatViewModel> PreviewedItemStats =>
+        PreviewedItem?.Stats.Select(CreateStatViewModel).ToArray() ?? [];
+
+    public bool HasPreviewedItemStats => PreviewedItemStats.Count > 0;
+
+    public string PreviewedItemPriceText => PreviewedItem is null
         ? string.Empty
         : _localization.Format(
             "Coaching.MatchupEditor.Items.Picker.Price",
-            SelectedItem.Price);
+            PreviewedItem.Price);
 
-    public string SelectedItemTechnicalText => SelectedItem is null
+    public string PreviewedItemTechnicalText => PreviewedItem is null
         ? string.Empty
         : _localization.Format(
             "Coaching.MatchupEditor.Items.Picker.Technical",
-            SelectedItem.Id,
-            GetCategoryLabel(SelectedItem.Category),
+            PreviewedItem.Id,
+            GetCategoryLabel(PreviewedItem.Category),
             _gamePatch);
 
     public bool HasResults => FilteredItems.Count > 0;
@@ -313,17 +316,24 @@ public sealed class ItemPickerViewModel : ObservableObject
         return EnsureCatalogLoadedAsync(cancellationToken);
     }
 
-    public void Open(ItemPickerTarget target)
+    public void Open(ItemPickerTarget target, IEnumerable<int>? selectedItemIds = null)
     {
         if (!IsCatalogReady || target == ItemPickerTarget.None)
         {
             return;
         }
 
+        var selectedIds = selectedItemIds?.ToHashSet() ?? [];
+        foreach (var item in Items)
+        {
+            item.IsSelected = selectedIds.Contains(item.Id);
+        }
+        NotifySelectionChanged();
+
         Search = string.Empty;
         SelectedCategory = ItemFilterCategory.All;
         SelectedSortOption = SortOptions.First(static option => option.Mode == ItemSortMode.Name);
-        SelectedItem = null;
+        PreviewedItem = null;
         Target = target;
     }
 
@@ -338,28 +348,47 @@ public sealed class ItemPickerViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(item);
         if (IsOpen)
         {
-            SelectedItem = item;
+            PreviewedItem = item;
         }
+    }
+
+    public void ToggleSelection(ItemOptionViewModel item)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        if (!IsOpen)
+        {
+            return;
+        }
+
+        PreviewedItem = item;
+        item.IsSelected = !item.IsSelected;
+        NotifySelectionChanged();
     }
 
     public bool ConfirmSelection()
     {
-        if (!IsOpen || SelectedItem is null)
+        var selectedItems = SelectedItems;
+        if (!IsOpen || selectedItems.Count == 0)
         {
             return false;
         }
 
         var selectedTarget = Target;
-        var selectedItem = SelectedItem;
         Close();
-        ItemSelected?.Invoke(selectedTarget, selectedItem);
+        ItemsSelected?.Invoke(selectedTarget, selectedItems);
         return true;
     }
 
     public void Close()
     {
         Search = string.Empty;
-        SelectedItem = null;
+        PreviewedItem = null;
+        foreach (var item in Items)
+        {
+            item.IsSelected = false;
+        }
+
+        NotifySelectionChanged();
         Target = ItemPickerTarget.None;
     }
 
@@ -416,9 +445,19 @@ public sealed class ItemPickerViewModel : ObservableObject
         OnPropertyChanged(nameof(Description));
         OnPropertyChanged(nameof(ResultCountText));
         OnPropertyChanged(nameof(CatalogStatusText));
-        OnPropertyChanged(nameof(SelectedItemStats));
-        OnPropertyChanged(nameof(SelectedItemPriceText));
-        OnPropertyChanged(nameof(SelectedItemTechnicalText));
+        OnPropertyChanged(nameof(PreviewedItemStats));
+        OnPropertyChanged(nameof(PreviewedItemPriceText));
+        OnPropertyChanged(nameof(PreviewedItemTechnicalText));
+        OnPropertyChanged(nameof(SelectedItemCountText));
+        OnPropertyChanged(nameof(ConfirmSelectionText));
+    }
+
+    private void NotifySelectionChanged()
+    {
+        OnPropertyChanged(nameof(SelectedItems));
+        OnPropertyChanged(nameof(HasSelectedItems));
+        OnPropertyChanged(nameof(SelectedItemCountText));
+        OnPropertyChanged(nameof(ConfirmSelectionText));
     }
 
     private ItemStatViewModel CreateStatViewModel(ItemStatEntry stat) => new(

@@ -22,7 +22,7 @@ public sealed class MatchupContentViewModel : ObservableObject
         Phases = new ReadOnlyObservableCollection<MatchupPhaseViewModel>(_phases);
         Editor = new MatchupPhaseEditorViewModel(localization);
         ItemPicker = new ItemPickerViewModel(itemCatalog, localization);
-        ItemPicker.ItemSelected += ItemPicker_ItemSelected;
+        ItemPicker.ItemsSelected += ItemPicker_ItemsSelected;
     }
 
     public ReadOnlyObservableCollection<MatchupPhaseViewModel> Phases { get; }
@@ -59,13 +59,17 @@ public sealed class MatchupContentViewModel : ObservableObject
     public Task RetryItemCatalogLoadAsync(CancellationToken cancellationToken = default) =>
         ItemPicker.RetryCatalogLoadAsync(cancellationToken);
 
-    public void OpenStartItemPicker() => ItemPicker.Open(ItemPickerTarget.PhaseStart);
+    public void OpenStartItemPicker() => ItemPicker.Open(
+        ItemPickerTarget.PhaseStart,
+        Editor.StartItems.Select(static item => item.Id));
 
-    public void OpenEndItemPicker() => ItemPicker.Open(ItemPickerTarget.PhaseEnd);
+    public void OpenEndItemPicker() => ItemPicker.Open(
+        ItemPickerTarget.PhaseEnd,
+        Editor.EndItems.Select(static item => item.Id));
 
-    public void RemoveStartItem() => Editor.RemoveStartItem();
+    public void RemoveStartItem(MatchupItemDraft item) => Editor.RemoveStartItem(item);
 
-    public void RemoveEndItem() => Editor.RemoveEndItem();
+    public void RemoveEndItem(MatchupItemDraft item) => Editor.RemoveEndItem(item);
 
     public void BeginEditPhase(MatchupPhaseViewModel phase)
     {
@@ -201,17 +205,17 @@ public sealed class MatchupContentViewModel : ObservableObject
         OnPropertyChanged(nameof(StatusDescription));
     }
 
-    private void ItemPicker_ItemSelected(
+    private void ItemPicker_ItemsSelected(
         ItemPickerTarget target,
-        ItemOptionViewModel item)
+        IReadOnlyList<ItemOptionViewModel> items)
     {
         if (target == ItemPickerTarget.PhaseStart)
         {
-            Editor.SetStartItem(item);
+            Editor.SetStartItems(items);
         }
         else if (target == ItemPickerTarget.PhaseEnd)
         {
-            Editor.SetEndItem(item);
+            Editor.SetEndItems(items);
         }
     }
 
