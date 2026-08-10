@@ -16,6 +16,7 @@ public partial class MatchupChampionsAndRoleView : UserControl
     private MatchupChampionsAndRoleViewModel ViewModel =>
         (MatchupChampionsAndRoleViewModel)DataContext;
 
+    // Каталог чемпионов запрашивается при первом показе шага и затем берётся из кэша ViewModel.
     private async void MatchupChampionsAndRoleView_IsVisibleChanged(
         object sender,
         DependencyPropertyChangedEventArgs e)
@@ -29,6 +30,7 @@ public partial class MatchupChampionsAndRoleView : UserControl
     private async void RetryChampionCatalogButton_Click(object sender, RoutedEventArgs e) =>
         await ViewModel.RetryCatalogLoadAsync();
 
+    // Оба выбора используют одну модалку, а целевую сторону хранит ViewModel.
     private void ChangePlayerChampionButton_Click(object sender, RoutedEventArgs e) =>
         ViewModel.OpenPlayerPicker();
 

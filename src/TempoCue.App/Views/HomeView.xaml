@@ -6,6 +6,7 @@
              Background="#080D14"
              FontFamily="Segoe UI">
     <UserControl.Resources>
+        <!-- Общие карточки, кнопки и типографика главной страницы. -->
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Styles/ShellControls.xaml" />
@@ -13,6 +14,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
+    <!-- Главная страница: состояние подключения и краткая готовность функций. -->
     <Grid Margin="24">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -20,6 +22,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
+        <!-- Центральный призыв подключиться к матчу или повторить проверку. -->
         <Border Style="{StaticResource ShellCard}" Padding="40" MinHeight="154">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -62,6 +65,7 @@
             </Grid>
         </Border>
 
+        <!-- Три информационные карточки: система, активный набор и доступные возможности. -->
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1.2*" />

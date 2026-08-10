@@ -6,6 +6,7 @@
              Background="#080D14"
              FontFamily="Segoe UI">
     <UserControl.Resources>
+        <!-- Стили индикаторов шагов редактора матчапа. -->
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Styles/ShellControls.xaml" />
@@ -90,6 +91,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
+    <!-- Каркас мастера: заголовок, шаги, содержимое и навигационные действия. -->
     <Grid Margin="24">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -99,6 +101,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
+        <!-- Заголовок черновика и кнопки перехода назад/вперёд. -->
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -163,6 +166,7 @@
             </StackPanel>
         </Grid>
 
+        <!-- Горизонтальная последовательность шагов; при недостатке ширины появляется прокрутка. -->
         <Border x:Name="MatchupEditorStepsPanel"
                 Grid.Row="2"
                 Background="#101827"
@@ -186,6 +190,7 @@
             </ListBox>
         </Border>
 
+        <!-- Содержимое активного шага. Видимость отдельных View управляется ViewModel. -->
         <ScrollViewer x:Name="MatchupEditorContentScrollViewer"
                       Grid.Row="4"
                       VerticalScrollBarVisibility="Auto"
@@ -241,6 +246,7 @@
             </Grid>
         </ScrollViewer>
 
+        <!-- Модальный выбор чемпиона расположен поверх любого шага редактора. -->
         <views:ChampionPickerDialogView x:Name="ChampionPickerDialog"
                                         Grid.RowSpan="5"
                                         Panel.ZIndex="20"

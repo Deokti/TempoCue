@@ -8,6 +8,7 @@
              Background="#080D14"
              FontFamily="Segoe UI">
     <UserControl.Resources>
+        <!-- Локальные стили библиотеки наборов и карточек правил. -->
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Styles/ShellControls.xaml" />
@@ -118,7 +119,9 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
+    <!-- Контейнер переключает библиотеку, выбор типа набора и редактор матчапа. -->
     <Grid>
+    <!-- Главная страница коучинга с установленными наборами. -->
     <Grid x:Name="CoachingLibraryPanel" Margin="24">
         <Grid.Style>
             <Style TargetType="Grid">
@@ -168,6 +171,7 @@
             </StackPanel>
         </Grid>
 
+        <!-- Категории библиотеки: матчапы, контроль карты и собственные наборы. -->
         <TabControl x:Name="CoachingSectionsTabControl"
                     Grid.Row="2"
                     Style="{StaticResource CoachingTabControl}">
@@ -181,6 +185,7 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
+                    <!-- Предупреждение о необходимости проверить встроенный набор на актуальном патче. -->
                     <Border Background="#29271E"
                             BorderBrush="#4A4530"
                             BorderThickness="1"
@@ -207,6 +212,7 @@
                         </Grid>
                     </Border>
 
+                    <!-- Слева выбирается набор, справа показываются входящие в него правила. -->
                     <Grid Grid.Row="2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="0.9*" />
@@ -454,6 +460,7 @@
         </TabControl>
     </Grid>
 
+        <!-- Вложенные страницы сценария создания набора. -->
         <views:PackTypeSelectionView x:Name="PackTypeSelectionPage"
                                      DataContext="{Binding PackTypeSelection}"
                                      BackRequested="PackTypeSelectionPage_BackRequested"

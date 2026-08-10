@@ -17,6 +17,7 @@ public partial class MatchupContentView : UserControl
 
     private MatchupPhaseEditorViewModel Editor => ViewModel.Editor;
 
+    // Действия с открытым редактором новой или выбранной фазы.
     private void AddPhaseButton_Click(object sender, RoutedEventArgs e) =>
         ViewModel.BeginAddPhase();
 
@@ -29,6 +30,7 @@ public partial class MatchupContentView : UserControl
     private void DeleteEditedPhaseButton_Click(object sender, RoutedEventArgs e) =>
         ViewModel.DeleteEditor();
 
+    // Действия над сохранённой карточкой фазы.
     private void EditPhaseButton_Click(object sender, RoutedEventArgs e) =>
         ViewModel.BeginEditPhase(GetPhase(sender));
 
@@ -44,6 +46,7 @@ public partial class MatchupContentView : UserControl
     private void MovePhaseDownButton_Click(object sender, RoutedEventArgs e) =>
         ViewModel.MovePhaseDown(GetPhase(sender));
 
+    // Кнопки диапазона изменяют значения в редакторе, а не в сохранённой фазе напрямую.
     private void DecreaseMinimumLevelButton_Click(object sender, RoutedEventArgs e) =>
         Editor.DecreaseMinimumLevel();
 

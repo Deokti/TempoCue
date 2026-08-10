@@ -15,6 +15,7 @@ public partial class PackTypeSelectionView : UserControl
 
     public event EventHandler? MatchupSelected;
 
+    // Представление сообщает о выборе родительскому экрану, а маршрут определяет CoachingViewModel.
     private void BackToLibraryButton_Click(object sender, RoutedEventArgs e) =>
         BackRequested?.Invoke(this, EventArgs.Empty);
 

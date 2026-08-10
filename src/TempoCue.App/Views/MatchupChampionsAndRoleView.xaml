@@ -6,6 +6,7 @@
              Background="Transparent"
              FontFamily="Segoe UI">
     <UserControl.Resources>
+        <!-- Стили карточек ролей и состояний каталога чемпионов. -->
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Styles/ShellControls.xaml" />
@@ -73,6 +74,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
+    <!-- Второй шаг выбирает обе стороны матчапа и роль, для которой написаны советы. -->
     <Border x:Name="MatchupChampionsCard"
             Style="{StaticResource ShellCard}"
             Padding="20">
@@ -122,6 +124,7 @@
                        TextWrapping="Wrap"
                        Margin="0,6,0,20" />
 
+            <!-- Скелетон отображается во время первого получения или чтения каталога. -->
             <StackPanel x:Name="ChampionCatalogLoadingPanel">
                 <StackPanel.Style>
                     <Style TargetType="StackPanel">
@@ -197,6 +200,7 @@
                 </Border>
             </StackPanel>
 
+            <!-- Ошибка каталога предлагает повторить запрос, не блокируя весь редактор. -->
             <Border x:Name="ChampionCatalogErrorPanel"
                     Background="#1A151E" BorderBrush="#5C3543" BorderThickness="1"
                     CornerRadius="10" Padding="20" MinHeight="150">
@@ -226,6 +230,7 @@
                 </StackPanel>
             </Border>
 
+            <!-- Загруженное состояние: выбранные чемпионы и кнопки открытия модального каталога. -->
             <StackPanel x:Name="ChampionSelectionContent">
                 <StackPanel.Style>
                     <Style TargetType="StackPanel">
@@ -350,6 +355,7 @@
 
             </StackPanel>
 
+            <!-- Роль ограничивает применимость набора; «любая» оставляет матчап универсальным. -->
             <StackPanel x:Name="MatchupRoleSelectionPanel" Margin="0,16,0,0">
                 <StackPanel.Style>
                     <Style TargetType="StackPanel">

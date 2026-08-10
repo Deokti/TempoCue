@@ -33,6 +33,7 @@ public partial class App : System.Windows.Application
         var settings = settingsService.Load();
         LocalizationService.Instance.SetLanguage(settings.Language);
 
+        // Встроенный набор пока служит проверяемым источником правил до появления хранилища Coach Pack.
         var packPath = Path.Combine(
             AppContext.BaseDirectory,
             "Assets",
@@ -41,6 +42,7 @@ public partial class App : System.Windows.Application
         var pack = CoachPackLoader.LoadFromFile(packPath);
         var coach = new MatchupCoach(pack.Rules);
 
+        // Инфраструктура матча создаётся здесь, чтобы View и ViewModel не конструировали HTTP-клиенты.
         _liveClientDataClient = new LiveClientDataClient();
         var activeMatchSession = new ActiveMatchSession(
             _liveClientDataClient,
@@ -55,6 +57,7 @@ public partial class App : System.Windows.Application
         _settingsViewModel = new SettingsViewModel(
             LocalizationService.Instance,
             settingsService);
+        // Каталоги Data Dragon используют общий локальный кэш патчей и чемпионов.
         var championCacheDirectory = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "TempoCue",
@@ -73,6 +76,7 @@ public partial class App : System.Windows.Application
             _gamePatchCatalog,
             _championCatalog);
 
+        // Окно получает полностью собранный граф зависимостей и только связывает ViewModel с View.
         MainWindow = new MainWindow(
             _currentMatchViewModel,
             _homeViewModel,
@@ -81,6 +85,7 @@ public partial class App : System.Windows.Application
         MainWindow.Show();
     }
 
+    // Освобождение выполняется в обратном порядке владения долгоживущими объектами.
     protected override void OnExit(ExitEventArgs e)
     {
         _coachingViewModel?.Dispose();

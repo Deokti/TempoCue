@@ -18,6 +18,7 @@ public partial class ChampionPickerDialogView : UserControl
     private MatchupChampionsAndRoleViewModel ViewModel =>
         (MatchupChampionsAndRoleViewModel)DataContext;
 
+    // Закрытие, выбор карточки и Escape завершают один и тот же модальный сценарий во ViewModel.
     private void CloseButton_Click(object sender, RoutedEventArgs e) =>
         ViewModel.ClosePicker();
 
@@ -47,6 +48,7 @@ public partial class ChampionPickerDialogView : UserControl
             return;
         }
 
+        // Фокус откладывается до построения визуального дерева открывшейся модалки.
         Dispatcher.BeginInvoke(
             ChampionPickerSearchTextBox.Focus,
             DispatcherPriority.Input);

@@ -7,6 +7,7 @@
              Background="#080D14"
              FontFamily="Segoe UI">
     <UserControl.Resources>
+        <!-- Локальные стили карточек, вкладок и строк участников текущего матча. -->
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Styles/ShellControls.xaml" />
@@ -151,12 +152,14 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
+    <!-- Экран обновляется из единого снимка Live Client Data через CurrentMatchViewModel. -->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="56" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
+        <!-- Строка состояния подключения и игрового времени. -->
         <Border Grid.Row="0" Background="#0C1420"
                 BorderBrush="#263750" BorderThickness="0,0,0,1">
             <Grid Margin="24,0">
@@ -245,9 +248,11 @@
             </Grid>
         </Border>
 
+        <!-- Прокручиваемое содержимое матча: участники, совет и игровые факты. -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
             <StackPanel Margin="24,22,24,24">
+                <!-- Краткая сводка активного игрока, соперника на линии и состояния правила. -->
                 <Border Style="{StaticResource CurrentCard}" Padding="16,12">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -305,6 +310,7 @@
                     </Grid>
                 </Border>
 
+                <!-- Основной совет слева и вспомогательные факты справа. -->
                 <Grid Margin="0,14,0,14">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="2*" />
@@ -397,6 +403,7 @@
                     </StackPanel>
                 </Grid>
 
+                <!-- Детали матча разделены на составы, события и уведомления. -->
                 <TabControl x:Name="CurrentSectionsTabControl"
                             Style="{StaticResource CurrentTabControl}"
                             MinHeight="306">

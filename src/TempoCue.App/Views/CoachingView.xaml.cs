@@ -15,6 +15,7 @@ public partial class CoachingView : UserControl
     private CoachingViewModel ViewModel =>
         (CoachingViewModel)DataContext;
 
+    // Переходы вложенного сценария централизованы здесь, чтобы дочерние View не знали друг о друге.
     private void CreatePackButton_Click(object sender, RoutedEventArgs e) =>
         ViewModel.OpenPackTypeSelection();
 

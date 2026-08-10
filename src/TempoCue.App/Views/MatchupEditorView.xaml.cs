@@ -18,6 +18,7 @@ public partial class MatchupEditorView : UserControl
     private MatchupEditorViewModel ViewModel =>
         (MatchupEditorViewModel)DataContext;
 
+    // Навигация меняет активный шаг, а на первом шаге возвращает к выбору типа набора.
     private void BackToPackTypeButton_Click(object sender, RoutedEventArgs e)
     {
         if (ViewModel.MovePrevious())
@@ -38,6 +39,7 @@ public partial class MatchupEditorView : UserControl
         }
     }
 
+    // Каждый новый шаг начинается с верхней границы содержимого независимо от позиции предыдущего.
     private void ResetContentScroll() =>
         Dispatcher.BeginInvoke(
             DispatcherPriority.Loaded,

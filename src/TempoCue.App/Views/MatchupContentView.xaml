@@ -13,6 +13,7 @@
                 <ResourceDictionary Source="../Styles/FormControls.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <!-- Локальные стили вкладок, уровней опасности и действий с фазами. -->
             <Style x:Key="ContentSectionTab" TargetType="Button">
                 <Setter Property="Background" Value="Transparent" />
                 <Setter Property="Foreground" Value="#7F93AF" />
@@ -152,6 +153,7 @@
     </UserControl.Resources>
 
     <StackPanel>
+        <!-- Вкладки содержания набора: фазы доступны сейчас, остальные разделы подготовлены к следующим итерациям. -->
         <Border Background="#101827"
                 BorderBrush="#263750"
                 BorderThickness="1"
@@ -173,6 +175,7 @@
             </StackPanel>
         </Border>
 
+        <!-- Рабочая область: редактор и список фаз слева, состояние шага справа. -->
         <Grid Margin="0,16,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*" />
@@ -181,6 +184,7 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0">
+                <!-- Редактор новой или выбранной фазы. Панель скрыта, пока пользователь не начал редактирование. -->
                 <Border x:Name="PhaseEditorPanel"
                         Padding="20"
                         Margin="0,0,0,14">
@@ -206,6 +210,7 @@
                                    TextWrapping="Wrap"
                                    Margin="0,6,0,0" />
 
+                        <!-- Название фазы. -->
                         <StackPanel Margin="0,18,0,0">
                             <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.Name}"
                                        Style="{StaticResource FormFieldLabel}" />
@@ -215,6 +220,7 @@
                                      MaxLength="80" />
                         </StackPanel>
 
+                        <!-- Уровень опасности определяет цвет и смысл фазы в наборе. -->
                         <StackPanel Margin="0,16,0,0">
                             <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.PowerState}"
                                        Style="{StaticResource FormFieldLabel}" />
@@ -282,6 +288,7 @@
                             </ListBox>
                         </StackPanel>
 
+                        <!-- Диапазон уровней, на котором действует фаза. -->
                         <Grid Margin="0,16,0,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -367,6 +374,7 @@
                             </StackPanel>
                         </Grid>
 
+                        <!-- Автоматическое пояснение выбранного диапазона уровней. -->
                         <Border x:Name="PhaseMeaningPanel"
                                 Margin="0,18,0,0"
                                 Background="#0C1420"
@@ -397,6 +405,7 @@
                             </Grid>
                         </Border>
 
+                        <!-- Главный совет, который игрок увидит первым. -->
                         <StackPanel Margin="0,18,0,0">
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,7">
                                 <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Content.Editor.PrimaryAdvice}"
@@ -415,6 +424,7 @@
                                      TextWrapping="NoWrap" />
                         </StackPanel>
 
+                        <!-- Дополнительный контекст: причина текущего совета и следующая цель. -->
                         <StackPanel Margin="0,16,0,0">
                             <StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,7">
@@ -452,6 +462,7 @@
                             </StackPanel>
                         </StackPanel>
 
+                        <!-- Действия над открытой фазой. -->
                         <Grid Margin="0,18,0,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -479,6 +490,7 @@
                     </StackPanel>
                 </Border>
 
+                <!-- Список уже добавленных фаз и кнопка создания следующей. -->
                 <Border Style="{StaticResource ShellCard}" Padding="20">
                     <StackPanel>
                         <Grid>
@@ -506,6 +518,7 @@
                                     Click="AddPhaseButton_Click" />
                         </Grid>
 
+                        <!-- Заглушка отображается, пока в наборе нет ни одной фазы. -->
                         <Border x:Name="EmptyPhasesPanel"
                                 Background="#0C1420"
                                 BorderBrush="#263750"
@@ -539,6 +552,7 @@
                             </StackPanel>
                         </Border>
 
+                        <!-- Карточки фаз поддерживают изменение порядка, редактирование, копирование и удаление. -->
                         <ItemsControl x:Name="MatchupPhasesItemsControl"
                                       ItemsSource="{Binding Phases}"
                                       Margin="0,18,0,0">
@@ -719,6 +733,7 @@
                 </Border>
             </StackPanel>
 
+            <!-- Правая колонка объясняет состояние редактора и границы текущей итерации. -->
             <StackPanel Grid.Column="2">
                 <Border Style="{StaticResource ShellCard}"
                         BorderBrush="#4FAAE8"

@@ -2,5 +2,6 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:TempoCue.App">
+    <!-- Глобальный словарь намеренно пуст: каждая View подключает только необходимые ей ресурсы. -->
     <Application.Resources />
 </Application>

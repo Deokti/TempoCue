@@ -13,6 +13,7 @@ public partial class MatchupMainInformationView : UserControl
         IsVisibleChanged += MatchupMainInformationView_IsVisibleChanged;
     }
 
+    // Каталог патчей загружается только при первом показе шага и не задерживает открытие редактора.
     private async void MatchupMainInformationView_IsVisibleChanged(
         object sender,
         DependencyPropertyChangedEventArgs e)
@@ -23,6 +24,7 @@ public partial class MatchupMainInformationView : UserControl
         }
     }
 
+    // Повторная попытка остаётся отдельным пользовательским действием после сетевой ошибки.
     private async void RetryGamePatchCatalogButton_Click(object sender, RoutedEventArgs e)
     {
         if (DataContext is MatchupMainInformationViewModel viewModel)

@@ -68,6 +68,7 @@
         </Setter>
     </Style>
 
+    <!-- Базовые поверхности и вспомогательный текст оболочки. -->
     <Style x:Key="ShellCard" TargetType="Border">
         <Setter Property="Background" Value="#101827" />
         <Setter Property="BorderBrush" Value="#263750" />
@@ -82,6 +83,7 @@
         <Setter Property="LineHeight" Value="18" />
     </Style>
 
+    <!-- Вертикальная полоса прокрутки приложения. -->
     <Style x:Key="ShellScrollBar" TargetType="ScrollBar">
         <Setter Property="Width" Value="4" />
         <Setter Property="Background" Value="Transparent" />
@@ -118,6 +120,7 @@
         </Setter>
     </Style>
 
+    <!-- Горизонтальная полоса применяется к шагам и другим узким спискам. -->
     <Style x:Key="ShellHorizontalScrollBar" TargetType="ScrollBar">
         <Setter Property="Height" Value="4" />
         <Setter Property="Background" Value="Transparent" />
@@ -154,6 +157,7 @@
         </Setter>
     </Style>
 
+    <!-- Пункты боковой навигации и их активное состояние. -->
     <Style x:Key="ShellNavButton" TargetType="Button">
         <Setter Property="Height" Value="40" />
         <Setter Property="Margin" Value="0,0,0,4" />
@@ -194,6 +198,7 @@
         <Setter Property="Background" Value="#162235" />
     </Style>
 
+    <!-- Основные и вторичные кнопки действий. -->
     <Style x:Key="PrimaryButton" TargetType="Button">
         <Setter Property="Height" Value="36" />
         <Setter Property="Padding" Value="16,7" />

@@ -5,6 +5,7 @@
              Background="#080D14"
              FontFamily="Segoe UI">
     <UserControl.Resources>
+        <!-- Общий шаблон карточки типа Coach Pack. -->
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Styles/ShellControls.xaml" />
@@ -54,12 +55,14 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
+    <!-- Страница выбора сценария создания нового набора. -->
     <Grid Margin="24">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
+        <!-- Возврат не создаёт черновик и ведёт обратно в библиотеку. -->
         <Button x:Name="BackToLibraryButton"
                 Style="{StaticResource SecondaryButton}"
                 HorizontalAlignment="Left"
@@ -76,6 +79,7 @@
             </StackPanel>
         </Button>
 
+        <!-- Карточки типов прокручиваются при небольшой высоте окна. -->
         <ScrollViewer Grid.Row="1"
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
@@ -109,6 +113,7 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
+                    <!-- Матчап доступен в текущей итерации. -->
                     <Button x:Name="MatchupPackTypeButton"
                             Style="{StaticResource PackTypeCardButton}"
                             MinHeight="330"
@@ -197,6 +202,7 @@
                         </Grid>
                     </Button>
 
+                    <!-- Контроль карты показан заранее, но заблокирован до отдельной реализации. -->
                     <Button x:Name="GameControlPackTypeButton"
                             Grid.Column="2"
                             Style="{StaticResource PackTypeCardButton}"

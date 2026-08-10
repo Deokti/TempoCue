@@ -5,6 +5,7 @@
              Background="Transparent"
              FontFamily="Segoe UI">
     <UserControl.Resources>
+        <!-- Общие стили формы и оболочки первого шага. -->
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Styles/ShellControls.xaml" />
@@ -14,6 +15,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
+    <!-- Основные метаданные будущего набора советов. -->
     <Border x:Name="MatchupMainInformationCard"
             Style="{StaticResource ShellCard}"
             Padding="20">
@@ -32,6 +34,7 @@
                     <StackPanel>
                         <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.PackName}"
                                    Style="{StaticResource FormFieldLabel}" />
+                        <!-- Название и краткое описание видны пользователю в библиотеке наборов. -->
                         <TextBox x:Name="MatchupPackNameTextBox"
                                  Text="{Binding PackName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                  Style="{StaticResource FormTextBox}"
@@ -52,6 +55,7 @@
                                  VerticalContentAlignment="Top" />
                     </StackPanel>
 
+                    <!-- Автор содержимого и язык самих советов не зависят от языка интерфейса. -->
                     <Grid Margin="0,16,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -83,6 +87,7 @@
                         </StackPanel>
                     </Grid>
 
+                    <!-- Патч загружается из Data Dragon, дата проверки пока заполняется автоматически. -->
                     <Grid Margin="0,16,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -206,6 +211,7 @@
                         </StackPanel>
                     </Grid>
 
+                    <!-- Пояснение разделяет локализацию интерфейса и язык пользовательского Coach Pack. -->
                     <Border Background="#101B2B"
                             BorderBrush="#4FAAE8"
                             BorderThickness="1,0,0,0"

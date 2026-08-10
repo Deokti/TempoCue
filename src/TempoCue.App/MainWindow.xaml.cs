@@ -25,6 +25,7 @@ public partial class MainWindow : Window
         ArgumentNullException.ThrowIfNull(coachingViewModel);
         _currentMatchViewModel = currentMatchViewModel;
 
+        // Главное окно является composition root для экранов: здесь им назначаются готовые ViewModel.
         InitializeComponent();
         WindowWorkAreaBehavior.Attach(this);
         HomeContentPage.DataContext = homeViewModel;
@@ -38,6 +39,7 @@ public partial class MainWindow : Window
         Closed += MainWindow_Closed;
     }
 
+    // Опрос матча запускается только после загрузки окна и останавливается при закрытии приложения.
     private void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
         _currentMatchViewModel.StateUpdated += CurrentMatchViewModel_StateUpdated;

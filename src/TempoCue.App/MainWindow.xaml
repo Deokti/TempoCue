@@ -25,6 +25,7 @@
     </shell:WindowChrome.WindowChrome>
 
     <Window.Resources>
+        <!-- Ресурсы оболочки окна: типографика, иконки и общие элементы управления. -->
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Styles/ShellControls.xaml" />
@@ -32,6 +33,7 @@
         </ResourceDictionary>
     </Window.Resources>
 
+    <!-- Собственная рамка заменяет стандартный заголовок Windows и содержит всю оболочку приложения. -->
     <Border BorderBrush="#263750" BorderThickness="1" Background="#080D14">
         <Grid>
             <Grid.RowDefinitions>
@@ -39,7 +41,7 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <!-- Общая строка заголовка остаётся видимой на всех страницах. -->
+            <!-- Заголовок окна и системные кнопки сворачивания, разворачивания и закрытия. -->
             <Border Grid.Row="0"
                     Background="#0C1420"
                     BorderBrush="#263750"
@@ -114,13 +116,14 @@
                 </Grid>
             </Border>
 
-            <!-- Первая переносимая страница: только реальные возможности текущего прототипа. -->
+            <!-- Основная область приложения: боковая навигация и выбранная страница. -->
             <Grid x:Name="HomePage" Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="240" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
+                <!-- Боковое меню разделов и состояние движка анализа. -->
                 <Border Grid.Column="0"
                         Background="#101827"
                         BorderBrush="#263750"
@@ -283,6 +286,7 @@
                     </Grid>
                 </Border>
 
+                <!-- Правая часть: статус подключения сверху и страницы приложения ниже. -->
                 <Grid Grid.Column="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="56" />
@@ -329,6 +333,7 @@
                         </Grid>
                     </Border>
 
+                    <!-- Страницы располагаются в одном контейнере; навигация переключает их видимость. -->
                     <views:HomeView x:Name="HomeContentPage"
                                     Grid.Row="1" />
 
