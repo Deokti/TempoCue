@@ -80,15 +80,19 @@ public partial class App : System.Windows.Application
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "TempoCue",
             "CoachPacks");
-        var saveCoachPack = new SaveCoachPackUseCase(
-            new LocalCoachPackStore(coachPackDirectory));
+        var coachPackStore = new LocalCoachPackStore(coachPackDirectory);
+        var saveCoachPack = new SaveCoachPackUseCase(coachPackStore);
+        var loadCoachPackLibrary = new LoadCoachPackLibraryUseCase(coachPackStore);
+        var setCoachPackState = new SetCoachPackStateUseCase(coachPackStore);
         _coachingViewModel = new CoachingViewModel(
             pack,
             LocalizationService.Instance,
             _gamePatchCatalog,
             _championCatalog,
             _itemCatalog,
-            saveCoachPack);
+            saveCoachPack,
+            loadCoachPackLibrary,
+            setCoachPackState);
 
         // Окно получает полностью собранный граф зависимостей и только связывает ViewModel с View.
         MainWindow = new MainWindow(

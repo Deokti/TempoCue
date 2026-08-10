@@ -152,6 +152,52 @@
                             </Track.IncreaseRepeatButton>
                         </Track>
                     </Grid>
+                 </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Компактный переключатель состояний для карточек и настроек. -->
+    <Style x:Key="TempoSwitch" TargetType="ToggleButton">
+        <Setter Property="Width" Value="52" />
+        <Setter Property="Height" Value="28" />
+        <Setter Property="Background" Value="#263750" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border x:Name="SwitchTrack"
+                            Width="{TemplateBinding Width}"
+                            Height="{TemplateBinding Height}"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="14">
+                        <Ellipse x:Name="SwitchThumb"
+                                 Width="20"
+                                 Height="20"
+                                 Margin="4"
+                                 Fill="#DCE7F5"
+                                 HorizontalAlignment="Left" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="SwitchTrack" Property="Background" Value="#4FAAE8" />
+                            <Setter TargetName="SwitchThumb" Property="Fill" Value="#071019" />
+                            <Setter TargetName="SwitchThumb" Property="HorizontalAlignment" Value="Right" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="SwitchTrack" Property="Opacity" Value="0.88" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="SwitchTrack" Property="BorderBrush" Value="#DCE7F5" />
+                            <Setter TargetName="SwitchTrack" Property="BorderThickness" Value="1" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="SwitchTrack" Property="Opacity" Value="0.48" />
+                            <Setter Property="Cursor" Value="Arrow" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

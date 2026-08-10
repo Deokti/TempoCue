@@ -33,4 +33,19 @@ public static class CoachPackLoader
         CoachPackValidator.Validate(pack);
         return pack;
     }
+
+    /// <summary>Асинхронно загружает и проверяет Coach Pack из потока внешнего хранилища.</summary>
+    public static async Task<CoachPack> LoadAsync(
+        Stream jsonStream,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(jsonStream);
+
+        var pack = await JsonSerializer.DeserializeAsync<CoachPack>(
+            jsonStream,
+            CoachPackJson.Options,
+            cancellationToken) ?? throw new InvalidDataException("Coach Pack is empty.");
+        CoachPackValidator.Validate(pack);
+        return pack;
+    }
 }

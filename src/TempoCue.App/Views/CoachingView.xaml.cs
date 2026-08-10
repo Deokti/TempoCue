@@ -16,7 +16,7 @@ public partial class CoachingView : UserControl
         (CoachingViewModel)DataContext;
 
     // Переходы вложенного сценария централизованы здесь, чтобы дочерние View не знали друг о друге.
-    private void CreatePackButton_Click(object sender, RoutedEventArgs e) =>
+    private void CoachingLibraryPage_CreateRequested(object? sender, EventArgs e) =>
         ViewModel.OpenPackTypeSelection();
 
     private void PackTypeSelectionPage_BackRequested(object? sender, EventArgs e) =>
@@ -28,6 +28,9 @@ public partial class CoachingView : UserControl
     private void MatchupEditorPage_BackRequested(object? sender, EventArgs e) =>
         ViewModel.OpenPackTypeSelection();
 
-    private void MatchupEditorPage_SaveCompleted(object? sender, EventArgs e) =>
+    private async void MatchupEditorPage_SaveCompleted(object? sender, EventArgs e)
+    {
         ViewModel.OpenLibrary();
+        await ViewModel.RefreshLibraryAsync();
+    }
 }

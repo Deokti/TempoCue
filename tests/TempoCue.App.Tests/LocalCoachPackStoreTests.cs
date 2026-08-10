@@ -38,6 +38,68 @@ public sealed class LocalCoachPackStoreTests
         }
     }
 
+    [Fact]
+    public async Task LoadAsync_ReturnsSavedPackAndSkipsDamagedFile()
+    {
+        var root = Path.Combine(
+            Path.GetTempPath(),
+            "TempoCue.App.Tests",
+            Guid.NewGuid().ToString("N"));
+        try
+        {
+            var store = new LocalCoachPackStore(root);
+            var pack = CreatePack();
+            await store.SaveAsync(pack, LocalCoachPackState.Enabled);
+            await File.WriteAllTextAsync(
+                Path.Combine(root, "damaged.json"),
+                "{ this is not a Coach Pack }");
+
+            var snapshot = await store.LoadAsync();
+
+            var entry = Assert.Single(snapshot.Entries);
+            Assert.Equal(pack.Id, entry.Pack.Id);
+            Assert.Equal(LocalCoachPackState.Enabled, entry.State);
+            Assert.Equal(1, snapshot.InvalidFileCount);
+        }
+        finally
+        {
+            if (Directory.Exists(root))
+            {
+                Directory.Delete(root, recursive: true);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task SetStateAsync_PersistsDisabledStateWithoutPackFile()
+    {
+        var root = Path.Combine(
+            Path.GetTempPath(),
+            "TempoCue.App.Tests",
+            Guid.NewGuid().ToString("N"));
+        try
+        {
+            var store = new LocalCoachPackStore(root);
+
+            await store.SetStateAsync(
+                "built-in.urgot-vs-sett",
+                LocalCoachPackState.Disabled);
+            var snapshot = await new LocalCoachPackStore(root).LoadAsync();
+
+            Assert.Empty(snapshot.Entries);
+            Assert.Equal(
+                LocalCoachPackState.Disabled,
+                snapshot.PackStates["built-in.urgot-vs-sett"]);
+        }
+        finally
+        {
+            if (Directory.Exists(root))
+            {
+                Directory.Delete(root, recursive: true);
+            }
+        }
+    }
+
     private static CoachPack CreatePack() => new()
     {
         SchemaVersion = 2,

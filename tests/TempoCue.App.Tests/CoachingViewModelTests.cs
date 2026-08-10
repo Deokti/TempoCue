@@ -26,7 +26,9 @@ public sealed class CoachingViewModelTests
             TestGamePatchCatalog.Ready(),
             TestChampionCatalog.Ready(),
             TestItemCatalog.Ready(),
-            new SaveCoachPackUseCase(new TestCoachPackStore()));
+            new SaveCoachPackUseCase(new TestCoachPackStore()),
+            new LoadCoachPackLibraryUseCase(new TestCoachPackStore()),
+            new SetCoachPackStateUseCase(new TestCoachPackStore()));
 
         Assert.Equal(CoachingScreen.Library, viewModel.CurrentScreen);
         Assert.True(viewModel.PackTypeSelection.IsMatchupAvailable);
@@ -117,7 +119,9 @@ public sealed class CoachingViewModelTests
                 TestGamePatchCatalog.Ready(),
                 TestChampionCatalog.Ready(),
                 TestItemCatalog.Ready(),
-                new SaveCoachPackUseCase(new TestCoachPackStore()));
+                new SaveCoachPackUseCase(new TestCoachPackStore()),
+                new LoadCoachPackLibraryUseCase(new TestCoachPackStore()),
+                new SetCoachPackStateUseCase(new TestCoachPackStore()));
 
             Assert.Equal("URG", viewModel.PlayerChampionInitials);
             Assert.Equal("SET", viewModel.OpponentChampionInitials);

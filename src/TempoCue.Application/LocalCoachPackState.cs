@@ -4,5 +4,6 @@ namespace TempoCue.Application;
 public enum LocalCoachPackState
 {
     Draft,
-    Enabled
+    Enabled,
+    Disabled
 }

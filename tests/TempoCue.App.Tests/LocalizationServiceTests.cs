@@ -134,7 +134,7 @@ public sealed class LocalizationServiceTests
             Assert.Equal("Home", localization.Get("Nav.Home"));
             Assert.Equal("Settings", localization.Get("Settings.Title"));
             Assert.Equal("Coaching", localization.Get("Coaching.Title"));
-            Assert.Equal("Map control", localization.Get("Coaching.Tab.MapControl"));
+            Assert.Equal("Game control", localization.Get("Coaching.Tab.MapControl"));
             Assert.Equal("Interface language", localization.Get("Settings.Language.Label"));
             Assert.Equal("Available now", localization.Get("Home.Available.Title"));
             Assert.Equal("v0.2.0", AppVersion.Display);
@@ -147,7 +147,7 @@ public sealed class LocalizationServiceTests
             Assert.Equal("Главная", localization.Get("Nav.Home"));
             Assert.Equal("Настройки", localization.Get("Settings.Title"));
             Assert.Equal("Коучинг", localization.Get("Coaching.Title"));
-            Assert.Equal("Контроль карты", localization.Get("Coaching.Tab.MapControl"));
+            Assert.Equal("Контроль игры", localization.Get("Coaching.Tab.MapControl"));
             Assert.Equal("Язык интерфейса", localization.Get("Settings.Language.Label"));
             Assert.Equal("Что работает сейчас", localization.Get("Home.Available.Title"));
             Assert.Equal("1 игрок", localization.Plural("Count.Player", 1));

@@ -1,6 +1,7 @@
 using System.Runtime.ExceptionServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Threading;
 
@@ -38,9 +39,14 @@ internal static class WpfTestHost
     public static void Pump(DispatcherPriority priority = DispatcherPriority.DataBind) =>
         Dispatcher.CurrentDispatcher.Invoke(static () => { }, priority);
 
-    public static void Click(Button button, DispatcherPriority priority = DispatcherPriority.DataBind)
+    public static void Click(ButtonBase button, DispatcherPriority priority = DispatcherPriority.DataBind)
     {
         ArgumentNullException.ThrowIfNull(button);
+        if (button is ToggleButton toggle)
+        {
+            toggle.IsChecked = !(toggle.IsChecked ?? false);
+        }
+
         button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         Pump(priority);
     }

@@ -79,6 +79,21 @@
   <data name="Count.Item.One" xml:space="preserve"><value>{0} предмет</value></data>
   <data name="Count.Item.Few" xml:space="preserve"><value>{0} предмета</value></data>
   <data name="Count.Item.Many" xml:space="preserve"><value>{0} предметов</value></data>
+  <data name="Count.Advice.One" xml:space="preserve"><value>{0} совет</value></data>
+  <data name="Count.Advice.Few" xml:space="preserve"><value>{0} совета</value></data>
+  <data name="Count.Advice.Many" xml:space="preserve"><value>{0} советов</value></data>
+  <data name="Count.CoachPack.One" xml:space="preserve"><value>{0} набор советов</value></data>
+  <data name="Count.CoachPack.Few" xml:space="preserve"><value>{0} набора советов</value></data>
+  <data name="Count.CoachPack.Many" xml:space="preserve"><value>{0} наборов советов</value></data>
+  <data name="Count.CoachPackEnabled.One" xml:space="preserve"><value>{0} включён</value></data>
+  <data name="Count.CoachPackEnabled.Few" xml:space="preserve"><value>{0} включены</value></data>
+  <data name="Count.CoachPackEnabled.Many" xml:space="preserve"><value>{0} включено</value></data>
+  <data name="Count.CoachPackCreated.One" xml:space="preserve"><value>{0} создан вами</value></data>
+  <data name="Count.CoachPackCreated.Few" xml:space="preserve"><value>{0} созданы вами</value></data>
+  <data name="Count.CoachPackCreated.Many" xml:space="preserve"><value>{0} создано вами</value></data>
+  <data name="Count.CoachPackInvalid.One" xml:space="preserve"><value>{0} повреждённый набор пропущен.</value></data>
+  <data name="Count.CoachPackInvalid.Few" xml:space="preserve"><value>{0} повреждённых набора пропущены.</value></data>
+  <data name="Count.CoachPackInvalid.Many" xml:space="preserve"><value>{0} повреждённых наборов пропущено.</value></data>
   <data name="Nav.Home" xml:space="preserve"><value>Главная</value></data>
   <data name="Nav.CurrentMatch" xml:space="preserve"><value>Текущий матч</value></data>
   <data name="Nav.Coaching" xml:space="preserve"><value>Коучинг</value></data>
@@ -194,8 +209,29 @@
   <data name="Coaching.Create" xml:space="preserve"><value>Создать набор советов</value></data>
   <data name="Coaching.PlannedTooltip" xml:space="preserve"><value>Импорт и редактор правил появятся в следующей итерации.</value></data>
   <data name="Coaching.Tab.Matchups" xml:space="preserve"><value>Матчапы</value></data>
-  <data name="Coaching.Tab.MapControl" xml:space="preserve"><value>Контроль карты</value></data>
+  <data name="Coaching.Tab.MapControl" xml:space="preserve"><value>Контроль игры</value></data>
   <data name="Coaching.Tab.MyPacks" xml:space="preserve"><value>Мои наборы</value></data>
+  <data name="Coaching.Library.Search" xml:space="preserve"><value>Поиск по чемпиону, набору или автору</value></data>
+  <data name="Coaching.Library.Matchup" xml:space="preserve"><value>{0} против {1}</value></data>
+  <data name="Coaching.Library.Card.Details" xml:space="preserve"><value>{0} · {1}</value></data>
+  <data name="Coaching.Library.State.Enabled" xml:space="preserve"><value>Включён</value></data>
+  <data name="Coaching.Library.State.Draft" xml:space="preserve"><value>Черновик</value></data>
+  <data name="Coaching.Library.State.Disabled" xml:space="preserve"><value>Выключен</value></data>
+  <data name="Coaching.Library.Toggle" xml:space="preserve"><value>Включить или выключить этот матчап</value></data>
+  <data name="Coaching.Library.StateChangeFailed" xml:space="preserve"><value>Не удалось сохранить состояние матчапа.</value></data>
+  <data name="Coaching.Library.Origin.BuiltIn" xml:space="preserve"><value>Встроенный</value></data>
+  <data name="Coaching.Library.Origin.Created" xml:space="preserve"><value>Создан вами</value></data>
+  <data name="Coaching.Library.Author.TempoCue" xml:space="preserve"><value>TempoCue</value></data>
+  <data name="Coaching.Library.Role.Any" xml:space="preserve"><value>Любая роль</value></data>
+  <data name="Coaching.Library.Language.Russian" xml:space="preserve"><value>Русский</value></data>
+  <data name="Coaching.Library.Language.English" xml:space="preserve"><value>Английский</value></data>
+  <data name="Coaching.Library.Language.Unknown" xml:space="preserve"><value>Язык не указан</value></data>
+  <data name="Coaching.Library.Patch" xml:space="preserve"><value>Патч {0}</value></data>
+  <data name="Coaching.Library.Open" xml:space="preserve"><value>Открыть</value></data>
+  <data name="Coaching.Library.Open.Planned" xml:space="preserve"><value>Экран подробностей набора появится в следующей итерации.</value></data>
+  <data name="Coaching.Library.LoadFailed" xml:space="preserve"><value>Не удалось прочитать локально сохранённые наборы советов.</value></data>
+  <data name="Coaching.Library.Empty.Matchups" xml:space="preserve"><value>Матчапы не найдены</value></data>
+  <data name="Coaching.Library.Empty.SearchHint" xml:space="preserve"><value>Очистите поиск или создайте новый набор советов.</value></data>
   <data name="Coaching.Update.WarningTitle" xml:space="preserve"><value>Набор требует проверки патча</value></data>
   <data name="Coaching.Update.WarningDescription" xml:space="preserve"><value>Метаданные набора: {0}. До проверки советы считаются черновыми.</value></data>
   <data name="Coaching.Matchups.LibraryTitle" xml:space="preserve"><value>Установленные матчапы</value></data>

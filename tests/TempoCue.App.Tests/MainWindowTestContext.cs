@@ -35,7 +35,9 @@ internal sealed class MainWindowTestContext : IDisposable
             TestGamePatchCatalog.Ready(),
             TestChampionCatalog.Ready(),
             TestItemCatalog.Ready(),
-            new SaveCoachPackUseCase(CoachPackStore));
+            new SaveCoachPackUseCase(CoachPackStore),
+            new LoadCoachPackLibraryUseCase(CoachPackStore),
+            new SetCoachPackStateUseCase(CoachPackStore));
         Window = new MainWindow(CurrentMatch, Home, Settings, Coaching);
     }
 
@@ -55,6 +57,9 @@ internal sealed class MainWindowTestContext : IDisposable
 
     public CoachingView CoachingPage =>
         WpfTestHost.Find<CoachingView>(Window, "CoachingContentPage");
+
+    public CoachingLibraryView CoachingLibraryPage =>
+        WpfTestHost.Find<CoachingLibraryView>(CoachingPage, "CoachingLibraryPage");
 
     public MatchupEditorView MatchupEditorPage =>
         WpfTestHost.Find<MatchupEditorView>(CoachingPage, "MatchupEditorPage");
@@ -110,7 +115,7 @@ internal sealed class MainWindowTestContext : IDisposable
     public void OpenMatchupEditor()
     {
         WpfTestHost.Click(WpfTestHost.Find<Button>(Window, "CoachingNavigationButton"));
-        WpfTestHost.Click(WpfTestHost.Find<Button>(CoachingPage, "CreatePackButton"));
+        WpfTestHost.Click(WpfTestHost.Find<Button>(CoachingLibraryPage, "CreatePackButton"));
         var packTypePage = WpfTestHost.Find<PackTypeSelectionView>(
             CoachingPage,
             "PackTypeSelectionPage");

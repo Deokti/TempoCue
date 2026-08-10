@@ -76,6 +76,16 @@
   <data name="Count.Champion.Other" xml:space="preserve"><value>{0} champions</value></data>
   <data name="Count.Item.One" xml:space="preserve"><value>{0} item</value></data>
   <data name="Count.Item.Other" xml:space="preserve"><value>{0} items</value></data>
+  <data name="Count.Advice.One" xml:space="preserve"><value>{0} piece of advice</value></data>
+  <data name="Count.Advice.Other" xml:space="preserve"><value>{0} pieces of advice</value></data>
+  <data name="Count.CoachPack.One" xml:space="preserve"><value>{0} advice pack</value></data>
+  <data name="Count.CoachPack.Other" xml:space="preserve"><value>{0} advice packs</value></data>
+  <data name="Count.CoachPackEnabled.One" xml:space="preserve"><value>{0} enabled</value></data>
+  <data name="Count.CoachPackEnabled.Other" xml:space="preserve"><value>{0} enabled</value></data>
+  <data name="Count.CoachPackCreated.One" xml:space="preserve"><value>{0} created by you</value></data>
+  <data name="Count.CoachPackCreated.Other" xml:space="preserve"><value>{0} created by you</value></data>
+  <data name="Count.CoachPackInvalid.One" xml:space="preserve"><value>{0} damaged pack was skipped.</value></data>
+  <data name="Count.CoachPackInvalid.Other" xml:space="preserve"><value>{0} damaged packs were skipped.</value></data>
   <data name="Nav.Home" xml:space="preserve"><value>Home</value></data>
   <data name="Nav.CurrentMatch" xml:space="preserve"><value>Current match</value></data>
   <data name="Nav.Coaching" xml:space="preserve"><value>Coaching</value></data>
@@ -191,8 +201,29 @@
   <data name="Coaching.Create" xml:space="preserve"><value>Create advice pack</value></data>
   <data name="Coaching.PlannedTooltip" xml:space="preserve"><value>Import and the rule editor will arrive in the next iteration.</value></data>
   <data name="Coaching.Tab.Matchups" xml:space="preserve"><value>Matchups</value></data>
-  <data name="Coaching.Tab.MapControl" xml:space="preserve"><value>Map control</value></data>
+  <data name="Coaching.Tab.MapControl" xml:space="preserve"><value>Game control</value></data>
   <data name="Coaching.Tab.MyPacks" xml:space="preserve"><value>My packs</value></data>
+  <data name="Coaching.Library.Search" xml:space="preserve"><value>Search by champion, pack or author</value></data>
+  <data name="Coaching.Library.Matchup" xml:space="preserve"><value>{0} vs {1}</value></data>
+  <data name="Coaching.Library.Card.Details" xml:space="preserve"><value>{0} · {1}</value></data>
+  <data name="Coaching.Library.State.Enabled" xml:space="preserve"><value>Enabled</value></data>
+  <data name="Coaching.Library.State.Draft" xml:space="preserve"><value>Draft</value></data>
+  <data name="Coaching.Library.State.Disabled" xml:space="preserve"><value>Disabled</value></data>
+  <data name="Coaching.Library.Toggle" xml:space="preserve"><value>Enable or disable this matchup</value></data>
+  <data name="Coaching.Library.StateChangeFailed" xml:space="preserve"><value>Could not save the matchup state.</value></data>
+  <data name="Coaching.Library.Origin.BuiltIn" xml:space="preserve"><value>Built in</value></data>
+  <data name="Coaching.Library.Origin.Created" xml:space="preserve"><value>Created by you</value></data>
+  <data name="Coaching.Library.Author.TempoCue" xml:space="preserve"><value>TempoCue</value></data>
+  <data name="Coaching.Library.Role.Any" xml:space="preserve"><value>Any role</value></data>
+  <data name="Coaching.Library.Language.Russian" xml:space="preserve"><value>Russian</value></data>
+  <data name="Coaching.Library.Language.English" xml:space="preserve"><value>English</value></data>
+  <data name="Coaching.Library.Language.Unknown" xml:space="preserve"><value>Language not specified</value></data>
+  <data name="Coaching.Library.Patch" xml:space="preserve"><value>Patch {0}</value></data>
+  <data name="Coaching.Library.Open" xml:space="preserve"><value>Open</value></data>
+  <data name="Coaching.Library.Open.Planned" xml:space="preserve"><value>The pack details screen will be added in the next iteration.</value></data>
+  <data name="Coaching.Library.LoadFailed" xml:space="preserve"><value>Could not read locally saved advice packs.</value></data>
+  <data name="Coaching.Library.Empty.Matchups" xml:space="preserve"><value>No matchups found</value></data>
+  <data name="Coaching.Library.Empty.SearchHint" xml:space="preserve"><value>Clear the search or create a new advice pack.</value></data>
   <data name="Coaching.Update.WarningTitle" xml:space="preserve"><value>Pack patch needs verification</value></data>
   <data name="Coaching.Update.WarningDescription" xml:space="preserve"><value>Pack metadata: {0}. Advice remains a draft until it is verified.</value></data>
   <data name="Coaching.Matchups.LibraryTitle" xml:space="preserve"><value>Installed matchups</value></data>
