@@ -499,4 +499,52 @@
   <data name="Coaching.MatchupEditor.Verification.Advice.PreviewHint" xml:space="preserve"><value>Так карточка выглядит в основном окне во время матча.</value></data>
   <data name="Coaching.MatchupEditor.Verification.Persistent.Title" xml:space="preserve"><value>Постоянные подсказки рядом</value></data>
   <data name="Coaching.MatchupEditor.Verification.Persistent.Empty" xml:space="preserve"><value>Для выбранной фазы нет постоянных подсказок.</value></data>
+  <data name="Coaching.MatchupEditor.StepSummary.Save" xml:space="preserve"><value>Шаг 5 из 5 · Сохранение</value></data>
+  <data name="Coaching.MatchupEditor.Save.Action.Draft" xml:space="preserve"><value>Сохранить как черновик</value></data>
+  <data name="Coaching.MatchupEditor.Save.Action.Enable" xml:space="preserve"><value>Сохранить и включить</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Title" xml:space="preserve"><value>Проверка перед сохранением</value></data>
+  <data name="Count.PhaseCompleted.One" xml:space="preserve"><value>{0} фаза заполнена</value></data>
+  <data name="Count.PhaseCompleted.Few" xml:space="preserve"><value>{0} фазы заполнены</value></data>
+  <data name="Count.PhaseCompleted.Many" xml:space="preserve"><value>{0} фаз заполнено</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Phases.Ready" xml:space="preserve"><value>Пересечений и пробелов между фазами нет.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Phases.Warning" xml:space="preserve"><value>Набор можно сохранить, но на непокрытых уровнях совет не появится.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Patch" xml:space="preserve"><value>Совместимо с патчем {0}</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Patch.Description" xml:space="preserve"><value>Идентификаторы выбранных предметов получены из каталога Data Dragon.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Permission.Ready" xml:space="preserve"><value>Источник готов</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Permission.Missing" xml:space="preserve"><value>Разрешение автора не подтверждено</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Permission.Personal" xml:space="preserve"><value>Личный опыт не требует разрешения внешнего автора.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Permission.Granted" xml:space="preserve"><value>Разрешение отмечено как полученное.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Permission.LocalOnly" xml:space="preserve"><value>Локальное сохранение доступно. Публикация для сообщества потребует подтверждения.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Title" xml:space="preserve"><value>Источник</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Description" xml:space="preserve"><value>Личный опыт — полноценный источник. Для внешнего материала укажите ссылку и автора.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.PersonalExperience" xml:space="preserve"><value>Личный опыт</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Article" xml:space="preserve"><value>Статья</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Video" xml:space="preserve"><value>Видео</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Guide" xml:space="preserve"><value>Гайд сообщества</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Name" xml:space="preserve"><value>Название источника *</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Author" xml:space="preserve"><value>Автор источника *</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Link" xml:space="preserve"><value>Ссылка *</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.RequiredHint" xml:space="preserve"><value>* Обязательные поля для внешнего источника</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Validation" xml:space="preserve"><value>Укажите название, автора и полную ссылку http:// или https://.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Permission.Checkbox" xml:space="preserve"><value>Разрешение автора на использование получено</value></data>
+  <data name="Coaching.MatchupEditor.Save.Permission.Granted" xml:space="preserve"><value>получено</value></data>
+  <data name="Coaching.MatchupEditor.Save.Permission.NotConfirmed" xml:space="preserve"><value>не подтверждено</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Title" xml:space="preserve"><value>Карточка набора</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Type.Matchup" xml:space="preserve"><value>Матчап</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Matchup" xml:space="preserve"><value>{0} против {1} · {2}</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Author" xml:space="preserve"><value>Автор</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.ContentLanguage" xml:space="preserve"><value>Язык содержимого</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Language" xml:space="preserve"><value>{0} · не переводится автоматически</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.GamePatch" xml:space="preserve"><value>Игровой патч</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.SourceLabel" xml:space="preserve"><value>Источник</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Source" xml:space="preserve"><value>{0} · разрешение: {1}</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Verified" xml:space="preserve"><value>Проверен</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.State" xml:space="preserve"><value>Состояние</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.State.Enabled" xml:space="preserve"><value>Включён</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Ready" xml:space="preserve"><value>Набор готов к локальному сохранению и использованию.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Status.Saving" xml:space="preserve"><value>Сохраняем набор…</value></data>
+  <data name="Coaching.MatchupEditor.Save.Status.DraftSaved" xml:space="preserve"><value>Черновик сохранён локально.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Status.EnabledSaved" xml:space="preserve"><value>Набор сохранён и включён. Подключение к движку будет завершено в следующей итерации библиотеки.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Status.Failed" xml:space="preserve"><value>Не удалось сохранить набор. Проверьте доступ к локальной папке приложения.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Status.Saved" xml:space="preserve"><value>Набор сохранён локально.</value></data>
 </root>

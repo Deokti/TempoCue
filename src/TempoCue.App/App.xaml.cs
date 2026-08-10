@@ -2,6 +2,7 @@ using System.IO;
 using System.Windows;
 using TempoCue.App.Localization;
 using TempoCue.App.Settings;
+using TempoCue.App.Persistence;
 using TempoCue.App.ViewModels;
 using TempoCue.Application;
 using TempoCue.Core;
@@ -34,7 +35,8 @@ public partial class App : System.Windows.Application
         var settings = settingsService.Load();
         LocalizationService.Instance.SetLanguage(settings.Language);
 
-        // Встроенный набор пока служит проверяемым источником правил до появления хранилища Coach Pack.
+        // Встроенный набор остаётся источником правил матча до следующей итерации,
+        // в которой движок будет выбирать включённый набор из локальной библиотеки.
         var packPath = Path.Combine(
             AppContext.BaseDirectory,
             "Assets",
@@ -74,12 +76,19 @@ public partial class App : System.Windows.Application
         _itemCatalog = new DataDragonItemCatalog(
             _dataDragonClient,
             dataDragonCacheDirectory);
+        var coachPackDirectory = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "TempoCue",
+            "CoachPacks");
+        var saveCoachPack = new SaveCoachPackUseCase(
+            new LocalCoachPackStore(coachPackDirectory));
         _coachingViewModel = new CoachingViewModel(
             pack,
             LocalizationService.Instance,
             _gamePatchCatalog,
             _championCatalog,
-            _itemCatalog);
+            _itemCatalog,
+            saveCoachPack);
 
         // Окно получает полностью собранный граф зависимостей и только связывает ViewModel с View.
         MainWindow = new MainWindow(

@@ -27,4 +27,7 @@ public partial class CoachingView : UserControl
 
     private void MatchupEditorPage_BackRequested(object? sender, EventArgs e) =>
         ViewModel.OpenPackTypeSelection();
+
+    private void MatchupEditorPage_SaveCompleted(object? sender, EventArgs e) =>
+        ViewModel.OpenLibrary();
 }

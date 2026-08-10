@@ -28,12 +28,14 @@ internal sealed class MainWindowTestContext : IDisposable
         CurrentMatch = new CurrentMatchViewModel(session, Localization);
         Home = new HomeViewModel(CurrentMatch, Localization);
         Settings = new SettingsViewModel(Localization, new AppSettingsService());
+        CoachPackStore = new TestCoachPackStore();
         Coaching = new CoachingViewModel(
             CreateCoachPack(),
             Localization,
             TestGamePatchCatalog.Ready(),
             TestChampionCatalog.Ready(),
-            TestItemCatalog.Ready());
+            TestItemCatalog.Ready(),
+            new SaveCoachPackUseCase(CoachPackStore));
         Window = new MainWindow(CurrentMatch, Home, Settings, Coaching);
     }
 
@@ -44,6 +46,8 @@ internal sealed class MainWindowTestContext : IDisposable
     public HomeViewModel Home { get; }
 
     public SettingsViewModel Settings { get; }
+
+    public TestCoachPackStore CoachPackStore { get; }
 
     public CoachingViewModel Coaching { get; }
 
@@ -70,6 +74,9 @@ internal sealed class MainWindowTestContext : IDisposable
 
     public MatchupVerificationView VerificationPage =>
         WpfTestHost.Find<MatchupVerificationView>(MatchupEditorPage, "MatchupVerificationPage");
+
+    public MatchupSaveView SavePage =>
+        WpfTestHost.Find<MatchupSaveView>(MatchupEditorPage, "MatchupSavePage");
 
     public MatchupPhaseEditorView PhaseEditorView =>
         WpfTestHost.Find<MatchupPhaseEditorView>(ContentPage, "PhaseEditorView");
@@ -177,6 +184,28 @@ internal sealed class MainWindowTestContext : IDisposable
         }
 
         return content.Phases[^1];
+    }
+
+    public void OpenSaveStep()
+    {
+        OpenMatchupContent();
+        AddPhase(
+            "Осторожное начало",
+            1,
+            8,
+            "Не ищи размен первым",
+            PowerState.Dangerous,
+            "Sett сильнее в начале",
+            "Дождаться девятого уровня");
+        AddPhase(
+            "Можно играть активнее",
+            9,
+            null,
+            "Используй усиленную W",
+            PowerState.Playable);
+        WpfTestHost.Click(WpfTestHost.Find<Button>(MatchupEditorPage, "MatchupEditorNextButton"));
+        WpfTestHost.Click(WpfTestHost.Find<Button>(MatchupEditorPage, "MatchupEditorNextButton"));
+        WpfTestHost.Pump(DispatcherPriority.ApplicationIdle);
     }
 
     public void Dispose()

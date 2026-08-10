@@ -26,7 +26,8 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
         LocalizationService localization,
         IGamePatchCatalog gamePatchCatalog,
         IChampionCatalog championCatalog,
-        IItemCatalog itemCatalog)
+        IItemCatalog itemCatalog,
+        SaveCoachPackUseCase saveCoachPack)
     {
         _pack = pack;
         _localization = localization;
@@ -40,7 +41,8 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
             localization,
             gamePatchCatalog,
             championCatalog,
-            itemCatalog);
+            itemCatalog,
+            saveCoachPack);
         RenderLocalizedPresentation();
     }
 

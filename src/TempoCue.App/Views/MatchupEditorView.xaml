@@ -145,6 +145,9 @@
                                 <DataTrigger Binding="{Binding CurrentStep}" Value="4">
                                     <Setter Property="Text" Value="{localization:Loc Coaching.MatchupEditor.StepSummary.Verification}" />
                                 </DataTrigger>
+                                <DataTrigger Binding="{Binding CurrentStep}" Value="5">
+                                    <Setter Property="Text" Value="{localization:Loc Coaching.MatchupEditor.StepSummary.Save}" />
+                                </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </TextBlock.Style>
@@ -160,11 +163,52 @@
                         Click="BackToPackTypeButton_Click" />
                 <Button x:Name="MatchupEditorNextButton"
                         Content="{localization:Loc Coaching.MatchupEditor.Next}"
-                        Style="{StaticResource PrimaryButton}"
                         Margin="10,0,0,0"
                         IsEnabled="{Binding CanMoveNext}"
                         Click="MatchupEditorNextButton_Click"
-                        ToolTip="{localization:Loc Coaching.MatchupEditor.Placeholder}" />
+                        ToolTip="{localization:Loc Coaching.MatchupEditor.Placeholder}">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentStep}" Value="5">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button x:Name="SaveAndEnableButton"
+                        Content="{localization:Loc Coaching.MatchupEditor.Save.Action.Enable}"
+                        Margin="10,0,0,0"
+                        IsEnabled="{Binding Save.CanSave}"
+                        Click="SaveAndEnableButton_Click">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentStep}" Value="5">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button x:Name="SaveDraftButton"
+                        Content="{localization:Loc Coaching.MatchupEditor.Save.Action.Draft}"
+                        Margin="10,0,0,0"
+                        IsEnabled="{Binding Save.CanSave}"
+                        Click="SaveDraftButton_Click">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentStep}" Value="5">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
             </StackPanel>
         </Grid>
 
@@ -258,6 +302,20 @@
                             </Style>
                         </views:MatchupVerificationView.Style>
                     </views:MatchupVerificationView>
+                    <views:MatchupSaveView x:Name="MatchupSavePage"
+                                           DataContext="{Binding Save}">
+                        <views:MatchupSaveView.Style>
+                            <Style TargetType="views:MatchupSaveView">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DataContext.CurrentStep, RelativeSource={RelativeSource AncestorType={x:Type views:MatchupEditorView}}}"
+                                                 Value="5">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </views:MatchupSaveView.Style>
+                    </views:MatchupSaveView>
                 </Grid>
             </Grid>
         </ScrollViewer>

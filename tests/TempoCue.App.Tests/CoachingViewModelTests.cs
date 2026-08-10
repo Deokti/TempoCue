@@ -1,5 +1,6 @@
 using TempoCue.App.Localization;
 using TempoCue.App.ViewModels;
+using TempoCue.Application;
 using TempoCue.Core;
 
 namespace TempoCue.App.Tests;
@@ -24,7 +25,8 @@ public sealed class CoachingViewModelTests
             localization,
             TestGamePatchCatalog.Ready(),
             TestChampionCatalog.Ready(),
-            TestItemCatalog.Ready());
+            TestItemCatalog.Ready(),
+            new SaveCoachPackUseCase(new TestCoachPackStore()));
 
         Assert.Equal(CoachingScreen.Library, viewModel.CurrentScreen);
         Assert.True(viewModel.PackTypeSelection.IsMatchupAvailable);
@@ -114,7 +116,8 @@ public sealed class CoachingViewModelTests
                 localization,
                 TestGamePatchCatalog.Ready(),
                 TestChampionCatalog.Ready(),
-                TestItemCatalog.Ready());
+                TestItemCatalog.Ready(),
+                new SaveCoachPackUseCase(new TestCoachPackStore()));
 
             Assert.Equal("URG", viewModel.PlayerChampionInitials);
             Assert.Equal("SET", viewModel.OpponentChampionInitials);

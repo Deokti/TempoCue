@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using TempoCue.App.ViewModels;
+using TempoCue.Application;
 
 namespace TempoCue.App.Views;
 
@@ -14,6 +15,8 @@ public partial class MatchupEditorView : UserControl
     }
 
     public event EventHandler? BackRequested;
+
+    public event EventHandler? SaveCompleted;
 
     private MatchupEditorViewModel ViewModel =>
         (MatchupEditorViewModel)DataContext;
@@ -36,6 +39,20 @@ public partial class MatchupEditorView : UserControl
         if (ViewModel.MoveNext())
         {
             ResetContentScroll();
+        }
+    }
+
+    private async void SaveDraftButton_Click(object sender, RoutedEventArgs e) =>
+        await SaveAndCloseAsync(LocalCoachPackState.Draft);
+
+    private async void SaveAndEnableButton_Click(object sender, RoutedEventArgs e) =>
+        await SaveAndCloseAsync(LocalCoachPackState.Enabled);
+
+    private async Task SaveAndCloseAsync(LocalCoachPackState state)
+    {
+        if (await ViewModel.Save.SaveAsync(state))
+        {
+            SaveCompleted?.Invoke(this, EventArgs.Empty);
         }
     }
 

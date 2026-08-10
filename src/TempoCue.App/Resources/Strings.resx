@@ -496,4 +496,51 @@
   <data name="Coaching.MatchupEditor.Verification.Advice.PreviewHint" xml:space="preserve"><value>This is how the advice card will look in the main window during a match.</value></data>
   <data name="Coaching.MatchupEditor.Verification.Persistent.Title" xml:space="preserve"><value>Persistent tips nearby</value></data>
   <data name="Coaching.MatchupEditor.Verification.Persistent.Empty" xml:space="preserve"><value>No persistent tips apply to the selected phase.</value></data>
+  <data name="Coaching.MatchupEditor.StepSummary.Save" xml:space="preserve"><value>Step 5 of 5 · Save</value></data>
+  <data name="Coaching.MatchupEditor.Save.Action.Draft" xml:space="preserve"><value>Save as draft</value></data>
+  <data name="Coaching.MatchupEditor.Save.Action.Enable" xml:space="preserve"><value>Save and enable</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Title" xml:space="preserve"><value>Pre-save check</value></data>
+  <data name="Count.PhaseCompleted.One" xml:space="preserve"><value>{0} phase completed</value></data>
+  <data name="Count.PhaseCompleted.Other" xml:space="preserve"><value>{0} phases completed</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Phases.Ready" xml:space="preserve"><value>There are no overlaps or gaps between phases.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Phases.Warning" xml:space="preserve"><value>The pack can be saved, but no advice will appear at uncovered levels.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Patch" xml:space="preserve"><value>Compatible with patch {0}</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Patch.Description" xml:space="preserve"><value>Selected item identifiers came from the Data Dragon catalog.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Permission.Ready" xml:space="preserve"><value>Source is ready</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Permission.Missing" xml:space="preserve"><value>Author permission is not confirmed</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Permission.Personal" xml:space="preserve"><value>Personal experience does not require permission from an external author.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Permission.Granted" xml:space="preserve"><value>Permission is marked as granted.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Permission.LocalOnly" xml:space="preserve"><value>Local saving is available. Community publishing will require confirmation.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Title" xml:space="preserve"><value>Source</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Description" xml:space="preserve"><value>Personal experience is a valid source. For external material, provide its URL and author.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.PersonalExperience" xml:space="preserve"><value>Personal experience</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Article" xml:space="preserve"><value>Article</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Video" xml:space="preserve"><value>Video</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Guide" xml:space="preserve"><value>Community guide</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Name" xml:space="preserve"><value>Source title *</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Author" xml:space="preserve"><value>Source author *</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Link" xml:space="preserve"><value>Link *</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.RequiredHint" xml:space="preserve"><value>* Required fields for an external source</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Validation" xml:space="preserve"><value>Provide a title, author, and full http:// or https:// URL.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Permission.Checkbox" xml:space="preserve"><value>Author permission to use this source was granted</value></data>
+  <data name="Coaching.MatchupEditor.Save.Permission.Granted" xml:space="preserve"><value>granted</value></data>
+  <data name="Coaching.MatchupEditor.Save.Permission.NotConfirmed" xml:space="preserve"><value>not confirmed</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Title" xml:space="preserve"><value>Pack card</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Type.Matchup" xml:space="preserve"><value>Matchup</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Matchup" xml:space="preserve"><value>{0} vs {1} · {2}</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Author" xml:space="preserve"><value>Author</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.ContentLanguage" xml:space="preserve"><value>Content language</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Language" xml:space="preserve"><value>{0} · not translated automatically</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.GamePatch" xml:space="preserve"><value>Game patch</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.SourceLabel" xml:space="preserve"><value>Source</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Source" xml:space="preserve"><value>{0} · permission: {1}</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Verified" xml:space="preserve"><value>Verified</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.State" xml:space="preserve"><value>State</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.State.Enabled" xml:space="preserve"><value>Enabled</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Ready" xml:space="preserve"><value>The pack is ready for local saving and use.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Status.Saving" xml:space="preserve"><value>Saving pack…</value></data>
+  <data name="Coaching.MatchupEditor.Save.Status.DraftSaved" xml:space="preserve"><value>Draft saved locally.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Status.EnabledSaved" xml:space="preserve"><value>Pack saved and enabled. Engine integration will be completed in the next library iteration.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Status.Failed" xml:space="preserve"><value>Could not save the pack. Check access to the local application folder.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Status.Saved" xml:space="preserve"><value>Pack saved locally.</value></data>
 </root>

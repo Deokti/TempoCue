@@ -1,0 +1,290 @@
+<UserControl x:Class="TempoCue.App.Views.MatchupSaveView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:TempoCue.App.Controls"
+             xmlns:localization="clr-namespace:TempoCue.App.Localization"
+             Background="Transparent"
+             FontFamily="Segoe UI">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Styles/ShellControls.xaml" />
+                <ResourceDictionary Source="../Styles/FormControls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style x:Key="SaveSectionTitle" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="#F4F7FB" />
+                <Setter Property="FontSize" Value="{StaticResource Typography.FontSize.SectionTitle}" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+            </Style>
+
+            <Style x:Key="SaveMetadataLabel" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="#778BA7" />
+                <Setter Property="FontSize" Value="{StaticResource Typography.FontSize.Caption}" />
+                <Setter Property="Margin" Value="0,0,0,4" />
+            </Style>
+
+            <Style x:Key="SaveMetadataValue" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="#DCEAF7" />
+                <Setter Property="FontSize" Value="{StaticResource Typography.FontSize.Body}" />
+                <Setter Property="TextWrapping" Value="Wrap" />
+            </Style>
+
+            <Style x:Key="SourceKindButton"
+                   TargetType="Button"
+                   BasedOn="{StaticResource SecondaryButton}">
+                <Style.Triggers>
+                    <Trigger Property="Tag" Value="True">
+                        <Setter Property="Background" Value="#1A3F5F" />
+                        <Setter Property="BorderBrush" Value="#4FAAE8" />
+                        <Setter Property="Foreground" Value="#6FC4EF" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <!-- Финальный экран: автоматические проверки, источник и итоговая карточка набора. -->
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1.35*" />
+            <ColumnDefinition Width="16" />
+            <ColumnDefinition Width="0.85*" />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel>
+            <!-- Автоматические проверки, которые не требуют ввода автора. -->
+            <Border x:Name="SaveChecksCard" Style="{StaticResource ShellCard}">
+                <StackPanel>
+                    <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Save.Check.Title}"
+                               Style="{StaticResource SaveSectionTitle}" />
+
+                    <Grid Margin="0,16,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="18" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Ellipse Width="8" Height="8" Fill="#58D8AE" VerticalAlignment="Top" Margin="0,5,0,0" />
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="{Binding PhaseCountTitle}" Style="{StaticResource SaveMetadataValue}" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding PhaseValidationDescription}" Style="{StaticResource ShellCaption}" Margin="0,3,0,0" />
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Margin="0,14,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="18" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Ellipse Width="8" Height="8" Fill="#58D8AE" VerticalAlignment="Top" Margin="0,5,0,0" />
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="{Binding PatchTitle}" Style="{StaticResource SaveMetadataValue}" FontWeight="SemiBold" />
+                            <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Save.Check.Patch.Description}"
+                                       Style="{StaticResource ShellCaption}"
+                                       Margin="0,3,0,0" />
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Margin="0,14,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="18" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Ellipse Width="8" Height="8" VerticalAlignment="Top" Margin="0,5,0,0">
+                            <Ellipse.Style>
+                                <Style TargetType="Ellipse">
+                                    <Setter Property="Fill" Value="#F2C75C" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsPersonalExperience}" Value="True">
+                                            <Setter Property="Fill" Value="#58D8AE" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding AuthorPermissionGranted}" Value="True">
+                                            <Setter Property="Fill" Value="#58D8AE" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Ellipse.Style>
+                        </Ellipse>
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="{Binding PermissionTitle}" Style="{StaticResource SaveMetadataValue}" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding PermissionDescription}" Style="{StaticResource ShellCaption}" Margin="0,3,0,0" />
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Источник добавляется в сохранённый Coach Pack и не относится к локализации приложения. -->
+            <Border x:Name="SaveSourceCard" Style="{StaticResource ShellCard}" Margin="0,16,0,0">
+                <StackPanel>
+                    <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Save.Source.Title}"
+                               Style="{StaticResource SaveSectionTitle}" />
+                    <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Save.Source.Description}"
+                               Style="{StaticResource ShellCaption}"
+                               TextWrapping="Wrap"
+                               Margin="0,5,0,0" />
+
+                    <WrapPanel Margin="0,14,0,0">
+                        <Button x:Name="PersonalExperienceSourceButton"
+                                Content="{localization:Loc Coaching.MatchupEditor.Save.Source.PersonalExperience}"
+                                Style="{StaticResource SourceKindButton}"
+                                Tag="{Binding IsPersonalExperience}"
+                                Margin="0,0,8,8"
+                                Click="PersonalExperienceSourceButton_Click" />
+                        <Button x:Name="ArticleSourceButton"
+                                Content="{localization:Loc Coaching.MatchupEditor.Save.Source.Article}"
+                                Style="{StaticResource SourceKindButton}"
+                                Tag="{Binding IsArticle}"
+                                Margin="0,0,8,8"
+                                Click="ArticleSourceButton_Click" />
+                        <Button x:Name="VideoSourceButton"
+                                Content="{localization:Loc Coaching.MatchupEditor.Save.Source.Video}"
+                                Style="{StaticResource SourceKindButton}"
+                                Tag="{Binding IsVideo}"
+                                Margin="0,0,8,8"
+                                Click="VideoSourceButton_Click" />
+                        <Button x:Name="GuideSourceButton"
+                                Content="{localization:Loc Coaching.MatchupEditor.Save.Source.Guide}"
+                                Style="{StaticResource SourceKindButton}"
+                                Tag="{Binding IsGuide}"
+                                Margin="0,0,0,8"
+                                Click="GuideSourceButton_Click" />
+                    </WrapPanel>
+
+                    <Grid x:Name="ExternalSourceFields" Margin="0,8,0,0">
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Setter Property="Visibility" Value="Visible" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HasExternalSource}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="8" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="12" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock x:Name="RequiredSourceFieldsHint"
+                                   Grid.ColumnSpan="3"
+                                   Text="{localization:Loc Coaching.MatchupEditor.Save.Source.RequiredHint}"
+                                   Foreground="#91A4BD"
+                                   FontSize="{StaticResource Typography.FontSize.Caption}" />
+
+                        <StackPanel Grid.Row="2">
+                            <TextBlock x:Name="SourceTitleLabel"
+                                       Text="{localization:Loc Coaching.MatchupEditor.Save.Source.Name}"
+                                       Style="{StaticResource FormFieldLabel}" />
+                            <TextBox x:Name="SourceTitleTextBox"
+                                     Text="{Binding SourceTitle, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource FormTextBox}" />
+                        </StackPanel>
+                        <StackPanel Grid.Row="2" Grid.Column="2">
+                            <TextBlock x:Name="SourceAuthorLabel"
+                                       Text="{localization:Loc Coaching.MatchupEditor.Save.Source.Author}"
+                                       Style="{StaticResource FormFieldLabel}" />
+                            <TextBox x:Name="SourceAuthorTextBox"
+                                     Text="{Binding SourceAuthor, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource FormTextBox}" />
+                        </StackPanel>
+                        <StackPanel Grid.Row="4" Grid.ColumnSpan="3">
+                            <TextBlock x:Name="SourceUrlLabel"
+                                       Text="{localization:Loc Coaching.MatchupEditor.Save.Source.Link}"
+                                       Style="{StaticResource FormFieldLabel}" />
+                            <TextBox x:Name="SourceUrlTextBox"
+                                     Text="{Binding SourceUrl, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource FormTextBox}" />
+                            <TextBlock Text="{Binding SourceValidationMessage}"
+                                       Foreground="#FF7285"
+                                       FontSize="{StaticResource Typography.FontSize.Caption}"
+                                       Margin="0,6,0,0" />
+                            <controls:TempoCheckBox x:Name="SourcePermissionCheckBox"
+                                                    Content="{localization:Loc Coaching.MatchupEditor.Save.Permission.Checkbox}"
+                                                    IsChecked="{Binding AuthorPermissionGranted, Mode=TwoWay}"
+                                                    Margin="0,12,0,0" />
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Результат операции остаётся на экране, чтобы путь можно было проверить вручную. -->
+            <Border x:Name="SaveResultCard"
+                    Margin="0,16,0,0">
+                <Border.Style>
+                    <Style TargetType="Border" BasedOn="{StaticResource ShellCard}">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SaveStatus}" Value="">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding HasSavedPath}" Value="True">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding HasSaveError}" Value="True">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <StackPanel>
+                    <TextBlock Text="{Binding SaveStatus}" Style="{StaticResource SaveMetadataValue}" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding SavedPath}" Style="{StaticResource ShellCaption}" Margin="0,5,0,0" TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <!-- Карточка показывает метаданные именно так, как набор появится в библиотеке. -->
+        <Border x:Name="SavedPackPreviewCard"
+                Grid.Column="2"
+                Style="{StaticResource ShellCard}"
+                VerticalAlignment="Top">
+            <StackPanel>
+                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Save.Card.Title}"
+                           Style="{StaticResource SaveSectionTitle}" />
+                <Border Background="#10243A" CornerRadius="8" Padding="9,4" HorizontalAlignment="Left" Margin="0,14,0,0">
+                    <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Save.Card.Type.Matchup}"
+                               Foreground="#68BFF2"
+                               FontSize="{StaticResource Typography.FontSize.Caption}"
+                               FontWeight="SemiBold" />
+                </Border>
+
+                <TextBlock Text="{Binding PackMatchupSummary}"
+                           Foreground="#F4F7FB"
+                           FontSize="{StaticResource Typography.FontSize.SectionTitle}"
+                           FontWeight="SemiBold"
+                           TextWrapping="Wrap"
+                           Margin="0,12,0,0" />
+
+                <Separator Background="#263750" Margin="0,16" />
+
+                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Save.Card.Author}" Style="{StaticResource SaveMetadataLabel}" />
+                <TextBlock Text="{Binding PackAuthor}" Style="{StaticResource SaveMetadataValue}" />
+                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Save.Card.ContentLanguage}" Style="{StaticResource SaveMetadataLabel}" Margin="0,13,0,4" />
+                <TextBlock Text="{Binding PackLanguage}" Style="{StaticResource SaveMetadataValue}" />
+                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Save.Card.GamePatch}" Style="{StaticResource SaveMetadataLabel}" Margin="0,13,0,4" />
+                <TextBlock Text="{Binding PackPatch}" Style="{StaticResource SaveMetadataValue}" />
+                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Save.Card.SourceLabel}" Style="{StaticResource SaveMetadataLabel}" Margin="0,13,0,4" />
+                <TextBlock Text="{Binding SourceSummary}" Style="{StaticResource SaveMetadataValue}" />
+                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Save.Card.Verified}" Style="{StaticResource SaveMetadataLabel}" Margin="0,13,0,4" />
+                <TextBlock Text="{Binding VerifiedOn}" Style="{StaticResource SaveMetadataValue}" />
+                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Save.Card.State}" Style="{StaticResource SaveMetadataLabel}" Margin="0,13,0,4" />
+                <TextBlock Text="{Binding PackStateLabel}" Style="{StaticResource SaveMetadataValue}" />
+
+                <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Save.Card.Ready}"
+                           Foreground="#58D8AE"
+                           FontSize="{StaticResource Typography.FontSize.Body}"
+                           TextWrapping="Wrap"
+                           Margin="0,18,0,0" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

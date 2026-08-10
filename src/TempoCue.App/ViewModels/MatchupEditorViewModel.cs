@@ -14,7 +14,8 @@ public sealed class MatchupEditorViewModel : ObservableObject
         LocalizationService localization,
         IGamePatchCatalog gamePatchCatalog,
         IChampionCatalog championCatalog,
-        IItemCatalog itemCatalog)
+        IItemCatalog itemCatalog,
+        SaveCoachPackUseCase saveCoachPack)
     {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         MainInformation = new MatchupMainInformationViewModel(
@@ -28,6 +29,7 @@ public sealed class MatchupEditorViewModel : ObservableObject
         Verification = new MatchupVerificationViewModel(
             localization,
             new TempoCue.Core.MatchupPhaseSelector());
+        Save = new MatchupSaveViewModel(localization, saveCoachPack);
         MainInformation.PropertyChanged += MainInformation_PropertyChanged;
         ChampionsAndRole.PropertyChanged += ChampionsAndRole_PropertyChanged;
         Content.PropertyChanged += Content_PropertyChanged;
@@ -59,6 +61,8 @@ public sealed class MatchupEditorViewModel : ObservableObject
 
     public MatchupVerificationViewModel Verification { get; }
 
+    public MatchupSaveViewModel Save { get; }
+
     public bool CanMovePrevious => CurrentStep > 1;
 
     public bool CanMoveNext => CurrentStep switch
@@ -87,6 +91,10 @@ public sealed class MatchupEditorViewModel : ObservableObject
         {
             Verification.Update(MainInformation, ChampionsAndRole, Content);
         }
+        else if (CurrentStep == 4)
+        {
+            Save.Update(MainInformation, ChampionsAndRole, Content);
+        }
 
         CurrentStep++;
         return true;
@@ -109,6 +117,7 @@ public sealed class MatchupEditorViewModel : ObservableObject
         ChampionsAndRole.UpdateLanguage(languageCode);
         Content.UpdateLanguage(languageCode);
         Verification.UpdateLanguage();
+        Save.UpdateLanguage();
     }
 
     private void MainInformation_PropertyChanged(object? sender, PropertyChangedEventArgs e)

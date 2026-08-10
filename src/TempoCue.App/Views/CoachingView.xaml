@@ -480,7 +480,8 @@
 
         <views:MatchupEditorView x:Name="MatchupEditorPage"
                                  DataContext="{Binding MatchupEditor}"
-                                 BackRequested="MatchupEditorPage_BackRequested">
+                                 BackRequested="MatchupEditorPage_BackRequested"
+                                 SaveCompleted="MatchupEditorPage_SaveCompleted">
             <views:MatchupEditorView.Style>
                 <Style TargetType="views:MatchupEditorView">
                     <Setter Property="Visibility" Value="Collapsed" />
