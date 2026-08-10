@@ -474,4 +474,29 @@
   <data name="Coaching.MatchupEditor.Content.Validation.Coverage.Covered" xml:space="preserve"><value>Уровень {0}: все состояния покрыты</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.Coverage.Uncovered" xml:space="preserve"><value>Уровень {0}: хотя бы одно состояние осталось без фазы</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.Coverage.Ambiguous" xml:space="preserve"><value>Уровень {0}: фазы могут пересекаться</value></data>
+  <data name="Coaching.MatchupEditor.StepSummary.Verification" xml:space="preserve"><value>Шаг 4 из 5 · Проверка</value></data>
+  <data name="Coaching.MatchupEditor.Verification.ActivePhase" xml:space="preserve"><value>Активна фаза {0}: {1}</value></data>
+  <data name="Coaching.MatchupEditor.Verification.ActivePhaseDescription" xml:space="preserve"><value>Фаза активна на {0}</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Selection.Selected" xml:space="preserve"><value>Фаза выбрана</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Selection.SelectedDescription" xml:space="preserve"><value>На {0}-м уровне подходит ровно одна фаза.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Selection.NotFound" xml:space="preserve"><value>Для этого уровня нет фазы</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Selection.NotFoundDescription" xml:space="preserve"><value>На {0}-м уровне игрок не получит совет фазы.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Selection.Ambiguous" xml:space="preserve"><value>Подходит несколько фаз</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Selection.AmbiguousDescription" xml:space="preserve"><value>Перед сохранением устраните конфликт на {0}-м уровне.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Preset" xml:space="preserve"><value>Уровень {0}</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Simulator.Title" xml:space="preserve"><value>Симулятор состояния матча</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Simulator.Description" xml:space="preserve"><value>Меняйте уровень и проверяйте переходы между фазами. Рекомендуемые предметы не переключают фазу.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Simulator.Level" xml:space="preserve"><value>Уровень чемпиона</value></data>
+  <data name="Coaching.MatchupEditor.Verification.RecommendedItems.Title" xml:space="preserve"><value>Рекомендуемые предметы этой фазы</value></data>
+  <data name="Coaching.MatchupEditor.Verification.RecommendedItems.Description" xml:space="preserve"><value>Это рекомендации для покупки, а не условия активации фазы.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.RecommendedItems.Empty" xml:space="preserve"><value>Для выбранной фазы предметы не рекомендованы.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Advice.Title" xml:space="preserve"><value>Главный совет игроку</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Advice.MatchupTag" xml:space="preserve"><value>Матчап</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Advice.Phase" xml:space="preserve"><value>фаза {0}</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Advice.WhyNow" xml:space="preserve"><value>Почему сейчас</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Advice.NextGoal" xml:space="preserve"><value>Дальше</value></data>
+  <data name="Coaching.MatchupEditor.Verification.AdviceSource" xml:space="preserve"><value>{0} против {1} · {2}</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Advice.PreviewHint" xml:space="preserve"><value>Так карточка выглядит в основном окне во время матча.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Persistent.Title" xml:space="preserve"><value>Постоянные подсказки рядом</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Persistent.Empty" xml:space="preserve"><value>Для выбранной фазы нет постоянных подсказок.</value></data>
 </root>

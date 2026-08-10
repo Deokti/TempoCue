@@ -68,6 +68,9 @@ internal sealed class MainWindowTestContext : IDisposable
     public MatchupContentView ContentPage =>
         WpfTestHost.Find<MatchupContentView>(MatchupEditorPage, "MatchupContentPage");
 
+    public MatchupVerificationView VerificationPage =>
+        WpfTestHost.Find<MatchupVerificationView>(MatchupEditorPage, "MatchupVerificationPage");
+
     public MatchupPhaseEditorView PhaseEditorView =>
         WpfTestHost.Find<MatchupPhaseEditorView>(ContentPage, "PhaseEditorView");
 
@@ -136,6 +139,44 @@ internal sealed class MainWindowTestContext : IDisposable
         OpenMatchupEditor();
         CompleteMainInformationAndOpenChampions();
         SelectChampionsAndOpenContent();
+    }
+
+    public MatchupPhaseViewModel AddPhase(
+        string name,
+        int minimumLevel,
+        int? maximumLevel,
+        string primaryAdvice,
+        PowerState powerState = PowerState.Dangerous,
+        string whyNow = "",
+        string nextGoal = "")
+    {
+        var content = Coaching.MatchupEditor.Content;
+        content.BeginAddPhase();
+        content.Editor.Name = name;
+        content.Editor.SelectedPowerState = powerState;
+        while (content.Editor.MinimumLevel < minimumLevel)
+        {
+            content.Editor.IncreaseMinimumLevel();
+        }
+
+        content.Editor.ExtendsToEnd = maximumLevel is null;
+        if (maximumLevel is int lastLevel)
+        {
+            while (content.Editor.MaximumLevel > lastLevel)
+            {
+                content.Editor.DecreaseMaximumLevel();
+            }
+        }
+
+        content.Editor.PrimaryAdvice = primaryAdvice;
+        content.Editor.WhyNow = whyNow;
+        content.Editor.NextGoal = nextGoal;
+        if (!content.SaveEditor())
+        {
+            throw new InvalidOperationException("Не удалось сохранить тестовую фазу матчапа.");
+        }
+
+        return content.Phases[^1];
     }
 
     public void Dispose()

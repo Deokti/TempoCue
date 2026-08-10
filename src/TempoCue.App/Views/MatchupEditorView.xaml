@@ -142,6 +142,9 @@
                                 <DataTrigger Binding="{Binding CurrentStep}" Value="3">
                                     <Setter Property="Text" Value="{localization:Loc Coaching.MatchupEditor.StepSummary.Content}" />
                                 </DataTrigger>
+                                <DataTrigger Binding="{Binding CurrentStep}" Value="4">
+                                    <Setter Property="Text" Value="{localization:Loc Coaching.MatchupEditor.StepSummary.Verification}" />
+                                </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </TextBlock.Style>
@@ -241,6 +244,20 @@
                             </Style>
                         </views:MatchupContentView.Style>
                     </views:MatchupContentView>
+                    <views:MatchupVerificationView x:Name="MatchupVerificationPage"
+                                                   DataContext="{Binding Verification}">
+                        <views:MatchupVerificationView.Style>
+                            <Style TargetType="views:MatchupVerificationView">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DataContext.CurrentStep, RelativeSource={RelativeSource AncestorType={x:Type views:MatchupEditorView}}}"
+                                                 Value="4">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </views:MatchupVerificationView.Style>
+                    </views:MatchupVerificationView>
                 </Grid>
             </Grid>
         </ScrollViewer>

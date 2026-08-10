@@ -471,4 +471,29 @@
   <data name="Coaching.MatchupEditor.Content.Validation.Coverage.Covered" xml:space="preserve"><value>Level {0}: every state is covered</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.Coverage.Uncovered" xml:space="preserve"><value>Level {0}: at least one state has no phase</value></data>
   <data name="Coaching.MatchupEditor.Content.Validation.Coverage.Ambiguous" xml:space="preserve"><value>Level {0}: phases can overlap</value></data>
+  <data name="Coaching.MatchupEditor.StepSummary.Verification" xml:space="preserve"><value>Step 4 of 5 · Verification</value></data>
+  <data name="Coaching.MatchupEditor.Verification.ActivePhase" xml:space="preserve"><value>Active phase {0}: {1}</value></data>
+  <data name="Coaching.MatchupEditor.Verification.ActivePhaseDescription" xml:space="preserve"><value>The phase is active at {0}</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Selection.Selected" xml:space="preserve"><value>A phase is selected</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Selection.SelectedDescription" xml:space="preserve"><value>Exactly one phase applies at level {0}.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Selection.NotFound" xml:space="preserve"><value>No phase for this level</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Selection.NotFoundDescription" xml:space="preserve"><value>The player will not receive a phase advice at level {0}.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Selection.Ambiguous" xml:space="preserve"><value>Several phases apply</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Selection.AmbiguousDescription" xml:space="preserve"><value>Resolve the conflict at level {0} before saving.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Preset" xml:space="preserve"><value>Level {0}</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Simulator.Title" xml:space="preserve"><value>Match state simulator</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Simulator.Description" xml:space="preserve"><value>Change the level to verify phase transitions. Recommended items do not switch phases.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Simulator.Level" xml:space="preserve"><value>Champion level</value></data>
+  <data name="Coaching.MatchupEditor.Verification.RecommendedItems.Title" xml:space="preserve"><value>Recommended items for this phase</value></data>
+  <data name="Coaching.MatchupEditor.Verification.RecommendedItems.Description" xml:space="preserve"><value>These are purchase recommendations, not phase activation conditions.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.RecommendedItems.Empty" xml:space="preserve"><value>No items were recommended for the selected phase.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Advice.Title" xml:space="preserve"><value>Main advice to the player</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Advice.MatchupTag" xml:space="preserve"><value>Matchup</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Advice.Phase" xml:space="preserve"><value>phase {0}</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Advice.WhyNow" xml:space="preserve"><value>Why now</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Advice.NextGoal" xml:space="preserve"><value>Next</value></data>
+  <data name="Coaching.MatchupEditor.Verification.AdviceSource" xml:space="preserve"><value>{0} vs {1} · {2}</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Advice.PreviewHint" xml:space="preserve"><value>This is how the advice card will look in the main window during a match.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Persistent.Title" xml:space="preserve"><value>Persistent tips nearby</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Persistent.Empty" xml:space="preserve"><value>No persistent tips apply to the selected phase.</value></data>
 </root>
