@@ -180,6 +180,8 @@ public sealed class LocalizationServiceTests
                     matchupEditorPage.FindName("MatchupMainInformationPage"));
                 var matchupChampionsAndRolePage = Assert.IsType<TempoCue.App.Views.MatchupChampionsAndRoleView>(
                     matchupEditorPage.FindName("MatchupChampionsAndRolePage"));
+                var matchupContentPage = Assert.IsType<TempoCue.App.Views.MatchupContentView>(
+                    matchupEditorPage.FindName("MatchupContentPage"));
                 var championPickerDialog = Assert.IsType<TempoCue.App.Views.ChampionPickerDialogView>(
                     matchupEditorPage.FindName("ChampionPickerDialog"));
                 var sharedTextBoxPadding = new Thickness(12, 0, 12, 0);
@@ -463,7 +465,55 @@ public sealed class LocalizationServiceTests
                     static () => { },
                     DispatcherPriority.DataBind);
                 Assert.True(championsAndRole.IsComplete);
+                Assert.True(matchupEditorNextButton.IsEnabled);
+                matchupEditorNextButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
+                Assert.Equal(3, coachingViewModel.MatchupEditor.CurrentStep);
+                Assert.Equal(Visibility.Collapsed, matchupChampionsAndRolePage.Visibility);
+                Assert.Equal(Visibility.Visible, matchupContentPage.Visibility);
+                Assert.Equal(
+                    "Шаг 3 из 5 · Содержание матчапа",
+                    Assert.IsType<TextBlock>(
+                        matchupEditorPage.FindName("MatchupEditorStepSummaryTextBlock")).Text);
 
+                var addPhaseButton = Assert.IsType<Button>(
+                    matchupContentPage.FindName("AddPhaseButton"));
+                addPhaseButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
+                Assert.Equal(
+                    Visibility.Visible,
+                    Assert.IsType<Border>(matchupContentPage.FindName("PhaseEditorPanel")).Visibility);
+                var content = coachingViewModel.MatchupEditor.Content;
+                content.Editor.Name = "Осторожное начало";
+                content.Editor.PrimaryAdvice = "Не ищи размен первым";
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
+                var savePhaseButton = Assert.IsType<Button>(
+                    matchupContentPage.FindName("SavePhaseButton"));
+                Assert.True(savePhaseButton.IsEnabled);
+                savePhaseButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
+                Assert.Single(content.Phases);
+                Assert.Equal("Фазы 1", Assert.IsType<Button>(
+                    matchupContentPage.FindName("MatchupPhasesTabButton")).Content);
+
+                Assert.IsType<Button>(
+                        matchupEditorPage.FindName("BackToPackTypeButton"))
+                    .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                Dispatcher.CurrentDispatcher.Invoke(
+                    static () => { },
+                    DispatcherPriority.DataBind);
+                Assert.Equal(2, coachingViewModel.MatchupEditor.CurrentStep);
+                Assert.Equal(Visibility.Visible, matchupChampionsAndRolePage.Visibility);
+                Assert.Equal(Visibility.Collapsed, matchupContentPage.Visibility);
+                Assert.Single(content.Phases);
                 Assert.IsType<Button>(
                         matchupEditorPage.FindName("BackToPackTypeButton"))
                     .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));

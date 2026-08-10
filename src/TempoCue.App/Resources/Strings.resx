@@ -278,6 +278,43 @@
   <data name="Coaching.MatchupEditor.Main.Readiness.SourceReady" xml:space="preserve"><value>specified</value></data>
   <data name="Coaching.MatchupEditor.Main.Readiness.NextIteration" xml:space="preserve"><value>The next step will become available after its own verified iteration.</value></data>
   <data name="Coaching.MatchupEditor.StepSummary.Champions" xml:space="preserve"><value>Step 2 of 5 · Champions and role</value></data>
+  <data name="Coaching.MatchupEditor.StepSummary.Content" xml:space="preserve"><value>Step 3 of 5 · Matchup content</value></data>
+  <data name="Coaching.MatchupEditor.Content.Tab.Phases" xml:space="preserve"><value>Phases {0}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Tab.Persistent" xml:space="preserve"><value>Persistent tips 0</value></data>
+  <data name="Coaching.MatchupEditor.Content.Tab.Items" xml:space="preserve"><value>Items 0</value></data>
+  <data name="Coaching.MatchupEditor.Content.FutureSection" xml:space="preserve"><value>Available in the next iteration of step 3</value></data>
+  <data name="Coaching.MatchupEditor.Content.PhasesTitle" xml:space="preserve"><value>Matchup phases</value></data>
+  <data name="Coaching.MatchupEditor.Content.PhasesDescription" xml:space="preserve"><value>Split the matchup into clear periods. Card order defines the reading sequence and the future stable rule order.</value></data>
+  <data name="Coaching.MatchupEditor.Content.AddPhase" xml:space="preserve"><value>+ Add phase</value></data>
+  <data name="Coaching.MatchupEditor.Content.Empty.Title" xml:space="preserve"><value>No phases yet</value></data>
+  <data name="Coaching.MatchupEditor.Content.Empty.Description" xml:space="preserve"><value>Add the first phase and specify the levels at which its main advice applies.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Status.EmptyTitle" xml:space="preserve"><value>Add the first phase</value></data>
+  <data name="Coaching.MatchupEditor.Content.Status.EmptyDescription" xml:space="preserve"><value>This step will contain advice for the different periods of the matchup.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Status.DraftTitle" xml:space="preserve"><value>Phase draft is filled</value></data>
+  <data name="Coaching.MatchupEditor.Content.Status.DraftDescription" xml:space="preserve"><value>Phases remain available when moving between steps. Overlap validation will arrive with advanced conditions.</value></data>
+  <data name="Coaching.MatchupEditor.Content.NextIteration.Title" xml:space="preserve"><value>Next iteration</value></data>
+  <data name="Coaching.MatchupEditor.Content.NextIteration.Description" xml:space="preserve"><value>We will add item conditions, level coverage validation, and persistent tips. Levels and advice content are available now.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.AddTitle" xml:space="preserve"><value>New phase</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.EditTitle" xml:space="preserve"><value>Editing phase: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.Description" xml:space="preserve"><value>Specify the period and recommendation. Changes reach the list only after you select Done.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.Name" xml:space="preserve"><value>Phase name</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.PowerState" xml:space="preserve"><value>Danger level</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.MinimumLevel" xml:space="preserve"><value>Starts at level</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.MaximumLevel" xml:space="preserve"><value>Ends at level</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.ToEnd" xml:space="preserve"><value>Until the end of the match</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.PrimaryAdvice" xml:space="preserve"><value>Main advice</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.PrimaryAdviceHint" xml:space="preserve"><value>(the player sees it first)</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.WhyNow" xml:space="preserve"><value>Why now</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.WhyNowHint" xml:space="preserve"><value>(short explanation)</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.NextGoal" xml:space="preserve"><value>Next goal</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.NextGoalHint" xml:space="preserve"><value>(what will move the phase forward)</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.Done" xml:space="preserve"><value>Done</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.DeletePhase" xml:space="preserve"><value>Delete phase</value></data>
+  <data name="Coaching.MatchupEditor.Content.Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Coaching.MatchupEditor.Content.Duplicate" xml:space="preserve"><value>Duplicate</value></data>
+  <data name="Coaching.MatchupEditor.Content.Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Coaching.MatchupEditor.Content.DuplicateName" xml:space="preserve"><value>{0} — copy</value></data>
   <data name="Coaching.MatchupEditor.Champions.Description" xml:space="preserve"><value>This advice pack applies only to this matchup: your champion against the selected opponent in the same lane.</value></data>
   <data name="Coaching.MatchupEditor.Champions.Player" xml:space="preserve"><value>I am playing</value></data>
   <data name="Coaching.MatchupEditor.Champions.Opponent" xml:space="preserve"><value>My opponent</value></data>

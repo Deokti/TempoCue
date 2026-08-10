@@ -281,6 +281,43 @@
   <data name="Coaching.MatchupEditor.Main.Readiness.SourceReady" xml:space="preserve"><value>указан</value></data>
   <data name="Coaching.MatchupEditor.Main.Readiness.NextIteration" xml:space="preserve"><value>Следующий шаг станет доступен после отдельной проверяемой итерации.</value></data>
   <data name="Coaching.MatchupEditor.StepSummary.Champions" xml:space="preserve"><value>Шаг 2 из 5 · Чемпионы и роль</value></data>
+  <data name="Coaching.MatchupEditor.StepSummary.Content" xml:space="preserve"><value>Шаг 3 из 5 · Содержание матчапа</value></data>
+  <data name="Coaching.MatchupEditor.Content.Tab.Phases" xml:space="preserve"><value>Фазы {0}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Tab.Persistent" xml:space="preserve"><value>Постоянные подсказки 0</value></data>
+  <data name="Coaching.MatchupEditor.Content.Tab.Items" xml:space="preserve"><value>Предметы 0</value></data>
+  <data name="Coaching.MatchupEditor.Content.FutureSection" xml:space="preserve"><value>Будет доступно в следующей итерации шага 3</value></data>
+  <data name="Coaching.MatchupEditor.Content.PhasesTitle" xml:space="preserve"><value>Фазы матчапа</value></data>
+  <data name="Coaching.MatchupEditor.Content.PhasesDescription" xml:space="preserve"><value>Разделите матчап на понятные периоды. Порядок карточек задаёт последовательность чтения и будущий стабильный порядок правил.</value></data>
+  <data name="Coaching.MatchupEditor.Content.AddPhase" xml:space="preserve"><value>+ Добавить фазу</value></data>
+  <data name="Coaching.MatchupEditor.Content.Empty.Title" xml:space="preserve"><value>Фаз пока нет</value></data>
+  <data name="Coaching.MatchupEditor.Content.Empty.Description" xml:space="preserve"><value>Добавьте первую фазу и укажите, на каких уровнях действует её основной совет.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Status.EmptyTitle" xml:space="preserve"><value>Добавьте первую фазу</value></data>
+  <data name="Coaching.MatchupEditor.Content.Status.EmptyDescription" xml:space="preserve"><value>На этом шаге будет храниться содержание советов для разных периодов матчапа.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Status.DraftTitle" xml:space="preserve"><value>Черновик фаз заполнен</value></data>
+  <data name="Coaching.MatchupEditor.Content.Status.DraftDescription" xml:space="preserve"><value>Фазы сохраняются при переходах между шагами. Проверка пересечений появится вместе с расширенными условиями.</value></data>
+  <data name="Coaching.MatchupEditor.Content.NextIteration.Title" xml:space="preserve"><value>Следующая итерация</value></data>
+  <data name="Coaching.MatchupEditor.Content.NextIteration.Description" xml:space="preserve"><value>Добавим условия предметов, проверку покрытия уровней и постоянные подсказки. Сейчас доступны уровни и содержание совета.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.AddTitle" xml:space="preserve"><value>Новая фаза</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.EditTitle" xml:space="preserve"><value>Редактирование фазы: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.Description" xml:space="preserve"><value>Укажите период и рекомендацию. Изменения применятся к списку только после нажатия «Готово».</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.Name" xml:space="preserve"><value>Название фазы</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.PowerState" xml:space="preserve"><value>Уровень опасности</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.MinimumLevel" xml:space="preserve"><value>Начинается с уровня</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.MaximumLevel" xml:space="preserve"><value>Заканчивается на уровне</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.ToEnd" xml:space="preserve"><value>До конца матча</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.PrimaryAdvice" xml:space="preserve"><value>Главный совет</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.PrimaryAdviceHint" xml:space="preserve"><value>(его видит игрок первым)</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.WhyNow" xml:space="preserve"><value>Почему сейчас</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.WhyNowHint" xml:space="preserve"><value>(короткое объяснение)</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.NextGoal" xml:space="preserve"><value>Следующая цель</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.NextGoalHint" xml:space="preserve"><value>(что приблизит смену фазы)</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.Cancel" xml:space="preserve"><value>Отмена</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.Done" xml:space="preserve"><value>Готово</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.DeletePhase" xml:space="preserve"><value>Удалить фазу</value></data>
+  <data name="Coaching.MatchupEditor.Content.Edit" xml:space="preserve"><value>Редактировать</value></data>
+  <data name="Coaching.MatchupEditor.Content.Duplicate" xml:space="preserve"><value>Дублировать</value></data>
+  <data name="Coaching.MatchupEditor.Content.Delete" xml:space="preserve"><value>Удалить</value></data>
+  <data name="Coaching.MatchupEditor.Content.DuplicateName" xml:space="preserve"><value>{0} — копия</value></data>
   <data name="Coaching.MatchupEditor.Champions.Description" xml:space="preserve"><value>Набор советов работает только в этом матчапе: ваш чемпион против выбранного противника на одной линии.</value></data>
   <data name="Coaching.MatchupEditor.Champions.Player" xml:space="preserve"><value>Я играю на</value></data>
   <data name="Coaching.MatchupEditor.Champions.Opponent" xml:space="preserve"><value>Мой противник</value></data>

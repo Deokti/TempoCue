@@ -82,11 +82,130 @@ public sealed class CoachingViewModelTests
         Assert.True(viewModel.MatchupEditor.MoveNext());
         Assert.Equal(2, viewModel.MatchupEditor.CurrentStep);
         Assert.False(viewModel.MatchupEditor.CanMoveNext);
+
+        var championsAndRole = viewModel.MatchupEditor.ChampionsAndRole;
+        await championsAndRole.EnsureCatalogLoadedAsync();
+        championsAndRole.SelectedPlayerChampion = championsAndRole.Champions
+            .Single(champion => champion.Id == "Urgot");
+        championsAndRole.SelectedOpponentChampion = championsAndRole.Champions
+            .Single(champion => champion.Id == "Sett");
+
+        Assert.True(viewModel.MatchupEditor.CanMoveNext);
+        Assert.True(viewModel.MatchupEditor.MoveNext());
+        Assert.Equal(3, viewModel.MatchupEditor.CurrentStep);
+        Assert.False(viewModel.MatchupEditor.CanMoveNext);
+
+        var content = viewModel.MatchupEditor.Content;
+        content.BeginAddPhase();
+        content.Editor.Name = "Осторожное начало";
+        content.Editor.PrimaryAdvice = "Не ищи размен первым";
+        Assert.True(content.SaveEditor());
+        Assert.Single(content.Phases);
+
         Assert.True(viewModel.MatchupEditor.MovePrevious());
-        Assert.Equal(1, viewModel.MatchupEditor.CurrentStep);
+        Assert.Equal(2, viewModel.MatchupEditor.CurrentStep);
+        Assert.True(viewModel.MatchupEditor.MoveNext());
+        Assert.Equal(3, viewModel.MatchupEditor.CurrentStep);
+        Assert.Single(content.Phases);
 
         viewModel.OpenLibrary();
         Assert.Equal(CoachingScreen.Library, viewModel.CurrentScreen);
+    }
+
+    [Fact]
+    public void MatchupContent_ManagesPhaseDraftWithoutMutatingUnsavedChanges()
+    {
+        var localization = LocalizationService.Instance;
+        var initialLanguage = localization.CurrentLanguageCode;
+        localization.SetLanguage("ru-RU");
+
+        try
+        {
+            var content = new MatchupContentViewModel(localization);
+
+            content.BeginAddPhase();
+            Assert.True(content.Editor.IsOpen);
+            Assert.False(content.Editor.CanSave);
+            content.Editor.Name = "Осторожное начало";
+            content.Editor.PrimaryAdvice = "Не ищи размен первым";
+            content.Editor.WhyNow = "Sett сильнее на первых уровнях";
+
+            Assert.True(content.Editor.CanSave);
+            Assert.True(content.SaveEditor());
+            var original = Assert.Single(content.Phases);
+            Assert.Equal("phase-1", original.Id);
+            Assert.Equal(1, original.Order);
+            Assert.False(original.CanMoveUp);
+            Assert.False(original.CanMoveDown);
+
+            content.BeginEditPhase(original);
+            content.Editor.Name = "Несохранённое название";
+            content.CancelEditor();
+            Assert.Equal("Осторожное начало", original.Name);
+
+            var duplicate = content.DuplicatePhase(original);
+            Assert.Equal(2, content.Phases.Count);
+            Assert.Equal("Осторожное начало — копия", duplicate.Name);
+            Assert.True(original.CanMoveDown);
+            Assert.True(duplicate.CanMoveUp);
+
+            Assert.True(content.MovePhaseUp(duplicate));
+            Assert.Same(duplicate, content.Phases[0]);
+            Assert.Equal(1, duplicate.Order);
+            Assert.Equal(2, original.Order);
+
+            content.BeginEditPhase(original);
+            content.Editor.Name = "Обновлённая фаза";
+            Assert.True(content.SaveEditor());
+            Assert.Equal("Обновлённая фаза", original.Name);
+
+            Assert.True(content.DeletePhase(duplicate));
+            Assert.Single(content.Phases);
+            Assert.Equal(1, original.Order);
+        }
+        finally
+        {
+            localization.SetLanguage(initialLanguage);
+        }
+    }
+
+    [Fact]
+    public void MatchupContent_EditorActionsDuplicateAndDeleteCurrentPhase()
+    {
+        var localization = LocalizationService.Instance;
+        var initialLanguage = localization.CurrentLanguageCode;
+        localization.SetLanguage("en-US");
+
+        try
+        {
+            var content = new MatchupContentViewModel(localization);
+            content.BeginAddPhase();
+            content.Editor.Name = "Early lane";
+            content.Editor.PrimaryAdvice = "Avoid extended trades";
+
+            var firstCopy = Assert.IsType<MatchupPhaseViewModel>(content.DuplicateEditor());
+            Assert.Equal(2, content.Phases.Count);
+            Assert.Equal("phase-2", firstCopy.Id);
+            Assert.Equal(firstCopy.Id, content.Editor.EditingPhaseId);
+            Assert.Equal("Early lane — copy", firstCopy.Name);
+
+            Assert.True(content.DeleteEditor());
+            Assert.False(content.Editor.IsOpen);
+            var original = Assert.Single(content.Phases);
+            Assert.Equal("Early lane", original.Name);
+
+            content.BeginEditPhase(original);
+            content.Editor.Name = "Edited only for copy";
+            var editedCopy = Assert.IsType<MatchupPhaseViewModel>(content.DuplicateEditor());
+
+            Assert.Equal("Early lane", original.Name);
+            Assert.Equal("Edited only for copy — copy", editedCopy.Name);
+            Assert.Equal(editedCopy.Id, content.Editor.EditingPhaseId);
+        }
+        finally
+        {
+            localization.SetLanguage(initialLanguage);
+        }
     }
 
     [Fact]

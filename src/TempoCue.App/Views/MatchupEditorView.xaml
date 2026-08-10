@@ -136,6 +136,9 @@
                                 <DataTrigger Binding="{Binding CurrentStep}" Value="2">
                                     <Setter Property="Text" Value="{localization:Loc Coaching.MatchupEditor.StepSummary.Champions}" />
                                 </DataTrigger>
+                                <DataTrigger Binding="{Binding CurrentStep}" Value="3">
+                                    <Setter Property="Text" Value="{localization:Loc Coaching.MatchupEditor.StepSummary.Content}" />
+                                </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </TextBlock.Style>
@@ -220,6 +223,20 @@
                             </Style>
                         </views:MatchupChampionsAndRoleView.Style>
                     </views:MatchupChampionsAndRoleView>
+                    <views:MatchupContentView x:Name="MatchupContentPage"
+                                              DataContext="{Binding Content}">
+                        <views:MatchupContentView.Style>
+                            <Style TargetType="views:MatchupContentView">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DataContext.CurrentStep, RelativeSource={RelativeSource AncestorType={x:Type views:MatchupEditorView}}}"
+                                                 Value="3">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </views:MatchupContentView.Style>
+                    </views:MatchupContentView>
                 </Grid>
             </Grid>
         </ScrollViewer>
