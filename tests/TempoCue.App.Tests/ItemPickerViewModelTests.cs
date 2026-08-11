@@ -35,9 +35,11 @@ public sealed class ItemPickerViewModelTests
 
             content.ItemPicker.Search = "сапоги";
             var boots = Assert.Single(content.ItemPicker.FilteredItems);
+            Assert.Same(content.ItemPicker.FilteredItems, content.ItemPicker.FilteredItems);
             content.ItemPicker.Preview(boots);
 
             Assert.Equal("1200 золота", content.ItemPicker.PreviewedItemPriceText);
+            Assert.Same(content.ItemPicker.PreviewedItemStats, content.ItemPicker.PreviewedItemStats);
             Assert.Contains(
                 content.ItemPicker.PreviewedItemStats,
                 stat => stat.Name == "Броня" && stat.Value == "+25");
@@ -47,5 +49,58 @@ public sealed class ItemPickerViewModelTests
         {
             localization.SetLanguage(initialLanguage);
         }
+    }
+
+    [Fact]
+    public async Task ItemPicker_OlderCatalogRequestCannotReplaceNewContext()
+    {
+        var catalog = new SequencedItemCatalog();
+        var viewModel = new ItemPickerViewModel(catalog, LocalizationService.Instance);
+        viewModel.SetContext("26.14", "ru-RU");
+        var olderRequest = viewModel.EnsureCatalogLoadedAsync();
+
+        viewModel.SetContext("26.15", "ru-RU");
+        var currentRequest = viewModel.EnsureCatalogLoadedAsync();
+        catalog.Complete("26.15", CreateResult(3071, "Текущий предмет"));
+        await currentRequest;
+
+        catalog.Complete("26.14", CreateResult(3047, "Устаревший предмет"));
+        await olderRequest;
+
+        Assert.Equal(CatalogViewState.Ready, viewModel.CatalogState);
+        Assert.Equal(3071, Assert.Single(viewModel.Items).Id);
+    }
+
+    private static ItemCatalogLoadResult CreateResult(int id, string name) => new(
+        [
+            new ItemCatalogEntry(
+                id,
+                name,
+                string.Empty,
+                new Uri($"https://example.test/{id}.png"),
+                1000,
+                [],
+                ItemCatalogCategory.Basic,
+                [])
+        ],
+        ItemCatalogSource.Network);
+
+    private sealed class SequencedItemCatalog : IItemCatalog
+    {
+        private readonly Dictionary<string, TaskCompletionSource<ItemCatalogLoadResult>> _requests = [];
+
+        public Task<ItemCatalogLoadResult> LoadAsync(
+            string gamePatch,
+            string languageCode,
+            CancellationToken cancellationToken = default)
+        {
+            var completion = new TaskCompletionSource<ItemCatalogLoadResult>(
+                TaskCreationOptions.RunContinuationsAsynchronously);
+            _requests.Add(gamePatch, completion);
+            return completion.Task.WaitAsync(cancellationToken);
+        }
+
+        public void Complete(string gamePatch, ItemCatalogLoadResult result) =>
+            _requests[gamePatch].TrySetResult(result);
     }
 }

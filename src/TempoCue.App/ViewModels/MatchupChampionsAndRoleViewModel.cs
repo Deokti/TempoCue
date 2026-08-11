@@ -9,11 +9,13 @@ public sealed class MatchupChampionsAndRoleViewModel : ObservableObject
     private readonly IChampionCatalog _championCatalog;
     private readonly LocalizationService _localization;
     private IReadOnlyList<ChampionOptionViewModel> _champions = [];
+    private IReadOnlyList<ChampionOptionViewModel> _filteredPickerChampions = [];
     private ChampionOptionViewModel? _selectedPlayerChampion;
     private ChampionOptionViewModel? _selectedOpponentChampion;
     private MatchupLaneRole _selectedRole = MatchupLaneRole.Top;
     private string _languageCode;
     private string? _loadedLanguageCode;
+    private int _catalogRequestVersion;
     private CatalogViewState _catalogState = CatalogViewState.NotLoaded;
     private ChampionPickerTarget _pickerTarget;
     private string _pickerSearch = string.Empty;
@@ -32,7 +34,7 @@ public sealed class MatchupChampionsAndRoleViewModel : ObservableObject
     public IReadOnlyList<ChampionOptionViewModel> Champions => _champions;
 
     public IReadOnlyList<ChampionOptionViewModel> FilteredPickerChampions =>
-        FilterAllChampions(PickerSearch);
+        _filteredPickerChampions;
 
     public ChampionPickerTarget PickerTarget
     {
@@ -55,9 +57,7 @@ public sealed class MatchupChampionsAndRoleViewModel : ObservableObject
         {
             if (SetProperty(ref _pickerSearch, value ?? string.Empty))
             {
-                OnPropertyChanged(nameof(FilteredPickerChampions));
-                OnPropertyChanged(nameof(HasPickerResults));
-                OnPropertyChanged(nameof(PickerResultCountText));
+                RefreshFilteredPickerChampions();
             }
         }
     }
@@ -160,6 +160,7 @@ public sealed class MatchupChampionsAndRoleViewModel : ObservableObject
         }
 
         _languageCode = languageCode;
+        _catalogRequestVersion++;
         ClosePicker();
         CatalogState = CatalogViewState.NotLoaded;
         OnPropertyChanged(nameof(CatalogStatusText));
@@ -206,17 +207,18 @@ public sealed class MatchupChampionsAndRoleViewModel : ObservableObject
         }
 
         CatalogState = CatalogViewState.Loading;
+        var requestVersion = ++_catalogRequestVersion;
         var requestedLanguageCode = _languageCode;
         var playerChampionId = SelectedPlayerChampion?.Id;
         var opponentChampionId = SelectedOpponentChampion?.Id;
         var result = await _championCatalog.LoadAsync(requestedLanguageCode, cancellationToken);
 
-        if (!string.Equals(
+        if (requestVersion != _catalogRequestVersion
+            || !string.Equals(
                 requestedLanguageCode,
                 _languageCode,
                 StringComparison.OrdinalIgnoreCase))
         {
-            CatalogState = CatalogViewState.NotLoaded;
             return;
         }
 
@@ -285,9 +287,15 @@ public sealed class MatchupChampionsAndRoleViewModel : ObservableObject
     private void NotifyCatalogChanged()
     {
         OnPropertyChanged(nameof(Champions));
+        RefreshFilteredPickerChampions();
+        OnPropertyChanged(nameof(CatalogStatusText));
+    }
+
+    private void RefreshFilteredPickerChampions()
+    {
+        _filteredPickerChampions = FilterAllChampions(PickerSearch);
         OnPropertyChanged(nameof(FilteredPickerChampions));
         OnPropertyChanged(nameof(HasPickerResults));
-        OnPropertyChanged(nameof(CatalogStatusText));
         OnPropertyChanged(nameof(PickerResultCountText));
     }
 

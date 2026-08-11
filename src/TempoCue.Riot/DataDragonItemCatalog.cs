@@ -134,6 +134,7 @@ public sealed class DataDragonItemCatalog : IItemCatalog
         IReadOnlyList<ItemCatalogEntry> items,
         CancellationToken cancellationToken)
     {
+        string? temporaryPath = null;
         try
         {
             Directory.CreateDirectory(_cacheDirectory);
@@ -164,7 +165,7 @@ public sealed class DataDragonItemCatalog : IItemCatalog
                     .ToList()
             };
             var cachePath = GetCachePath(gamePatch, locale);
-            var temporaryPath = $"{cachePath}.{Guid.NewGuid():N}.tmp";
+            temporaryPath = $"{cachePath}.{Guid.NewGuid():N}.tmp";
             await using (var stream = File.Create(temporaryPath))
             {
                 await JsonSerializer.SerializeAsync(
@@ -184,6 +185,10 @@ public sealed class DataDragonItemCatalog : IItemCatalog
         catch (Exception exception) when (IsExpectedCacheFailure(exception))
         {
             return false;
+        }
+        finally
+        {
+            DeleteTemporaryFile(temporaryPath);
         }
     }
 
@@ -335,6 +340,23 @@ public sealed class DataDragonItemCatalog : IItemCatalog
 
         mappedStat = new ItemStatEntry(mapping.Item1, value);
         return true;
+    }
+
+    private static void DeleteTemporaryFile(string? path)
+    {
+        if (path is null)
+        {
+            return;
+        }
+
+        try
+        {
+            File.Delete(path);
+        }
+        catch (Exception exception) when (IsExpectedCacheFailure(exception))
+        {
+            // Ошибка очистки временного кеша не должна скрывать исходный результат загрузки.
+        }
     }
 
     private static bool IsExpectedCacheFailure(Exception exception) =>

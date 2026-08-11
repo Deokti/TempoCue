@@ -7,6 +7,29 @@ namespace TempoCue.App;
 /// <summary>Навигация, системные кнопки окна и переключение языка.</summary>
 public partial class MainWindow
 {
+    private static readonly SolidColorBrush _navigationActiveBrush =
+        CreateFrozenBrush("#50B7ED");
+    private static readonly SolidColorBrush _navigationInactiveBrush =
+        CreateFrozenBrush("#7F93AF");
+    private static readonly SolidColorBrush _waitingBadgeBackgroundBrush =
+        CreateFrozenBrush("#1E2E45");
+    private static readonly SolidColorBrush _waitingStatusDotBrush =
+        CreateFrozenBrush("#8393A8");
+    private static readonly SolidColorBrush _waitingStatusTextBrush =
+        CreateFrozenBrush("#B5C5D8");
+    private static readonly SolidColorBrush _connectedBadgeBackgroundBrush =
+        CreateFrozenBrush("#17342D");
+    private static readonly SolidColorBrush _connectedStatusDotBrush =
+        CreateFrozenBrush("#64D5A4");
+    private static readonly SolidColorBrush _connectedStatusTextBrush =
+        CreateFrozenBrush("#87E1BB");
+    private static readonly SolidColorBrush _errorBadgeBackgroundBrush =
+        CreateFrozenBrush("#3A3020");
+    private static readonly SolidColorBrush _errorStatusDotBrush =
+        CreateFrozenBrush("#E8BB58");
+    private static readonly SolidColorBrush _errorStatusTextBrush =
+        CreateFrozenBrush("#F0CC7A");
+
     private enum AppPage
     {
         Home,
@@ -119,10 +142,16 @@ public partial class MainWindow
         SettingsNavigationButton.Style = (Style)FindResource(
             settingsAreOpen ? "ShellNavButtonActive" : "ShellNavButton");
 
-        HomeNavigationIcon.Stroke = ToBrush(homeIsOpen ? "#50B7ED" : "#7F93AF");
-        CurrentMatchNavigationIcon.Stroke = ToBrush(matchIsOpen ? "#50B7ED" : "#7F93AF");
-        CoachingNavigationIcon.Stroke = ToBrush(coachingIsOpen ? "#50B7ED" : "#7F93AF");
-        SettingsNavigationIcon.Stroke = ToBrush(settingsAreOpen ? "#50B7ED" : "#7F93AF");
+        HomeNavigationIcon.Stroke = homeIsOpen ? _navigationActiveBrush : _navigationInactiveBrush;
+        CurrentMatchNavigationIcon.Stroke = matchIsOpen
+            ? _navigationActiveBrush
+            : _navigationInactiveBrush;
+        CoachingNavigationIcon.Stroke = coachingIsOpen
+            ? _navigationActiveBrush
+            : _navigationInactiveBrush;
+        SettingsNavigationIcon.Stroke = settingsAreOpen
+            ? _navigationActiveBrush
+            : _navigationInactiveBrush;
         HomeNavigationTextBlock.FontWeight = homeIsOpen ? FontWeights.SemiBold : FontWeights.Normal;
         CurrentMatchNavigationTextBlock.FontWeight = matchIsOpen
             ? FontWeights.SemiBold
@@ -133,6 +162,10 @@ public partial class MainWindow
         SettingsNavigationTextBlock.FontWeight = settingsAreOpen ? FontWeights.SemiBold : FontWeights.Normal;
     }
 
-    private static SolidColorBrush ToBrush(string color) =>
-        new((Color)ColorConverter.ConvertFromString(color));
+    private static SolidColorBrush CreateFrozenBrush(string color)
+    {
+        var brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color));
+        brush.Freeze();
+        return brush;
+    }
 }

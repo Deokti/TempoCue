@@ -1,5 +1,6 @@
 using TempoCue.Application;
 using TempoCue.Core;
+using static TempoCue.App.Tests.CurrentMatchViewModelTestData;
 
 namespace TempoCue.App.Tests;
 
@@ -219,18 +220,4 @@ public sealed class CurrentMatchViewModelTests
         Assert.Contains("не выбирает рекомендацию случайно", viewModel.AdviceReason);
     }
 
-    private static PlayerState CreatePlayer(
-        string id,
-        string champion,
-        TeamSide team,
-        PlayerPosition position,
-        int creepScore = 0) => new()
-        {
-            ParticipantId = id,
-            ChampionName = champion,
-            Team = team,
-            Position = position,
-            Level = 1,
-            CreepScore = creepScore
-        };
 }

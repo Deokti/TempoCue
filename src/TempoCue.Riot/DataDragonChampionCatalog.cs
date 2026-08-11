@@ -108,6 +108,7 @@ public sealed class DataDragonChampionCatalog : IChampionCatalog
         IReadOnlyList<ChampionCatalogEntry> champions,
         CancellationToken cancellationToken)
     {
+        string? temporaryPath = null;
         try
         {
             Directory.CreateDirectory(_cacheDirectory);
@@ -127,7 +128,7 @@ public sealed class DataDragonChampionCatalog : IChampionCatalog
                     .ToList()
             };
             var cachePath = GetCachePath(locale);
-            var temporaryPath = $"{cachePath}.{Guid.NewGuid():N}.tmp";
+            temporaryPath = $"{cachePath}.{Guid.NewGuid():N}.tmp";
             await using (var stream = File.Create(temporaryPath))
             {
                 await JsonSerializer.SerializeAsync(
@@ -149,6 +150,10 @@ public sealed class DataDragonChampionCatalog : IChampionCatalog
             // Ошибка преобразуется в явный признак результата: сетевые данные остаются
             // пригодными для текущего запуска, но вызывающая сторона знает о сбое кеша.
             return false;
+        }
+        finally
+        {
+            DeleteTemporaryFile(temporaryPath);
         }
     }
 
@@ -207,6 +212,23 @@ public sealed class DataDragonChampionCatalog : IChampionCatalog
 
     private static bool IsSummonersRiftChampion(string championId) =>
         !championId.StartsWith("Jade_", StringComparison.OrdinalIgnoreCase);
+
+    private static void DeleteTemporaryFile(string? path)
+    {
+        if (path is null)
+        {
+            return;
+        }
+
+        try
+        {
+            File.Delete(path);
+        }
+        catch (Exception exception) when (IsExpectedCacheFailure(exception))
+        {
+            // Ошибка очистки временного кеша не должна скрывать исходный результат загрузки.
+        }
+    }
 
     private static bool IsExpectedCacheFailure(Exception exception) =>
         exception is IOException

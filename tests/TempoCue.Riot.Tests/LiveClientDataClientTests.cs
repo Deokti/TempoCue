@@ -137,8 +137,7 @@ public sealed class LiveClientDataClientTests
         Assert.Equal("SettPlayer#TEST", championKill.VictimParticipantId);
         Assert.Equal(["AllySupport#TEST"], championKill.AssisterParticipantIds);
 
-        Assert.Contains(Environment.NewLine, snapshot.RawJson);
-        Assert.Contains("\"allPlayers\"", snapshot.RawJson);
+        Assert.Equal(json, snapshot.RawJson);
 
         // Проверяем всю цепочку: JSON Riot → MatchState → определение Sett на TOP → совет.
         var coach = new MatchupCoach(

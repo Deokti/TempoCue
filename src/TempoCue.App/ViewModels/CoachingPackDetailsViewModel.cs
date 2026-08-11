@@ -11,6 +11,7 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
 {
     private readonly LocalizationService _localization;
     private readonly IItemCatalog _itemCatalog;
+    private CancellationTokenSource? _itemCatalogLoadCancellation;
     private CoachingPackCardViewModel? _card;
     private IReadOnlyDictionary<int, ItemCatalogEntry> _items =
         new Dictionary<int, ItemCatalogEntry>();
@@ -20,6 +21,7 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
     private IReadOnlyList<CoachingPackItemBlockDetailsViewModel> _itemBlocks = [];
     private bool _isItemCatalogLoading;
     private string _itemCatalogMessage = string.Empty;
+    private long _itemCatalogLoadVersion;
     private bool _isDisposed;
 
     public CoachingPackDetailsViewModel(
@@ -185,12 +187,25 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
         CoachingPackCardViewModel card,
         CancellationToken cancellationToken = default)
     {
-        _card = card ?? throw new ArgumentNullException(nameof(card));
-        _items = new Dictionary<int, ItemCatalogEntry>();
-        CurrentTab = CoachingPackDetailsTab.Overview;
-        NotifyHeaderChanged();
-        RebuildContent();
-        await LoadItemCatalogAsync(cancellationToken);
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
+        ArgumentNullException.ThrowIfNull(card);
+
+        var request = BeginItemCatalogLoad(cancellationToken);
+        try
+        {
+            _card = card;
+            _items = new Dictionary<int, ItemCatalogEntry>();
+            IsItemCatalogLoading = card.Pack.ItemBlocks.Count > 0;
+            ItemCatalogMessage = string.Empty;
+            CurrentTab = CoachingPackDetailsTab.Overview;
+            NotifyHeaderChanged();
+            RebuildContent();
+            await LoadItemCatalogAsync(card.Pack, request);
+        }
+        finally
+        {
+            CompleteItemCatalogLoad(request);
+        }
     }
 
     public void UpdateCard(CoachingPackCardViewModel card)
@@ -239,24 +254,29 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
         }
 
         _isDisposed = true;
+        CancelCurrentItemCatalogLoad();
+        Export.Close();
         _localization.PropertyChanged -= Localization_PropertyChanged;
     }
 
-    private async Task LoadItemCatalogAsync(CancellationToken cancellationToken)
+    private async Task LoadItemCatalogAsync(CoachPack pack, ItemCatalogLoadRequest request)
     {
-        if (Pack is null || !HasItemBlocks)
+        if (pack.ItemBlocks.Count == 0)
         {
             return;
         }
 
-        IsItemCatalogLoading = true;
-        ItemCatalogMessage = string.Empty;
         try
         {
             var result = await _itemCatalog.LoadAsync(
-                Pack.Patch,
+                pack.Patch,
                 _localization.CurrentLanguageCode,
-                cancellationToken);
+                request.Cancellation.Token);
+            if (!IsCurrentItemCatalogLoad(request))
+            {
+                return;
+            }
+
             if (!result.IsAvailable)
             {
                 ItemCatalogMessage = _localization.Get("Coaching.Details.Items.CatalogUnavailable");
@@ -266,12 +286,61 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
             _items = result.Items.ToDictionary(static item => item.Id);
             RebuildContent();
         }
-        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        catch (OperationCanceledException) when (request.Cancellation.IsCancellationRequested)
         {
         }
-        finally
+    }
+
+    private ItemCatalogLoadRequest BeginItemCatalogLoad(CancellationToken cancellationToken)
+    {
+        var requestCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        var version = Interlocked.Increment(ref _itemCatalogLoadVersion);
+        var previousCancellation = Interlocked.Exchange(
+            ref _itemCatalogLoadCancellation,
+            requestCancellation);
+        TryCancel(previousCancellation);
+        return new ItemCatalogLoadRequest(version, requestCancellation);
+    }
+
+    private bool IsCurrentItemCatalogLoad(ItemCatalogLoadRequest request) =>
+        !_isDisposed
+        && Volatile.Read(ref _itemCatalogLoadVersion) == request.Version
+        && ReferenceEquals(
+            Volatile.Read(ref _itemCatalogLoadCancellation),
+            request.Cancellation);
+
+    private void CompleteItemCatalogLoad(ItemCatalogLoadRequest request)
+    {
+        if (IsCurrentItemCatalogLoad(request)
+            && ReferenceEquals(
+                Interlocked.CompareExchange(
+                    ref _itemCatalogLoadCancellation,
+                    null,
+                    request.Cancellation),
+                request.Cancellation))
         {
             IsItemCatalogLoading = false;
+        }
+
+        request.Cancellation.Dispose();
+    }
+
+    private void CancelCurrentItemCatalogLoad()
+    {
+        Interlocked.Increment(ref _itemCatalogLoadVersion);
+        var cancellation = Interlocked.Exchange(ref _itemCatalogLoadCancellation, null);
+        TryCancel(cancellation);
+    }
+
+    private static void TryCancel(CancellationTokenSource? cancellation)
+    {
+        try
+        {
+            cancellation?.Cancel();
+        }
+        catch (ObjectDisposedException)
+        {
+            // Завершившийся запрос мог уже освободить собственный источник отмены.
         }
     }
 
@@ -385,6 +454,10 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
     private string GetAuthorLabel(string? author) => string.IsNullOrWhiteSpace(author)
         ? _localization.Get("Coaching.Library.Author.TempoCue")
         : author;
+
+    private readonly record struct ItemCatalogLoadRequest(
+        long Version,
+        CancellationTokenSource Cancellation);
 
     private string BuildSourceLabel(CoachPack? pack)
     {

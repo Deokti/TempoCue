@@ -105,7 +105,9 @@ public sealed class DataDragonClient : IDisposable
 
     public void Dispose()
     {
-        _versionLock.Dispose();
+        // WPF не может синхронно дождаться всех async-обработчиков при OnExit. Семафор не
+        // использует AvailableWaitHandle, поэтому его безопаснее собрать вместе с клиентом,
+        // чем уничтожить до Release() ещё завершающегося запроса каталога.
         if (_ownsHttpClient)
         {
             _httpClient.Dispose();

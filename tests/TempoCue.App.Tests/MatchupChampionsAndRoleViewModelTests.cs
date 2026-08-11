@@ -86,6 +86,7 @@ public sealed class MatchupChampionsAndRoleViewModelTests
         Assert.Equal(ChampionPickerTarget.Player, viewModel.PickerTarget);
         viewModel.PickerSearch = "set";
         var sett = Assert.Single(viewModel.FilteredPickerChampions);
+        Assert.Same(viewModel.FilteredPickerChampions, viewModel.FilteredPickerChampions);
 
         viewModel.SelectPickerChampion(sett);
 
@@ -98,5 +99,58 @@ public sealed class MatchupChampionsAndRoleViewModelTests
 
         Assert.Equal("Urgot", viewModel.SelectedOpponentChampion?.Id);
         Assert.True(viewModel.IsComplete);
+    }
+
+    [Fact]
+    public async Task ChampionsAndRole_OlderCatalogRequestCannotReplaceNewLanguage()
+    {
+        var catalog = new SequencedChampionCatalog();
+        var initialLanguage = LocalizationService.Instance.CurrentLanguageCode;
+        var nextLanguage = initialLanguage.StartsWith("ru", StringComparison.OrdinalIgnoreCase)
+            ? "en-US"
+            : "ru-RU";
+        var viewModel = new MatchupChampionsAndRoleViewModel(
+            catalog,
+            LocalizationService.Instance);
+        var olderRequest = viewModel.EnsureCatalogLoadedAsync();
+
+        viewModel.UpdateLanguage(nextLanguage);
+        var currentRequest = viewModel.EnsureCatalogLoadedAsync();
+        catalog.Complete(nextLanguage, CreateResult("Sett", "Sett"));
+        await currentRequest;
+
+        catalog.Complete(initialLanguage, CreateResult("Urgot", "Ургот"));
+        await olderRequest;
+
+        Assert.Equal(CatalogViewState.Ready, viewModel.CatalogState);
+        Assert.Equal("Sett", Assert.Single(viewModel.Champions).Id);
+    }
+
+    private static ChampionCatalogLoadResult CreateResult(string id, string name) => new(
+        [
+            new ChampionCatalogEntry(
+                id,
+                1,
+                name,
+                new Uri($"https://example.test/{id}.png"))
+        ],
+        ChampionCatalogSource.Network);
+
+    private sealed class SequencedChampionCatalog : IChampionCatalog
+    {
+        private readonly Dictionary<string, TaskCompletionSource<ChampionCatalogLoadResult>> _requests = [];
+
+        public Task<ChampionCatalogLoadResult> LoadAsync(
+            string languageCode,
+            CancellationToken cancellationToken = default)
+        {
+            var completion = new TaskCompletionSource<ChampionCatalogLoadResult>(
+                TaskCreationOptions.RunContinuationsAsynchronously);
+            _requests.Add(languageCode, completion);
+            return completion.Task.WaitAsync(cancellationToken);
+        }
+
+        public void Complete(string languageCode, ChampionCatalogLoadResult result) =>
+            _requests[languageCode].TrySetResult(result);
     }
 }

@@ -16,11 +16,6 @@ public sealed class LiveClientDataClient : IMatchSnapshotSource, IDisposable
 
     private static readonly JsonSerializerOptions ReadOptions = new(JsonSerializerDefaults.Web);
 
-    private static readonly JsonSerializerOptions DisplayOptions = new(JsonSerializerDefaults.Web)
-    {
-        WriteIndented = true
-    };
-
     private readonly HttpClient _httpClient;
     private readonly bool _ownsHttpClient;
     private readonly Func<bool> _isGameProcessRunning;
@@ -77,11 +72,7 @@ public sealed class LiveClientDataClient : IMatchSnapshotSource, IDisposable
         var match = LiveClientDataMapper.Map(data);
         var events = LiveClientDataMapper.MapEvents(data);
 
-        // Повторная сериализация нужна только для удобного отображения JSON в приложении.
-        using var document = JsonDocument.Parse(rawJson);
-        var displayJson = JsonSerializer.Serialize(document.RootElement, DisplayOptions);
-
-        return new MatchSnapshot(match, events, displayJson, DateTimeOffset.UtcNow);
+        return new MatchSnapshot(match, events, rawJson, DateTimeOffset.UtcNow);
     }
 
     /// <summary>

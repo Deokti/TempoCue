@@ -77,11 +77,12 @@ public sealed class DataDragonGamePatchCatalog : IGamePatchCatalog
         IReadOnlyList<GamePatchCatalogEntry> patches,
         CancellationToken cancellationToken)
     {
+        string? temporaryPath = null;
         try
         {
             Directory.CreateDirectory(_cacheDirectory);
             var cachePath = GetCachePath();
-            var temporaryPath = $"{cachePath}.{Guid.NewGuid():N}.tmp";
+            temporaryPath = $"{cachePath}.{Guid.NewGuid():N}.tmp";
             var cache = new DataDragonGamePatchCacheDto
             {
                 SavedAtUtc = DateTimeOffset.UtcNow,
@@ -105,6 +106,10 @@ public sealed class DataDragonGamePatchCatalog : IGamePatchCatalog
         catch (Exception exception) when (IsExpectedCacheFailure(exception))
         {
             // Список из сети пригоден для текущего запуска, даже если обновить кеш не удалось.
+        }
+        finally
+        {
+            DeleteTemporaryFile(temporaryPath);
         }
     }
 
@@ -140,6 +145,23 @@ public sealed class DataDragonGamePatchCatalog : IGamePatchCatalog
     }
 
     private string GetCachePath() => Path.Combine(_cacheDirectory, "patches.json");
+
+    private static void DeleteTemporaryFile(string? path)
+    {
+        if (path is null)
+        {
+            return;
+        }
+
+        try
+        {
+            File.Delete(path);
+        }
+        catch (Exception exception) when (IsExpectedCacheFailure(exception))
+        {
+            // Ошибка очистки временного кеша не должна скрывать исходный результат загрузки.
+        }
+    }
 
     private static string? NormalizePatch(string version)
     {

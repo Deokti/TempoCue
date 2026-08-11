@@ -216,8 +216,15 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
             return;
         }
 
-        var update = await _session.RefreshAsync(_sessionCancellation.Token);
-        ApplyUpdate(update);
+        try
+        {
+            var update = await _session.RefreshAsync(_sessionCancellation.Token);
+            ApplyUpdate(update);
+        }
+        catch (OperationCanceledException) when (_sessionCancellation.IsCancellationRequested)
+        {
+            // Закрытие экрана штатно отменяет ручное обновление вместе с фоновым циклом.
+        }
     }
 
     public void Dispose()
@@ -248,6 +255,11 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         }
         catch (Exception exception)
         {
+            if (_isDisposed)
+            {
+                return;
+            }
+
             Trace.TraceError(
                 "Цикл текущего матча завершился с ошибкой ({0}): {1}",
                 exception.GetType().Name,
@@ -261,6 +273,11 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
 
     private void ApplyUpdate(ActiveMatchUpdate update)
     {
+        if (_isDisposed)
+        {
+            return;
+        }
+
         _lastUpdate = update;
         Status = update.Status;
 
@@ -432,39 +449,38 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
 
     private void RenderParticipants(MatchState match)
     {
-        Allies.Clear();
-        Enemies.Clear();
-
         var activePlayer = match.GetActivePlayer();
         if (activePlayer is null || activePlayer.Team == TeamSide.Unknown)
         {
+            ClearIfNotEmpty(Allies);
+            ClearIfNotEmpty(Enemies);
             HasParticipants = false;
             OnPropertyChanged(nameof(ParticipantCount));
             return;
         }
 
-        foreach (var player in match.Players
-                     .Where(player => player.Team == activePlayer.Team)
-                     .Select(player => player with
-                     {
-                         Position = PlayerPositionResolver.Resolve(match, player)
-                     })
-                     .OrderBy(player => GetPositionOrder(player.Position)))
-        {
-            Allies.Add(CreateParticipant(player, activePlayer.ParticipantId));
-        }
+        var allies = match.Players
+            .Where(player => player.Team == activePlayer.Team)
+            .Select(player => player with
+            {
+                Position = PlayerPositionResolver.Resolve(match, player)
+            })
+            .OrderBy(player => GetPositionOrder(player.Position))
+            .Select(player => CreateParticipant(player, activePlayer.ParticipantId))
+            .ToArray();
+        var enemies = match.Players
+            .Where(player => player.Team != TeamSide.Unknown
+                && player.Team != activePlayer.Team)
+            .Select(player => player with
+            {
+                Position = PlayerPositionResolver.Resolve(match, player)
+            })
+            .OrderBy(player => GetPositionOrder(player.Position))
+            .Select(player => CreateParticipant(player, activePlayer.ParticipantId))
+            .ToArray();
 
-        foreach (var player in match.Players
-                     .Where(player => player.Team != TeamSide.Unknown
-                         && player.Team != activePlayer.Team)
-                     .Select(player => player with
-                     {
-                         Position = PlayerPositionResolver.Resolve(match, player)
-                     })
-                     .OrderBy(player => GetPositionOrder(player.Position)))
-        {
-            Enemies.Add(CreateParticipant(player, activePlayer.ParticipantId));
-        }
+        ReplaceItemsIfChanged(Allies, allies);
+        ReplaceItemsIfChanged(Enemies, enemies);
 
         HasParticipants = Allies.Count + Enemies.Count > 0;
         OnPropertyChanged(nameof(ParticipantCount));
@@ -505,14 +521,13 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
 
     private void RenderEvents(MatchState match, IReadOnlyList<MatchEvent> events)
     {
-        Events.Clear();
         var activePlayer = match.GetActivePlayer();
+        var renderedEvents = events
+            .OrderByDescending(item => item.GameTimeSeconds)
+            .Select(matchEvent => CreateEvent(match, activePlayer, matchEvent))
+            .ToArray();
 
-        foreach (var matchEvent in events.OrderByDescending(item => item.GameTimeSeconds))
-        {
-            Events.Add(CreateEvent(match, activePlayer, matchEvent));
-        }
-
+        ReplaceItemsIfChanged(Events, renderedEvents);
         HasEvents = Events.Count > 0;
     }
 
@@ -591,9 +606,9 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         AdviceSource = string.Empty;
         PowerStateLabel = _localization.Get("Power.Waiting");
         PowerState = null;
-        Allies.Clear();
-        Enemies.Clear();
-        Events.Clear();
+        ClearIfNotEmpty(Allies);
+        ClearIfNotEmpty(Enemies);
+        ClearIfNotEmpty(Events);
         HasParticipants = false;
         HasEvents = false;
         OnPropertyChanged(nameof(ParticipantCount));
@@ -618,6 +633,30 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         }
 
         StateUpdated?.Invoke(this, EventArgs.Empty);
+    }
+
+    private static void ReplaceItemsIfChanged<T>(
+        ObservableCollection<T> target,
+        IReadOnlyList<T> items)
+    {
+        if (target.Count == items.Count && target.SequenceEqual(items))
+        {
+            return;
+        }
+
+        target.Clear();
+        foreach (var item in items)
+        {
+            target.Add(item);
+        }
+    }
+
+    private static void ClearIfNotEmpty<T>(ObservableCollection<T> target)
+    {
+        if (target.Count > 0)
+        {
+            target.Clear();
+        }
     }
 
     private string GetPhaseLabel(PlayerState player, CoachAdvice? advice)

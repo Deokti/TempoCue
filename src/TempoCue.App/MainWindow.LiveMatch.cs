@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Media;
 using TempoCue.Application;
 
 namespace TempoCue.App;
@@ -52,7 +53,10 @@ public partial class MainWindow
                 : _localization.Get("Home.Engine.Waiting");
         HomeMatchNavBadgeTextBlock.Text = "—";
         HomeGameTimePanel.Visibility = Visibility.Collapsed;
-        ApplyShellConnectionColors("#1E2E45", "#8393A8", "#B5C5D8");
+        ApplyShellConnectionColors(
+            _waitingBadgeBackgroundBrush,
+            _waitingStatusDotBrush,
+            _waitingStatusTextBrush);
         UpdateTitleBarContext();
     }
 
@@ -64,7 +68,10 @@ public partial class MainWindow
         HomeMatchNavBadgeTextBlock.Text = "LIVE";
         HomeGameTimeTextBlock.Text = _currentMatchViewModel.GameTime;
         HomeGameTimePanel.Visibility = Visibility.Visible;
-        ApplyShellConnectionColors("#17342D", "#64D5A4", "#87E1BB");
+        ApplyShellConnectionColors(
+            _connectedBadgeBackgroundBrush,
+            _connectedStatusDotBrush,
+            _connectedStatusTextBrush);
         UpdateTitleBarContext(_currentMatchViewModel.GameTime);
     }
 
@@ -75,18 +82,21 @@ public partial class MainWindow
         HomeEngineStatusTextBlock.Text = _localization.Get("Home.Engine.Error");
         HomeMatchNavBadgeTextBlock.Text = "—";
         HomeGameTimePanel.Visibility = Visibility.Collapsed;
-        ApplyShellConnectionColors("#3A3020", "#E8BB58", "#F0CC7A");
+        ApplyShellConnectionColors(
+            _errorBadgeBackgroundBrush,
+            _errorStatusDotBrush,
+            _errorStatusTextBrush);
         UpdateTitleBarContext();
     }
 
     private void ApplyShellConnectionColors(
-        string badgeBackground,
-        string statusDot,
-        string statusText)
+        SolidColorBrush badgeBackground,
+        SolidColorBrush statusDot,
+        SolidColorBrush statusText)
     {
-        HomeConnectionBadgeBorder.Background = ToBrush(badgeBackground);
-        HomeConnectionDot.Fill = ToBrush(statusDot);
-        HomeEngineStatusDot.Fill = ToBrush(statusDot);
-        HomeConnectionTitleTextBlock.Foreground = ToBrush(statusText);
+        HomeConnectionBadgeBorder.Background = badgeBackground;
+        HomeConnectionDot.Fill = statusDot;
+        HomeEngineStatusDot.Fill = statusDot;
+        HomeConnectionTitleTextBlock.Foreground = statusText;
     }
 }

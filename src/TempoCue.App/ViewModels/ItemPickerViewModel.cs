@@ -13,6 +13,9 @@ public sealed class ItemPickerViewModel : ObservableObject
     private readonly IItemCatalog _itemCatalog;
     private readonly LocalizationService _localization;
     private IReadOnlyList<ItemOptionViewModel> _items = [];
+    private IReadOnlyList<ItemOptionViewModel> _filteredItems = [];
+    private IReadOnlyList<ItemOptionViewModel> _selectedItems = [];
+    private IReadOnlyList<ItemStatViewModel> _previewedItemStats = [];
     private IReadOnlyList<ItemCategoryOptionViewModel> _categoryOptions = [];
     private IReadOnlyList<ItemSortOptionViewModel> _sortOptions = [];
     private CatalogViewState _catalogState = CatalogViewState.NotLoaded;
@@ -20,6 +23,7 @@ public sealed class ItemPickerViewModel : ObservableObject
     private string _languageCode;
     private string? _loadedGamePatch;
     private string? _loadedLanguageCode;
+    private int _catalogRequestVersion;
     private ItemPickerTarget _target;
     private string _search = string.Empty;
     private ItemFilterCategory _selectedCategory = ItemFilterCategory.All;
@@ -44,34 +48,7 @@ public sealed class ItemPickerViewModel : ObservableObject
 
     public IReadOnlyList<ItemSortOptionViewModel> SortOptions => _sortOptions;
 
-    public IReadOnlyList<ItemOptionViewModel> FilteredItems
-    {
-        get
-        {
-            var normalizedSearch = Search.Trim();
-            var filtered = Items.Where(item =>
-                (normalizedSearch.Length == 0
-                 || item.DisplayName.Contains(
-                     normalizedSearch,
-                     StringComparison.CurrentCultureIgnoreCase))
-                && MatchesCategory(item, SelectedCategory));
-
-            return (SelectedSortOption?.Mode ?? ItemSortMode.Name) switch
-            {
-                ItemSortMode.PriceAscending => filtered
-                    .OrderBy(static item => item.Price)
-                    .ThenBy(static item => item.DisplayName, StringComparer.CurrentCultureIgnoreCase)
-                    .ToArray(),
-                ItemSortMode.PriceDescending => filtered
-                    .OrderByDescending(static item => item.Price)
-                    .ThenBy(static item => item.DisplayName, StringComparer.CurrentCultureIgnoreCase)
-                    .ToArray(),
-                _ => filtered
-                    .OrderBy(static item => item.DisplayName, StringComparer.CurrentCultureIgnoreCase)
-                    .ToArray()
-            };
-        }
-    }
+    public IReadOnlyList<ItemOptionViewModel> FilteredItems => _filteredItems;
 
     public CatalogViewState CatalogState
     {
@@ -168,6 +145,7 @@ public sealed class ItemPickerViewModel : ObservableObject
             }
 
             _previewedItem = value;
+            _previewedItemStats = value?.Stats.Select(CreateStatViewModel).ToArray() ?? [];
             OnPropertyChanged();
             OnPropertyChanged(nameof(HasPreviewedItem));
             OnPropertyChanged(nameof(PreviewedItemStats));
@@ -179,8 +157,7 @@ public sealed class ItemPickerViewModel : ObservableObject
 
     public bool HasPreviewedItem => PreviewedItem is not null;
 
-    public IReadOnlyList<ItemOptionViewModel> SelectedItems =>
-        Items.Where(static item => item.IsSelected).ToArray();
+    public IReadOnlyList<ItemOptionViewModel> SelectedItems => _selectedItems;
 
     public bool HasSelectedItems => SelectedItems.Count > 0;
 
@@ -192,8 +169,7 @@ public sealed class ItemPickerViewModel : ObservableObject
         "Coaching.MatchupEditor.Items.Picker.ConfirmMultiple",
         SelectedItems.Count);
 
-    public IReadOnlyList<ItemStatViewModel> PreviewedItemStats =>
-        PreviewedItem?.Stats.Select(CreateStatViewModel).ToArray() ?? [];
+    public IReadOnlyList<ItemStatViewModel> PreviewedItemStats => _previewedItemStats;
 
     public bool HasPreviewedItemStats => PreviewedItemStats.Count > 0;
 
@@ -250,6 +226,7 @@ public sealed class ItemPickerViewModel : ObservableObject
         _items = [];
         _loadedGamePatch = null;
         _loadedLanguageCode = null;
+        _catalogRequestVersion++;
         NotifyCatalogChanged();
         CatalogState = CatalogViewState.NotLoaded;
         NotifyLocalizedPresentationChanged();
@@ -267,6 +244,7 @@ public sealed class ItemPickerViewModel : ObservableObject
         }
 
         CatalogState = CatalogViewState.Loading;
+        var requestVersion = ++_catalogRequestVersion;
         var requestedPatch = _gamePatch;
         var requestedLanguage = _languageCode;
         var result = await _itemCatalog.LoadAsync(
@@ -274,10 +252,10 @@ public sealed class ItemPickerViewModel : ObservableObject
             requestedLanguage,
             cancellationToken);
 
-        if (!string.Equals(requestedPatch, _gamePatch, StringComparison.OrdinalIgnoreCase)
+        if (requestVersion != _catalogRequestVersion
+            || !string.Equals(requestedPatch, _gamePatch, StringComparison.OrdinalIgnoreCase)
             || !string.Equals(requestedLanguage, _languageCode, StringComparison.OrdinalIgnoreCase))
         {
-            CatalogState = CatalogViewState.NotLoaded;
             return;
         }
 
@@ -434,6 +412,7 @@ public sealed class ItemPickerViewModel : ObservableObject
 
     private void NotifyFilteredItemsChanged()
     {
+        _filteredItems = BuildFilteredItems();
         OnPropertyChanged(nameof(FilteredItems));
         OnPropertyChanged(nameof(HasResults));
         OnPropertyChanged(nameof(ResultCountText));
@@ -441,6 +420,7 @@ public sealed class ItemPickerViewModel : ObservableObject
 
     private void NotifyLocalizedPresentationChanged()
     {
+        _previewedItemStats = PreviewedItem?.Stats.Select(CreateStatViewModel).ToArray() ?? [];
         OnPropertyChanged(nameof(Title));
         OnPropertyChanged(nameof(Description));
         OnPropertyChanged(nameof(ResultCountText));
@@ -454,10 +434,37 @@ public sealed class ItemPickerViewModel : ObservableObject
 
     private void NotifySelectionChanged()
     {
+        _selectedItems = Items.Where(static item => item.IsSelected).ToArray();
         OnPropertyChanged(nameof(SelectedItems));
         OnPropertyChanged(nameof(HasSelectedItems));
         OnPropertyChanged(nameof(SelectedItemCountText));
         OnPropertyChanged(nameof(ConfirmSelectionText));
+    }
+
+    private IReadOnlyList<ItemOptionViewModel> BuildFilteredItems()
+    {
+        var normalizedSearch = Search.Trim();
+        var filtered = Items.Where(item =>
+            (normalizedSearch.Length == 0
+             || item.DisplayName.Contains(
+                 normalizedSearch,
+                 StringComparison.CurrentCultureIgnoreCase))
+            && MatchesCategory(item, SelectedCategory));
+
+        return (SelectedSortOption?.Mode ?? ItemSortMode.Name) switch
+        {
+            ItemSortMode.PriceAscending => filtered
+                .OrderBy(static item => item.Price)
+                .ThenBy(static item => item.DisplayName, StringComparer.CurrentCultureIgnoreCase)
+                .ToArray(),
+            ItemSortMode.PriceDescending => filtered
+                .OrderByDescending(static item => item.Price)
+                .ThenBy(static item => item.DisplayName, StringComparer.CurrentCultureIgnoreCase)
+                .ToArray(),
+            _ => filtered
+                .OrderBy(static item => item.DisplayName, StringComparer.CurrentCultureIgnoreCase)
+                .ToArray()
+        };
     }
 
     private ItemStatViewModel CreateStatViewModel(ItemStatEntry stat) => new(
