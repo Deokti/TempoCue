@@ -12,6 +12,7 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
 {
     private readonly LocalizationService _localization;
     private readonly IItemCatalog _itemCatalog;
+    private readonly CoachingPackDetailsContentFactory _contentFactory;
     private CancellationTokenSource? _itemCatalogLoadCancellation;
     private CoachingPackCardViewModel? _card;
     private IReadOnlyDictionary<int, ItemCatalogEntry> _items =
@@ -36,6 +37,7 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
     {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _itemCatalog = itemCatalog ?? throw new ArgumentNullException(nameof(itemCatalog));
+        _contentFactory = new CoachingPackDetailsContentFactory(localization);
         Export = new LeagueItemSetExportDialogViewModel(
             localization,
             buildLeagueItemSetExport ?? throw new ArgumentNullException(nameof(buildLeagueItemSetExport)));
@@ -244,10 +246,16 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
     public IReadOnlyList<CoachingPackItemBlockDetailsViewModel> ItemBlocks
     {
         get => _itemBlocks;
-        private set => SetProperty(ref _itemBlocks, value);
+        private set
+        {
+            if (SetProperty(ref _itemBlocks, value))
+            {
+                OnPropertyChanged(nameof(HasItemBlocks));
+            }
+        }
     }
 
-    public bool HasItemBlocks => Pack?.ItemBlocks.Count > 0;
+    public bool HasItemBlocks => ItemBlocks.Count > 0;
 
     public bool IsItemCatalogLoading
     {
@@ -478,49 +486,11 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
             return;
         }
 
-        Phases = Pack.Rules
-            .Select(rule => new CoachingPackPhaseDetailsViewModel(
-                rule.Id,
-                rule.Title,
-                rule.Message,
-                rule.WhyNow,
-                rule.NextGoal,
-                rule.PowerState,
-                GetPowerStateLabel(rule.PowerState),
-                GetLevelRange(rule.MinimumLevel, rule.MaximumLevel),
-                ResolveItems(rule.RecommendedItemIds)))
-            .ToArray();
-        var phasesById = Phases.ToDictionary(static phase => phase.Id, StringComparer.Ordinal);
-        PersistentTips = Pack.PersistentTips
-            .Select(tip => new CoachingPackPersistentTipDetailsViewModel(
-                tip.Title,
-                tip.Message,
-                tip.ApplicableRuleId is string ruleId && phasesById.TryGetValue(ruleId, out var phase)
-                    ? phase.Title
-                    : _localization.Get("Coaching.MatchupEditor.Persistent.Scope.WholeMatch")))
-            .ToArray();
-        ItemBlocks = Pack.ItemBlocks
-            .Select(block => new CoachingPackItemBlockDetailsViewModel(
-                block.Id,
-                block.Name,
-                string.IsNullOrWhiteSpace(block.WhenToChoose)
-                    ? _localization.Get("Coaching.Details.Items.NoHint")
-                    : block.WhenToChoose,
-                _localization.Plural("Count.Item", block.ItemIds.Count),
-                ResolveItems(block.ItemIds)))
-            .ToArray();
-        OnPropertyChanged(nameof(HasItemBlocks));
+        var content = _contentFactory.Create(Pack, _items);
+        Phases = content.Phases;
+        PersistentTips = content.PersistentTips;
+        ItemBlocks = content.ItemBlocks;
     }
-
-    private IReadOnlyList<CoachingPackItemDetailsViewModel> ResolveItems(
-        IEnumerable<int> itemIds) => itemIds
-        .Select(itemId => _items.TryGetValue(itemId, out var item)
-            ? new CoachingPackItemDetailsViewModel(item.Id, item.DisplayName, item.ImageUri)
-            : new CoachingPackItemDetailsViewModel(
-                itemId,
-                _localization.Format("Coaching.Details.Items.Unknown", itemId),
-                null))
-        .ToArray();
 
     private void Localization_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -574,20 +544,6 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
             SourceLinkMessage = _localization.Get("Coaching.Details.Source.OpenFailed");
         }
     }
-
-    private string GetPowerStateLabel(PowerState powerState) => _localization.Get(powerState switch
-    {
-        PowerState.Dangerous => "Coaching.Power.Dangerous",
-        PowerState.Cautious => "Coaching.Power.Cautious",
-        PowerState.Playable => "Coaching.Power.Playable",
-        PowerState.Favorable => "Coaching.Power.Favorable",
-        _ => throw new ArgumentOutOfRangeException(nameof(powerState))
-    });
-
-    private string GetLevelRange(int minimumLevel, int? maximumLevel) =>
-        maximumLevel is int upperBound
-            ? _localization.Format("Coaching.Rule.LevelRange", minimumLevel, upperBound)
-            : _localization.Format("Coaching.Rule.LevelFrom", minimumLevel);
 
     private string GetRoleLabel(string? role) => string.IsNullOrWhiteSpace(role)
         ? _localization.Get("Coaching.Library.Role.Any")

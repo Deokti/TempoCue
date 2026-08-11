@@ -43,3 +43,9 @@ public sealed record CoachingPackItemBlockDetailsViewModel(
 {
     public bool HasItems => Items.Count > 0;
 }
+
+/// <summary>Полный локализованный снимок содержимого Coach Pack для режима чтения.</summary>
+internal sealed record CoachingPackDetailsContent(
+    IReadOnlyList<CoachingPackPhaseDetailsViewModel> Phases,
+    IReadOnlyList<CoachingPackPersistentTipDetailsViewModel> PersistentTips,
+    IReadOnlyList<CoachingPackItemBlockDetailsViewModel> ItemBlocks);
