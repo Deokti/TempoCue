@@ -19,6 +19,7 @@ public sealed class CurrentMatchViewModelLifecycleTests
             new TestMatchAdviceSelector());
         var viewModel = new CurrentMatchViewModel(
             monitor,
+            TestChampionCatalog.Ready(),
             LocalizationService.Instance);
         var completedUpdates = 0;
         viewModel.StateUpdated += (_, _) => completedUpdates++;

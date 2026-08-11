@@ -45,7 +45,10 @@ public sealed class HomeViewModelTests
             var snapshot = new MatchSnapshot(match, [], "{}", DateTimeOffset.UtcNow);
             using var monitor = CurrentMatchViewModelTestData.CreateMonitor(
                 TestMatchSnapshotSource.FromSnapshot(snapshot));
-            using var currentMatch = new CurrentMatchViewModel(monitor, localization);
+            using var currentMatch = new CurrentMatchViewModel(
+                monitor,
+                TestChampionCatalog.Ready(),
+                localization);
             using var home = new HomeViewModel(currentMatch, localization);
 
             await home.RefreshAsync();
@@ -56,6 +59,9 @@ public sealed class HomeViewModelTests
             Assert.Contains("2 игрока", home.HeroDescription);
             Assert.Equal("подключено", home.LiveDataValue);
             Assert.Equal("идёт", home.MatchStatusValue);
+
+            home.SetCoachPackCount(3);
+            Assert.Equal("3", home.CoachPackCountValue);
         }
         finally
         {

@@ -88,6 +88,7 @@ public sealed class CurrentMatchViewModelEfficiencyTests
         using var monitor = CreateMonitor(source);
         using var viewModel = new CurrentMatchViewModel(
             monitor,
+            TestChampionCatalog.Ready(),
             LocalizationService.Instance);
 
         await viewModel.RefreshAsync();

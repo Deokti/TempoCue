@@ -15,21 +15,29 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
     private const int BlackCleaverItemId = 3071;
 
     private readonly IActiveMatchMonitor _monitor;
+    private readonly IChampionCatalog _championCatalog;
     private readonly LocalizationService _localization;
 
     private ActiveMatchUpdate? _lastUpdate;
+    private IReadOnlyDictionary<string, Uri> _championImages =
+        new Dictionary<string, Uri>(StringComparer.OrdinalIgnoreCase);
+    private CancellationTokenSource? _championCatalogLoadCancellation;
+    private int _championCatalogLoadVersion;
+    private bool _isChampionCatalogLoaded;
     private MatchSnapshotReadStatus _status = MatchSnapshotReadStatus.NoActiveMatch;
     private string _connectionTitle = string.Empty;
     private string _connectionDetails = string.Empty;
     private string _gameTime = "00:00";
     private string _activeChampion = "—";
     private string _activeChampionInitials = "—";
+    private Uri? _activeChampionImageUri;
     private string _activeSummary = "—";
     private string _activePosition = "—";
     private string _activeKda = "0/0/0";
     private string _activeCreepScore = "0 CS";
     private string _opponentChampion = "—";
     private string _opponentChampionInitials = "—";
+    private Uri? _opponentChampionImageUri;
     private string _matchupPhase = "—";
     private string _adviceTitle = string.Empty;
     private string _adviceMessage = string.Empty;
@@ -43,9 +51,11 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
 
     public CurrentMatchViewModel(
         IActiveMatchMonitor monitor,
+        IChampionCatalog championCatalog,
         LocalizationService localization)
     {
         _monitor = monitor ?? throw new ArgumentNullException(nameof(monitor));
+        _championCatalog = championCatalog ?? throw new ArgumentNullException(nameof(championCatalog));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _monitor.Updated += Monitor_Updated;
         _localization.PropertyChanged += Localization_PropertyChanged;
@@ -105,6 +115,12 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         private set => SetProperty(ref _activeChampionInitials, value);
     }
 
+    public Uri? ActiveChampionImageUri
+    {
+        get => _activeChampionImageUri;
+        private set => SetProperty(ref _activeChampionImageUri, value);
+    }
+
     public string ActiveSummary
     {
         get => _activeSummary;
@@ -139,6 +155,12 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
     {
         get => _opponentChampionInitials;
         private set => SetProperty(ref _opponentChampionInitials, value);
+    }
+
+    public Uri? OpponentChampionImageUri
+    {
+        get => _opponentChampionImageUri;
+        private set => SetProperty(ref _opponentChampionImageUri, value);
     }
 
     public string MatchupPhase
@@ -203,6 +225,54 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         return _monitor.RefreshAsync();
     }
 
+    /// <summary>
+    /// Один раз загружает каталог портретов. При недоступности Data Dragon экран
+    /// продолжает показывать инициалы и может повторить загрузку позднее.
+    /// </summary>
+    public async Task LoadChampionImagesAsync(CancellationToken cancellationToken = default)
+    {
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
+        if (_isChampionCatalogLoaded)
+        {
+            return;
+        }
+
+        var version = Interlocked.Increment(ref _championCatalogLoadVersion);
+        var requestCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        var previousCancellation = Interlocked.Exchange(
+            ref _championCatalogLoadCancellation,
+            requestCancellation);
+        TryCancel(previousCancellation);
+
+        try
+        {
+            var result = await _championCatalog.LoadAsync(
+                _localization.CurrentLanguageCode,
+                requestCancellation.Token);
+            if (_isDisposed || version != Volatile.Read(ref _championCatalogLoadVersion))
+            {
+                return;
+            }
+
+            _championImages = BuildChampionImageLookup(result.Champions);
+            _isChampionCatalogLoaded = result.IsAvailable;
+            RerenderLastUpdate();
+        }
+        catch (OperationCanceledException) when (
+            !cancellationToken.IsCancellationRequested
+            && requestCancellation.IsCancellationRequested)
+        {
+        }
+        finally
+        {
+            Interlocked.CompareExchange(
+                ref _championCatalogLoadCancellation,
+                null,
+                requestCancellation);
+            requestCancellation.Dispose();
+        }
+    }
+
     public void Dispose()
     {
         if (_isDisposed)
@@ -211,6 +281,8 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         }
 
         _isDisposed = true;
+        Interlocked.Increment(ref _championCatalogLoadVersion);
+        TryCancel(Interlocked.Exchange(ref _championCatalogLoadCancellation, null));
         _monitor.Updated -= Monitor_Updated;
         _localization.PropertyChanged -= Localization_PropertyChanged;
     }
@@ -259,6 +331,7 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         {
             ActiveChampion = activePlayer.ChampionName;
             ActiveChampionInitials = GetInitials(activePlayer.ChampionName);
+            ActiveChampionImageUri = FindChampionImage(activePlayer.ChampionName);
             ActiveSummary = _localization.Format(
                 "Current.Player.Level",
                 activePlayer.ChampionName,
@@ -278,11 +351,13 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         {
             OpponentChampion = matchup.Opponent.ChampionName;
             OpponentChampionInitials = GetInitials(matchup.Opponent.ChampionName);
+            OpponentChampionImageUri = FindChampionImage(matchup.Opponent.ChampionName);
         }
         else
         {
             OpponentChampion = "—";
             OpponentChampionInitials = "—";
+            OpponentChampionImageUri = null;
         }
 
         RenderAdvice(selection, activePlayer);
@@ -458,6 +533,7 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         return new ParticipantViewModel(
             GetPositionCode(player.Position),
             GetInitials(player.ChampionName),
+            FindChampionImage(player.ChampionName),
             player.ChampionName,
             details,
             $"{player.Kills}/{player.Deaths}/{player.Assists}",
@@ -540,12 +616,14 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         GameTime = "00:00";
         ActiveChampion = "—";
         ActiveChampionInitials = "—";
+        ActiveChampionImageUri = null;
         ActiveSummary = _localization.Get("Current.Player.Waiting");
         ActivePosition = "—";
         ActiveKda = "0/0/0";
         ActiveCreepScore = "0 CS";
         OpponentChampion = "—";
         OpponentChampionInitials = "—";
+        OpponentChampionImageUri = null;
         MatchupPhase = "—";
         AdviceTitle = _localization.Get("Advice.Waiting.Title");
         AdviceMessage = _localization.Get("Advice.Waiting.Message");
@@ -625,6 +703,7 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
     {
         ActiveChampion = "—";
         ActiveChampionInitials = "—";
+        ActiveChampionImageUri = null;
         ActiveSummary = _localization.Get("Current.Player.Waiting");
         ActivePosition = "—";
         ActiveKda = "0/0/0";
@@ -684,6 +763,53 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         return letters.Length == 0
             ? "—"
             : new string(letters).ToUpperInvariant();
+    }
+
+    private Uri? FindChampionImage(string championName) =>
+        _championImages.GetValueOrDefault(NormalizeChampionKey(championName));
+
+    private static IReadOnlyDictionary<string, Uri> BuildChampionImageLookup(
+        IReadOnlyList<ChampionCatalogEntry> champions)
+    {
+        var images = new Dictionary<string, Uri>(StringComparer.OrdinalIgnoreCase);
+        foreach (var champion in champions)
+        {
+            images.TryAdd(NormalizeChampionKey(champion.Id), champion.ImageUri);
+            images.TryAdd(NormalizeChampionKey(champion.DisplayName), champion.ImageUri);
+        }
+
+        return images;
+    }
+
+    private static string NormalizeChampionKey(string value) =>
+        string.Concat(value.Where(char.IsLetterOrDigit)).ToUpperInvariant();
+
+    private void RerenderLastUpdate()
+    {
+        if (_lastUpdate?.Snapshot is not { } snapshot)
+        {
+            return;
+        }
+
+        RenderSnapshot(snapshot, _lastUpdate.CoachPackSelection);
+        StateUpdated?.Invoke(this, EventArgs.Empty);
+    }
+
+    private static void TryCancel(CancellationTokenSource? cancellation)
+    {
+        if (cancellation is null)
+        {
+            return;
+        }
+
+        try
+        {
+            cancellation.Cancel();
+        }
+        catch (ObjectDisposedException)
+        {
+            // Завершившийся запрос мог освободить свой CTS одновременно с новой загрузкой.
+        }
     }
 
     private static string FormatTime(double seconds)

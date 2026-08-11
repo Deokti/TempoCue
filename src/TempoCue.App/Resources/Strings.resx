@@ -130,21 +130,21 @@
   <data name="Home.Readiness.Title" xml:space="preserve"><value>System readiness</value></data>
   <data name="Home.Readiness.Refresh" xml:space="preserve"><value>Data refresh</value></data>
   <data name="Home.Readiness.Match" xml:space="preserve"><value>Active match</value></data>
+  <data name="Home.Readiness.CoachPacks" xml:space="preserve"><value>Coach Packs</value></data>
   <data name="Home.Readiness.Hint" xml:space="preserve"><value>No action is required: the local endpoint is checked every second.</value></data>
   <data name="Home.Status.Waiting" xml:space="preserve"><value>waiting</value></data>
   <data name="Home.Status.Connected" xml:space="preserve"><value>connected</value></data>
   <data name="Home.Status.Error" xml:space="preserve"><value>error</value></data>
   <data name="Home.Status.NotFound" xml:space="preserve"><value>not found</value></data>
   <data name="Home.Status.Active" xml:space="preserve"><value>active</value></data>
-  <data name="Home.Pack.Title" xml:space="preserve"><value>Active Coach Pack</value></data>
-  <data name="Home.Pack.Rules" xml:space="preserve"><value>3 matchup phases are loaded</value></data>
-  <data name="Home.Pack.PatchWarning" xml:space="preserve"><value>Requires verification on the current patch</value></data>
-  <data name="Home.Pack.Test" xml:space="preserve"><value>Open current match</value></data>
+  <data name="Home.History.Title" xml:space="preserve"><value>Match history</value></data>
+  <data name="Home.History.Development" xml:space="preserve"><value>In development</value></data>
+  <data name="Home.History.Description" xml:space="preserve"><value>Recent matches and coaching results will appear here.</value></data>
   <data name="Home.Available.Title" xml:space="preserve"><value>Available now</value></data>
   <data name="Home.Available.LiveData" xml:space="preserve"><value>Live Client Data connection</value></data>
   <data name="Home.Available.Participants" xml:space="preserve"><value>All match participants</value></data>
   <data name="Home.Available.Matchup" xml:space="preserve"><value>Lane matchup detection</value></data>
-  <data name="Home.Available.Advice" xml:space="preserve"><value>Urgot vs Sett advice</value></data>
+  <data name="Home.Available.Advice" xml:space="preserve"><value>Advice from local Coach Packs</value></data>
   <data name="Home.Available.Json" xml:space="preserve"><value>Raw match JSON</value></data>
   <data name="Home.Available.Future" xml:space="preserve"><value>Map analysis, history, reports, and overlay will be added in later versions.</value></data>
   <data name="Current.Status.Connected" xml:space="preserve"><value>MATCH DATA RECEIVED</value></data>

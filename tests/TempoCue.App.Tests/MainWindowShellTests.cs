@@ -44,6 +44,17 @@ public sealed class MainWindowShellTests
         Assert.NotNull(homeNavigationIcon.Data);
         Assert.IsType<StreamGeometry>(window.FindResource("Icon.NavHome"));
 
+        var homePage = WpfTestHost.Find<HomeView>(window, "HomeContentPage");
+        context.Home.SetCoachPackCount(3);
+        WpfTestHost.Pump();
+        Assert.Equal(
+            "3",
+            WpfTestHost.Find<TextBlock>(homePage, "CoachPackCountTextBlock").Text);
+        Assert.Equal(
+            "В разработке",
+            WpfTestHost.Find<TextBlock>(homePage, "HistoryDevelopmentTextBlock").Text);
+        CoachingViewTestContext.SaveVisualSnapshotIfRequested(window, "home.png");
+
         var currentMatchPage = WpfTestHost.Find<CurrentMatchView>(
             window,
             "CurrentMatchContentPage");

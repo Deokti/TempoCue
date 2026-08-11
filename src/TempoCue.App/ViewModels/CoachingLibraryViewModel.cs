@@ -86,6 +86,8 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
 
     public bool HasMyPackCards => MyPackCards.Count > 0;
 
+    public int TotalPackCount => _allCards.Count;
+
     public string LibrarySummary
     {
         get => _librarySummary;
@@ -309,6 +311,7 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
                 _champions)))
             .ToArray();
         _allCards = cards;
+        OnPropertyChanged(nameof(TotalPackCount));
         LibrarySummary = string.Join(
             " · ",
             _localization.Plural("Count.CoachPack", cards.Length),

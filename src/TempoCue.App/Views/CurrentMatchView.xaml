@@ -268,9 +268,14 @@
                         </Grid.ColumnDefinitions>
                         <Border Width="42" Height="42" Background="#162A43"
                                 BorderBrush="#29435F" BorderThickness="1" CornerRadius="8">
-                            <TextBlock Text="{Binding ActiveChampionInitials}"
-                                       Foreground="#6FC4EF" FontSize="10" FontWeight="Bold"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <Grid>
+                                <TextBlock Text="{Binding ActiveChampionInitials}"
+                                           Foreground="#6FC4EF" FontSize="10" FontWeight="Bold"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <Image Source="{Binding ActiveChampionImageUri}"
+                                       Stretch="UniformToFill"
+                                       SnapsToDevicePixels="True" />
+                            </Grid>
                         </Border>
                         <StackPanel Grid.Column="1" Margin="12,1,0,0">
                             <TextBlock Text="{Binding ActiveSummary}"
@@ -289,9 +294,14 @@
                         <Border Grid.Column="6" Width="34" Height="34" Background="#18253A"
                                 BorderBrush="#29405E" BorderThickness="1" CornerRadius="7"
                                 VerticalAlignment="Center">
-                            <TextBlock Text="{Binding OpponentChampionInitials}"
-                                       Foreground="#A9BAD0" FontSize="9" FontWeight="Bold"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <Grid>
+                                <TextBlock Text="{Binding OpponentChampionInitials}"
+                                           Foreground="#A9BAD0" FontSize="9" FontWeight="Bold"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <Image Source="{Binding OpponentChampionImageUri}"
+                                       Stretch="UniformToFill"
+                                       SnapsToDevicePixels="True" />
+                            </Grid>
                         </Border>
                         <StackPanel Grid.Column="7" Margin="11,0,0,0" VerticalAlignment="Center">
                             <TextBlock Foreground="#F4F7FB" FontSize="14" FontWeight="SemiBold">
@@ -438,9 +448,14 @@
                                                                    FontSize="10" VerticalAlignment="Center" />
                                                         <Border Grid.Column="1" Width="30" Height="30" Background="#15263D"
                                                                 BorderBrush="#29405E" BorderThickness="1" CornerRadius="6">
-                                                            <TextBlock Text="{Binding ChampionInitials}" Foreground="#7CC6EE"
-                                                                       FontSize="8" FontWeight="Bold"
-                                                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                            <Grid>
+                                                                <TextBlock Text="{Binding ChampionInitials, Mode=OneTime}" Foreground="#7CC6EE"
+                                                                           FontSize="8" FontWeight="Bold"
+                                                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                                <Image Source="{Binding ChampionImageUri, Mode=OneTime}"
+                                                                       Stretch="UniformToFill"
+                                                                       SnapsToDevicePixels="True" />
+                                                            </Grid>
                                                         </Border>
                                                         <StackPanel Grid.Column="2" Margin="9,0,0,0">
                                                             <TextBlock Text="{Binding ChampionName}" Foreground="#F4F7FB"
@@ -480,9 +495,14 @@
                                                                    FontSize="10" VerticalAlignment="Center" />
                                                         <Border Grid.Column="1" Width="30" Height="30" Background="#192238"
                                                                 BorderBrush="#3A354B" BorderThickness="1" CornerRadius="6">
-                                                            <TextBlock Text="{Binding ChampionInitials}" Foreground="#C1A7B5"
-                                                                       FontSize="8" FontWeight="Bold"
-                                                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                            <Grid>
+                                                                <TextBlock Text="{Binding ChampionInitials, Mode=OneTime}" Foreground="#C1A7B5"
+                                                                           FontSize="8" FontWeight="Bold"
+                                                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                                <Image Source="{Binding ChampionImageUri, Mode=OneTime}"
+                                                                       Stretch="UniformToFill"
+                                                                       SnapsToDevicePixels="True" />
+                                                            </Grid>
                                                         </Border>
                                                         <StackPanel Grid.Column="2" Margin="9,0,0,0">
                                                             <TextBlock Text="{Binding ChampionName}" Foreground="#F4F7FB"

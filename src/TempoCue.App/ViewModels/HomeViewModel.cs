@@ -18,6 +18,7 @@ public sealed class HomeViewModel : ObservableObject, IDisposable
     private string _heroDescription = string.Empty;
     private string _liveDataValue = string.Empty;
     private string _matchStatusValue = string.Empty;
+    private string _coachPackCountValue = "—";
     private bool _isDisposed;
 
     public HomeViewModel(
@@ -61,7 +62,20 @@ public sealed class HomeViewModel : ObservableObject, IDisposable
         private set => SetProperty(ref _matchStatusValue, value);
     }
 
+    public string CoachPackCountValue
+    {
+        get => _coachPackCountValue;
+        private set => SetProperty(ref _coachPackCountValue, value);
+    }
+
     public Task RefreshAsync() => _currentMatch.RefreshAsync();
+
+    /// <summary>Обновляет число реально загруженных наборов после чтения библиотеки.</summary>
+    public void SetCoachPackCount(int count)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(count);
+        CoachPackCountValue = count.ToString();
+    }
 
     public void Dispose()
     {

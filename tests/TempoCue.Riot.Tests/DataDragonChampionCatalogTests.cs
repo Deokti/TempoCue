@@ -40,10 +40,10 @@ public sealed class DataDragonChampionCatalogTests
             Assert.Equal(ChampionCatalogSource.Network, onlineResult.Source);
             Assert.Equal(ChampionCatalogSource.Network, repeatedOnlineResult.Source);
             Assert.Single(requestedPaths, path => path == "/api/versions.json");
-            Assert.Equal(
-                2,
-                requestedPaths.Count(path =>
-                    path == "/cdn/26.15.1/data/ru_RU/champion.json"));
+            Assert.Single(
+                requestedPaths,
+                path => path == "/cdn/26.15.1/data/ru_RU/champion.json");
+            Assert.Same(onlineResult, repeatedOnlineResult);
             Assert.Equal(["Aatrox", "Urgot"], onlineResult.Champions.Select(x => x.Id));
             Assert.Equal("Ургот", onlineResult.Champions[1].DisplayName);
             Assert.Equal(6, onlineResult.Champions[1].NumericId);

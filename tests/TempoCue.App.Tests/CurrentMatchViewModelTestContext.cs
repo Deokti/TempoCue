@@ -30,12 +30,16 @@ internal sealed class CurrentMatchViewModelTestContext : IDisposable
 
     public CurrentMatchViewModel CreateViewModel(
         MatchSnapshotReadResult result,
-        IMatchAdviceSelector adviceSelector)
+        IMatchAdviceSelector adviceSelector,
+        IChampionCatalog? championCatalog = null)
     {
         var monitor = CurrentMatchViewModelTestData.CreateMonitor(
             TestMatchSnapshotSource.FromResult(result),
             adviceSelector);
-        var viewModel = new CurrentMatchViewModel(monitor, Localization);
+        var viewModel = new CurrentMatchViewModel(
+            monitor,
+            championCatalog ?? TestChampionCatalog.Ready(),
+            Localization);
         _monitors.Add(monitor);
         _viewModels.Add(viewModel);
         return viewModel;

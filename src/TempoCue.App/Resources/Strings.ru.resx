@@ -138,21 +138,21 @@
   <data name="Home.Readiness.Title" xml:space="preserve"><value>Готовность системы</value></data>
   <data name="Home.Readiness.Refresh" xml:space="preserve"><value>Обновление данных</value></data>
   <data name="Home.Readiness.Match" xml:space="preserve"><value>Активный матч</value></data>
+  <data name="Home.Readiness.CoachPacks" xml:space="preserve"><value>Наборы советов</value></data>
   <data name="Home.Readiness.Hint" xml:space="preserve"><value>Ничего нажимать не нужно: локальный адрес проверяется каждую секунду.</value></data>
   <data name="Home.Status.Waiting" xml:space="preserve"><value>ожидание</value></data>
   <data name="Home.Status.Connected" xml:space="preserve"><value>подключено</value></data>
   <data name="Home.Status.Error" xml:space="preserve"><value>ошибка</value></data>
   <data name="Home.Status.NotFound" xml:space="preserve"><value>не найден</value></data>
   <data name="Home.Status.Active" xml:space="preserve"><value>идёт</value></data>
-  <data name="Home.Pack.Title" xml:space="preserve"><value>Активный набор советов</value></data>
-  <data name="Home.Pack.Rules" xml:space="preserve"><value>Загружены 3 фазы матчапа</value></data>
-  <data name="Home.Pack.PatchWarning" xml:space="preserve"><value>Требует проверки на актуальном патче</value></data>
-  <data name="Home.Pack.Test" xml:space="preserve"><value>Открыть текущий матч</value></data>
+  <data name="Home.History.Title" xml:space="preserve"><value>История матчей</value></data>
+  <data name="Home.History.Development" xml:space="preserve"><value>В разработке</value></data>
+  <data name="Home.History.Description" xml:space="preserve"><value>Здесь появятся последние матчи и результаты работы коучинга.</value></data>
   <data name="Home.Available.Title" xml:space="preserve"><value>Что работает сейчас</value></data>
   <data name="Home.Available.LiveData" xml:space="preserve"><value>Подключение к Live Client Data</value></data>
   <data name="Home.Available.Participants" xml:space="preserve"><value>Все участники матча</value></data>
   <data name="Home.Available.Matchup" xml:space="preserve"><value>Определение матчапа на линии</value></data>
-  <data name="Home.Available.Advice" xml:space="preserve"><value>Советы Urgot против Sett</value></data>
+  <data name="Home.Available.Advice" xml:space="preserve"><value>Советы из локальной библиотеки</value></data>
   <data name="Home.Available.Json" xml:space="preserve"><value>Исходный JSON матча</value></data>
   <data name="Home.Available.Future" xml:space="preserve"><value>Анализ карты, история, отчёты и оверлей появятся в следующих версиях.</value></data>
   <data name="Current.Status.Connected" xml:space="preserve"><value>ДАННЫЕ МАТЧА ПОЛУЧЕНЫ</value></data>

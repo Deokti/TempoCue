@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using TempoCue.App.Localization;
@@ -25,6 +26,7 @@ public partial class App : System.Windows.Application
     private HomeViewModel? _homeViewModel;
     private SettingsViewModel? _settingsViewModel;
     private CoachingViewModel? _coachingViewModel;
+    private readonly CancellationTokenSource _lifetimeCancellation = new();
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -56,22 +58,6 @@ public partial class App : System.Windows.Application
             builtInPacks,
             loadCoachPackLibrary);
 
-        // Инфраструктура матча создаётся здесь, чтобы View и ViewModel не конструировали HTTP-клиенты.
-        _liveClientDataClient = new LiveClientDataClient();
-        var activeMatchSession = new ActiveMatchSession(
-            _liveClientDataClient,
-            activeCoachPackSelector,
-            TimeSpan.FromSeconds(1));
-        _activeMatchMonitor = new ActiveMatchMonitor(activeMatchSession);
-        _currentMatchViewModel = new CurrentMatchViewModel(
-            _activeMatchMonitor,
-            LocalizationService.Instance);
-        _homeViewModel = new HomeViewModel(
-            _currentMatchViewModel,
-            LocalizationService.Instance);
-        _settingsViewModel = new SettingsViewModel(
-            LocalizationService.Instance,
-            settingsService);
         // Каталоги Data Dragon используют общий локальный кэш патчей и чемпионов.
         var dataDragonCacheDirectory = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -88,6 +74,26 @@ public partial class App : System.Windows.Application
         _itemCatalog = new DataDragonItemCatalog(
             _dataDragonClient,
             dataDragonCacheDirectory);
+
+        // Инфраструктура матча создаётся здесь, чтобы View и ViewModel не конструировали HTTP-клиенты.
+        _liveClientDataClient = new LiveClientDataClient();
+        var activeMatchSession = new ActiveMatchSession(
+            _liveClientDataClient,
+            activeCoachPackSelector,
+            TimeSpan.FromSeconds(1));
+        _activeMatchMonitor = new ActiveMatchMonitor(activeMatchSession);
+        var currentMatchViewModel = new CurrentMatchViewModel(
+            _activeMatchMonitor,
+            _championCatalog,
+            LocalizationService.Instance);
+        _currentMatchViewModel = currentMatchViewModel;
+        var homeViewModel = new HomeViewModel(
+            currentMatchViewModel,
+            LocalizationService.Instance);
+        _homeViewModel = homeViewModel;
+        _settingsViewModel = new SettingsViewModel(
+            LocalizationService.Instance,
+            settingsService);
         var coachingLibraryViewModel = new CoachingLibraryViewModel(
             builtInPacks,
             LocalizationService.Instance,
@@ -96,7 +102,10 @@ public partial class App : System.Windows.Application
             setCoachPackState,
             deleteCoachPack);
         coachingLibraryViewModel.LibraryChanged += (_, _) =>
+        {
             activeCoachPackSelector.Invalidate();
+            homeViewModel.SetCoachPackCount(coachingLibraryViewModel.TotalPackCount);
+        };
         var buildLeagueItemSetExport = new BuildLeagueItemSetExportUseCase(
             _championCatalog,
             _itemCatalog);
@@ -129,6 +138,32 @@ public partial class App : System.Windows.Application
             _coachingViewModel);
         MainWindow.Show();
         _activeMatchMonitor.Start();
+        _ = InitializeScreenDataAsync(
+            coachingLibraryViewModel,
+            currentMatchViewModel,
+            _lifetimeCancellation.Token);
+    }
+
+    private static async Task InitializeScreenDataAsync(
+        CoachingLibraryViewModel coachingLibrary,
+        CurrentMatchViewModel currentMatch,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await Task.WhenAll(
+                coachingLibrary.EnsureLoadedAsync(cancellationToken),
+                currentMatch.LoadChampionImagesAsync(cancellationToken));
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+        }
+        catch (Exception exception)
+        {
+            // Ошибка фоновой подготовки не должна закрывать окно: каждый экран сохраняет
+            // безопасное состояние без каталога, а причина остаётся доступна в диагностике.
+            Trace.TraceError($"Не удалось подготовить данные экранов: {exception}");
+        }
     }
 
     private static IReadOnlyList<CoachPack> LoadBuiltInCoachPacks()
@@ -156,6 +191,7 @@ public partial class App : System.Windows.Application
     // Освобождение выполняется в обратном порядке владения долгоживущими объектами.
     protected override void OnExit(ExitEventArgs e)
     {
+        _lifetimeCancellation.Cancel();
         _coachingViewModel?.Dispose();
         _settingsViewModel?.Dispose();
         _homeViewModel?.Dispose();

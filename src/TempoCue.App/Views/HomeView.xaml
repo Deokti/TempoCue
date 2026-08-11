@@ -65,7 +65,7 @@
             </Grid>
         </Border>
 
-        <!-- Три информационные карточки: система, активный набор и доступные возможности. -->
+        <!-- Три информационные карточки: система, будущая история и доступные возможности. -->
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1.2*" />
@@ -148,8 +148,10 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Coach Pack" Foreground="#F4F7FB" FontSize="14" />
-                        <TextBlock Grid.Column="1" Text="1"
+                        <TextBlock Text="{localization:Loc Home.Readiness.CoachPacks}"
+                                   Foreground="#F4F7FB" FontSize="14" />
+                        <TextBlock x:Name="CoachPackCountTextBlock"
+                                   Grid.Column="1" Text="{Binding CoachPackCountValue}"
                                    Foreground="#67CDA4" FontSize="13" />
                     </Grid>
                     <Border Height="1" Background="#162235" Margin="0,16,0,14" />
@@ -160,38 +162,46 @@
             </Border>
 
             <Border Grid.Column="2" Style="{StaticResource ShellCard}">
-                <StackPanel>
-                    <TextBlock Text="{localization:Loc Home.Pack.Title}"
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="{localization:Loc Home.History.Title}"
                                Foreground="#91A4BD" FontSize="13"
                                FontWeight="SemiBold" />
-                    <StackPanel Orientation="Horizontal" Margin="0,18,0,10">
-                        <Border Width="42" Height="42" Background="#14253C"
-                                BorderBrush="#29435F" BorderThickness="1"
-                                CornerRadius="8">
-                            <TextBlock Text="URG" Foreground="#6FC4EF"
-                                       FontSize="10" FontWeight="Bold"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <StackPanel Grid.Row="1"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                MaxWidth="250">
+                        <Border Width="48" Height="48"
+                                HorizontalAlignment="Center"
+                                Background="#14253C"
+                                BorderBrush="#29435F"
+                                BorderThickness="1"
+                                CornerRadius="10">
+                            <Path Width="22" Height="22"
+                                  Data="{StaticResource Icon.NavHistory}"
+                                  Style="{StaticResource TempoIcon}"
+                                  Stroke="#6FC4EF"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center" />
                         </Border>
-                        <StackPanel Margin="12,1,0,0">
-                            <TextBlock Text="Urgot vs Sett"
-                                       Foreground="#ECF3FA" FontSize="14"
-                                       FontWeight="SemiBold" />
-                            <TextBlock Text="TOP · GoliathGames"
-                                       Style="{StaticResource ShellCaption}"
-                                       Margin="0,5,0,0" />
-                        </StackPanel>
+                        <TextBlock x:Name="HistoryDevelopmentTextBlock"
+                                   Text="{localization:Loc Home.History.Development}"
+                                   Foreground="#ECF3FA"
+                                   FontSize="15"
+                                   FontWeight="SemiBold"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,14,0,0" />
+                        <TextBlock Text="{localization:Loc Home.History.Description}"
+                                   Style="{StaticResource ShellCaption}"
+                                   TextWrapping="Wrap"
+                                   TextAlignment="Center"
+                                   LineHeight="18"
+                                   Margin="0,8,0,0" />
                     </StackPanel>
-                    <TextBlock Text="{localization:Loc Home.Pack.Rules}"
-                               Foreground="#AABAD0" FontSize="12" />
-                    <TextBlock Text="{localization:Loc Home.Pack.PatchWarning}"
-                               Foreground="#D7B965" FontSize="11"
-                               TextWrapping="Wrap" Margin="0,9,0,0" />
-                    <Button Content="{localization:Loc Home.Pack.Test}"
-                            Style="{StaticResource SecondaryButton}"
-                            Height="34" HorizontalAlignment="Left"
-                            Margin="0,16,0,0"
-                            Click="OpenCurrentMatchButton_Click" />
-                </StackPanel>
+                </Grid>
             </Border>
 
             <Border Grid.Column="4" Style="{StaticResource ShellCard}">

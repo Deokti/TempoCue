@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.Text.Json;
 using TempoCue.Application;
@@ -14,6 +15,9 @@ public sealed class DataDragonChampionCatalog : IChampionCatalog
 
     private readonly DataDragonClient _dataDragonClient;
     private readonly string _cacheDirectory;
+    private readonly SemaphoreSlim _loadLock = new(1, 1);
+    private readonly ConcurrentDictionary<string, ChampionCatalogLoadResult> _memoryCache =
+        new(StringComparer.OrdinalIgnoreCase);
 
     public DataDragonChampionCatalog(
         DataDragonClient dataDragonClient,
@@ -31,6 +35,37 @@ public sealed class DataDragonChampionCatalog : IChampionCatalog
         CancellationToken cancellationToken = default)
     {
         var locale = DataDragonClient.NormalizeLocale(languageCode);
+        if (_memoryCache.TryGetValue(locale, out var cachedResult))
+        {
+            return cachedResult;
+        }
+
+        await _loadLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            if (_memoryCache.TryGetValue(locale, out cachedResult))
+            {
+                return cachedResult;
+            }
+
+            var result = await LoadCoreAsync(locale, cancellationToken).ConfigureAwait(false);
+            if (result.IsAvailable)
+            {
+                _memoryCache[locale] = result;
+            }
+
+            return result;
+        }
+        finally
+        {
+            _loadLock.Release();
+        }
+    }
+
+    private async Task<ChampionCatalogLoadResult> LoadCoreAsync(
+        string locale,
+        CancellationToken cancellationToken)
+    {
 
         try
         {

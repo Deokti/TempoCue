@@ -32,6 +32,7 @@ public sealed class CurrentMatchViewModelTests
 
         using var viewModel = new TempoCue.App.ViewModels.CurrentMatchViewModel(
             monitor,
+            TestChampionCatalog.Ready(),
             TempoCue.App.Localization.LocalizationService.Instance);
 
         Assert.Equal(MatchSnapshotReadStatus.Success, viewModel.Status);
@@ -210,6 +211,41 @@ public sealed class CurrentMatchViewModelTests
         Assert.Equal("вы · ≈53 CS", activePlayer.Details);
         Assert.Equal("Верхняя линия", viewModel.ActivePosition);
         Assert.Equal("Teemo", viewModel.OpponentChampion);
+    }
+
+    [Fact]
+    public async Task LoadChampionImagesAsync_AddsPortraitsToCurrentMatchSnapshot()
+    {
+        using var context = new CurrentMatchViewModelTestContext();
+        var match = new MatchState
+        {
+            GameTimeSeconds = 120,
+            ActivePlayerId = "urgot-player",
+            Players =
+            [
+                CreatePlayer("urgot-player", "Urgot", TeamSide.Order, PlayerPosition.Top),
+                CreatePlayer("sett-player", "Sett", TeamSide.Chaos, PlayerPosition.Top)
+            ]
+        };
+        var viewModel = context.CreateViewModel(
+            MatchSnapshotReadResult.Success(
+                new MatchSnapshot(match, [], "{}", DateTimeOffset.UtcNow)),
+            new TestMatchAdviceSelector(),
+            TestChampionCatalog.Ready());
+
+        await viewModel.RefreshAsync();
+        Assert.Null(viewModel.ActiveChampionImageUri);
+
+        await viewModel.LoadChampionImagesAsync();
+
+        Assert.Equal("https://example.test/Urgot.png", viewModel.ActiveChampionImageUri?.AbsoluteUri);
+        Assert.Equal("https://example.test/Sett.png", viewModel.OpponentChampionImageUri?.AbsoluteUri);
+        Assert.Equal(
+            viewModel.ActiveChampionImageUri,
+            Assert.Single(viewModel.Allies).ChampionImageUri);
+        Assert.Equal(
+            viewModel.OpponentChampionImageUri,
+            Assert.Single(viewModel.Enemies).ChampionImageUri);
     }
 
     [Fact]

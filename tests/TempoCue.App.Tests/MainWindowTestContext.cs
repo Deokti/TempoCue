@@ -25,7 +25,10 @@ internal sealed class MainWindowTestContext : IDisposable
         _activeMatchMonitor = CurrentMatchViewModelTestData.CreateMonitor(
             TestMatchSnapshotSource.FromResult(MatchSnapshotReadResult.NoActiveMatch()),
             new TestMatchAdviceSelector());
-        CurrentMatch = new CurrentMatchViewModel(_activeMatchMonitor, Localization);
+        CurrentMatch = new CurrentMatchViewModel(
+            _activeMatchMonitor,
+            TestChampionCatalog.Ready(),
+            Localization);
         Home = new HomeViewModel(CurrentMatch, Localization);
         Settings = new SettingsViewModel(Localization, new AppSettingsService());
         CoachPackStore = new TestCoachPackStore();
