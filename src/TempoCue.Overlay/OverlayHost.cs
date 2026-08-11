@@ -7,7 +7,7 @@ namespace TempoCue.Overlay;
 public sealed class OverlayHost : IOverlayPresenter
 {
     private const double WorkAreaRightMargin = 24;
-    private const double WorkAreaTopMargin = 29;
+    private const double WorkAreaTopMargin = 80;
     private static readonly TimeSpan LifecycleTick = TimeSpan.FromMilliseconds(100);
 
     private readonly Dispatcher _dispatcher;

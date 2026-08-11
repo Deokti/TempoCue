@@ -7,6 +7,8 @@ namespace TempoCue.Overlay.Tests;
 
 public sealed class OverlayHostTests
 {
+    private const double ExpectedTopMargin = 80;
+
     [Fact]
     public void Show_ReusesWindowAndReplacesEqualPriorityCard() => WpfTestHost.Run(() =>
     {
@@ -19,11 +21,7 @@ public sealed class OverlayHostTests
         WpfTestHost.Pump();
         var window = Assert.IsType<OverlayWindow>(host.CurrentWindow);
 
-        Assert.True(window.IsVisible);
-        Assert.False(window.ShowInTaskbar);
-        Assert.False(window.ShowActivated);
-        Assert.True(window.Topmost);
-        Assert.Equal(SystemParameters.WorkArea.Top + 29, window.Top);
+        AssertWindowBehavior(window);
         Assert.Same(first, window.PrimaryCardView.DataContext);
 
         host.Show(second);
@@ -37,6 +35,15 @@ public sealed class OverlayHostTests
 
         host.Hide();
     });
+
+    private static void AssertWindowBehavior(OverlayWindow window)
+    {
+        Assert.True(window.IsVisible);
+        Assert.False(window.ShowInTaskbar);
+        Assert.False(window.ShowActivated);
+        Assert.True(window.Topmost);
+        Assert.Equal(SystemParameters.WorkArea.Top + ExpectedTopMargin, window.Top);
+    }
 
     [Fact]
     public void ShowPreview_SupportsManualPrioritySequenceAndRestart() => WpfTestHost.Run(() =>
