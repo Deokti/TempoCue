@@ -259,6 +259,22 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
         }
     }
 
+    public void ReportImportSuccess(string packName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(packName);
+        IsLibraryMessageSuccess = true;
+        LibraryMessage = _localization.Format("Coaching.Library.Imported", packName);
+    }
+
+    public void ReportExportResult(string packName, bool succeeded)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(packName);
+        IsLibraryMessageSuccess = succeeded;
+        LibraryMessage = succeeded
+            ? _localization.Format("Coaching.Library.Exported", packName)
+            : _localization.Get("Coaching.Library.ExportFailed");
+    }
+
     public void Dispose()
     {
         if (_isDisposed)

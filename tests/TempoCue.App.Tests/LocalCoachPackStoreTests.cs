@@ -103,6 +103,75 @@ public sealed class LocalCoachPackStoreTests
         Assert.Equal(0, snapshot.InvalidFileCount);
     }
 
+    [Fact]
+    public async Task ImportAsync_DoesNotOverwritePackWithCollidingSafeFileName()
+    {
+        using var directory = new TestCoachPackDirectory();
+        var store = new LocalCoachPackStore(directory.RootPath);
+        var existing = CreatePack() with { Id = "matchup:test" };
+        var imported = CreatePack() with { Id = "matchup-test" };
+        await store.SaveAsync(existing, LocalCoachPackState.Enabled);
+
+        await Assert.ThrowsAsync<InvalidDataException>(
+            () => store.ImportAsync(imported, LocalCoachPackState.Disabled));
+
+        var entry = Assert.Single((await store.LoadAsync()).Entries);
+        Assert.Equal(existing.Id, entry.Pack.Id);
+        Assert.Equal(LocalCoachPackOrigin.CreatedByUser, entry.Origin);
+    }
+
+    [Fact]
+    public async Task SaveAsync_RepairsDamagedStateWhenStoredPackIdMatches()
+    {
+        using var directory = new TestCoachPackDirectory();
+        var store = new LocalCoachPackStore(directory.RootPath);
+        var pack = CreatePack();
+        await store.SaveAsync(pack, LocalCoachPackState.Enabled);
+        await File.WriteAllTextAsync(
+            Path.Combine(directory.RootPath, $"{pack.Id}.state.json"),
+            "{ damaged state }");
+
+        await store.SaveAsync(pack, LocalCoachPackState.Disabled);
+
+        var entry = Assert.Single((await store.LoadAsync()).Entries);
+        Assert.Equal(pack.Id, entry.Pack.Id);
+        Assert.Equal(LocalCoachPackState.Disabled, entry.State);
+        Assert.Equal(LocalCoachPackOrigin.CreatedByUser, entry.Origin);
+        Assert.Equal(0, (await store.LoadAsync()).InvalidFileCount);
+    }
+
+    [Fact]
+    public async Task ImportAsync_DoesNotOverwritePackCreatedByUser()
+    {
+        using var directory = new TestCoachPackDirectory();
+        var store = new LocalCoachPackStore(directory.RootPath);
+        var pack = CreatePack();
+        await store.SaveAsync(pack, LocalCoachPackState.Enabled);
+
+        await Assert.ThrowsAsync<InvalidDataException>(
+            () => store.ImportAsync(pack with { Name = "Чужая версия" }, LocalCoachPackState.Disabled));
+
+        var entry = Assert.Single((await store.LoadAsync()).Entries);
+        Assert.Equal(pack.Name, entry.Pack.Name);
+        Assert.Equal(LocalCoachPackOrigin.CreatedByUser, entry.Origin);
+    }
+
+    [Fact]
+    public async Task SaveAsync_DoesNotOverwriteImportedPack()
+    {
+        using var directory = new TestCoachPackDirectory();
+        var store = new LocalCoachPackStore(directory.RootPath);
+        var pack = CreatePack();
+        await store.ImportAsync(pack, LocalCoachPackState.Disabled);
+
+        await Assert.ThrowsAsync<InvalidDataException>(
+            () => store.SaveAsync(pack with { Name = "Локальная правка" }, LocalCoachPackState.Enabled));
+
+        var entry = Assert.Single((await store.LoadAsync()).Entries);
+        Assert.Equal(pack.Name, entry.Pack.Name);
+        Assert.Equal(LocalCoachPackOrigin.Imported, entry.Origin);
+    }
+
     private static CoachPack CreatePack() => new()
     {
         SchemaVersion = 2,

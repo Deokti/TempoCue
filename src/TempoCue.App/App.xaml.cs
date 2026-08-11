@@ -48,6 +48,9 @@ public partial class App : System.Windows.Application
         var loadCoachPackLibrary = new LoadCoachPackLibraryUseCase(coachPackStore);
         var setCoachPackState = new SetCoachPackStateUseCase(coachPackStore);
         var deleteCoachPack = new DeleteCoachPackUseCase(coachPackStore);
+        var importCoachPack = new ImportCoachPackUseCase(
+            coachPackStore,
+            builtInPacks.Select(static pack => pack.Id));
         var activeCoachPackSelector = new SelectActiveCoachPackUseCase(
             builtInPacks,
             loadCoachPackLibrary);
@@ -110,6 +113,9 @@ public partial class App : System.Windows.Application
             LocalizationService.Instance,
             coachingLibraryViewModel,
             coachingPackDetailsViewModel,
+            new CoachPackImportDialogViewModel(
+                LocalizationService.Instance,
+                importCoachPack),
             new PackTypeSelectionViewModel(),
             matchupEditorViewModel);
 

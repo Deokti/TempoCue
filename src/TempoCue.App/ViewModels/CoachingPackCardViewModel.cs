@@ -20,7 +20,8 @@ public sealed record CoachingPackCardViewModel(
     string StateLabel,
     string OriginLabel,
     string ContentLanguageLabel,
-    string PatchLabel)
+    string PatchLabel,
+    string DeleteActionLabel)
 {
     public bool IsEnabled => State == LocalCoachPackState.Enabled;
 

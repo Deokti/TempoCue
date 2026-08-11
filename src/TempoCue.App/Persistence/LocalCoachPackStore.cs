@@ -71,7 +71,35 @@ public sealed class LocalCoachPackStore : ICoachPackStore
         await _operationLock.WaitAsync(cancellationToken);
         try
         {
-            return await SaveCoreAsync(pack, state, cancellationToken);
+            return await SaveCoreAsync(
+                pack,
+                state,
+                LocalCoachPackOrigin.CreatedByUser,
+                cancellationToken);
+        }
+        finally
+        {
+            _operationLock.Release();
+        }
+    }
+
+    public async Task<CoachPackSaveResult> ImportAsync(
+        CoachPack pack,
+        LocalCoachPackState state,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(pack);
+        ValidateState(state);
+        CoachPackValidator.Validate(pack);
+
+        await _operationLock.WaitAsync(cancellationToken);
+        try
+        {
+            return await SaveCoreAsync(
+                pack,
+                state,
+                LocalCoachPackOrigin.Imported,
+                cancellationToken);
         }
         finally
         {
@@ -82,6 +110,7 @@ public sealed class LocalCoachPackStore : ICoachPackStore
     private async Task<CoachPackSaveResult> SaveCoreAsync(
         CoachPack pack,
         LocalCoachPackState state,
+        LocalCoachPackOrigin origin,
         CancellationToken cancellationToken)
     {
         Directory.CreateDirectory(_rootDirectory);
@@ -93,6 +122,12 @@ public sealed class LocalCoachPackStore : ICoachPackStore
 
         try
         {
+            await EnsureDestinationBelongsToPackAsync(
+                packPath,
+                statePath,
+                pack.Id,
+                origin,
+                cancellationToken);
             await using (var packStream = CreateFile(packTemporaryPath))
             {
                 await CoachPackWriter.WriteAsync(packStream, pack, cancellationToken);
@@ -104,7 +139,7 @@ public sealed class LocalCoachPackStore : ICoachPackStore
                     stateStream,
                     pack.Id,
                     state,
-                    LocalCoachPackOrigin.CreatedByUser,
+                    origin,
                     DateTimeOffset.UtcNow,
                     cancellationToken);
             }
@@ -334,6 +369,74 @@ public sealed class LocalCoachPackStore : ICoachPackStore
         catch (Exception exception) when (IsInvalidStoredFile(exception))
         {
             return LocalCoachPackOrigin.CreatedByUser;
+        }
+    }
+
+    private static async Task EnsureDestinationBelongsToPackAsync(
+        string packPath,
+        string statePath,
+        string packId,
+        LocalCoachPackOrigin intendedOrigin,
+        CancellationToken cancellationToken)
+    {
+        var matchingPackExists = false;
+        if (File.Exists(packPath))
+        {
+            await using var packStream = OpenFile(packPath);
+            var storedPack = await CoachPackLoader.LoadAsync(packStream, cancellationToken);
+            if (!string.Equals(storedPack.Id, packId, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidDataException(
+                    "A different Coach Pack uses the same safe file name.");
+            }
+
+            matchingPackExists = true;
+        }
+
+        LocalCoachPackOrigin? storedOrigin = null;
+        if (File.Exists(statePath))
+        {
+            StoredCoachPackState storedState;
+            try
+            {
+                await using var stateStream = OpenFile(statePath);
+                storedState = await LocalCoachPackStateSerializer.ReadAsync(
+                    stateStream,
+                    cancellationToken);
+            }
+            catch (Exception exception) when (
+                matchingPackExists
+                && intendedOrigin == LocalCoachPackOrigin.CreatedByUser
+                && exception is InvalidDataException or JsonException)
+            {
+                // Повреждённое состояние собственного набора восстанавливается при сохранении.
+                return;
+            }
+
+            if (!string.Equals(storedState.PackId, packId, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidDataException(
+                    "A different Coach Pack state uses the same safe file name.");
+            }
+
+            storedOrigin = storedState.Origin;
+        }
+
+        if (!matchingPackExists)
+        {
+            return;
+        }
+
+        var replacesDifferentOrigin = intendedOrigin switch
+        {
+            LocalCoachPackOrigin.Imported => storedOrigin != LocalCoachPackOrigin.Imported,
+            LocalCoachPackOrigin.CreatedByUser => storedOrigin == LocalCoachPackOrigin.Imported,
+            _ => true
+        };
+        if (replacesDifferentOrigin)
+        {
+            throw new InvalidDataException(
+                "A Coach Pack cannot replace a local installation with a different origin.");
         }
     }
 

@@ -134,6 +134,7 @@ public sealed class CoachingPackDetailsViewModelTests
         string.Empty,
         string.Empty,
         string.Empty,
+        string.Empty,
         string.Empty);
 
     private static ItemCatalogLoadResult CreateCatalogResult(string displayName) => new(

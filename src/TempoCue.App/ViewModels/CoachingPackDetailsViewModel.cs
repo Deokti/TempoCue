@@ -316,6 +316,18 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
         NotifyHeaderChanged();
     }
 
+    /// <summary>Выбирает карточку для быстрого действия, не загружая каталог предметов.</summary>
+    public void SelectForActions(CoachingPackCardViewModel card)
+    {
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
+        ArgumentNullException.ThrowIfNull(card);
+        CancelCurrentItemCatalogLoad();
+        _card = card;
+        SourceLinkMessage = string.Empty;
+        SetCoachPackExportStatus(CoachPackExportStatus.None);
+        NotifyHeaderChanged();
+    }
+
     public void ShowOverview() => CurrentTab = CoachingPackDetailsTab.Overview;
 
     public void ReportSourceLinkOpenFailure() =>

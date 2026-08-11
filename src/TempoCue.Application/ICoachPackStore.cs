@@ -13,6 +13,11 @@ public interface ICoachPackStore
         LocalCoachPackState state,
         CancellationToken cancellationToken = default);
 
+    Task<CoachPackSaveResult> ImportAsync(
+        CoachPack pack,
+        LocalCoachPackState state,
+        CancellationToken cancellationToken = default);
+
     Task SetStateAsync(
         string packId,
         LocalCoachPackState state,

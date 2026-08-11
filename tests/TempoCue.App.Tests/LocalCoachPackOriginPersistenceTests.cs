@@ -21,18 +21,7 @@ public sealed class LocalCoachPackOriginPersistenceTests
             ForkedFromPackId = original.Id,
             ForkedFromAuthor = original.Author
         };
-        await store.SaveAsync(fork, LocalCoachPackState.Enabled);
-        var statePath = System.IO.Path.Combine(directory.Path, $"{fork.Id}.state.json");
-        await File.WriteAllTextAsync(
-            statePath,
-            JsonSerializer.Serialize(new
-            {
-                schemaVersion = 2,
-                packId = fork.Id,
-                state = "enabled",
-                origin = "imported",
-                savedAtUtc = DateTimeOffset.UtcNow
-            }, new JsonSerializerOptions { WriteIndented = true }));
+        await store.ImportAsync(fork, LocalCoachPackState.Enabled);
 
         await store.SetStateAsync(fork.Id, LocalCoachPackState.Disabled);
         var entry = Assert.Single((await store.LoadAsync()).Entries);

@@ -35,10 +35,14 @@ internal static class CoachingViewModelTestFactory
             itemCatalog,
             new BuildLeagueItemSetExportUseCase(championCatalog, itemCatalog),
             new ExportCoachPackUseCase());
+        var import = new CoachPackImportDialogViewModel(
+            resolvedLocalization,
+            new ImportCoachPackUseCase(resolvedStore, [builtInPack.Id]));
         return new CoachingViewModel(
             resolvedLocalization,
             library,
             details,
+            import,
             new PackTypeSelectionViewModel(),
             editor);
     }

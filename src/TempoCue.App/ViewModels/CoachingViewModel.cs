@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.IO;
 using TempoCue.App.Localization;
 
 namespace TempoCue.App.ViewModels;
@@ -15,12 +16,14 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
         LocalizationService localization,
         CoachingLibraryViewModel library,
         CoachingPackDetailsViewModel details,
+        CoachPackImportDialogViewModel import,
         PackTypeSelectionViewModel packTypeSelection,
         MatchupEditorViewModel matchupEditor)
     {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         Library = library ?? throw new ArgumentNullException(nameof(library));
         Details = details ?? throw new ArgumentNullException(nameof(details));
+        Import = import ?? throw new ArgumentNullException(nameof(import));
         PackTypeSelection = packTypeSelection
             ?? throw new ArgumentNullException(nameof(packTypeSelection));
         MatchupEditor = matchupEditor ?? throw new ArgumentNullException(nameof(matchupEditor));
@@ -30,6 +33,8 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
     public CoachingLibraryViewModel Library { get; }
 
     public CoachingPackDetailsViewModel Details { get; }
+
+    public CoachPackImportDialogViewModel Import { get; }
 
     public PackTypeSelectionViewModel PackTypeSelection { get; }
 
@@ -49,6 +54,35 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
 
     public void OpenPackTypeSelection() =>
         CurrentScreen = CoachingScreen.PackTypeSelection;
+
+    public Task OpenImportAsync(
+        Stream source,
+        CancellationToken cancellationToken = default) =>
+        Import.OpenAsync(source, cancellationToken);
+
+    public void ReportImportFileFailure() => Import.OpenFileFailure();
+
+    public async Task<bool> ConfirmImportAsync(CancellationToken cancellationToken = default)
+    {
+        var packName = Import.PackName;
+        if (!await Import.ConfirmAsync(cancellationToken))
+        {
+            return false;
+        }
+
+        Import.Close();
+        await Library.RefreshAsync(cancellationToken);
+        Library.ReportImportSuccess(packName);
+        return true;
+    }
+
+    public void CloseImport() => Import.Close();
+
+    public void SelectPackForActions(CoachingPackCardViewModel card)
+    {
+        ArgumentNullException.ThrowIfNull(card);
+        Details.SelectForActions(card);
+    }
 
     public async Task OpenPackDetailsAsync(
         CoachingPackCardViewModel card,
@@ -151,6 +185,7 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
         _isDisposed = true;
         _localization.PropertyChanged -= Localization_PropertyChanged;
         Details.Dispose();
+        Import.Dispose();
         Library.Dispose();
     }
 

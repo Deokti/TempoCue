@@ -18,7 +18,10 @@
         <views:CoachingLibraryView x:Name="CoachingLibraryPage"
                                    DataContext="{Binding Library}"
                                    CreateRequested="CoachingLibraryPage_CreateRequested"
-                                   PackOpenRequested="CoachingLibraryPage_PackOpenRequested">
+                                   ImportRequested="CoachingLibraryPage_ImportRequested"
+                                   PackOpenRequested="CoachingLibraryPage_PackOpenRequested"
+                                   PackExportRequested="CoachingLibraryPage_PackExportRequested"
+                                   PackDeleteRequested="CoachingLibraryPage_PackDeleteRequested">
             <views:CoachingLibraryView.Style>
                 <Style TargetType="views:CoachingLibraryView">
                     <Setter Property="Visibility" Value="Collapsed" />
@@ -151,5 +154,22 @@
                 </Grid>
             </Border>
         </Grid>
+
+        <!-- Импорт размещён поверх всех экранов раздела и не меняет файл до явного подтверждения. -->
+        <views:CoachPackImportDialogView x:Name="CoachPackImportDialog"
+                                         DataContext="{Binding Import}"
+                                         CloseRequested="CoachPackImportDialog_CloseRequested"
+                                         ConfirmRequested="CoachPackImportDialog_ConfirmRequested">
+            <views:CoachPackImportDialogView.Style>
+                <Style TargetType="views:CoachPackImportDialogView">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsOpen}" Value="True">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </views:CoachPackImportDialogView.Style>
+        </views:CoachPackImportDialogView>
     </Grid>
 </UserControl>

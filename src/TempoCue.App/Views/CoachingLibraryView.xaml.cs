@@ -15,7 +15,13 @@ public partial class CoachingLibraryView : UserControl
 
     public event EventHandler? CreateRequested;
 
+    public event EventHandler? ImportRequested;
+
     public event EventHandler<CoachingPackEventArgs>? PackOpenRequested;
+
+    public event EventHandler<CoachingPackEventArgs>? PackExportRequested;
+
+    public event EventHandler<CoachingPackEventArgs>? PackDeleteRequested;
 
     private CoachingLibraryViewModel ViewModel => (CoachingLibraryViewModel)DataContext;
 
@@ -24,6 +30,9 @@ public partial class CoachingLibraryView : UserControl
 
     private void CreatePackButton_Click(object sender, RoutedEventArgs e) =>
         CreateRequested?.Invoke(this, EventArgs.Empty);
+
+    private void ImportPackButton_Click(object sender, RoutedEventArgs e) =>
+        ImportRequested?.Invoke(this, EventArgs.Empty);
 
     private void OpenCoachingPackButton_Click(object sender, RoutedEventArgs e)
     {
@@ -51,5 +60,21 @@ public partial class CoachingLibraryView : UserControl
         }
 
         toggle.IsEnabled = true;
+    }
+
+    private void PackActionsMenu_ExportRequested(object? sender, EventArgs e)
+    {
+        if (sender is CoachPackActionsMenu { DataContext: CoachingPackCardViewModel card })
+        {
+            PackExportRequested?.Invoke(this, new CoachingPackEventArgs(card));
+        }
+    }
+
+    private void PackActionsMenu_DeleteRequested(object? sender, EventArgs e)
+    {
+        if (sender is CoachPackActionsMenu { DataContext: CoachingPackCardViewModel card })
+        {
+            PackDeleteRequested?.Invoke(this, new CoachingPackEventArgs(card));
+        }
     }
 }

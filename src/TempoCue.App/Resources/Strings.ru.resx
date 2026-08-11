@@ -222,6 +222,34 @@
   <data name="Coaching.Title" xml:space="preserve"><value>Коучинг</value></data>
   <data name="Coaching.Summary" xml:space="preserve"><value>1 набор советов · 1 включён · 0 созданы вами</value></data>
   <data name="Coaching.Import" xml:space="preserve"><value>Импортировать файл</value></data>
+  <data name="Coaching.Import.Tooltip" xml:space="preserve"><value>Выбрать файл TempoCue Coach Pack</value></data>
+  <data name="Coaching.Import.Title" xml:space="preserve"><value>Импорт Coach Pack</value></data>
+  <data name="Coaching.Import.Subtitle" xml:space="preserve"><value>Проверьте данные набора перед добавлением в библиотеку.</value></data>
+  <data name="Coaching.Import.Dialog.Filter" xml:space="preserve"><value>TempoCue Coach Pack (*.tempocue.json)|*.tempocue.json|Файлы JSON (*.json)|*.json|Все файлы (*.*)|*.*</value></data>
+  <data name="Coaching.Import.Preview.Description.Empty" xml:space="preserve"><value>Автор не добавил описание.</value></data>
+  <data name="Coaching.Import.Preview.Author" xml:space="preserve"><value>Автор</value></data>
+  <data name="Coaching.Import.Preview.Language" xml:space="preserve"><value>Язык содержимого</value></data>
+  <data name="Coaching.Import.Preview.Patch" xml:space="preserve"><value>Игровой патч</value></data>
+  <data name="Coaching.Import.Preview.Contents" xml:space="preserve"><value>Содержимое</value></data>
+  <data name="Coaching.Import.Status.Loading.Title" xml:space="preserve"><value>Проверяем файл</value></data>
+  <data name="Coaching.Import.Status.Loading.Message" xml:space="preserve"><value>TempoCue проверяет версию схемы и содержимое Coach Pack.</value></data>
+  <data name="Coaching.Import.Status.Ready.Title" xml:space="preserve"><value>Можно импортировать</value></data>
+  <data name="Coaching.Import.Status.Ready.Message" xml:space="preserve"><value>Файл корректен. Coach Pack будет добавлен выключенным, чтобы вы сначала могли его проверить.</value></data>
+  <data name="Coaching.Import.Status.Replacement.Title" xml:space="preserve"><value>Импортированный набор уже установлен</value></data>
+  <data name="Coaching.Import.Status.Replacement.Message" xml:space="preserve"><value>Заменить локальную установку «{0}»? Её состояние «включён» или «выключен» сохранится.</value></data>
+  <data name="Coaching.Import.Status.CreatedConflict.Title" xml:space="preserve"><value>У вашего Coach Pack такой же идентификатор</value></data>
+  <data name="Coaching.Import.Status.CreatedConflict.Message" xml:space="preserve"><value>«{0}» создан вами и не будет перезаписан. Измените идентификатор импортируемого набора или сохраните его отдельной копией.</value></data>
+  <data name="Coaching.Import.Status.BuiltInConflict.Title" xml:space="preserve"><value>У встроенного Coach Pack такой же идентификатор</value></data>
+  <data name="Coaching.Import.Status.BuiltInConflict.Message" xml:space="preserve"><value>«{0}» поставляется вместе с TempoCue и не может быть заменён локальным файлом.</value></data>
+  <data name="Coaching.Import.Status.Invalid.Title" xml:space="preserve"><value>Некорректный файл Coach Pack</value></data>
+  <data name="Coaching.Import.Status.Invalid.Message" xml:space="preserve"><value>JSON повреждён, использует неподдерживаемую схему или содержит противоречивые данные Coach Pack.</value></data>
+  <data name="Coaching.Import.Status.ReadFailed.Title" xml:space="preserve"><value>Не удалось прочитать файл</value></data>
+  <data name="Coaching.Import.Status.ReadFailed.Message" xml:space="preserve"><value>Проверьте, что файл существует и TempoCue разрешено его открывать.</value></data>
+  <data name="Coaching.Import.Status.SaveFailed.Title" xml:space="preserve"><value>Не удалось импортировать Coach Pack</value></data>
+  <data name="Coaching.Import.Status.SaveFailed.Message" xml:space="preserve"><value>TempoCue не удалось сохранить «{0}» в локальную библиотеку. Существующий набор намеренно не изменялся.</value></data>
+  <data name="Coaching.Import.Action.Import" xml:space="preserve"><value>Импортировать</value></data>
+  <data name="Coaching.Import.Action.Replace" xml:space="preserve"><value>Заменить установку</value></data>
+  <data name="Coaching.Import.Action.Cancel" xml:space="preserve"><value>Отмена</value></data>
   <data name="Coaching.Create" xml:space="preserve"><value>Создать набор советов</value></data>
   <data name="Coaching.PlannedTooltip" xml:space="preserve"><value>Импорт и редактор правил появятся в следующей итерации.</value></data>
   <data name="Coaching.Tab.Matchups" xml:space="preserve"><value>Матчапы</value></data>
@@ -237,6 +265,9 @@
   <data name="Coaching.Library.StateChangeFailed" xml:space="preserve"><value>Не удалось сохранить состояние матчапа.</value></data>
   <data name="Coaching.Library.DeleteFailed" xml:space="preserve"><value>Не удалось удалить Coach Pack.</value></data>
   <data name="Coaching.Library.Deleted" xml:space="preserve"><value>Coach Pack «{0}» удалён с этого устройства.</value></data>
+  <data name="Coaching.Library.Imported" xml:space="preserve"><value>Coach Pack «{0}» импортирован в локальную библиотеку.</value></data>
+  <data name="Coaching.Library.Exported" xml:space="preserve"><value>Coach Pack «{0}» экспортирован в файл.</value></data>
+  <data name="Coaching.Library.ExportFailed" xml:space="preserve"><value>Не удалось экспортировать Coach Pack в файл.</value></data>
   <data name="Coaching.Library.Origin.BuiltIn" xml:space="preserve"><value>Встроенный</value></data>
   <data name="Coaching.Library.Origin.Created" xml:space="preserve"><value>Создан вами</value></data>
   <data name="Coaching.Library.Origin.Imported" xml:space="preserve"><value>Добавлен из библиотеки</value></data>

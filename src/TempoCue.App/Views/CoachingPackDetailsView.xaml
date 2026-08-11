@@ -42,39 +42,6 @@
                 </Setter>
             </Style>
 
-            <!-- Редкие действия находятся в компактном меню и не конкурируют с основным действием. -->
-            <Style x:Key="DetailsActionsMenuButton" TargetType="Button">
-                <Setter Property="Foreground" Value="#DCE7F5" />
-                <Setter Property="Background" Value="Transparent" />
-                <Setter Property="BorderThickness" Value="0" />
-                <Setter Property="Padding" Value="14,10" />
-                <Setter Property="FontSize" Value="{StaticResource Typography.FontSize.Body}" />
-                <Setter Property="HorizontalContentAlignment" Value="Left" />
-                <Setter Property="Cursor" Value="Hand" />
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="Button">
-                            <Border x:Name="MenuButtonBorder"
-                                    Background="{TemplateBinding Background}"
-                                    CornerRadius="7"
-                                    Padding="{TemplateBinding Padding}">
-                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                  VerticalAlignment="Center" />
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="MenuButtonBorder" Property="Background" Value="#1B2A42" />
-                                </Trigger>
-                                <Trigger Property="IsEnabled" Value="False">
-                                    <Setter Property="Opacity" Value="0.38" />
-                                    <Setter Property="Cursor" Value="Arrow" />
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-
             <!-- В заголовке наборов переключатель меньше карточного, чтобы не увеличивать строку действий. -->
             <Style x:Key="DetailsCompactSwitch"
                    TargetType="ToggleButton"
@@ -227,62 +194,13 @@
                                 Margin="10,0,0,0"
                                 Style="{StaticResource PrimaryButton}"
                                 Click="EditActionButton_Click" />
-                        <Button x:Name="PackAdditionalActionsButton"
-                                Content="⋯"
-                                ToolTip="{localization:Loc Coaching.Details.MoreActions}"
-                                AutomationProperties.Name="{localization:Loc Coaching.Details.MoreActions}"
-                                Margin="10,0,0,0"
-                                Style="{StaticResource SecondaryButton}"
-                                Width="40"
-                                Padding="0"
-                                Click="AdditionalActionsButton_Click" />
-                        <Popup x:Name="PackActionsPopup"
-                               DataContext="{Binding DataContext, ElementName=PackAdditionalActionsButton}"
-                               PlacementTarget="{Binding ElementName=PackAdditionalActionsButton}"
-                               Placement="Bottom"
-                               HorizontalOffset="-208"
-                               AllowsTransparency="True"
-                               PopupAnimation="Fade"
-                               StaysOpen="False">
-                            <Border Width="248"
-                                    Margin="0,6,0,0"
-                                    Padding="6"
-                                    Background="#101A2A"
-                                    BorderBrush="#314866"
-                                    BorderThickness="1"
-                                    CornerRadius="10">
-                                <StackPanel>
-                                    <Button x:Name="ExportCoachPackMenuButton"
-                                            Content="{localization:Loc Coaching.Details.ExportPack}"
-                                            ToolTip="{localization:Loc Coaching.Details.ExportPack.Hint}"
-                                            IsEnabled="{Binding CanExportCoachPack}"
-                                            Style="{StaticResource DetailsActionsMenuButton}"
-                                            Click="ExportCoachPackMenuButton_Click" />
-                                    <Button x:Name="CheckCoachPackUpdateMenuButton"
-                                            Content="{localization:Loc Coaching.Details.CheckUpdate}"
-                                            IsEnabled="False"
-                                            Style="{StaticResource DetailsActionsMenuButton}" />
-                                    <Border Height="1"
-                                            Margin="10,5"
-                                            Background="#263750" />
-                                    <Button x:Name="DeleteCoachPackMenuButton"
-                                            Content="{Binding DeleteActionLabel}"
-                                            Click="DeleteCoachPackMenuButton_Click">
-                                        <Button.Style>
-                                            <Style TargetType="Button" BasedOn="{StaticResource DetailsActionsMenuButton}">
-                                                <Setter Property="Visibility" Value="Collapsed" />
-                                                <Setter Property="Foreground" Value="#FF7185" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding CanDelete}" Value="True">
-                                                        <Setter Property="Visibility" Value="Visible" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Button.Style>
-                                    </Button>
-                                </StackPanel>
-                            </Border>
-                        </Popup>
+                        <views:CoachPackActionsMenu x:Name="PackActionsMenu"
+                                                    Margin="10,0,0,0"
+                                                    CanExport="{Binding CanExportCoachPack}"
+                                                    CanDelete="{Binding CanDelete}"
+                                                    DeleteActionLabel="{Binding DeleteActionLabel}"
+                                                    ExportRequested="PackActionsMenu_ExportRequested"
+                                                    DeleteRequested="PackActionsMenu_DeleteRequested" />
                     </StackPanel>
                     <TextBlock Text="{Binding CoachPackExportMessage}"
                                HorizontalAlignment="Right"

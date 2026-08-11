@@ -2,7 +2,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Threading;
+using TempoCue.App.ViewModels;
 using TempoCue.App.Views;
+using TempoCue.Application;
 using static TempoCue.App.Tests.CoachingViewTestContext;
 
 namespace TempoCue.App.Tests;
@@ -82,6 +84,55 @@ public sealed class CoachingLibraryViewTests
             candidate => candidate.Name == "PackEnabledToggle");
         Assert.False(refreshedToggle.IsChecked);
     });
+
+    [Fact]
+    public void Library_CardActionsMenuOffersExportAndDeleteWithoutOpeningDetails() =>
+        WpfTestHost.Run(() =>
+        {
+            using var context = new MainWindowTestContext();
+            var pack = TestCoachPackFactory.CreateDetailedMatchup() with
+            {
+                Id = "matchup.library-card-actions",
+                Name = "Действия из карточки"
+            };
+            context.CoachPackStore.SaveAsync(pack, LocalCoachPackState.Disabled)
+                .GetAwaiter()
+                .GetResult();
+            var libraryPage = OpenLibrary(context);
+            context.Coaching.Library.RefreshAsync().GetAwaiter().GetResult();
+            WpfTestHost.Pump(DispatcherPriority.ApplicationIdle);
+
+            var actionsMenu = Assert.Single(
+                WpfTestHost.FindVisualDescendants<CoachPackActionsMenu>(libraryPage),
+                menu => menu.DataContext is CoachingPackCardViewModel card
+                        && card.Pack.Id == pack.Id);
+            WpfTestHost.Click(WpfTestHost.Find<Button>(
+                actionsMenu,
+                "AdditionalActionsButton"));
+            WpfTestHost.Pump(DispatcherPriority.ApplicationIdle);
+
+            var popup = WpfTestHost.Find<Popup>(actionsMenu, "ActionsPopup");
+            var popupContent = Assert.IsAssignableFrom<FrameworkElement>(popup.Child);
+            Assert.True(popup.IsOpen);
+            Assert.True(WpfTestHost.Find<Button>(popupContent, "ExportMenuButton").IsEnabled);
+            var deleteButton = WpfTestHost.Find<Button>(popupContent, "DeleteMenuButton");
+            Assert.True(deleteButton.IsVisible);
+            Assert.Equal("Удалить набор", deleteButton.Content);
+            SaveVisualSnapshotIfRequested(popupContent, "coach-pack-card-actions-menu.png");
+            SaveVisualSnapshotIfRequested(context.Window, "coaching-library-card-actions.png");
+
+            WpfTestHost.Click(deleteButton);
+            WpfTestHost.Pump(DispatcherPriority.ApplicationIdle);
+
+            Assert.Equal(CoachingScreen.Library, context.Coaching.CurrentScreen);
+            Assert.True(context.Coaching.IsDeleteConfirmationOpen);
+            Assert.Equal(pack.Id, context.Coaching.Details.Pack?.Id);
+            Assert.Equal(
+                Visibility.Visible,
+                WpfTestHost.Find<Grid>(
+                    context.CoachingPage,
+                    "DeleteConfirmationOverlay").Visibility);
+        });
 
     private static void AssertLibraryStyles(
         CoachingLibraryView libraryPage,

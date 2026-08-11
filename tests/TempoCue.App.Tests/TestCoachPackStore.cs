@@ -36,6 +36,18 @@ internal sealed class TestCoachPackStore : ICoachPackStore
         return Task.FromResult(new CoachPackSaveResult(pack.Id, state, $"C:\\Test\\{pack.Id}.json"));
     }
 
+    public Task<CoachPackSaveResult> ImportAsync(
+        CoachPack pack,
+        LocalCoachPackState state,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        SavedPack = pack;
+        SavedState = state;
+        AddEntry(pack, state, LocalCoachPackOrigin.Imported);
+        return Task.FromResult(new CoachPackSaveResult(pack.Id, state, $"C:\\Test\\{pack.Id}.json"));
+    }
+
     public void AddEntry(
         CoachPack pack,
         LocalCoachPackState state,

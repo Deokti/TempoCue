@@ -239,6 +239,12 @@ public sealed class SelectActiveCoachPackUseCaseTests
             CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
 
+        public Task<CoachPackSaveResult> ImportAsync(
+            CoachPack pack,
+            LocalCoachPackState state,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
         public Task SetStateAsync(
             string packId,
             LocalCoachPackState state,
