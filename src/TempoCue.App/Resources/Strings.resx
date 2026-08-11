@@ -725,9 +725,16 @@
   <data name="Coaching.Export.Status.Failed" xml:space="preserve"><value>The item set could not be built.</value></data>
   <data name="Settings.Overlay.Section" xml:space="preserve"><value>Game overlay</value></data>
   <data name="Settings.Overlay.Preview.Label" xml:space="preserve"><value>Overlay preview</value></data>
-  <data name="Settings.Overlay.Description" xml:space="preserve"><value>Shows a test notification without requiring an active League match.</value></data>
-  <data name="Settings.Overlay.Preview.Button" xml:space="preserve"><value>Show test overlay</value></data>
-  <data name="Settings.Overlay.Preview.Title" xml:space="preserve"><value>TempoCue overlay is ready</value></data>
-  <data name="Settings.Overlay.Preview.Message" xml:space="preserve"><value>This is a test notification. Match advice will be connected in the next iteration.</value></data>
+  <data name="Settings.Overlay.Description" xml:space="preserve"><value>Shows three notifications in sequence so you can verify two-slot stacking and priority replacement.</value></data>
+  <data name="Settings.Overlay.Preview.Button" xml:space="preserve"><value>Show next notification</value></data>
+  <data name="Settings.Overlay.Preview.Warning.Label" xml:space="preserve"><value>Caution</value></data>
+  <data name="Settings.Overlay.Preview.Warning.Title" xml:space="preserve"><value>An opponent has left their lane</value></data>
+  <data name="Settings.Overlay.Preview.Warning.Message" xml:space="preserve"><value>First notification · top slot</value></data>
+  <data name="Settings.Overlay.Preview.Information.Label" xml:space="preserve"><value>Event</value></data>
+  <data name="Settings.Overlay.Preview.Information.Title" xml:space="preserve"><value>Dragon spawns in 30 seconds</value></data>
+  <data name="Settings.Overlay.Preview.Information.Message" xml:space="preserve"><value>Second notification · bottom slot</value></data>
+  <data name="Settings.Overlay.Preview.Danger.Label" xml:space="preserve"><value>Danger</value></data>
+  <data name="Settings.Overlay.Preview.Danger.Title" xml:space="preserve"><value>The enemy jungler appeared nearby</value></data>
+  <data name="Settings.Overlay.Preview.Danger.Message" xml:space="preserve"><value>Third notification · replaces lower-priority cards</value></data>
   <data name="Settings.Overlay.Preview.Close" xml:space="preserve"><value>Close overlay</value></data>
 </root>

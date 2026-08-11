@@ -38,23 +38,42 @@ public sealed class OverlayHostTests
     });
 
     [Fact]
-    public void ShowPreview_CanBeRepeatedImmediatelyAfterHide() => WpfTestHost.Run(() =>
+    public void ShowPreview_SupportsManualPrioritySequenceAndRestart() => WpfTestHost.Run(() =>
     {
         using var host = new OverlayHost(Dispatcher.CurrentDispatcher);
-        var preview = Create("settings.preview", "Тестовый совет");
+        var warning = Create(
+            "settings.preview.warning",
+            "Тестовое предупреждение",
+            OverlayNotificationTone.Caution);
+        var information = Create("settings.preview.information", "Тестовое событие");
+        var danger = Create(
+            "settings.preview.danger",
+            "Тестовая опасность",
+            OverlayNotificationTone.Danger);
 
         host.SetInteractionMode(OverlayInteractionMode.Setup);
-        host.ShowPreview(preview);
+        host.ShowPreview([warning]);
         WpfTestHost.Pump();
         var window = Assert.IsType<OverlayWindow>(host.CurrentWindow);
-        Assert.Same(preview, window.PrimaryCardView.DataContext);
+        Assert.Same(warning, window.PrimaryCardView.DataContext);
 
-        host.Hide();
-        host.ShowPreview(preview);
+        host.Show(information);
         WpfTestHost.Pump();
+        Assert.Same(information, window.SecondaryCardView.DataContext);
 
-        Assert.True(window.IsVisible);
-        Assert.Same(preview, window.PrimaryCardView.DataContext);
+        host.Show(danger);
+        WpfTestHost.Pump();
+        Assert.Same(danger, window.PrimaryCardView.DataContext);
+        Assert.Equal(
+            "settings.preview.danger",
+            Assert.Single(host.CurrentSnapshot.Items).Notification.Key);
+
+        host.ShowPreview([warning]);
+        WpfTestHost.Pump();
+        Assert.Same(warning, window.PrimaryCardView.DataContext);
+        Assert.Equal(
+            "settings.preview.warning",
+            Assert.Single(host.CurrentSnapshot.Items).Notification.Key);
         host.Hide();
     });
 

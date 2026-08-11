@@ -70,18 +70,36 @@ public sealed class OverlayHost : IOverlayPresenter
         ApplySnapshot(snapshot);
     }
 
-    public void ShowPreview(OverlayNotification notification)
+    public void ShowPreview(IReadOnlyList<OverlayNotification> notifications)
     {
-        ArgumentNullException.ThrowIfNull(notification);
+        ArgumentNullException.ThrowIfNull(notifications);
+        if (notifications.Count == 0)
+        {
+            throw new ArgumentException("Предпросмотр должен содержать хотя бы одно уведомление.", nameof(notifications));
+        }
+
+        var previewNotifications = notifications.ToArray();
+        if (previewNotifications.Any(static notification => notification is null))
+        {
+            throw new ArgumentException("Предпросмотр не может содержать пустое уведомление.", nameof(notifications));
+        }
+
         if (!_dispatcher.CheckAccess())
         {
-            _ = _dispatcher.InvokeAsync(() => ShowPreview(notification));
+            _ = _dispatcher.InvokeAsync(() => ShowPreview(previewNotifications));
             return;
         }
 
         ObjectDisposedException.ThrowIf(_isDisposed, this);
         _lastSnapshot = _scheduler.Reset();
-        ApplySnapshot(_scheduler.Publish(notification, _timeProvider.GetUtcNow()));
+        var now = _timeProvider.GetUtcNow();
+        var snapshot = _scheduler.Current;
+        foreach (var notification in previewNotifications)
+        {
+            snapshot = _scheduler.Publish(notification, now);
+        }
+
+        ApplySnapshot(snapshot);
     }
 
     public void Hide()

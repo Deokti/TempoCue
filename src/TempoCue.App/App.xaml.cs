@@ -29,6 +29,7 @@ public partial class App : System.Windows.Application
     private CoachingViewModel? _coachingViewModel;
     private IOverlayPresenter? _overlayPresenter;
     private readonly CancellationTokenSource _lifetimeCancellation = new();
+    private int _overlayPreviewStep;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -194,16 +195,52 @@ public partial class App : System.Windows.Application
 
     private void ShowOverlayPreview()
     {
+        if (_overlayPresenter is null)
+        {
+            return;
+        }
+
         var localization = LocalizationService.Instance;
-        _overlayPresenter?.SetInteractionMode(OverlayInteractionMode.Setup);
-        _overlayPresenter?.ShowPreview(new OverlayNotification(
-            "settings.preview",
-            localization.Get("Settings.Overlay.Preview.Label"),
-            localization.Get("Settings.Overlay.Preview.Title"),
-            localization.Get("Settings.Overlay.Preview.Message"),
-            localization.Get("Settings.Overlay.Preview.Close"),
-            OverlayNotificationTone.Information));
+        _overlayPresenter.SetInteractionMode(OverlayInteractionMode.Setup);
+        var step = _overlayPreviewStep;
+        var notification = step switch
+        {
+            0 => CreateOverlayPreviewNotification(
+                localization,
+                "Warning",
+                OverlayNotificationTone.Caution),
+            1 => CreateOverlayPreviewNotification(
+                localization,
+                "Information",
+                OverlayNotificationTone.Information),
+            _ => CreateOverlayPreviewNotification(
+                localization,
+                "Danger",
+                OverlayNotificationTone.Danger)
+        };
+
+        if (step == 0)
+        {
+            _overlayPresenter.ShowPreview([notification]);
+        }
+        else
+        {
+            _overlayPresenter.Show(notification);
+        }
+
+        _overlayPreviewStep = (step + 1) % 3;
     }
+
+    private static OverlayNotification CreateOverlayPreviewNotification(
+        LocalizationService localization,
+        string resourceSuffix,
+        OverlayNotificationTone tone) => new(
+            $"settings.preview.{resourceSuffix.ToLowerInvariant()}",
+            localization.Get($"Settings.Overlay.Preview.{resourceSuffix}.Label"),
+            localization.Get($"Settings.Overlay.Preview.{resourceSuffix}.Title"),
+            localization.Get($"Settings.Overlay.Preview.{resourceSuffix}.Message"),
+            localization.Get("Settings.Overlay.Preview.Close"),
+            tone);
 
     // Освобождение выполняется в обратном порядке владения долгоживущими объектами.
     protected override void OnExit(ExitEventArgs e)

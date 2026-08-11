@@ -20,14 +20,15 @@ public sealed class SettingsOverlayPreviewViewTests
             var settings = WpfTestHost.Find<SettingsView>(context.Window, "SettingsContentPage");
             var previewButton = WpfTestHost.Find<Button>(settings, "ShowOverlayPreviewButton");
 
-            Assert.Equal("Показать тестовый оверлей", previewButton.Content);
+            Assert.Equal("Показать следующее уведомление", previewButton.Content);
             WpfTestHost.Click(previewButton);
             context.Localization.SetLanguage("en-US");
             WpfTestHost.Pump();
-            Assert.Equal("Show test overlay", previewButton.Content);
+            Assert.Equal("Show next notification", previewButton.Content);
+            WpfTestHost.Click(previewButton);
             WpfTestHost.Click(previewButton);
 
-            Assert.Equal(2, previewCount);
+            Assert.Equal(3, previewCount);
 
             var snapshotDirectory = Environment.GetEnvironmentVariable("TEMPOCUE_UI_SNAPSHOT_DIR");
             if (!string.IsNullOrWhiteSpace(snapshotDirectory))

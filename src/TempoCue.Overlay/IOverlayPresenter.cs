@@ -9,7 +9,7 @@ public interface IOverlayPresenter : IDisposable
 
     void Show(OverlayNotification notification);
 
-    void ShowPreview(OverlayNotification notification);
+    void ShowPreview(IReadOnlyList<OverlayNotification> notifications);
 
     void Hide();
 }

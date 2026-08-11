@@ -735,9 +735,16 @@
   <data name="Coaching.Export.Status.Failed" xml:space="preserve"><value>Не удалось собрать набор предметов.</value></data>
   <data name="Settings.Overlay.Section" xml:space="preserve"><value>Игровой оверлей</value></data>
   <data name="Settings.Overlay.Preview.Label" xml:space="preserve"><value>Предпросмотр оверлея</value></data>
-  <data name="Settings.Overlay.Description" xml:space="preserve"><value>Показывает тестовое уведомление без необходимости запускать матч League.</value></data>
-  <data name="Settings.Overlay.Preview.Button" xml:space="preserve"><value>Показать тестовый оверлей</value></data>
-  <data name="Settings.Overlay.Preview.Title" xml:space="preserve"><value>Оверлей TempoCue готов</value></data>
-  <data name="Settings.Overlay.Preview.Message" xml:space="preserve"><value>Это тестовое уведомление. Советы из матча подключим в следующей итерации.</value></data>
+  <data name="Settings.Overlay.Description" xml:space="preserve"><value>Последовательно показывает три уведомления и позволяет проверить заполнение двух слотов и вытеснение по приоритету.</value></data>
+  <data name="Settings.Overlay.Preview.Button" xml:space="preserve"><value>Показать следующее уведомление</value></data>
+  <data name="Settings.Overlay.Preview.Warning.Label" xml:space="preserve"><value>Осторожно</value></data>
+  <data name="Settings.Overlay.Preview.Warning.Title" xml:space="preserve"><value>Соперник пропал с линии</value></data>
+  <data name="Settings.Overlay.Preview.Warning.Message" xml:space="preserve"><value>Первое уведомление · верхний слот</value></data>
+  <data name="Settings.Overlay.Preview.Information.Label" xml:space="preserve"><value>Событие</value></data>
+  <data name="Settings.Overlay.Preview.Information.Title" xml:space="preserve"><value>Дракон появится через 30 секунд</value></data>
+  <data name="Settings.Overlay.Preview.Information.Message" xml:space="preserve"><value>Второе уведомление · нижний слот</value></data>
+  <data name="Settings.Overlay.Preview.Danger.Label" xml:space="preserve"><value>Опасно</value></data>
+  <data name="Settings.Overlay.Preview.Danger.Title" xml:space="preserve"><value>Лесник соперника появился рядом</value></data>
+  <data name="Settings.Overlay.Preview.Danger.Message" xml:space="preserve"><value>Третье уведомление · вытесняет менее важные карточки</value></data>
   <data name="Settings.Overlay.Preview.Close" xml:space="preserve"><value>Закрыть оверлей</value></data>
 </root>
