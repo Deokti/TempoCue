@@ -49,10 +49,29 @@ public partial class MatchupEditorView : UserControl
 
     private void MatchupEditorStepsListBox_SelectionChanged(
         object sender,
-        SelectionChangedEventArgs e)
+        SelectionChangedEventArgs e) =>
+        NavigateToStep(MatchupEditorStepsListBox.SelectedIndex + 1);
+
+    private void MatchupEditorStepsListBox_PreviewMouseLeftButtonDown(
+        object sender,
+        MouseButtonEventArgs e)
     {
-        var selectedStep = MatchupEditorStepsListBox.SelectedIndex + 1;
-        if (selectedStep == ViewModel.CurrentStep)
+        if (sender is not ListBox
+            || FindStepItem(e.OriginalSource as DependencyObject) is not { IsEnabled: true } stepItem
+            || !int.TryParse(stepItem.Tag?.ToString(), out var selectedStep))
+        {
+            return;
+        }
+
+        NavigateToStep(selectedStep);
+        e.Handled = true;
+    }
+
+    private void NavigateToStep(int selectedStep)
+    {
+        if (selectedStep < 1
+            || selectedStep > ViewModel.TotalSteps
+            || selectedStep == ViewModel.CurrentStep)
         {
             return;
         }
@@ -63,26 +82,6 @@ public partial class MatchupEditorView : UserControl
         }
 
         MatchupEditorStepsListBox.SelectedIndex = ViewModel.CurrentStepIndex;
-    }
-
-    private void MatchupEditorStepsListBox_PreviewMouseLeftButtonDown(
-        object sender,
-        MouseButtonEventArgs e)
-    {
-        if (sender is not ListBox stepsListBox
-            || FindStepItem(e.OriginalSource as DependencyObject) is not { IsEnabled: true } stepItem
-            || !int.TryParse(stepItem.Tag?.ToString(), out var selectedStep))
-        {
-            return;
-        }
-
-        if (ViewModel.NavigateToStep(selectedStep))
-        {
-            ResetContentScroll();
-        }
-
-        stepsListBox.SelectedIndex = ViewModel.CurrentStepIndex;
-        e.Handled = true;
     }
 
     private static ListBoxItem? FindStepItem(DependencyObject? element)
