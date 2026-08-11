@@ -6,6 +6,15 @@ namespace TempoCue.Core;
 /// </summary>
 public static class PlayerPositionResolver
 {
+    private static readonly PlayerPosition[] ExactPositions =
+    [
+        PlayerPosition.Top,
+        PlayerPosition.Jungle,
+        PlayerPosition.Middle,
+        PlayerPosition.Bottom,
+        PlayerPosition.Support
+    ];
+
     public static PlayerPosition Resolve(MatchState match, PlayerState player)
     {
         ArgumentNullException.ThrowIfNull(match);
@@ -25,6 +34,12 @@ public static class PlayerPositionResolver
             || teammates.Count(candidate => candidate.Position == PlayerPosition.Unknown) != 1)
         {
             return PlayerPosition.Unknown;
+        }
+
+        var exactPosition = ResolveOnlyMissingExactPosition(teammates);
+        if (exactPosition != PlayerPosition.Unknown)
+        {
+            return exactPosition;
         }
 
         var topSlots = 1;
@@ -76,5 +91,32 @@ public static class PlayerPositionResolver
         return middleSlots == 1
             ? PlayerPosition.Middle
             : PlayerPosition.Unknown;
+    }
+
+    private static PlayerPosition ResolveOnlyMissingExactPosition(
+        IReadOnlyList<PlayerState> teammates)
+    {
+        var missingPosition = PlayerPosition.Unknown;
+
+        foreach (var position in ExactPositions)
+        {
+            var occupiedSlots = teammates.Count(player => player.Position == position);
+            if (occupiedSlots > 1)
+            {
+                return PlayerPosition.Unknown;
+            }
+
+            if (occupiedSlots == 0)
+            {
+                if (missingPosition != PlayerPosition.Unknown)
+                {
+                    return PlayerPosition.Unknown;
+                }
+
+                missingPosition = position;
+            }
+        }
+
+        return missingPosition;
     }
 }
