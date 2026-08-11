@@ -10,6 +10,7 @@ internal sealed class CurrentMatchViewModelTestContext : IDisposable
 {
     private readonly string _initialLanguage;
     private readonly List<CurrentMatchViewModel> _viewModels = [];
+    private readonly List<ActiveMatchMonitor> _monitors = [];
 
     public CurrentMatchViewModelTestContext()
     {
@@ -31,11 +32,11 @@ internal sealed class CurrentMatchViewModelTestContext : IDisposable
         MatchSnapshotReadResult result,
         IMatchAdviceSelector adviceSelector)
     {
-        var session = new ActiveMatchSession(
+        var monitor = CurrentMatchViewModelTestData.CreateMonitor(
             TestMatchSnapshotSource.FromResult(result),
-            adviceSelector,
-            TimeSpan.FromSeconds(1));
-        var viewModel = new CurrentMatchViewModel(session, Localization);
+            adviceSelector);
+        var viewModel = new CurrentMatchViewModel(monitor, Localization);
+        _monitors.Add(monitor);
         _viewModels.Add(viewModel);
         return viewModel;
     }
@@ -55,6 +56,11 @@ internal sealed class CurrentMatchViewModelTestContext : IDisposable
         foreach (var viewModel in _viewModels)
         {
             viewModel.Dispose();
+        }
+
+        foreach (var monitor in _monitors)
+        {
+            monitor.Dispose();
         }
 
         Localization.SetLanguage(_initialLanguage);

@@ -20,6 +20,7 @@ public partial class App : System.Windows.Application
     private DataDragonGamePatchCatalog? _gamePatchCatalog;
     private DataDragonChampionCatalog? _championCatalog;
     private DataDragonItemCatalog? _itemCatalog;
+    private ActiveMatchMonitor? _activeMatchMonitor;
     private CurrentMatchViewModel? _currentMatchViewModel;
     private HomeViewModel? _homeViewModel;
     private SettingsViewModel? _settingsViewModel;
@@ -61,8 +62,9 @@ public partial class App : System.Windows.Application
             _liveClientDataClient,
             activeCoachPackSelector,
             TimeSpan.FromSeconds(1));
+        _activeMatchMonitor = new ActiveMatchMonitor(activeMatchSession);
         _currentMatchViewModel = new CurrentMatchViewModel(
-            activeMatchSession,
+            _activeMatchMonitor,
             LocalizationService.Instance);
         _homeViewModel = new HomeViewModel(
             _currentMatchViewModel,
@@ -126,6 +128,7 @@ public partial class App : System.Windows.Application
             _settingsViewModel,
             _coachingViewModel);
         MainWindow.Show();
+        _activeMatchMonitor.Start();
     }
 
     private static IReadOnlyList<CoachPack> LoadBuiltInCoachPacks()
@@ -157,6 +160,7 @@ public partial class App : System.Windows.Application
         _settingsViewModel?.Dispose();
         _homeViewModel?.Dispose();
         _currentMatchViewModel?.Dispose();
+        _activeMatchMonitor?.Dispose();
         _dataDragonClient?.Dispose();
         _liveClientDataClient?.Dispose();
         base.OnExit(e);

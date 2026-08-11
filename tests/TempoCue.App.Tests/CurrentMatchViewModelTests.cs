@@ -8,6 +8,37 @@ namespace TempoCue.App.Tests;
 public sealed class CurrentMatchViewModelTests
 {
     [Fact]
+    public async Task Constructor_AppliesLastUpdatePublishedBeforeSubscription()
+    {
+        var snapshot = new MatchSnapshot(
+            new MatchState
+            {
+                GameTimeSeconds = 60,
+                ActivePlayerId = "urgot-player",
+                Players =
+                [
+                    CreatePlayer(
+                        "urgot-player",
+                        "Urgot",
+                        TeamSide.Order,
+                        PlayerPosition.Top)
+                ]
+            },
+            [],
+            "{}",
+            DateTimeOffset.UtcNow);
+        using var monitor = CreateMonitor(TestMatchSnapshotSource.FromSnapshot(snapshot));
+        await monitor.RefreshAsync();
+
+        using var viewModel = new TempoCue.App.ViewModels.CurrentMatchViewModel(
+            monitor,
+            TempoCue.App.Localization.LocalizationService.Instance);
+
+        Assert.Equal(MatchSnapshotReadStatus.Success, viewModel.Status);
+        Assert.Equal("Urgot", viewModel.ActiveChampion);
+    }
+
+    [Fact]
     public async Task RefreshAsync_BuildsRostersAdviceAndRiotEvents()
     {
         using var context = new CurrentMatchViewModelTestContext();

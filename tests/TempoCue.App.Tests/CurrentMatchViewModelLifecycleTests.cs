@@ -14,12 +14,11 @@ public sealed class CurrentMatchViewModelLifecycleTests
     {
         var completion = new TaskCompletionSource<MatchSnapshotReadResult>(
             TaskCreationOptions.RunContinuationsAsynchronously);
-        var session = new ActiveMatchSession(
+        using var monitor = CreateMonitor(
             new TestMatchSnapshotSource(_ => completion.Task),
-            new TestMatchAdviceSelector(),
-            TimeSpan.FromSeconds(1));
+            new TestMatchAdviceSelector());
         var viewModel = new CurrentMatchViewModel(
-            session,
+            monitor,
             LocalizationService.Instance);
         var completedUpdates = 0;
         viewModel.StateUpdated += (_, _) => completedUpdates++;

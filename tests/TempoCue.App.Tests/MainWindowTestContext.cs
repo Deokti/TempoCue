@@ -13,6 +13,7 @@ namespace TempoCue.App.Tests;
 internal sealed class MainWindowTestContext : IDisposable
 {
     private readonly string _initialLanguage;
+    private readonly ActiveMatchMonitor _activeMatchMonitor;
     private bool _isDisposed;
 
     public MainWindowTestContext()
@@ -21,11 +22,10 @@ internal sealed class MainWindowTestContext : IDisposable
         _initialLanguage = Localization.CurrentLanguageCode;
         Localization.SetLanguage("ru-RU");
 
-        var session = new ActiveMatchSession(
+        _activeMatchMonitor = CurrentMatchViewModelTestData.CreateMonitor(
             TestMatchSnapshotSource.FromResult(MatchSnapshotReadResult.NoActiveMatch()),
-            new TestMatchAdviceSelector(),
-            TimeSpan.FromSeconds(1));
-        CurrentMatch = new CurrentMatchViewModel(session, Localization);
+            new TestMatchAdviceSelector());
+        CurrentMatch = new CurrentMatchViewModel(_activeMatchMonitor, Localization);
         Home = new HomeViewModel(CurrentMatch, Localization);
         Settings = new SettingsViewModel(Localization, new AppSettingsService());
         CoachPackStore = new TestCoachPackStore();
@@ -227,6 +227,7 @@ internal sealed class MainWindowTestContext : IDisposable
         Settings.Dispose();
         Home.Dispose();
         CurrentMatch.Dispose();
+        _activeMatchMonitor.Dispose();
         Localization.SetLanguage(_initialLanguage);
     }
 }

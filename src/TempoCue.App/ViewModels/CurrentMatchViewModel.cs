@@ -1,6 +1,5 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using TempoCue.App.Localization;
 using TempoCue.Application;
 using TempoCue.Core;
@@ -15,12 +14,10 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
 {
     private const int BlackCleaverItemId = 3071;
 
-    private readonly ActiveMatchSession _session;
+    private readonly IActiveMatchMonitor _monitor;
     private readonly LocalizationService _localization;
-    private readonly CancellationTokenSource _sessionCancellation = new();
 
     private ActiveMatchUpdate? _lastUpdate;
-    private Task? _watchTask;
     private MatchSnapshotReadStatus _status = MatchSnapshotReadStatus.NoActiveMatch;
     private string _connectionTitle = string.Empty;
     private string _connectionDetails = string.Empty;
@@ -45,13 +42,19 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
     private bool _isDisposed;
 
     public CurrentMatchViewModel(
-        ActiveMatchSession session,
+        IActiveMatchMonitor monitor,
         LocalizationService localization)
     {
-        _session = session;
-        _localization = localization;
+        _monitor = monitor ?? throw new ArgumentNullException(nameof(monitor));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        _monitor.Updated += Monitor_Updated;
         _localization.PropertyChanged += Localization_PropertyChanged;
         RenderWaiting();
+
+        if (_monitor.CurrentUpdate is { } update)
+        {
+            ApplyUpdate(update);
+        }
     }
 
     public ObservableCollection<ParticipantViewModel> Allies { get; } = [];
@@ -194,37 +197,10 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
 
     public int ParticipantCount => Allies.Count + Enemies.Count;
 
-    public void Start()
+    public Task RefreshAsync()
     {
         ObjectDisposedException.ThrowIf(_isDisposed, this);
-        _watchTask ??= WatchAsync(_sessionCancellation.Token);
-    }
-
-    public void Stop()
-    {
-        if (!_sessionCancellation.IsCancellationRequested)
-        {
-            _sessionCancellation.Cancel();
-        }
-    }
-
-    public async Task RefreshAsync()
-    {
-        ObjectDisposedException.ThrowIf(_isDisposed, this);
-        if (_sessionCancellation.IsCancellationRequested)
-        {
-            return;
-        }
-
-        try
-        {
-            var update = await _session.RefreshAsync(_sessionCancellation.Token);
-            ApplyUpdate(update);
-        }
-        catch (OperationCanceledException) when (_sessionCancellation.IsCancellationRequested)
-        {
-            // Закрытие экрана штатно отменяет ручное обновление вместе с фоновым циклом.
-        }
+        return _monitor.RefreshAsync();
     }
 
     public void Dispose()
@@ -235,41 +211,12 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         }
 
         _isDisposed = true;
+        _monitor.Updated -= Monitor_Updated;
         _localization.PropertyChanged -= Localization_PropertyChanged;
-        Stop();
-        _sessionCancellation.Dispose();
     }
 
-    private async Task WatchAsync(CancellationToken cancellationToken)
-    {
-        try
-        {
-            await foreach (var update in _session.WatchAsync(cancellationToken))
-            {
-                ApplyUpdate(update);
-            }
-        }
-        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-        {
-            // Закрытие приложения штатно завершает сессию наблюдения.
-        }
-        catch (Exception exception)
-        {
-            if (_isDisposed)
-            {
-                return;
-            }
-
-            Trace.TraceError(
-                "Цикл текущего матча завершился с ошибкой ({0}): {1}",
-                exception.GetType().Name,
-                exception.Message);
-            _lastUpdate = null;
-            Status = MatchSnapshotReadStatus.Failed;
-            RenderWaiting();
-            StateUpdated?.Invoke(this, EventArgs.Empty);
-        }
-    }
+    private void Monitor_Updated(object? sender, ActiveMatchUpdateEventArgs e) =>
+        ApplyUpdate(e.Update);
 
     private void ApplyUpdate(ActiveMatchUpdate update)
     {

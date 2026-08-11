@@ -85,11 +85,9 @@ public sealed class CurrentMatchViewModelEfficiencyTests
                 new MatchSnapshot(firstMatch, [matchEvent], "{}", DateTimeOffset.UtcNow)),
             MatchSnapshotReadResult.Success(
                 new MatchSnapshot(secondMatch, [matchEvent], "{}", DateTimeOffset.UtcNow)));
+        using var monitor = CreateMonitor(source);
         using var viewModel = new CurrentMatchViewModel(
-            new ActiveMatchSession(
-                source,
-                new TestMatchAdviceSelector(),
-                TimeSpan.FromSeconds(1)),
+            monitor,
             LocalizationService.Instance);
 
         await viewModel.RefreshAsync();

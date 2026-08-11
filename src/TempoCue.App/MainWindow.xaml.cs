@@ -39,11 +39,11 @@ public partial class MainWindow : Window
         Closed += MainWindow_Closed;
     }
 
-    // Опрос матча запускается только после загрузки окна и останавливается при закрытии приложения.
+    // После загрузки окно подписывается только на представление состояния;
+    // единый цикл polling принадлежит ActiveMatchMonitor в composition root.
     private void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
         _currentMatchViewModel.StateUpdated += CurrentMatchViewModel_StateUpdated;
-        _currentMatchViewModel.Start();
         RenderShellFromCurrentMatch();
     }
 
