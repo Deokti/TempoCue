@@ -9,15 +9,18 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
 {
     private readonly LocalizationService _localization;
     private readonly AppSettingsService _settings;
+    private readonly Action _showOverlayPreview;
     private string _selectedLanguageCode;
     private bool _isDisposed;
 
     public SettingsViewModel(
         LocalizationService localization,
-        AppSettingsService settings)
+        AppSettingsService settings,
+        Action showOverlayPreview)
     {
         _localization = localization;
         _settings = settings;
+        _showOverlayPreview = showOverlayPreview ?? throw new ArgumentNullException(nameof(showOverlayPreview));
         _selectedLanguageCode = localization.CurrentLanguageCode;
         _localization.PropertyChanged += Localization_PropertyChanged;
     }
@@ -43,6 +46,9 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
             _settings.SaveLanguage(normalizedCode);
         }
     }
+
+    /// <summary>Показывает демонстрационное уведомление без активного матча.</summary>
+    public void ShowOverlayPreview() => _showOverlayPreview();
 
     public void Dispose()
     {

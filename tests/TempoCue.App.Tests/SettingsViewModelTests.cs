@@ -24,7 +24,10 @@ public sealed class SettingsViewModelTests
         try
         {
             localization.SetLanguage("ru-RU");
-            using var viewModel = new SettingsViewModel(localization, settingsService);
+            using var viewModel = new SettingsViewModel(
+                localization,
+                settingsService,
+                static () => { });
 
             viewModel.SelectedLanguageCode = "en-US";
 

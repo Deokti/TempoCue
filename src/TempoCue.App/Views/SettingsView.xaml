@@ -14,7 +14,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <!-- Сейчас страница содержит только настройку языка интерфейса. -->
+    <!-- Настройки интерфейса и безопасная проверка будущего игрового оверлея. -->
     <Grid Margin="24">
         <StackPanel HorizontalAlignment="Left" MaxWidth="760">
             <TextBlock x:Name="SettingsTitleTextBlock"
@@ -66,6 +66,43 @@
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Предпросмотр проверяет отдельное окно без матча и не меняет игровые данные. -->
+            <Border Style="{StaticResource ShellCard}"
+                    Width="760"
+                    Margin="0,12,0,0">
+                <StackPanel>
+                    <TextBlock Text="{localization:Loc Settings.Overlay.Section}"
+                               Foreground="#91A4BD"
+                               FontSize="13"
+                               FontWeight="SemiBold"
+                               Margin="0,0,0,16" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel VerticalAlignment="Center" Margin="0,0,28,0">
+                            <TextBlock Text="{localization:Loc Settings.Overlay.Preview.Label}"
+                                       Foreground="#F4F7FB"
+                                       FontSize="14" />
+                            <TextBlock Text="{localization:Loc Settings.Overlay.Description}"
+                                       Style="{StaticResource ShellCaption}"
+                                       TextWrapping="Wrap"
+                                       LineHeight="18"
+                                       Margin="0,4,0,0" />
+                        </StackPanel>
+                        <Button x:Name="ShowOverlayPreviewButton"
+                                Grid.Column="1"
+                                Content="{localization:Loc Settings.Overlay.Preview.Button}"
+                                Style="{StaticResource PrimaryButton}"
+                                MinWidth="196"
+                                Height="38"
+                                VerticalAlignment="Center"
+                                Click="ShowOverlayPreviewButton_Click" />
                     </Grid>
                 </StackPanel>
             </Border>

@@ -1,0 +1,24 @@
+<Window x:Class="TempoCue.Overlay.OverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:TempoCue.Overlay"
+        x:ClassModifier="internal"
+        Title="TempoCue Overlay"
+        Width="340"
+        SizeToContent="Height"
+        WindowStartupLocation="Manual"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        ShowActivated="False"
+        Topmost="True"
+        FontFamily="Segoe UI">
+    <!-- Ровно два слота: очередь и приоритеты остаются вне визуального дерева. -->
+    <StackPanel x:Name="OverlayCardsPanel"
+                MouseLeftButtonDown="OverlayCardsPanel_MouseLeftButtonDown">
+        <local:OverlayCardView x:Name="PrimaryCard" />
+        <local:OverlayCardView x:Name="SecondaryCard" Margin="0,8,0,0" />
+    </StackPanel>
+</Window>

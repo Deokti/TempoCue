@@ -7,6 +7,7 @@ using TempoCue.App.Persistence;
 using TempoCue.App.ViewModels;
 using TempoCue.Application;
 using TempoCue.Core;
+using TempoCue.Overlay;
 using TempoCue.Riot;
 
 namespace TempoCue.App;
@@ -26,6 +27,7 @@ public partial class App : System.Windows.Application
     private HomeViewModel? _homeViewModel;
     private SettingsViewModel? _settingsViewModel;
     private CoachingViewModel? _coachingViewModel;
+    private IOverlayPresenter? _overlayPresenter;
     private readonly CancellationTokenSource _lifetimeCancellation = new();
 
     protected override void OnStartup(StartupEventArgs e)
@@ -91,9 +93,11 @@ public partial class App : System.Windows.Application
             currentMatchViewModel,
             LocalizationService.Instance);
         _homeViewModel = homeViewModel;
+        _overlayPresenter = new OverlayHost(Dispatcher);
         _settingsViewModel = new SettingsViewModel(
             LocalizationService.Instance,
-            settingsService);
+            settingsService,
+            ShowOverlayPreview);
         var coachingLibraryViewModel = new CoachingLibraryViewModel(
             builtInPacks,
             LocalizationService.Instance,
@@ -188,10 +192,24 @@ public partial class App : System.Windows.Application
         return packs;
     }
 
+    private void ShowOverlayPreview()
+    {
+        var localization = LocalizationService.Instance;
+        _overlayPresenter?.SetInteractionMode(OverlayInteractionMode.Setup);
+        _overlayPresenter?.ShowPreview(new OverlayNotification(
+            "settings.preview",
+            localization.Get("Settings.Overlay.Preview.Label"),
+            localization.Get("Settings.Overlay.Preview.Title"),
+            localization.Get("Settings.Overlay.Preview.Message"),
+            localization.Get("Settings.Overlay.Preview.Close"),
+            OverlayNotificationTone.Information));
+    }
+
     // Освобождение выполняется в обратном порядке владения долгоживущими объектами.
     protected override void OnExit(ExitEventArgs e)
     {
         _lifetimeCancellation.Cancel();
+        _overlayPresenter?.Dispose();
         _coachingViewModel?.Dispose();
         _settingsViewModel?.Dispose();
         _homeViewModel?.Dispose();

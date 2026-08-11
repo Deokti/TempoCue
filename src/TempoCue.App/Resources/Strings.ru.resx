@@ -733,4 +733,11 @@
   <data name="Coaching.Export.Status.ItemCatalogUnavailable" xml:space="preserve"><value>Каталог предметов недоступен. Экспорт заблокирован до проверки совместимости предметов.</value></data>
   <data name="Coaching.Export.Status.ItemsNotFound" xml:space="preserve"><value>В каталоге выбранного патча нет предметов с ID: {0}.</value></data>
   <data name="Coaching.Export.Status.Failed" xml:space="preserve"><value>Не удалось собрать набор предметов.</value></data>
+  <data name="Settings.Overlay.Section" xml:space="preserve"><value>Игровой оверлей</value></data>
+  <data name="Settings.Overlay.Preview.Label" xml:space="preserve"><value>Предпросмотр оверлея</value></data>
+  <data name="Settings.Overlay.Description" xml:space="preserve"><value>Показывает тестовое уведомление без необходимости запускать матч League.</value></data>
+  <data name="Settings.Overlay.Preview.Button" xml:space="preserve"><value>Показать тестовый оверлей</value></data>
+  <data name="Settings.Overlay.Preview.Title" xml:space="preserve"><value>Оверлей TempoCue готов</value></data>
+  <data name="Settings.Overlay.Preview.Message" xml:space="preserve"><value>Это тестовое уведомление. Советы из матча подключим в следующей итерации.</value></data>
+  <data name="Settings.Overlay.Preview.Close" xml:space="preserve"><value>Закрыть оверлей</value></data>
 </root>

@@ -1,4 +1,5 @@
 using System.Windows.Controls;
+using TempoCue.App.ViewModels;
 
 namespace TempoCue.App.Views;
 
@@ -8,5 +9,13 @@ public partial class SettingsView : UserControl
     public SettingsView()
     {
         InitializeComponent();
+    }
+
+    private void ShowOverlayPreviewButton_Click(object sender, System.Windows.RoutedEventArgs e)
+    {
+        if (DataContext is SettingsViewModel viewModel)
+        {
+            viewModel.ShowOverlayPreview();
+        }
     }
 }

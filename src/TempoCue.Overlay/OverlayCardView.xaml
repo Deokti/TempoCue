@@ -1,0 +1,175 @@
+<UserControl x:Class="TempoCue.Overlay.OverlayCardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:TempoCue.Overlay"
+             x:ClassModifier="internal"
+             IsTabStop="False">
+    <UserControl.Resources>
+        <!-- Цвета состояний совпадают с шестью вариантами актуального макета. -->
+        <Style x:Key="AccentRailStyle" TargetType="Border">
+            <Setter Property="Background" Value="#68BFF2" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Tone}" Value="{x:Static local:OverlayNotificationTone.Danger}">
+                    <Setter Property="Background" Value="#FF7185" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Tone}" Value="{x:Static local:OverlayNotificationTone.Caution}">
+                    <Setter Property="Background" Value="#F2C66D" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Tone}" Value="{x:Static local:OverlayNotificationTone.Coach}">
+                    <Setter Property="Background" Value="#4FAAE8" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Tone}" Value="{x:Static local:OverlayNotificationTone.NoData}">
+                    <Setter Property="Background" Value="#91A4BD" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Tone}" Value="{x:Static local:OverlayNotificationTone.Paused}">
+                    <Setter Property="Background" Value="#91A4BD" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="AccentTextStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#68BFF2" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Tone}" Value="{x:Static local:OverlayNotificationTone.Danger}">
+                    <Setter Property="Foreground" Value="#FF7185" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Tone}" Value="{x:Static local:OverlayNotificationTone.Caution}">
+                    <Setter Property="Foreground" Value="#F2C66D" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Tone}" Value="{x:Static local:OverlayNotificationTone.Coach}">
+                    <Setter Property="Foreground" Value="#4FAAE8" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Tone}" Value="{x:Static local:OverlayNotificationTone.NoData}">
+                    <Setter Property="Foreground" Value="#91A4BD" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Tone}" Value="{x:Static local:OverlayNotificationTone.Paused}">
+                    <Setter Property="Foreground" Value="#91A4BD" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="CardBorderStyle" TargetType="Border">
+            <Setter Property="BorderBrush" Value="#24405A" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Tone}" Value="{x:Static local:OverlayNotificationTone.Danger}">
+                    <Setter Property="BorderBrush" Value="#4E2A36" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Tone}" Value="{x:Static local:OverlayNotificationTone.Caution}">
+                    <Setter Property="BorderBrush" Value="#4A3E24" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Tone}" Value="{x:Static local:OverlayNotificationTone.NoData}">
+                    <Setter Property="BorderBrush" Value="#263750" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Tone}" Value="{x:Static local:OverlayNotificationTone.Paused}">
+                    <Setter Property="BorderBrush" Value="#263750" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <!-- Фон полупрозрачен, но дочерний текст и цветовая полоса остаются непрозрачными. -->
+    <Border x:Name="OverlayCard"
+            Background="#CC101827"
+            BorderThickness="1"
+            CornerRadius="12"
+            Style="{StaticResource CardBorderStyle}">
+        <Grid>
+            <Border Width="3"
+                    HorizontalAlignment="Left"
+                    CornerRadius="12,0,0,12"
+                    Style="{StaticResource AccentRailStyle}" />
+
+            <Grid Margin="14,12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Строка состояния, контекста и кнопки режима настройки. -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding DisplayStatus}"
+                               FontSize="13"
+                               LineHeight="18"
+                               FontWeight="Bold"
+                               TextOptions.TextFormattingMode="Display"
+                               Style="{StaticResource AccentTextStyle}" />
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding Context}"
+                               Margin="8,0,0,0"
+                               HorizontalAlignment="Right"
+                               Foreground="#91A4BD"
+                               FontFamily="Consolas"
+                               FontSize="13"
+                               LineHeight="18"
+                               TextTrimming="CharacterEllipsis" />
+                    <Button x:Name="CloseOverlayButton"
+                            Grid.Column="2"
+                            Content="×"
+                            Width="24"
+                            Height="24"
+                            Margin="8,-4,-4,0"
+                            Background="Transparent"
+                            Foreground="#91A4BD"
+                            BorderThickness="0"
+                            FontSize="18"
+                            Cursor="Hand"
+                            Focusable="False"
+                            Visibility="Collapsed"
+                            ToolTip="{Binding DismissLabel}"
+                            AutomationProperties.Name="{Binding DismissLabel}"
+                            Click="CloseOverlayButton_Click" />
+                </Grid>
+
+                <!-- Одна короткая фраза — основное содержимое карточки. -->
+                <TextBlock x:Name="OverlayPhraseTextBlock"
+                           Grid.Row="1"
+                           Text="{Binding Phrase}"
+                           Margin="0,6,0,0"
+                           Foreground="#F4F7FB"
+                           FontSize="15"
+                           LineHeight="21"
+                           FontWeight="SemiBold"
+                           TextWrapping="Wrap" />
+
+                <!-- Источник или причина, а также необязательная системная метка. -->
+                <Grid Grid.Row="2" Margin="0,8,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock x:Name="OverlaySourceTextBlock"
+                               Text="{Binding Source}"
+                               Foreground="#91A4BD"
+                               FontSize="13"
+                               LineHeight="18"
+                               TextWrapping="Wrap" />
+                    <Border Grid.Column="1"
+                            Margin="8,0,0,0"
+                            Padding="7,2"
+                            Background="#263750"
+                            CornerRadius="8">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Visibility" Value="Visible" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Badge}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <TextBlock Text="{Binding Badge}"
+                                   Foreground="#91A4BD"
+                                   FontSize="11" />
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

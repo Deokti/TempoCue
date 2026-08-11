@@ -16,7 +16,7 @@ internal sealed class MainWindowTestContext : IDisposable
     private readonly ActiveMatchMonitor _activeMatchMonitor;
     private bool _isDisposed;
 
-    public MainWindowTestContext()
+    public MainWindowTestContext(Action? showOverlayPreview = null)
     {
         Localization = LocalizationService.Instance;
         _initialLanguage = Localization.CurrentLanguageCode;
@@ -30,7 +30,10 @@ internal sealed class MainWindowTestContext : IDisposable
             TestChampionCatalog.Ready(),
             Localization);
         Home = new HomeViewModel(CurrentMatch, Localization);
-        Settings = new SettingsViewModel(Localization, new AppSettingsService());
+        Settings = new SettingsViewModel(
+            Localization,
+            new AppSettingsService(),
+            showOverlayPreview ?? (static () => { }));
         CoachPackStore = new TestCoachPackStore();
         Coaching = CoachingViewModelTestFactory.Create(
             TestCoachPackFactory.CreateMatchup(),

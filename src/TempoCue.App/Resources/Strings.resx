@@ -723,4 +723,11 @@
   <data name="Coaching.Export.Status.ItemCatalogUnavailable" xml:space="preserve"><value>The item catalog is unavailable. Export is blocked until item compatibility can be verified.</value></data>
   <data name="Coaching.Export.Status.ItemsNotFound" xml:space="preserve"><value>These item IDs are absent from the selected patch catalog: {0}.</value></data>
   <data name="Coaching.Export.Status.Failed" xml:space="preserve"><value>The item set could not be built.</value></data>
+  <data name="Settings.Overlay.Section" xml:space="preserve"><value>Game overlay</value></data>
+  <data name="Settings.Overlay.Preview.Label" xml:space="preserve"><value>Overlay preview</value></data>
+  <data name="Settings.Overlay.Description" xml:space="preserve"><value>Shows a test notification without requiring an active League match.</value></data>
+  <data name="Settings.Overlay.Preview.Button" xml:space="preserve"><value>Show test overlay</value></data>
+  <data name="Settings.Overlay.Preview.Title" xml:space="preserve"><value>TempoCue overlay is ready</value></data>
+  <data name="Settings.Overlay.Preview.Message" xml:space="preserve"><value>This is a test notification. Match advice will be connected in the next iteration.</value></data>
+  <data name="Settings.Overlay.Preview.Close" xml:space="preserve"><value>Close overlay</value></data>
 </root>

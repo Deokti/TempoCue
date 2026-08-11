@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\TempoCue.Application\TempoCue.Application.csproj" />
     <ProjectReference Include="..\TempoCue.Core\TempoCue.Core.csproj" />
+    <ProjectReference Include="..\TempoCue.Overlay\TempoCue.Overlay.csproj" />
     <ProjectReference Include="..\TempoCue.Riot\TempoCue.Riot.csproj" />
   </ItemGroup>
 
