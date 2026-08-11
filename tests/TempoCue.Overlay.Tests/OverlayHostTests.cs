@@ -23,6 +23,7 @@ public sealed class OverlayHostTests
         Assert.False(window.ShowInTaskbar);
         Assert.False(window.ShowActivated);
         Assert.True(window.Topmost);
+        Assert.Equal(SystemParameters.WorkArea.Top + 29, window.Top);
         Assert.Same(first, window.PrimaryCardView.DataContext);
 
         host.Show(second);
@@ -87,18 +88,34 @@ public sealed class OverlayHostTests
             window.SetInteractionMode(OverlayInteractionMode.Setup);
             window.ShowNotifications(new OverlayScheduleSnapshot(
             [
-                new OverlayDisplayItem(2, Create("caution", "Возможная угроза", OverlayNotificationTone.Caution), DateTimeOffset.UtcNow, DateTimeOffset.UtcNow.AddSeconds(6)),
+                new OverlayDisplayItem(
+                    2,
+                    Create(
+                        "caution",
+                        "Не рассчитывай на безопасный recall",
+                        OverlayNotificationTone.Coach,
+                        "Urgot против Sett",
+                        "Уровень 2",
+                        "Подсказка по матчапу"),
+                    DateTimeOffset.UtcNow,
+                    DateTimeOffset.UtcNow.AddSeconds(13)),
                 new OverlayDisplayItem(1, Create("info", "Дракон появится через 30 секунд", OverlayNotificationTone.Information), DateTimeOffset.UtcNow, DateTimeOffset.UtcNow.AddSeconds(5))
             ]));
             window.Show();
             WpfTestHost.Pump(DispatcherPriority.Loaded);
             var primaryCard = Assert.IsType<Border>(window.PrimaryCardView.FindName("OverlayCard"));
+            var primaryBadge = Assert.IsType<Border>(window.PrimaryCardView.FindName("OverlayBadgeBorder"));
             var primaryPhrase = Assert.IsType<TextBlock>(window.PrimaryCardView.FindName("OverlayPhraseTextBlock"));
             var primarySource = Assert.IsType<TextBlock>(window.PrimaryCardView.FindName("OverlaySourceTextBlock"));
 
             Assert.InRange(primaryCard.ActualWidth, 338, 342);
+            Assert.Equal(Visibility.Visible, primaryBadge.Visibility);
+            Assert.InRange(primaryBadge.ActualHeight, 16, 24);
             Assert.True(primaryPhrase.ActualHeight >= primaryPhrase.FontSize);
             Assert.True(primarySource.ActualHeight >= primarySource.FontSize);
+            Assert.True(
+                primaryBadge.TranslatePoint(new Point(), primaryCard).Y <
+                primaryPhrase.TranslatePoint(new Point(), primaryCard).Y);
             Assert.Equal(Visibility.Visible, window.SecondaryCardView.Visibility);
 
             var snapshotDirectory = Environment.GetEnvironmentVariable("TEMPOCUE_UI_SNAPSHOT_DIR");
@@ -118,9 +135,12 @@ public sealed class OverlayHostTests
     private static OverlayNotification Create(
         string key,
         string phrase,
-        OverlayNotificationTone tone = OverlayNotificationTone.Information) => new(
+        OverlayNotificationTone tone = OverlayNotificationTone.Information,
+        string? context = "только что",
+        string? badge = null,
+        string? status = null) => new(
         key,
-        tone switch
+        status ?? tone switch
         {
             OverlayNotificationTone.Danger => "Опасно",
             OverlayNotificationTone.Caution => "Осторожно",
@@ -133,5 +153,6 @@ public sealed class OverlayHostTests
         "Набор советов · тест",
         "Закрыть оверлей",
         tone,
-        "только что");
+        context,
+        badge);
 }

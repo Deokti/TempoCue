@@ -92,6 +92,7 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="{Binding DisplayStatus}"
                                FontSize="13"
@@ -108,8 +109,29 @@
                                FontSize="13"
                                LineHeight="18"
                                TextTrimming="CharacterEllipsis" />
-                    <Button x:Name="CloseOverlayButton"
+                    <Border x:Name="OverlayBadgeBorder"
                             Grid.Column="2"
+                            Margin="8,-1,0,0"
+                            Padding="7,2"
+                            VerticalAlignment="Top"
+                            Background="#263750"
+                            CornerRadius="8">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Visibility" Value="Visible" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Badge}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <TextBlock Text="{Binding Badge}"
+                                   Foreground="#91A4BD"
+                                   FontSize="11" />
+                    </Border>
+                    <Button x:Name="CloseOverlayButton"
+                            Grid.Column="3"
                             Content="×"
                             Width="24"
                             Height="24"
@@ -137,38 +159,15 @@
                            FontWeight="SemiBold"
                            TextWrapping="Wrap" />
 
-                <!-- Источник или причина, а также необязательная системная метка. -->
-                <Grid Grid.Row="2" Margin="0,8,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock x:Name="OverlaySourceTextBlock"
-                               Text="{Binding Source}"
-                               Foreground="#91A4BD"
-                               FontSize="13"
-                               LineHeight="18"
-                               TextWrapping="Wrap" />
-                    <Border Grid.Column="1"
-                            Margin="8,0,0,0"
-                            Padding="7,2"
-                            Background="#263750"
-                            CornerRadius="8">
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Setter Property="Visibility" Value="Visible" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Badge}" Value="{x:Null}">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
-                        <TextBlock Text="{Binding Badge}"
-                                   Foreground="#91A4BD"
-                                   FontSize="11" />
-                    </Border>
-                </Grid>
+                <!-- Подробное объяснение совета занимает всю ширину карточки. -->
+                <TextBlock x:Name="OverlaySourceTextBlock"
+                           Grid.Row="2"
+                           Text="{Binding Source}"
+                           Margin="0,8,0,0"
+                           Foreground="#91A4BD"
+                           FontSize="13"
+                           LineHeight="18"
+                           TextWrapping="Wrap" />
             </Grid>
         </Grid>
     </Border>

@@ -152,7 +152,7 @@ public sealed class OverlayNotificationScheduler
         _visible[visibleIndex] = current with
         {
             Notification = notification,
-            ExpiresAt = GetExpiration(notification.Tone, now)
+            ExpiresAt = GetExpiration(notification, now)
         };
         _lastShownByKey[notification.Key] = now;
         SortVisible();
@@ -196,7 +196,7 @@ public sealed class OverlayNotificationScheduler
             ++_nextSequence,
             notification,
             now,
-            GetExpiration(notification.Tone, now));
+            GetExpiration(notification, now));
         _visible.Add(item);
         _lastShownByKey[notification.Key] = now;
         if (!_policy.BypassesCadence(notification.Tone))
@@ -207,9 +207,11 @@ public sealed class OverlayNotificationScheduler
         SortVisible();
     }
 
-    private DateTimeOffset? GetExpiration(OverlayNotificationTone tone, DateTimeOffset now)
+    private DateTimeOffset? GetExpiration(
+        OverlayNotification notification,
+        DateTimeOffset now)
     {
-        var lifetime = _policy.GetLifetime(tone);
+        var lifetime = _policy.GetLifetime(notification);
         return lifetime == Timeout.InfiniteTimeSpan ? null : now + lifetime;
     }
 

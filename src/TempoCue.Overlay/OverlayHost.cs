@@ -6,7 +6,8 @@ namespace TempoCue.Overlay;
 /// <summary>Владеет окном, планировщиком карточек и одним UI-таймером жизненного цикла.</summary>
 public sealed class OverlayHost : IOverlayPresenter
 {
-    private const double WorkAreaMargin = 24;
+    private const double WorkAreaRightMargin = 24;
+    private const double WorkAreaTopMargin = 29;
     private static readonly TimeSpan LifecycleTick = TimeSpan.FromMilliseconds(100);
 
     private readonly Dispatcher _dispatcher;
@@ -198,8 +199,10 @@ public sealed class OverlayHost : IOverlayPresenter
     {
         window.UpdateLayout();
         var workArea = SystemParameters.WorkArea;
-        window.Left = Math.Max(workArea.Left, workArea.Right - window.ActualWidth - WorkAreaMargin);
-        window.Top = workArea.Top + WorkAreaMargin;
+        window.Left = Math.Max(
+            workArea.Left,
+            workArea.Right - window.ActualWidth - WorkAreaRightMargin);
+        window.Top = workArea.Top + WorkAreaTopMargin;
     }
 
     private void LifecycleTimer_Tick(object? sender, EventArgs e)

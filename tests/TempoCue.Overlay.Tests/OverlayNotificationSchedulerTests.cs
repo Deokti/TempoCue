@@ -68,6 +68,20 @@ public sealed class OverlayNotificationSchedulerTests
     }
 
     [Fact]
+    public void Publish_ExtendsLifetimeForLongAdviceText()
+    {
+        var scheduler = new OverlayNotificationScheduler();
+        var longAdvice = new string('a', 180);
+
+        var snapshot = scheduler.Publish(
+            Create("long-coach", OverlayNotificationTone.Coach, longAdvice),
+            Start);
+
+        var item = Assert.Single(snapshot.Items);
+        Assert.Equal(Start.AddSeconds(13), item.ExpiresAt);
+    }
+
+    [Fact]
     public void Publish_SuppressesRecentlyCompletedDuplicate()
     {
         var scheduler = new OverlayNotificationScheduler();

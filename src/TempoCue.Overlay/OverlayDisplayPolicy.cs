@@ -3,6 +3,10 @@ namespace TempoCue.Overlay;
 /// <summary>Единые интервалы и приоритеты жизненного цикла карточек оверлея.</summary>
 public sealed class OverlayDisplayPolicy
 {
+    private const double ReadingCharactersPerSecond = 18;
+    private const double ReadingPreparationSeconds = 2.5;
+    private const double MaximumReadingLifetimeSeconds = 16;
+
     public const int VisibleSlotCount = 2;
     public const int PendingCapacity = 2;
 
@@ -28,6 +32,25 @@ public sealed class OverlayDisplayPolicy
         OverlayNotificationTone.Paused => Timeout.InfiniteTimeSpan,
         _ => throw new ArgumentOutOfRangeException(nameof(tone), tone, null)
     };
+
+    public TimeSpan GetLifetime(OverlayNotification notification)
+    {
+        ArgumentNullException.ThrowIfNull(notification);
+        var minimumLifetime = GetLifetime(notification.Tone);
+        if (minimumLifetime == Timeout.InfiniteTimeSpan)
+        {
+            return minimumLifetime;
+        }
+
+        var readableCharacterCount = notification.Phrase.Length + notification.Source.Length;
+        var readingSeconds = Math.Ceiling(
+            ReadingPreparationSeconds + readableCharacterCount / ReadingCharactersPerSecond);
+        var lifetimeSeconds = Math.Clamp(
+            readingSeconds,
+            minimumLifetime.TotalSeconds,
+            MaximumReadingLifetimeSeconds);
+        return TimeSpan.FromSeconds(lifetimeSeconds);
+    }
 
     public int GetPriority(OverlayNotificationTone tone) => tone switch
     {
