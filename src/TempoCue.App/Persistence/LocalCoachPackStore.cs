@@ -123,6 +123,44 @@ public sealed class LocalCoachPackStore : ICoachPackStore
         }
     }
 
+    public async Task<bool> DeleteAsync(
+        string packId,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(packId);
+        if (!Directory.Exists(_rootDirectory))
+        {
+            return false;
+        }
+
+        var fileStem = CreateSafeFileStem(packId);
+        var packPath = Path.Combine(_rootDirectory, $"{fileStem}.json");
+        if (!File.Exists(packPath))
+        {
+            return false;
+        }
+
+        // Перед необратимым удалением убеждаемся, что безопасное имя файла не привело к коллизии ID.
+        await using (var packStream = OpenFile(packPath))
+        {
+            var storedPack = await CoachPackLoader.LoadAsync(packStream, cancellationToken);
+            if (!string.Equals(storedPack.Id, packId, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidDataException("Stored Coach Pack id does not match the requested id.");
+            }
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+        File.Delete(packPath);
+        var statePath = Path.Combine(_rootDirectory, $"{fileStem}.state.json");
+        if (File.Exists(statePath))
+        {
+            File.Delete(statePath);
+        }
+
+        return true;
+    }
+
     private static FileStream CreateFile(string path) => new(
         path,
         FileMode.CreateNew,

@@ -1,10 +1,18 @@
 <UserControl x:Class="TempoCue.App.Views.CoachingView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:localization="clr-namespace:TempoCue.App.Localization"
              xmlns:viewModels="clr-namespace:TempoCue.App.ViewModels"
              xmlns:views="clr-namespace:TempoCue.App.Views"
              Background="#080D14"
              FontFamily="Segoe UI">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Styles/ShellControls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <!-- Контейнер переключает независимые экраны библиотеки, выбора типа и редактора. -->
     <Grid>
         <views:CoachingLibraryView x:Name="CoachingLibraryPage"
@@ -28,7 +36,8 @@
                                        DataContext="{Binding Details}"
                                        BackRequested="CoachingPackDetailsPage_BackRequested"
                                        StateChangeRequested="CoachingPackDetailsPage_StateChangeRequested"
-                                       EditRequested="CoachingPackDetailsPage_EditRequested">
+                                       EditRequested="CoachingPackDetailsPage_EditRequested"
+                                       DeleteRequested="CoachingPackDetailsPage_DeleteRequested">
             <views:CoachingPackDetailsView.Style>
                 <Style TargetType="views:CoachingPackDetailsView">
                     <Setter Property="Visibility" Value="Collapsed" />
@@ -75,5 +84,72 @@
                 </Style>
             </views:MatchupEditorView.Style>
         </views:MatchupEditorView>
+
+        <!-- Подтверждение остаётся внутри приложения, чтобы действие называлось однозначно для своего и импортированного набора. -->
+        <Grid x:Name="DeleteConfirmationOverlay"
+              Background="#D9080D14"
+              Focusable="True"
+              PreviewKeyDown="DeleteConfirmationOverlay_PreviewKeyDown">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsDeleteConfirmationOpen}" Value="True">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+
+            <Border Width="520"
+                    MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=views:CoachingView}}"
+                    Background="#101A2A"
+                    BorderBrush="#3A4F6B"
+                    BorderThickness="1"
+                    CornerRadius="14"
+                    Padding="24"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="10" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="22" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="{Binding Details.DeleteConfirmationTitle}"
+                               Foreground="#F4F7FB"
+                               FontSize="{StaticResource Typography.FontSize.SectionTitle}"
+                               FontWeight="SemiBold" />
+                    <TextBlock Grid.Row="2"
+                               Text="{Binding Details.DeleteConfirmationMessage}"
+                               Foreground="#AFC0D6"
+                               FontSize="{StaticResource Typography.FontSize.BodyLarge}"
+                               TextWrapping="Wrap" />
+                    <StackPanel Grid.Row="4"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right">
+                        <Button x:Name="CancelDeleteCoachPackButton"
+                                Content="{localization:Loc Coaching.Details.Delete.Confirmation.Cancel}"
+                                Style="{StaticResource PrimaryButton}"
+                                IsDefault="True"
+                                Click="CancelDeleteCoachPackButton_Click" />
+                        <Button x:Name="ConfirmDeleteCoachPackButton"
+                                Content="{Binding Details.DeleteConfirmationActionLabel}"
+                                Margin="10,0,0,0"
+                                Click="ConfirmDeleteCoachPackButton_Click">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+                                    <Setter Property="Foreground" Value="#FF7185" />
+                                    <Setter Property="BorderBrush" Value="#7B3343" />
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
     </Grid>
 </UserControl>

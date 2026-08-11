@@ -14,6 +14,7 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
     private readonly IChampionCatalog _championCatalog;
     private readonly LoadCoachPackLibraryUseCase _loadCoachPackLibrary;
     private readonly SetCoachPackStateUseCase _setCoachPackState;
+    private readonly DeleteCoachPackUseCase _deleteCoachPack;
     private readonly CoachingPackCardFactory _cardFactory;
 
     private IReadOnlyList<LocalCoachPackEntry> _localEntries = [];
@@ -25,6 +26,7 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
     private string _librarySummary = string.Empty;
     private string _searchText = string.Empty;
     private string _libraryMessage = string.Empty;
+    private bool _isLibraryMessageSuccess;
     private bool _isLibraryLoading;
     private bool _isLibraryLoaded;
     private bool _isChampionCatalogLoaded;
@@ -37,7 +39,8 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
         LocalizationService localization,
         IChampionCatalog championCatalog,
         LoadCoachPackLibraryUseCase loadCoachPackLibrary,
-        SetCoachPackStateUseCase setCoachPackState)
+        SetCoachPackStateUseCase setCoachPackState,
+        DeleteCoachPackUseCase deleteCoachPack)
     {
         ArgumentNullException.ThrowIfNull(builtInPacks);
         _builtInPacks = builtInPacks.ToArray();
@@ -47,6 +50,8 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
             ?? throw new ArgumentNullException(nameof(loadCoachPackLibrary));
         _setCoachPackState = setCoachPackState
             ?? throw new ArgumentNullException(nameof(setCoachPackState));
+        _deleteCoachPack = deleteCoachPack
+            ?? throw new ArgumentNullException(nameof(deleteCoachPack));
         _cardFactory = new CoachingPackCardFactory(localization);
         _localization.PropertyChanged += Localization_PropertyChanged;
         RebuildCards();
@@ -112,6 +117,12 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
 
     public bool HasLibraryMessage => !string.IsNullOrWhiteSpace(LibraryMessage);
 
+    public bool IsLibraryMessageSuccess
+    {
+        get => _isLibraryMessageSuccess;
+        private set => SetProperty(ref _isLibraryMessageSuccess, value);
+    }
+
     /// <summary>
     /// Сообщает composition root, что наборы или их локальные состояния перечитаны.
     /// Активный движок использует событие только для инвалидирования своего кеша.
@@ -138,6 +149,7 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
     public async Task RefreshAsync(CancellationToken cancellationToken = default)
     {
         IsLibraryLoading = true;
+        IsLibraryMessageSuccess = false;
         LibraryMessage = string.Empty;
         try
         {
@@ -182,6 +194,7 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(card);
+        IsLibraryMessageSuccess = false;
         try
         {
             await _setCoachPackState.ExecuteAsync(
@@ -202,6 +215,41 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
         }
     }
 
+    public async Task<bool> DeletePackAsync(
+        CoachingPackCardViewModel card,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(card);
+        IsLibraryMessageSuccess = false;
+        if (!card.CanDelete)
+        {
+            return false;
+        }
+
+        try
+        {
+            if (!await _deleteCoachPack.ExecuteAsync(card.Pack.Id, cancellationToken))
+            {
+                LibraryMessage = _localization.Get("Coaching.Library.DeleteFailed");
+                return false;
+            }
+
+            await RefreshAsync(cancellationToken);
+            IsLibraryMessageSuccess = true;
+            LibraryMessage = _localization.Format("Coaching.Library.Deleted", card.Title);
+            return true;
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            return false;
+        }
+        catch (Exception exception) when (IsExpectedLibraryException(exception))
+        {
+            LibraryMessage = _localization.Get("Coaching.Library.DeleteFailed");
+            return false;
+        }
+    }
+
     public void Dispose()
     {
         if (_isDisposed)
@@ -213,8 +261,12 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
         _localization.PropertyChanged -= Localization_PropertyChanged;
     }
 
-    private void Localization_PropertyChanged(object? sender, PropertyChangedEventArgs e) =>
+    private void Localization_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        IsLibraryMessageSuccess = false;
+        LibraryMessage = string.Empty;
         RebuildCards();
+    }
 
     private void RebuildCards()
     {

@@ -17,4 +17,8 @@ public interface ICoachPackStore
         string packId,
         LocalCoachPackState state,
         CancellationToken cancellationToken = default);
+
+    Task<bool> DeleteAsync(
+        string packId,
+        CancellationToken cancellationToken = default);
 }

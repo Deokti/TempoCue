@@ -33,4 +33,6 @@ public sealed record CoachingPackCardViewModel(
     public bool CanEdit => IsCreatedByUser;
 
     public bool CanCreateCopy => !IsCreatedByUser;
+
+    public bool CanDelete => Origin != CoachingPackOrigin.BuiltIn;
 }

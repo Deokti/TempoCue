@@ -21,7 +21,8 @@ internal static class CoachingViewModelTestFactory
             resolvedLocalization,
             championCatalog,
             new LoadCoachPackLibraryUseCase(resolvedStore),
-            new SetCoachPackStateUseCase(resolvedStore));
+            new SetCoachPackStateUseCase(resolvedStore),
+            new DeleteCoachPackUseCase(resolvedStore));
         var itemCatalog = TestItemCatalog.Ready();
         var editor = new MatchupEditorViewModel(
             resolvedLocalization,
@@ -32,7 +33,8 @@ internal static class CoachingViewModelTestFactory
         var details = new CoachingPackDetailsViewModel(
             resolvedLocalization,
             itemCatalog,
-            new BuildLeagueItemSetExportUseCase(championCatalog, itemCatalog));
+            new BuildLeagueItemSetExportUseCase(championCatalog, itemCatalog),
+            new ExportCoachPackUseCase());
         return new CoachingViewModel(
             resolvedLocalization,
             library,

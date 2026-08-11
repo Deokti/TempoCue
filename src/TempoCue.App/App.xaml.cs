@@ -47,6 +47,7 @@ public partial class App : System.Windows.Application
         var saveCoachPack = new SaveCoachPackUseCase(coachPackStore);
         var loadCoachPackLibrary = new LoadCoachPackLibraryUseCase(coachPackStore);
         var setCoachPackState = new SetCoachPackStateUseCase(coachPackStore);
+        var deleteCoachPack = new DeleteCoachPackUseCase(coachPackStore);
         var activeCoachPackSelector = new SelectActiveCoachPackUseCase(
             builtInPacks,
             loadCoachPackLibrary);
@@ -87,7 +88,8 @@ public partial class App : System.Windows.Application
             LocalizationService.Instance,
             _championCatalog,
             loadCoachPackLibrary,
-            setCoachPackState);
+            setCoachPackState,
+            deleteCoachPack);
         coachingLibraryViewModel.LibraryChanged += (_, _) =>
             activeCoachPackSelector.Invalidate();
         var buildLeagueItemSetExport = new BuildLeagueItemSetExportUseCase(
@@ -96,7 +98,8 @@ public partial class App : System.Windows.Application
         var coachingPackDetailsViewModel = new CoachingPackDetailsViewModel(
             LocalizationService.Instance,
             _itemCatalog,
-            buildLeagueItemSetExport);
+            buildLeagueItemSetExport,
+            new ExportCoachPackUseCase());
         var matchupEditorViewModel = new MatchupEditorViewModel(
             LocalizationService.Instance,
             _gamePatchCatalog,

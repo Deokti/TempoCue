@@ -32,13 +32,21 @@ internal sealed class TestCoachPackStore : ICoachPackStore
         cancellationToken.ThrowIfCancellationRequested();
         SavedPack = pack;
         SavedState = state;
+        AddEntry(pack, state, LocalCoachPackOrigin.CreatedByUser);
+        return Task.FromResult(new CoachPackSaveResult(pack.Id, state, $"C:\\Test\\{pack.Id}.json"));
+    }
+
+    public void AddEntry(
+        CoachPack pack,
+        LocalCoachPackState state,
+        LocalCoachPackOrigin origin)
+    {
         _entries.RemoveAll(entry => string.Equals(
             entry.Pack.Id,
             pack.Id,
             StringComparison.OrdinalIgnoreCase));
-        _entries.Add(new LocalCoachPackEntry(pack, state, DateTimeOffset.UtcNow));
+        _entries.Add(new LocalCoachPackEntry(pack, state, DateTimeOffset.UtcNow, origin));
         _states[pack.Id] = state;
-        return Task.FromResult(new CoachPackSaveResult(pack.Id, state, $"C:\\Test\\{pack.Id}.json"));
     }
 
     public Task SetStateAsync(
@@ -63,5 +71,18 @@ internal sealed class TestCoachPackStore : ICoachPackStore
         }
 
         return Task.CompletedTask;
+    }
+
+    public Task<bool> DeleteAsync(
+        string packId,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var removed = _entries.RemoveAll(entry => string.Equals(
+            entry.Pack.Id,
+            packId,
+            StringComparison.OrdinalIgnoreCase)) > 0;
+        _states.Remove(packId);
+        return Task.FromResult(removed);
     }
 }

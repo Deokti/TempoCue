@@ -244,5 +244,10 @@ public sealed class SelectActiveCoachPackUseCaseTests
             LocalCoachPackState state,
             CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
+
+        public Task<bool> DeleteAsync(
+            string packId,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
     }
 }

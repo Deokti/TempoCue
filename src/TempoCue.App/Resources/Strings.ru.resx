@@ -235,6 +235,8 @@
   <data name="Coaching.Library.State.Disabled" xml:space="preserve"><value>Выключен</value></data>
   <data name="Coaching.Library.Toggle" xml:space="preserve"><value>Включить или выключить этот матчап</value></data>
   <data name="Coaching.Library.StateChangeFailed" xml:space="preserve"><value>Не удалось сохранить состояние матчапа.</value></data>
+  <data name="Coaching.Library.DeleteFailed" xml:space="preserve"><value>Не удалось удалить Coach Pack.</value></data>
+  <data name="Coaching.Library.Deleted" xml:space="preserve"><value>Coach Pack «{0}» удалён с этого устройства.</value></data>
   <data name="Coaching.Library.Origin.BuiltIn" xml:space="preserve"><value>Встроенный</value></data>
   <data name="Coaching.Library.Origin.Created" xml:space="preserve"><value>Создан вами</value></data>
   <data name="Coaching.Library.Origin.Imported" xml:space="preserve"><value>Добавлен из библиотеки</value></data>
@@ -615,6 +617,20 @@
   <data name="Coaching.Details.Header" xml:space="preserve"><value>Матчап · {0} · {1} · {2}</value></data>
   <data name="Coaching.Details.Edit" xml:space="preserve"><value>Редактировать</value></data>
   <data name="Coaching.Details.CreateCopy" xml:space="preserve"><value>Создать свою копию</value></data>
+  <data name="Coaching.Details.Delete" xml:space="preserve"><value>Удалить</value></data>
+  <data name="Coaching.Details.Delete.Own" xml:space="preserve"><value>Удалить набор</value></data>
+  <data name="Coaching.Details.Delete.Imported" xml:space="preserve"><value>Удалить установку</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Own.Title" xml:space="preserve"><value>Удалить Coach Pack?</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Own.Message" xml:space="preserve"><value>Навсегда удалить «{0}» с этого устройства? Это действие нельзя отменить.</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Own.Action" xml:space="preserve"><value>Удалить навсегда</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Imported.Title" xml:space="preserve"><value>Удалить установленный Coach Pack?</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Imported.Message" xml:space="preserve"><value>Удалить локальную установку «{0}»? Опубликованный оригинал автора не изменится.</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Imported.Action" xml:space="preserve"><value>Удалить установку</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Cancel" xml:space="preserve"><value>Отмена</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Title" xml:space="preserve"><value>Удалить Coach Pack?</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Message" xml:space="preserve"><value>Удалить «{0}» с этого устройства? Это действие нельзя отменить.</value></data>
+  <data name="Coaching.Details.Delete.Failed.Title" xml:space="preserve"><value>Coach Pack не удалён</value></data>
+  <data name="Coaching.Details.Delete.Failed.Message" xml:space="preserve"><value>Не удалось удалить локальные файлы Coach Pack. Закройте программы, которые могут их использовать, и повторите попытку.</value></data>
   <data name="Coaching.Details.Edit.Planned" xml:space="preserve"><value>Редактирование сохранённого набора появится в следующей итерации.</value></data>
   <data name="Coaching.Details.Tab.Overview" xml:space="preserve"><value>Обзор</value></data>
   <data name="Coaching.Details.Tab.Advice" xml:space="preserve"><value>Советы</value></data>
@@ -637,6 +653,14 @@
   <data name="Coaching.Details.Overview.NotSpecified" xml:space="preserve"><value>Не указано</value></data>
   <data name="Coaching.Details.Source.PersonalExperience" xml:space="preserve"><value>Личный опыт автора</value></data>
   <data name="Coaching.Details.Source.OpenFailed" xml:space="preserve"><value>Не удалось открыть ссылку в браузере.</value></data>
+  <data name="Coaching.Details.ExportPack" xml:space="preserve"><value>Экспортировать набор в файл</value></data>
+  <data name="Coaching.Details.CheckUpdate" xml:space="preserve"><value>Проверить обновление</value></data>
+  <data name="Coaching.Details.MoreActions" xml:space="preserve"><value>Дополнительные действия</value></data>
+  <data name="Coaching.Details.Toggle" xml:space="preserve"><value>Включить или отключить этот Coach Pack</value></data>
+  <data name="Coaching.Details.ExportPack.Hint" xml:space="preserve"><value>Сохранить весь Coach Pack для передачи или резервной копии.</value></data>
+  <data name="Coaching.Details.ExportPack.Filter" xml:space="preserve"><value>Coach Pack TempoCue (*.tempocue.json)|*.tempocue.json|JSON (*.json)|*.json</value></data>
+  <data name="Coaching.Details.ExportPack.Status.Saved" xml:space="preserve"><value>Файл Coach Pack сохранён.</value></data>
+  <data name="Coaching.Details.ExportPack.Status.Failed" xml:space="preserve"><value>Не удалось сохранить Coach Pack. Выберите другую папку и повторите попытку.</value></data>
   <data name="Coaching.Details.Advice.Phases" xml:space="preserve"><value>Фазы матчапа</value></data>
   <data name="Coaching.Details.Advice.ReadOnly" xml:space="preserve"><value>Только для чтения. Чтобы изменить советы, откройте редактор набора.</value></data>
   <data name="Coaching.Details.Advice.Persistent" xml:space="preserve"><value>Постоянные подсказки</value></data>

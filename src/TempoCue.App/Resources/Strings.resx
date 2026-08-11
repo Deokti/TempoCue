@@ -227,6 +227,8 @@
   <data name="Coaching.Library.State.Disabled" xml:space="preserve"><value>Disabled</value></data>
   <data name="Coaching.Library.Toggle" xml:space="preserve"><value>Enable or disable this matchup</value></data>
   <data name="Coaching.Library.StateChangeFailed" xml:space="preserve"><value>Could not save the matchup state.</value></data>
+  <data name="Coaching.Library.DeleteFailed" xml:space="preserve"><value>Could not delete the Coach Pack.</value></data>
+  <data name="Coaching.Library.Deleted" xml:space="preserve"><value>Coach Pack “{0}” was deleted from this device.</value></data>
   <data name="Coaching.Library.Origin.BuiltIn" xml:space="preserve"><value>Built in</value></data>
   <data name="Coaching.Library.Origin.Created" xml:space="preserve"><value>Created by you</value></data>
   <data name="Coaching.Library.Origin.Imported" xml:space="preserve"><value>Added from library</value></data>
@@ -605,6 +607,20 @@
   <data name="Coaching.Details.Header" xml:space="preserve"><value>Matchup · {0} · {1} · {2}</value></data>
   <data name="Coaching.Details.Edit" xml:space="preserve"><value>Edit</value></data>
   <data name="Coaching.Details.CreateCopy" xml:space="preserve"><value>Create your copy</value></data>
+  <data name="Coaching.Details.Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Coaching.Details.Delete.Own" xml:space="preserve"><value>Delete Coach Pack</value></data>
+  <data name="Coaching.Details.Delete.Imported" xml:space="preserve"><value>Remove installation</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Own.Title" xml:space="preserve"><value>Delete Coach Pack?</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Own.Message" xml:space="preserve"><value>Delete “{0}” permanently from this device? This action cannot be undone.</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Own.Action" xml:space="preserve"><value>Delete permanently</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Imported.Title" xml:space="preserve"><value>Remove installed Coach Pack?</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Imported.Message" xml:space="preserve"><value>Remove the local installation of “{0}”? The author's published original will not be changed.</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Imported.Action" xml:space="preserve"><value>Remove installation</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Title" xml:space="preserve"><value>Delete Coach Pack?</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Message" xml:space="preserve"><value>Delete “{0}” from this device? This action cannot be undone.</value></data>
+  <data name="Coaching.Details.Delete.Failed.Title" xml:space="preserve"><value>Coach Pack was not deleted</value></data>
+  <data name="Coaching.Details.Delete.Failed.Message" xml:space="preserve"><value>Could not delete the local Coach Pack files. Close programs that may be using them and try again.</value></data>
   <data name="Coaching.Details.Edit.Planned" xml:space="preserve"><value>Editing a saved pack will be added in a later iteration.</value></data>
   <data name="Coaching.Details.Tab.Overview" xml:space="preserve"><value>Overview</value></data>
   <data name="Coaching.Details.Tab.Advice" xml:space="preserve"><value>Advice</value></data>
@@ -627,6 +643,14 @@
   <data name="Coaching.Details.Overview.NotSpecified" xml:space="preserve"><value>Not specified</value></data>
   <data name="Coaching.Details.Source.PersonalExperience" xml:space="preserve"><value>Author's personal experience</value></data>
   <data name="Coaching.Details.Source.OpenFailed" xml:space="preserve"><value>Could not open the link in the browser.</value></data>
+  <data name="Coaching.Details.ExportPack" xml:space="preserve"><value>Export Coach Pack to file</value></data>
+  <data name="Coaching.Details.CheckUpdate" xml:space="preserve"><value>Check for updates</value></data>
+  <data name="Coaching.Details.MoreActions" xml:space="preserve"><value>More actions</value></data>
+  <data name="Coaching.Details.Toggle" xml:space="preserve"><value>Enable or disable this Coach Pack</value></data>
+  <data name="Coaching.Details.ExportPack.Hint" xml:space="preserve"><value>Save the complete Coach Pack for sharing or backup.</value></data>
+  <data name="Coaching.Details.ExportPack.Filter" xml:space="preserve"><value>TempoCue Coach Pack (*.tempocue.json)|*.tempocue.json|JSON (*.json)|*.json</value></data>
+  <data name="Coaching.Details.ExportPack.Status.Saved" xml:space="preserve"><value>The Coach Pack file was saved.</value></data>
+  <data name="Coaching.Details.ExportPack.Status.Failed" xml:space="preserve"><value>The Coach Pack could not be saved. Choose another folder and try again.</value></data>
   <data name="Coaching.Details.Advice.Phases" xml:space="preserve"><value>Matchup phases</value></data>
   <data name="Coaching.Details.Advice.ReadOnly" xml:space="preserve"><value>Read-only. Open the pack editor to change advice.</value></data>
   <data name="Coaching.Details.Advice.Persistent" xml:space="preserve"><value>Persistent tips</value></data>

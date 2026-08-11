@@ -71,7 +71,10 @@ public partial class LeagueItemSetExportDialogView : UserControl
             AddExtension = true,
             DefaultExt = ".json",
             Filter = "JSON (*.json)|*.json",
-            FileName = CreateSafeFileName(ViewModel.Title)
+            FileName = FileNameUtilities.Create(
+                ViewModel.Title,
+                ".json",
+                "TempoCue-item-set")
         };
         if (dialog.ShowDialog(Window.GetWindow(this)) != true)
         {
@@ -89,15 +92,4 @@ public partial class LeagueItemSetExportDialogView : UserControl
         }
     }
 
-    private static string CreateSafeFileName(string title)
-    {
-        var invalidCharacters = Path.GetInvalidFileNameChars().ToHashSet();
-        var safeName = new string(title
-            .Select(character => invalidCharacters.Contains(character) ? '-' : character)
-            .ToArray())
-            .Trim();
-        return string.IsNullOrWhiteSpace(safeName)
-            ? "TempoCue-item-set.json"
-            : $"{safeName}.json";
-    }
 }

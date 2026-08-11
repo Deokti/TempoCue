@@ -18,12 +18,12 @@ internal static class CoachingViewTestContext
         return context.CoachingLibraryPage;
     }
 
-    public static void SaveVisualSnapshotIfRequested(Window window, string fileName)
+    public static void SaveVisualSnapshotIfRequested(FrameworkElement element, string fileName)
     {
         var directory = Environment.GetEnvironmentVariable("TEMPOCUE_UI_SNAPSHOT_DIR");
         if (!string.IsNullOrWhiteSpace(directory))
         {
-            WpfTestHost.SavePng(window, Path.Combine(directory, fileName));
+            WpfTestHost.SavePng(element, Path.Combine(directory, fileName));
         }
     }
 }

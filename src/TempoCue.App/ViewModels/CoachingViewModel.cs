@@ -8,6 +8,7 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
 {
     private readonly LocalizationService _localization;
     private CoachingScreen _currentScreen = CoachingScreen.Library;
+    private bool _isDeleteConfirmationOpen;
     private bool _isDisposed;
 
     public CoachingViewModel(
@@ -40,6 +41,12 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
         private set => SetProperty(ref _currentScreen, value);
     }
 
+    public bool IsDeleteConfirmationOpen
+    {
+        get => _isDeleteConfirmationOpen;
+        private set => SetProperty(ref _isDeleteConfirmationOpen, value);
+    }
+
     public void OpenPackTypeSelection() =>
         CurrentScreen = CoachingScreen.PackTypeSelection;
 
@@ -48,9 +55,21 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(card);
+        IsDeleteConfirmationOpen = false;
         CurrentScreen = CoachingScreen.PackDetails;
         await Details.OpenAsync(card, cancellationToken);
     }
+
+    public void OpenDeleteConfirmation()
+    {
+        if (Details.CanDelete)
+        {
+            IsDeleteConfirmationOpen = true;
+        }
+    }
+
+    public void CloseDeleteConfirmation() =>
+        IsDeleteConfirmationOpen = false;
 
     public async Task<bool> SetSelectedPackEnabledAsync(
         bool isEnabled,
@@ -69,6 +88,23 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
             Details.UpdateCard(refreshedCard);
         }
 
+        return true;
+    }
+
+    public async Task<bool> DeleteSelectedPackAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var card = Details.Card;
+        if (card is null
+            || !card.CanDelete
+            || !await Library.DeletePackAsync(card, cancellationToken))
+        {
+            return false;
+        }
+
+        Details.Export.Close();
+        IsDeleteConfirmationOpen = false;
+        CurrentScreen = CoachingScreen.Library;
         return true;
     }
 
@@ -99,8 +135,11 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
             ? CoachingScreen.PackDetails
             : CoachingScreen.PackTypeSelection;
 
-    public void OpenLibrary() =>
+    public void OpenLibrary()
+    {
+        IsDeleteConfirmationOpen = false;
         CurrentScreen = CoachingScreen.Library;
+    }
 
     public void Dispose()
     {

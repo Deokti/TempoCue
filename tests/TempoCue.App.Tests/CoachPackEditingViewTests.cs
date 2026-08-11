@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Threading;
 using TempoCue.App.ViewModels;
 using TempoCue.Application;
@@ -27,7 +28,23 @@ public sealed class CoachPackEditingViewTests
         var editButton = WpfTestHost.Find<Button>(
             context.CoachingPackDetailsPage,
             "PackEditActionButton");
+        var stateToggle = WpfTestHost.Find<ToggleButton>(
+            context.CoachingPackDetailsPage,
+            "PackEnabledToggle");
+        var actionsButton = WpfTestHost.Find<Button>(
+            context.CoachingPackDetailsPage,
+            "PackAdditionalActionsButton");
+        Assert.True(stateToggle.IsChecked);
+        Assert.Equal(38, stateToggle.ActualWidth);
+        Assert.Equal(20, stateToggle.ActualHeight);
         Assert.Equal("Редактировать", editButton.Content);
+        var actionsPopup = OpenActionsPopup(
+            context.CoachingPackDetailsPage,
+            actionsButton);
+        Assert.Equal(
+            Visibility.Visible,
+            FindPopupButton(actionsPopup, "DeleteCoachPackMenuButton").Visibility);
+        actionsPopup.IsOpen = false;
         WpfTestHost.Click(editButton);
         WpfTestHost.Pump(DispatcherPriority.ApplicationIdle);
 
@@ -64,13 +81,119 @@ public sealed class CoachPackEditingViewTests
         var editButton = WpfTestHost.Find<Button>(
             context.CoachingPackDetailsPage,
             "PackEditActionButton");
+        var actionsButton = WpfTestHost.Find<Button>(
+            context.CoachingPackDetailsPage,
+            "PackAdditionalActionsButton");
+        var actionsPopup = OpenActionsPopup(
+            context.CoachingPackDetailsPage,
+            actionsButton);
+        Assert.Equal(
+            Visibility.Collapsed,
+            FindPopupButton(actionsPopup, "DeleteCoachPackMenuButton").Visibility);
+        actionsPopup.IsOpen = false;
         Assert.Equal("Создать свою копию", editButton.Content);
+        SaveVisualSnapshotIfRequested(
+            context.Window,
+            "built-in-pack-details.png");
         WpfTestHost.Click(editButton);
         WpfTestHost.Pump(DispatcherPriority.ApplicationIdle);
 
         Assert.Equal(Visibility.Visible, context.MatchupEditorPage.Visibility);
         Assert.Equal(MatchupEditorMode.Copy, context.Coaching.MatchupEditor.Mode);
     });
+
+    [Fact]
+    public void OwnPack_DeleteMenuOpensConfirmationAndCancelKeepsDetails() => WpfTestHost.Run(() =>
+    {
+        using var context = new MainWindowTestContext();
+        var pack = TestCoachPackFactory.CreateDetailedMatchup() with
+        {
+            Id = "matchup.local.confirm-delete"
+        };
+        context.CoachPackStore.SaveAsync(pack, LocalCoachPackState.Enabled)
+            .GetAwaiter()
+            .GetResult();
+        var library = OpenLibrary(context);
+        context.Coaching.Library.RefreshAsync().GetAwaiter().GetResult();
+        WpfTestHost.Pump(DispatcherPriority.ApplicationIdle);
+        OpenPack(library, pack.Id);
+
+        var actionsButton = WpfTestHost.Find<Button>(
+            context.CoachingPackDetailsPage,
+            "PackAdditionalActionsButton");
+        var actionsPopup = OpenActionsPopup(
+            context.CoachingPackDetailsPage,
+            actionsButton);
+        WpfTestHost.Click(FindPopupButton(actionsPopup, "DeleteCoachPackMenuButton"));
+        WpfTestHost.Pump(DispatcherPriority.ApplicationIdle);
+
+        Assert.True(context.Coaching.IsDeleteConfirmationOpen);
+        Assert.Equal(
+            Visibility.Visible,
+            WpfTestHost.Find<Grid>(context.CoachingPage, "DeleteConfirmationOverlay").Visibility);
+        Assert.Equal(
+            "Удалить навсегда",
+            WpfTestHost.Find<Button>(
+                context.CoachingPage,
+                "ConfirmDeleteCoachPackButton").Content);
+        SaveVisualSnapshotIfRequested(context.Window, "coach-pack-delete-confirmation.png");
+
+        WpfTestHost.Click(WpfTestHost.Find<Button>(
+            context.CoachingPage,
+            "CancelDeleteCoachPackButton"));
+        Assert.False(context.Coaching.IsDeleteConfirmationOpen);
+        Assert.Equal(CoachingScreen.PackDetails, context.Coaching.CurrentScreen);
+    });
+
+    [Fact]
+    public void ImportedPack_UsesCopyAndRemoveInstallationActions() => WpfTestHost.Run(() =>
+    {
+        using var context = new MainWindowTestContext();
+        var pack = TestCoachPackFactory.CreateDetailedMatchup() with
+        {
+            Id = "matchup.imported.actions"
+        };
+        context.CoachPackStore.AddEntry(
+            pack,
+            LocalCoachPackState.Enabled,
+            LocalCoachPackOrigin.Imported);
+        var library = OpenLibrary(context);
+        context.Coaching.Library.RefreshAsync().GetAwaiter().GetResult();
+        WpfTestHost.Pump(DispatcherPriority.ApplicationIdle);
+        OpenPack(library, pack.Id);
+
+        Assert.True(context.Coaching.Details.IsImported);
+        Assert.Contains("оригинал автора", context.Coaching.Details.DeleteConfirmationMessage);
+        Assert.Equal(
+            "Создать свою копию",
+            WpfTestHost.Find<Button>(
+                context.CoachingPackDetailsPage,
+                "PackEditActionButton").Content);
+        var actionsButton = WpfTestHost.Find<Button>(
+            context.CoachingPackDetailsPage,
+            "PackAdditionalActionsButton");
+        var actionsPopup = OpenActionsPopup(
+            context.CoachingPackDetailsPage,
+            actionsButton);
+        Assert.Equal(
+            "Удалить установку",
+            FindPopupButton(actionsPopup, "DeleteCoachPackMenuButton").Content);
+        actionsPopup.IsOpen = false;
+    });
+
+    private static Popup OpenActionsPopup(FrameworkElement detailsPage, Button actionsButton)
+    {
+        WpfTestHost.Click(actionsButton);
+        WpfTestHost.Pump(DispatcherPriority.ApplicationIdle);
+        var popup = WpfTestHost.Find<Popup>(detailsPage, "PackActionsPopup");
+        Assert.True(popup.IsOpen);
+        return popup;
+    }
+
+    private static Button FindPopupButton(Popup popup, string name) =>
+        WpfTestHost.Find<Button>(
+            Assert.IsAssignableFrom<FrameworkElement>(popup.Child),
+            name);
 
     private static void OpenPack(FrameworkElement library, string packId)
     {

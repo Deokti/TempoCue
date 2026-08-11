@@ -298,25 +298,39 @@
                     </Grid>
 
                     <Border Grid.Row="2"
-                            Background="#29271E"
-                            BorderBrush="#4A4530"
                             BorderThickness="1"
                             CornerRadius="8"
                             Padding="12,8">
                         <Border.Style>
                             <Style TargetType="Border">
                                 <Setter Property="Visibility" Value="Collapsed" />
+                                <Setter Property="Background" Value="#29271E" />
+                                <Setter Property="BorderBrush" Value="#4A4530" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding HasLibraryMessage}" Value="True">
                                         <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsLibraryMessageSuccess}" Value="True">
+                                        <Setter Property="Background" Value="#142B27" />
+                                        <Setter Property="BorderBrush" Value="#2F6859" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </Border.Style>
                         <TextBlock Text="{Binding LibraryMessage}"
-                                   Foreground="#F1D274"
                                    FontSize="{StaticResource Typography.FontSize.Body}"
-                                   TextWrapping="Wrap" />
+                                   TextWrapping="Wrap">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="#F1D274" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsLibraryMessageSuccess}" Value="True">
+                                            <Setter Property="Foreground" Value="#76D7A8" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
                     </Border>
 
                     <Grid Grid.Row="4">

@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 using TempoCue.App.Localization;
 using TempoCue.Application;
 using TempoCue.Core;
@@ -22,23 +23,29 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
     private bool _isItemCatalogLoading;
     private string _itemCatalogMessage = string.Empty;
     private string _sourceLinkMessage = string.Empty;
+    private CoachPackExportStatus _coachPackExportStatus;
+    private bool _isCoachPackExporting;
     private long _itemCatalogLoadVersion;
     private bool _isDisposed;
 
     public CoachingPackDetailsViewModel(
         LocalizationService localization,
         IItemCatalog itemCatalog,
-        BuildLeagueItemSetExportUseCase buildLeagueItemSetExport)
+        BuildLeagueItemSetExportUseCase buildLeagueItemSetExport,
+        ExportCoachPackUseCase exportCoachPack)
     {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _itemCatalog = itemCatalog ?? throw new ArgumentNullException(nameof(itemCatalog));
         Export = new LeagueItemSetExportDialogViewModel(
             localization,
             buildLeagueItemSetExport ?? throw new ArgumentNullException(nameof(buildLeagueItemSetExport)));
+        CoachPackExport = exportCoachPack ?? throw new ArgumentNullException(nameof(exportCoachPack));
         _localization.PropertyChanged += Localization_PropertyChanged;
     }
 
     public LeagueItemSetExportDialogViewModel Export { get; }
+
+    private ExportCoachPackUseCase CoachPackExport { get; }
 
     public CoachingPackCardViewModel? Card => _card;
 
@@ -83,6 +90,34 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
     public string EditActionLabel => Card?.CanEdit == true
         ? _localization.Get("Coaching.Details.Edit")
         : _localization.Get("Coaching.Details.CreateCopy");
+
+    public bool CanDelete => Card?.CanDelete == true;
+
+    public bool IsImported => Card?.Origin == CoachingPackOrigin.Imported;
+
+    public string DeleteActionLabel => IsImported
+        ? _localization.Get("Coaching.Details.Delete.Imported")
+        : _localization.Get("Coaching.Details.Delete.Own");
+
+    public string DeleteConfirmationTitle => IsImported
+        ? _localization.Get("Coaching.Details.Delete.Confirmation.Imported.Title")
+        : _localization.Get("Coaching.Details.Delete.Confirmation.Own.Title");
+
+    public string DeleteConfirmationMessage => _localization.Format(
+        IsImported
+            ? "Coaching.Details.Delete.Confirmation.Imported.Message"
+            : "Coaching.Details.Delete.Confirmation.Own.Message",
+        Title);
+
+    public string DeleteConfirmationActionLabel => IsImported
+        ? _localization.Get("Coaching.Details.Delete.Confirmation.Imported.Action")
+        : _localization.Get("Coaching.Details.Delete.Confirmation.Own.Action");
+
+    public string DeleteFailureTitle =>
+        _localization.Get("Coaching.Details.Delete.Failed.Title");
+
+    public string DeleteFailureMessage =>
+        _localization.Get("Coaching.Details.Delete.Failed.Message");
 
     public string HeaderDetails => Pack is null
         ? string.Empty
@@ -129,6 +164,34 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
     }
 
     public bool HasSourceLinkMessage => !string.IsNullOrWhiteSpace(SourceLinkMessage);
+
+    public bool IsCoachPackExporting
+    {
+        get => _isCoachPackExporting;
+        private set
+        {
+            if (SetProperty(ref _isCoachPackExporting, value))
+            {
+                OnPropertyChanged(nameof(CanExportCoachPack));
+            }
+        }
+    }
+
+    public bool CanExportCoachPack => Pack is not null && !IsCoachPackExporting;
+
+    public string CoachPackExportMessage => _coachPackExportStatus switch
+    {
+        CoachPackExportStatus.Saved => _localization.Get("Coaching.Details.ExportPack.Status.Saved"),
+        CoachPackExportStatus.Failed => _localization.Get("Coaching.Details.ExportPack.Status.Failed"),
+        _ => string.Empty
+    };
+
+    public bool HasCoachPackExportMessage => _coachPackExportStatus != CoachPackExportStatus.None;
+
+    public bool HasCoachPackExportError => _coachPackExportStatus == CoachPackExportStatus.Failed;
+
+    public string CoachPackExportDialogFilter =>
+        _localization.Get("Coaching.Details.ExportPack.Filter");
 
     public CoachingPackDetailsTab CurrentTab
     {
@@ -221,6 +284,7 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
             IsItemCatalogLoading = card.Pack.ItemBlocks.Count > 0;
             ItemCatalogMessage = string.Empty;
             SourceLinkMessage = string.Empty;
+            SetCoachPackExportStatus(CoachPackExportStatus.None);
             CurrentTab = CoachingPackDetailsTab.Overview;
             NotifyHeaderChanged();
             RebuildContent();
@@ -272,6 +336,39 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
             ItemBlocks,
             cancellationToken);
     }
+
+    public async Task<bool> ExportCoachPackAsync(
+        Stream destination,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(destination);
+        if (Pack is null || IsCoachPackExporting)
+        {
+            return false;
+        }
+
+        IsCoachPackExporting = true;
+        SetCoachPackExportStatus(CoachPackExportStatus.None);
+        try
+        {
+            await CoachPackExport.ExecuteAsync(Pack, destination, cancellationToken);
+            SetCoachPackExportStatus(CoachPackExportStatus.Saved);
+            return true;
+        }
+        catch (Exception exception) when (
+            exception is IOException or UnauthorizedAccessException or InvalidDataException)
+        {
+            SetCoachPackExportStatus(CoachPackExportStatus.Failed);
+            return false;
+        }
+        finally
+        {
+            IsCoachPackExporting = false;
+        }
+    }
+
+    public void ReportCoachPackExportFileFailure() =>
+        SetCoachPackExportStatus(CoachPackExportStatus.Failed);
 
     public void Dispose()
     {
@@ -430,6 +527,8 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
         NotifyHeaderChanged();
         RebuildContent();
         Export.UpdateLanguage();
+        OnPropertyChanged(nameof(CoachPackExportMessage));
+        OnPropertyChanged(nameof(CoachPackExportDialogFilter));
     }
 
     private void NotifyHeaderChanged()
@@ -451,6 +550,14 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(IsEnabled));
         OnPropertyChanged(nameof(StateActionLabel));
         OnPropertyChanged(nameof(EditActionLabel));
+        OnPropertyChanged(nameof(CanDelete));
+        OnPropertyChanged(nameof(IsImported));
+        OnPropertyChanged(nameof(DeleteActionLabel));
+        OnPropertyChanged(nameof(DeleteConfirmationTitle));
+        OnPropertyChanged(nameof(DeleteConfirmationMessage));
+        OnPropertyChanged(nameof(DeleteConfirmationActionLabel));
+        OnPropertyChanged(nameof(DeleteFailureTitle));
+        OnPropertyChanged(nameof(DeleteFailureMessage));
         OnPropertyChanged(nameof(HeaderDetails));
         OnPropertyChanged(nameof(Description));
         OnPropertyChanged(nameof(RoleLabel));
@@ -461,6 +568,7 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(SourceLabel));
         OnPropertyChanged(nameof(SourceUri));
         OnPropertyChanged(nameof(HasSourceUri));
+        OnPropertyChanged(nameof(CanExportCoachPack));
         if (HasSourceLinkMessage)
         {
             SourceLinkMessage = _localization.Get("Coaching.Details.Source.OpenFailed");
@@ -526,5 +634,25 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
                || string.Equals(sourceUri.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase)
             ? sourceUri
             : null;
+    }
+
+    private void SetCoachPackExportStatus(CoachPackExportStatus status)
+    {
+        if (_coachPackExportStatus == status)
+        {
+            return;
+        }
+
+        _coachPackExportStatus = status;
+        OnPropertyChanged(nameof(CoachPackExportMessage));
+        OnPropertyChanged(nameof(HasCoachPackExportMessage));
+        OnPropertyChanged(nameof(HasCoachPackExportError));
+    }
+
+    private enum CoachPackExportStatus
+    {
+        None,
+        Saved,
+        Failed
     }
 }

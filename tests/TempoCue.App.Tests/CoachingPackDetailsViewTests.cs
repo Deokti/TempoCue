@@ -1,5 +1,7 @@
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Threading;
 using TempoCue.App.ViewModels;
@@ -63,7 +65,34 @@ public sealed class CoachingPackDetailsViewTests
         Assert.True(WpfTestHost.Find<TextBlock>(
             detailsPage,
             "SourceUrlTextBlock").IsVisible);
+        var actionsButton = WpfTestHost.Find<Button>(
+            detailsPage,
+            "PackAdditionalActionsButton");
+        WpfTestHost.Click(actionsButton);
+        WpfTestHost.Pump(DispatcherPriority.ApplicationIdle);
+        var actionsPopup = WpfTestHost.Find<Popup>(detailsPage, "PackActionsPopup");
+        var popupContent = Assert.IsAssignableFrom<FrameworkElement>(actionsPopup.Child);
+        var exportCoachPackMenuButton = WpfTestHost.Find<Button>(
+            popupContent,
+            "ExportCoachPackMenuButton");
+        Assert.True(actionsPopup.IsOpen);
+        Assert.True(exportCoachPackMenuButton.IsVisible);
+        Assert.True(exportCoachPackMenuButton.IsEnabled);
+        Assert.Equal("Экспортировать набор в файл", exportCoachPackMenuButton.Content);
+        Assert.False(WpfTestHost.Find<Button>(
+            popupContent,
+            "CheckCoachPackUpdateMenuButton").IsEnabled);
+        SaveVisualSnapshotIfRequested(popupContent, "coach-pack-actions-menu.png");
+        actionsPopup.IsOpen = false;
         SaveVisualSnapshotIfRequested(context.Window, "coach-pack-overview.png");
+
+        using var coachPackStream = new MemoryStream();
+        Assert.True(context.Coaching.Details.ExportCoachPackAsync(coachPackStream)
+            .GetAwaiter()
+            .GetResult());
+        WpfTestHost.Pump(DispatcherPriority.ApplicationIdle);
+        Assert.True(context.Coaching.Details.HasCoachPackExportMessage);
+        SaveVisualSnapshotIfRequested(context.Window, "coach-pack-overview-exported.png");
 
         WpfTestHost.Click(WpfTestHost.Find<Button>(detailsPage, "PackAdviceTabButton"));
         Assert.True(WpfTestHost.Find<Grid>(detailsPage, "PackAdviceContent").IsVisible);

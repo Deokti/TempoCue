@@ -11,94 +11,73 @@ public sealed class LocalCoachPackStoreTests
     [Fact]
     public async Task SaveAsync_WritesPackAndSeparateLocalState()
     {
-        var root = Path.Combine(
-            Path.GetTempPath(),
-            "TempoCue.App.Tests",
-            Guid.NewGuid().ToString("N"));
-        try
-        {
-            var store = new LocalCoachPackStore(root);
-            var pack = CreatePack();
+        using var directory = new TestCoachPackDirectory();
+        var store = new LocalCoachPackStore(directory.RootPath);
+        var pack = CreatePack();
 
-            var result = await store.SaveAsync(pack, LocalCoachPackState.Enabled);
+        var result = await store.SaveAsync(pack, LocalCoachPackState.Enabled);
 
-            Assert.True(File.Exists(result.DisplayPath));
-            await using var savedPackStream = File.OpenRead(result.DisplayPath);
-            Assert.Equal(pack.Id, CoachPackLoader.Load(savedPackStream).Id);
-            var statePath = Path.Combine(root, $"{pack.Id}.state.json");
-            Assert.True(File.Exists(statePath));
-            using var state = JsonDocument.Parse(await File.ReadAllTextAsync(statePath));
-            Assert.Equal("enabled", state.RootElement.GetProperty("state").GetString());
-        }
-        finally
-        {
-            if (Directory.Exists(root))
-            {
-                Directory.Delete(root, recursive: true);
-            }
-        }
+        Assert.True(File.Exists(result.DisplayPath));
+        await using var savedPackStream = File.OpenRead(result.DisplayPath);
+        Assert.Equal(pack.Id, CoachPackLoader.Load(savedPackStream).Id);
+        var statePath = Path.Combine(directory.RootPath, $"{pack.Id}.state.json");
+        Assert.True(File.Exists(statePath));
+        using var state = JsonDocument.Parse(await File.ReadAllTextAsync(statePath));
+        Assert.Equal("enabled", state.RootElement.GetProperty("state").GetString());
     }
 
     [Fact]
     public async Task LoadAsync_ReturnsSavedPackAndSkipsDamagedFile()
     {
-        var root = Path.Combine(
-            Path.GetTempPath(),
-            "TempoCue.App.Tests",
-            Guid.NewGuid().ToString("N"));
-        try
-        {
-            var store = new LocalCoachPackStore(root);
-            var pack = CreatePack();
-            await store.SaveAsync(pack, LocalCoachPackState.Enabled);
-            await File.WriteAllTextAsync(
-                Path.Combine(root, "damaged.json"),
-                "{ this is not a Coach Pack }");
+        using var directory = new TestCoachPackDirectory();
+        var store = new LocalCoachPackStore(directory.RootPath);
+        var pack = CreatePack();
+        await store.SaveAsync(pack, LocalCoachPackState.Enabled);
+        await File.WriteAllTextAsync(
+            Path.Combine(directory.RootPath, "damaged.json"),
+            "{ this is not a Coach Pack }");
 
-            var snapshot = await store.LoadAsync();
+        var snapshot = await store.LoadAsync();
 
-            var entry = Assert.Single(snapshot.Entries);
-            Assert.Equal(pack.Id, entry.Pack.Id);
-            Assert.Equal(LocalCoachPackState.Enabled, entry.State);
-            Assert.Equal(1, snapshot.InvalidFileCount);
-        }
-        finally
-        {
-            if (Directory.Exists(root))
-            {
-                Directory.Delete(root, recursive: true);
-            }
-        }
+        var entry = Assert.Single(snapshot.Entries);
+        Assert.Equal(pack.Id, entry.Pack.Id);
+        Assert.Equal(LocalCoachPackState.Enabled, entry.State);
+        Assert.Equal(1, snapshot.InvalidFileCount);
     }
 
     [Fact]
     public async Task SetStateAsync_PersistsDisabledStateWithoutPackFile()
     {
-        var root = Path.Combine(
-            Path.GetTempPath(),
-            "TempoCue.App.Tests",
-            Guid.NewGuid().ToString("N"));
-        try
-        {
-            var store = new LocalCoachPackStore(root);
+        using var directory = new TestCoachPackDirectory();
+        var store = new LocalCoachPackStore(directory.RootPath);
 
-            await store.SetStateAsync(
-                "built-in.urgot-vs-sett",
-                LocalCoachPackState.Disabled);
-            var snapshot = await new LocalCoachPackStore(root).LoadAsync();
+        await store.SetStateAsync(
+            "built-in.urgot-vs-sett",
+            LocalCoachPackState.Disabled);
+        var snapshot = await new LocalCoachPackStore(directory.RootPath).LoadAsync();
 
-            Assert.Empty(snapshot.Entries);
-            Assert.Equal(
-                LocalCoachPackState.Disabled,
-                snapshot.PackStates["built-in.urgot-vs-sett"]);
-        }
-        finally
-        {
-            if (Directory.Exists(root))
-            {
-                Directory.Delete(root, recursive: true);
-            }
-        }
+        Assert.Empty(snapshot.Entries);
+        Assert.Equal(
+            LocalCoachPackState.Disabled,
+            snapshot.PackStates["built-in.urgot-vs-sett"]);
+    }
+
+    [Fact]
+    public async Task DeleteAsync_RemovesPackAndItsLocalState()
+    {
+        using var directory = new TestCoachPackDirectory();
+        var store = new LocalCoachPackStore(directory.RootPath);
+        var pack = CreatePack();
+        var saved = await store.SaveAsync(pack, LocalCoachPackState.Enabled);
+        var statePath = Path.Combine(directory.RootPath, $"{pack.Id}.state.json");
+
+        var deleted = await store.DeleteAsync(pack.Id);
+
+        Assert.True(deleted);
+        Assert.False(File.Exists(saved.DisplayPath));
+        Assert.False(File.Exists(statePath));
+        Assert.Empty((await store.LoadAsync()).Entries);
+        Assert.False(await store.DeleteAsync(pack.Id));
     }
 
     private static CoachPack CreatePack() => new()
@@ -134,4 +113,25 @@ public sealed class LocalCoachPackStoreTests
             }
         ]
     };
+
+    private sealed class TestCoachPackDirectory : IDisposable
+    {
+        public TestCoachPackDirectory()
+        {
+            RootPath = Path.Combine(
+                Path.GetTempPath(),
+                "TempoCue.App.Tests",
+                Guid.NewGuid().ToString("N"));
+        }
+
+        public string RootPath { get; }
+
+        public void Dispose()
+        {
+            if (Directory.Exists(RootPath))
+            {
+                Directory.Delete(RootPath, recursive: true);
+            }
+        }
+    }
 }

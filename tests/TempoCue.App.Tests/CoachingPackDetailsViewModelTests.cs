@@ -1,3 +1,4 @@
+using System.IO;
 using TempoCue.App.Localization;
 using TempoCue.App.ViewModels;
 using TempoCue.Application;
@@ -12,12 +13,7 @@ public sealed class CoachingPackDetailsViewModelTests
     public async Task OpenAsync_IgnoresCatalogResultFromPreviousPack()
     {
         var itemCatalog = new ControlledItemCatalog();
-        using var viewModel = new CoachingPackDetailsViewModel(
-            LocalizationService.Instance,
-            itemCatalog,
-            new BuildLeagueItemSetExportUseCase(
-                TestChampionCatalog.Ready(),
-                itemCatalog));
+        using var viewModel = CreateViewModel(itemCatalog);
         var firstPack = CreatePack("first", "26.14");
         var secondPack = CreatePack("second", "26.15");
 
@@ -51,12 +47,7 @@ public sealed class CoachingPackDetailsViewModelTests
     public async Task Dispose_ClosesExportAndCancelsItsCatalogLoad()
     {
         var itemCatalog = new ControlledItemCatalog();
-        var viewModel = new CoachingPackDetailsViewModel(
-            LocalizationService.Instance,
-            itemCatalog,
-            new BuildLeagueItemSetExportUseCase(
-                TestChampionCatalog.Ready(),
-                itemCatalog));
+        var viewModel = CreateViewModel(itemCatalog);
         var pack = CreatePack("pack", "26.15");
         var openDetails = viewModel.OpenAsync(CreateCard(pack));
         itemCatalog.Complete(0, CreateCatalogResult("Чёрная секира"));
@@ -74,13 +65,39 @@ public sealed class CoachingPackDetailsViewModelTests
         Assert.False(viewModel.Export.IsBuilding);
     }
 
+    [Fact]
+    public async Task ExportCoachPackAsync_WritesCurrentPackAndReportsSuccess()
+    {
+        var itemCatalog = new ControlledItemCatalog();
+        using var viewModel = CreateViewModel(itemCatalog);
+        var pack = CreatePack("pack-for-export", "26.15");
+        var openDetails = viewModel.OpenAsync(CreateCard(pack));
+        itemCatalog.Complete(0, CreateCatalogResult("Чёрная секира"));
+        await openDetails;
+        await using var destination = new MemoryStream();
+
+        var exported = await viewModel.ExportCoachPackAsync(destination);
+
+        Assert.True(exported);
+        Assert.True(viewModel.CanExportCoachPack);
+        Assert.True(viewModel.HasCoachPackExportMessage);
+        Assert.False(viewModel.HasCoachPackExportError);
+        destination.Position = 0;
+        var exportedPack = await CoachPackLoader.LoadAsync(destination);
+        Assert.Equal(pack.Id, exportedPack.Id);
+        Assert.Equal(pack.Name, exportedPack.Name);
+        var exportedBlock = Assert.Single(exportedPack.ItemBlocks);
+        Assert.Equal(pack.ItemBlocks[0].Id, exportedBlock.Id);
+        Assert.Equal(pack.ItemBlocks[0].Name, exportedBlock.Name);
+        Assert.Equal(pack.ItemBlocks[0].ItemIds, exportedBlock.ItemIds);
+    }
+
     private static CoachPack CreatePack(string id, string patch) =>
         TestCoachPackFactory.CreateDetailedMatchup() with
         {
             Id = id,
             Name = id,
             Patch = patch,
-            Rules = [],
             PersistentTips = [],
             ItemBlocks =
             [
@@ -92,6 +109,14 @@ public sealed class CoachingPackDetailsViewModelTests
                 }
             ]
         };
+
+    private static CoachingPackDetailsViewModel CreateViewModel(IItemCatalog itemCatalog) => new(
+        LocalizationService.Instance,
+        itemCatalog,
+        new BuildLeagueItemSetExportUseCase(
+            TestChampionCatalog.Ready(),
+            itemCatalog),
+        new ExportCoachPackUseCase());
 
     private static CoachingPackCardViewModel CreateCard(CoachPack pack) => new(
         pack,
