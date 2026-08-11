@@ -16,7 +16,7 @@ public sealed class LeagueItemSetExportDialogViewModelTests
         localization.SetLanguage("en-US");
         try
         {
-            var itemCatalog = new ControlledItemCatalog();
+            var itemCatalog = new ControlledItemCatalog(honorCancellation: true);
             var viewModel = CreateViewModel(localization, itemCatalog);
             var pack = TestCoachPackFactory.CreateDetailedMatchup();
             var openTask = viewModel.OpenAsync(pack, "First title", CreateBlocks(pack));
@@ -55,7 +55,7 @@ public sealed class LeagueItemSetExportDialogViewModelTests
     public async Task OpenAndClose_CancelPreviousBuildsWithoutRestoringTheirState()
     {
         var localization = LocalizationService.Instance;
-        var itemCatalog = new ControlledItemCatalog();
+        var itemCatalog = new ControlledItemCatalog(honorCancellation: true);
         var viewModel = CreateViewModel(localization, itemCatalog);
         var pack = TestCoachPackFactory.CreateDetailedMatchup();
         var blocks = CreateBlocks(pack);
@@ -123,24 +123,4 @@ public sealed class LeagueItemSetExportDialogViewModelTests
         ItemCatalogCategory.Legendary,
         []);
 
-    private sealed class ControlledItemCatalog : IItemCatalog
-    {
-        private readonly List<TaskCompletionSource<ItemCatalogLoadResult>> _requests = [];
-
-        public int RequestCount => _requests.Count;
-
-        public Task<ItemCatalogLoadResult> LoadAsync(
-            string gamePatch,
-            string languageCode,
-            CancellationToken cancellationToken = default)
-        {
-            var completion = new TaskCompletionSource<ItemCatalogLoadResult>(
-                TaskCreationOptions.RunContinuationsAsynchronously);
-            _requests.Add(completion);
-            return completion.Task.WaitAsync(cancellationToken);
-        }
-
-        public void Complete(int requestIndex, ItemCatalogLoadResult result) =>
-            _requests[requestIndex].TrySetResult(result);
-    }
 }

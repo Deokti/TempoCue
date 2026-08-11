@@ -12,7 +12,7 @@ public sealed class CoachingPackDetailsViewModelTests
     [Fact]
     public async Task OpenAsync_IgnoresCatalogResultFromPreviousPack()
     {
-        var itemCatalog = new ControlledItemCatalog();
+        var itemCatalog = new ControlledItemCatalog(honorCancellation: false);
         using var viewModel = CreateViewModel(itemCatalog);
         var firstPack = CreatePack("first", "26.14");
         var secondPack = CreatePack("second", "26.15");
@@ -46,7 +46,7 @@ public sealed class CoachingPackDetailsViewModelTests
     [Fact]
     public async Task Dispose_ClosesExportAndCancelsItsCatalogLoad()
     {
-        var itemCatalog = new ControlledItemCatalog();
+        var itemCatalog = new ControlledItemCatalog(honorCancellation: false);
         var viewModel = CreateViewModel(itemCatalog);
         var pack = CreatePack("pack", "26.15");
         var openDetails = viewModel.OpenAsync(CreateCard(pack));
@@ -68,7 +68,7 @@ public sealed class CoachingPackDetailsViewModelTests
     [Fact]
     public async Task ExportCoachPackAsync_WritesCurrentPackAndReportsSuccess()
     {
-        var itemCatalog = new ControlledItemCatalog();
+        var itemCatalog = new ControlledItemCatalog(honorCancellation: false);
         using var viewModel = CreateViewModel(itemCatalog);
         var pack = CreatePack("pack-for-export", "26.15");
         var openDetails = viewModel.OpenAsync(CreateCard(pack));
@@ -150,31 +150,4 @@ public sealed class CoachingPackDetailsViewModelTests
         ],
         ItemCatalogSource.Network);
 
-    private sealed class ControlledItemCatalog : IItemCatalog
-    {
-        private readonly List<Request> _requests = [];
-
-        public int RequestCount => _requests.Count;
-
-        public Task<ItemCatalogLoadResult> LoadAsync(
-            string gamePatch,
-            string languageCode,
-            CancellationToken cancellationToken = default)
-        {
-            var completion = new TaskCompletionSource<ItemCatalogLoadResult>(
-                TaskCreationOptions.RunContinuationsAsynchronously);
-            _requests.Add(new Request(completion, cancellationToken));
-            return completion.Task;
-        }
-
-        public CancellationToken GetCancellationToken(int requestIndex) =>
-            _requests[requestIndex].CancellationToken;
-
-        public void Complete(int requestIndex, ItemCatalogLoadResult result) =>
-            _requests[requestIndex].Completion.TrySetResult(result);
-
-        private sealed record Request(
-            TaskCompletionSource<ItemCatalogLoadResult> Completion,
-            CancellationToken CancellationToken);
-    }
 }
