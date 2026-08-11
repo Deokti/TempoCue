@@ -44,7 +44,7 @@ public sealed class HomeViewModelTests
             };
             var snapshot = new MatchSnapshot(match, [], "{}", DateTimeOffset.UtcNow);
             var session = new ActiveMatchSession(
-                new SnapshotSource(snapshot),
+                TestMatchSnapshotSource.FromSnapshot(snapshot),
                 new TestMatchAdviceSelector(),
                 TimeSpan.FromSeconds(1));
             using var currentMatch = new CurrentMatchViewModel(session, localization);
@@ -65,10 +65,4 @@ public sealed class HomeViewModelTests
         }
     }
 
-    private sealed class SnapshotSource(MatchSnapshot snapshot) : IMatchSnapshotSource
-    {
-        public Task<MatchSnapshotReadResult> ReadAsync(
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult(MatchSnapshotReadResult.Success(snapshot));
-    }
 }

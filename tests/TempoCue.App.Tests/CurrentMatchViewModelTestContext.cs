@@ -32,7 +32,7 @@ internal sealed class CurrentMatchViewModelTestContext : IDisposable
         IMatchAdviceSelector adviceSelector)
     {
         var session = new ActiveMatchSession(
-            new SnapshotSource(result),
+            TestMatchSnapshotSource.FromResult(result),
             adviceSelector,
             TimeSpan.FromSeconds(1));
         var viewModel = new CurrentMatchViewModel(session, Localization);
@@ -58,12 +58,5 @@ internal sealed class CurrentMatchViewModelTestContext : IDisposable
         }
 
         Localization.SetLanguage(_initialLanguage);
-    }
-
-    private sealed class SnapshotSource(MatchSnapshotReadResult result) : IMatchSnapshotSource
-    {
-        public Task<MatchSnapshotReadResult> ReadAsync(
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult(result);
     }
 }

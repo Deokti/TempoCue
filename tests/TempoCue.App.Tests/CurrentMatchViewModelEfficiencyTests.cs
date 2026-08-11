@@ -80,7 +80,7 @@ public sealed class CurrentMatchViewModelEfficiencyTests
             KillerParticipantId = "urgot-player",
             VictimParticipantId = "enemy-player"
         };
-        var source = new SequencedSnapshotSource(
+        var source = TestMatchSnapshotSource.FromSequence(
             MatchSnapshotReadResult.Success(
                 new MatchSnapshot(firstMatch, [matchEvent], "{}", DateTimeOffset.UtcNow)),
             MatchSnapshotReadResult.Success(
@@ -98,15 +98,5 @@ public sealed class CurrentMatchViewModelEfficiencyTests
         await viewModel.RefreshAsync();
 
         Assert.Contains("Darius", Assert.Single(viewModel.Events).Title);
-    }
-
-    private sealed class SequencedSnapshotSource(params MatchSnapshotReadResult[] results)
-        : IMatchSnapshotSource
-    {
-        private readonly Queue<MatchSnapshotReadResult> _results = new(results);
-
-        public Task<MatchSnapshotReadResult> ReadAsync(
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult(_results.Dequeue());
     }
 }

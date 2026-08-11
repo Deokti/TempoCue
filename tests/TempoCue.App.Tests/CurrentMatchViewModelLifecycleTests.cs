@@ -12,9 +12,10 @@ public sealed class CurrentMatchViewModelLifecycleTests
     [Fact]
     public async Task Dispose_PreventsPendingRefreshFromUpdatingViewModel()
     {
-        var source = new DeferredSnapshotSource();
+        var completion = new TaskCompletionSource<MatchSnapshotReadResult>(
+            TaskCreationOptions.RunContinuationsAsynchronously);
         var session = new ActiveMatchSession(
-            source,
+            new TestMatchSnapshotSource(_ => completion.Task),
             new TestMatchAdviceSelector(),
             TimeSpan.FromSeconds(1));
         var viewModel = new CurrentMatchViewModel(
@@ -25,7 +26,7 @@ public sealed class CurrentMatchViewModelLifecycleTests
         var refresh = viewModel.RefreshAsync();
 
         viewModel.Dispose();
-        source.Complete(MatchSnapshotReadResult.Success(new MatchSnapshot(
+        completion.SetResult(MatchSnapshotReadResult.Success(new MatchSnapshot(
             new MatchState
             {
                 GameTimeSeconds = 120,
@@ -42,18 +43,5 @@ public sealed class CurrentMatchViewModelLifecycleTests
 
         Assert.Equal(0, completedUpdates);
         Assert.Equal("—", viewModel.ActiveChampion);
-    }
-
-    private sealed class DeferredSnapshotSource : IMatchSnapshotSource
-    {
-        private readonly TaskCompletionSource<MatchSnapshotReadResult> _completion =
-            new(TaskCreationOptions.RunContinuationsAsynchronously);
-
-        public Task<MatchSnapshotReadResult> ReadAsync(
-            CancellationToken cancellationToken = default) =>
-            _completion.Task;
-
-        public void Complete(MatchSnapshotReadResult result) =>
-            _completion.TrySetResult(result);
     }
 }

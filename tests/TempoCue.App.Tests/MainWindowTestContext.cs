@@ -22,7 +22,7 @@ internal sealed class MainWindowTestContext : IDisposable
         Localization.SetLanguage("ru-RU");
 
         var session = new ActiveMatchSession(
-            new WaitingSnapshotSource(),
+            TestMatchSnapshotSource.FromResult(MatchSnapshotReadResult.NoActiveMatch()),
             new TestMatchAdviceSelector(),
             TimeSpan.FromSeconds(1));
         CurrentMatch = new CurrentMatchViewModel(session, Localization);
@@ -228,12 +228,5 @@ internal sealed class MainWindowTestContext : IDisposable
         Home.Dispose();
         CurrentMatch.Dispose();
         Localization.SetLanguage(_initialLanguage);
-    }
-
-    private sealed class WaitingSnapshotSource : IMatchSnapshotSource
-    {
-        public Task<MatchSnapshotReadResult> ReadAsync(
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult(MatchSnapshotReadResult.NoActiveMatch());
     }
 }
