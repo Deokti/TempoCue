@@ -181,6 +181,21 @@ public sealed class MatchupPersistentTipsViewModel : ObservableObject
         }
     }
 
+    public void Load(IEnumerable<MatchupPersistentTipDraft> tips)
+    {
+        ArgumentNullException.ThrowIfNull(tips);
+        Editor.Close();
+        _tips.Clear();
+        foreach (var draft in tips)
+        {
+            _tips.Add(new MatchupPersistentTipViewModel(draft, _localization));
+        }
+
+        _nextTipNumber = 1;
+        UpdatePhases(_phases);
+        NotifyCollectionChanged();
+    }
+
     private MatchupPersistentTipViewModel CreateDuplicate(MatchupPersistentTipDraft source)
     {
         var duplicateTitle = _localization.Format(
@@ -224,7 +239,17 @@ public sealed class MatchupPersistentTipsViewModel : ObservableObject
         return -1;
     }
 
-    private string CreateTipId() => $"persistent-tip-{_nextTipNumber++}";
+    private string CreateTipId()
+    {
+        string id;
+        do
+        {
+            id = $"persistent-tip-{_nextTipNumber++}";
+        }
+        while (_tips.Any(tip => tip.Id == id));
+
+        return id;
+    }
 
     private void NotifyCollectionChanged()
     {

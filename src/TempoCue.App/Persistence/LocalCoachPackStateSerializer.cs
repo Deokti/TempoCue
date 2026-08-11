@@ -8,7 +8,7 @@ namespace TempoCue.App.Persistence;
 /// <summary>Владеет локальной JSON-схемой состояния Coach Pack, не зная пути к файлу.</summary>
 internal static class LocalCoachPackStateSerializer
 {
-    private const int CurrentSchemaVersion = 1;
+    private const int CurrentSchemaVersion = 2;
     private static readonly JsonSerializerOptions SerializerOptions = CreateOptions();
 
     public static async Task<StoredCoachPackState> ReadAsync(
@@ -20,21 +20,27 @@ internal static class LocalCoachPackStateSerializer
             stream,
             SerializerOptions,
             cancellationToken);
+        var origin = metadata?.SchemaVersion == 1
+            ? LocalCoachPackOrigin.CreatedByUser
+            : metadata?.Origin;
         if (metadata is null
-            || metadata.SchemaVersion != CurrentSchemaVersion
+            || metadata.SchemaVersion is not (1 or CurrentSchemaVersion)
             || string.IsNullOrWhiteSpace(metadata.PackId)
-            || !Enum.IsDefined(metadata.State))
+            || !Enum.IsDefined(metadata.State)
+            || origin is null
+            || !Enum.IsDefined(origin.Value))
         {
             throw new InvalidDataException("Local Coach Pack state is invalid.");
         }
 
-        return new StoredCoachPackState(metadata.PackId, metadata.State);
+        return new StoredCoachPackState(metadata.PackId, metadata.State, origin.Value);
     }
 
     public static Task WriteAsync(
         Stream stream,
         string packId,
         LocalCoachPackState state,
+        LocalCoachPackOrigin origin,
         DateTimeOffset savedAtUtc,
         CancellationToken cancellationToken = default)
     {
@@ -44,6 +50,7 @@ internal static class LocalCoachPackStateSerializer
             CurrentSchemaVersion,
             packId,
             state,
+            origin,
             savedAtUtc);
         return JsonSerializer.SerializeAsync(
             stream,
@@ -66,9 +73,11 @@ internal static class LocalCoachPackStateSerializer
         int SchemaVersion,
         string PackId,
         LocalCoachPackState State,
+        LocalCoachPackOrigin? Origin,
         DateTimeOffset SavedAtUtc);
 }
 
 internal sealed record StoredCoachPackState(
     string PackId,
-    LocalCoachPackState State);
+    LocalCoachPackState State,
+    LocalCoachPackOrigin Origin);

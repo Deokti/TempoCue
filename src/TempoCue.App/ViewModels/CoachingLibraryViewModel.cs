@@ -225,7 +225,9 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
                 _champions))
             .Concat(_localEntries.Select(entry => _cardFactory.Create(
                 entry.Pack,
-                CoachingPackOrigin.CreatedByUser,
+                entry.Origin == LocalCoachPackOrigin.CreatedByUser
+                    ? CoachingPackOrigin.CreatedByUser
+                    : CoachingPackOrigin.Imported,
                 entry.State,
                 _champions)))
             .ToArray();

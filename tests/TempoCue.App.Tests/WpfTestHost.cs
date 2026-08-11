@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
@@ -50,6 +51,17 @@ internal static class WpfTestHost
         }
 
         button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        Pump(priority);
+    }
+
+    public static void Click(ListBoxItem item, DispatcherPriority priority = DispatcherPriority.DataBind)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        item.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, Environment.TickCount, MouseButton.Left)
+        {
+            RoutedEvent = Mouse.PreviewMouseDownEvent,
+            Source = item
+        });
         Pump(priority);
     }
 

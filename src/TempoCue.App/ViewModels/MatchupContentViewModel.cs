@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Globalization;
 using TempoCue.App.Localization;
 using TempoCue.Application;
 using TempoCue.Core;
@@ -102,6 +103,58 @@ public sealed class MatchupContentViewModel : ObservableObject
 
     public Task RetryItemCatalogLoadAsync(CancellationToken cancellationToken = default) =>
         ItemPicker.RetryCatalogLoadAsync(cancellationToken);
+
+    public void BeginNew()
+    {
+        Editor.Close();
+        ItemPicker.Close();
+        _itemPickerBlockId = null;
+        _phases.Clear();
+        _nextPhaseNumber = 1;
+        PersistentTips.Load([]);
+        ItemBlocks.Load([]);
+        CurrentSection = MatchupContentSection.Phases;
+        NotifyCollectionChanged();
+    }
+
+    public void Load(CoachPack pack)
+    {
+        ArgumentNullException.ThrowIfNull(pack);
+        Editor.Close();
+        ItemPicker.Close();
+        _itemPickerBlockId = null;
+        _phases.Clear();
+        foreach (var rule in pack.Rules)
+        {
+            _phases.Add(new MatchupPhaseViewModel(
+                new MatchupPhaseDraft(
+                    rule.Id,
+                    rule.Title,
+                    rule.PowerState,
+                    rule.MinimumLevel,
+                    rule.MaximumLevel,
+                    rule.Message,
+                    rule.WhyNow,
+                    rule.NextGoal,
+                    CreateItemDrafts(rule.RecommendedItemIds, pack.Patch)),
+                _localization));
+        }
+
+        _nextPhaseNumber = 1;
+        NotifyCollectionChanged();
+        PersistentTips.Load(pack.PersistentTips.Select(tip => new MatchupPersistentTipDraft(
+            tip.Id,
+            tip.Title,
+            tip.Message,
+            tip.ApplicableRuleId,
+            string.IsNullOrWhiteSpace(tip.Source) ? null : tip.Source)));
+        ItemBlocks.Load(pack.ItemBlocks.Select(block => new MatchupItemBlockDraft(
+            block.Id,
+            block.Name,
+            block.WhenToChoose,
+            CreateItemDrafts(block.ItemIds, pack.Patch))));
+        CurrentSection = MatchupContentSection.Phases;
+    }
 
     public void OpenRecommendedItemPicker() => ItemPicker.Open(
         ItemPickerTarget.PhaseRecommendations,
@@ -328,7 +381,32 @@ public sealed class MatchupContentViewModel : ObservableObject
             _localization);
     }
 
-    private string CreatePhaseId() => $"phase-{_nextPhaseNumber++}";
+    private string CreatePhaseId()
+    {
+        string id;
+        do
+        {
+            id = $"phase-{_nextPhaseNumber++}";
+        }
+        while (_phases.Any(phase => phase.Id == id));
+
+        return id;
+    }
+
+    private IReadOnlyList<MatchupItemDraft> CreateItemDrafts(
+        IEnumerable<int> itemIds,
+        string patch)
+    {
+        var items = ItemPicker.Items.ToDictionary(static item => item.Id);
+        return itemIds.Select(itemId => items.TryGetValue(itemId, out var item)
+            ? new MatchupItemDraft(item.Id, item.DisplayName, item.ImageUri)
+            : new MatchupItemDraft(
+                itemId,
+                itemId.ToString(CultureInfo.InvariantCulture),
+                new Uri(
+                    $"https://ddragon.leagueoflegends.com/cdn/{Uri.EscapeDataString(patch)}/img/item/{itemId}.png")))
+            .ToArray();
+    }
 
     private int FindPhaseIndex(string phaseId)
     {

@@ -32,33 +32,20 @@ public sealed class CoachingViewModelTests
         Assert.Equal(5, viewModel.MatchupEditor.TotalSteps);
         Assert.False(viewModel.MatchupEditor.MoveNext());
 
-        var mainInformation = viewModel.MatchupEditor.MainInformation;
-        mainInformation.PackName = "Urgot против Sett";
-        mainInformation.ShortDescription = "Как пережить раннюю линию и найти момент для боя.";
-        mainInformation.Author = "TopLaneAuthor";
-        await mainInformation.EnsureGamePatchCatalogLoadedAsync();
+        await CompleteMainInformationAsync(viewModel.MatchupEditor);
 
         Assert.True(viewModel.MatchupEditor.MoveNext());
         Assert.Equal(2, viewModel.MatchupEditor.CurrentStep);
         Assert.False(viewModel.MatchupEditor.CanMoveNext);
 
-        var championsAndRole = viewModel.MatchupEditor.ChampionsAndRole;
-        await championsAndRole.EnsureCatalogLoadedAsync();
-        championsAndRole.SelectedPlayerChampion = championsAndRole.Champions
-            .Single(champion => champion.Id == "Urgot");
-        championsAndRole.SelectedOpponentChampion = championsAndRole.Champions
-            .Single(champion => champion.Id == "Sett");
+        await SelectChampionsAsync(viewModel.MatchupEditor);
 
         Assert.True(viewModel.MatchupEditor.CanMoveNext);
         Assert.True(viewModel.MatchupEditor.MoveNext());
         Assert.Equal(3, viewModel.MatchupEditor.CurrentStep);
         Assert.False(viewModel.MatchupEditor.CanMoveNext);
 
-        var content = viewModel.MatchupEditor.Content;
-        content.BeginAddPhase();
-        content.Editor.Name = "Осторожное начало";
-        content.Editor.PrimaryAdvice = "Не ищи размен первым";
-        Assert.True(content.SaveEditor());
+        var content = AddPhase(viewModel.MatchupEditor);
         Assert.Single(content.Phases);
 
         Assert.True(viewModel.MatchupEditor.MovePrevious());
@@ -69,6 +56,31 @@ public sealed class CoachingViewModelTests
 
         viewModel.OpenLibrary();
         Assert.Equal(CoachingScreen.Library, viewModel.CurrentScreen);
+    }
+
+    [Fact]
+    public async Task NewPack_AllowsVisitedValidStepsButDoesNotSkipUnvisitedOnes()
+    {
+        using var viewModel = CoachingViewModelTestFactory.Create(
+            TestCoachPackFactory.CreateMatchup(),
+            LocalizationService.Instance);
+        viewModel.OpenMatchupEditor();
+
+        Assert.False(viewModel.MatchupEditor.CanNavigateToStep3);
+        Assert.False(viewModel.MatchupEditor.NavigateToStep(5));
+
+        await CompleteMainInformationAsync(viewModel.MatchupEditor);
+        Assert.True(viewModel.MatchupEditor.NavigateToStep(2));
+        Assert.False(viewModel.MatchupEditor.CanNavigateToStep3);
+
+        await SelectChampionsAsync(viewModel.MatchupEditor);
+        Assert.True(viewModel.MatchupEditor.NavigateToStep(3));
+        Assert.True(viewModel.MatchupEditor.NavigateToStep(1));
+        Assert.True(viewModel.MatchupEditor.CanNavigateToStep3);
+
+        viewModel.MatchupEditor.MainInformation.PackName = string.Empty;
+        Assert.False(viewModel.MatchupEditor.CanNavigateToStep2);
+        Assert.False(viewModel.MatchupEditor.NavigateToStep(3));
     }
 
     [Fact]
@@ -123,6 +135,32 @@ public sealed class CoachingViewModelTests
         {
             localization.SetLanguage(initialLanguage);
         }
+    }
+
+    private static async Task CompleteMainInformationAsync(MatchupEditorViewModel editor)
+    {
+        editor.MainInformation.PackName = "Urgot против Sett";
+        editor.MainInformation.ShortDescription = "Как пережить раннюю линию и найти момент для боя.";
+        editor.MainInformation.Author = "TopLaneAuthor";
+        await editor.MainInformation.EnsureGamePatchCatalogLoadedAsync();
+    }
+
+    private static async Task SelectChampionsAsync(MatchupEditorViewModel editor)
+    {
+        await editor.ChampionsAndRole.EnsureCatalogLoadedAsync();
+        editor.ChampionsAndRole.SelectedPlayerChampion = editor.ChampionsAndRole.Champions
+            .Single(static champion => champion.Id == "Urgot");
+        editor.ChampionsAndRole.SelectedOpponentChampion = editor.ChampionsAndRole.Champions
+            .Single(static champion => champion.Id == "Sett");
+    }
+
+    private static MatchupContentViewModel AddPhase(MatchupEditorViewModel editor)
+    {
+        editor.Content.BeginAddPhase();
+        editor.Content.Editor.Name = "Осторожное начало";
+        editor.Content.Editor.PrimaryAdvice = "Не ищи размен первым";
+        Assert.True(editor.Content.SaveEditor());
+        return editor.Content;
     }
 
 }

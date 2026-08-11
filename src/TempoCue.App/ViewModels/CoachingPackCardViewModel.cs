@@ -29,4 +29,8 @@ public sealed record CoachingPackCardViewModel(
     public bool IsDisabled => State == LocalCoachPackState.Disabled;
 
     public bool IsCreatedByUser => Origin == CoachingPackOrigin.CreatedByUser;
+
+    public bool CanEdit => IsCreatedByUser;
+
+    public bool CanCreateCopy => !IsCreatedByUser;
 }

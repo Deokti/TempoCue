@@ -1,5 +1,6 @@
 using TempoCue.Application;
 using TempoCue.App.Localization;
+using TempoCue.Core;
 
 namespace TempoCue.App.ViewModels;
 
@@ -252,6 +253,32 @@ public sealed class MatchupChampionsAndRoleViewModel : ObservableObject
         return EnsureCatalogLoadedAsync(cancellationToken);
     }
 
+    public void BeginNew()
+    {
+        SelectedPlayerChampion = null;
+        SelectedOpponentChampion = null;
+        SelectedRole = MatchupLaneRole.Top;
+        ClosePicker();
+    }
+
+    public void Load(CoachPack pack)
+    {
+        ArgumentNullException.ThrowIfNull(pack);
+        var firstRule = pack.Rules.FirstOrDefault();
+        var playerChampion = string.IsNullOrWhiteSpace(pack.PlayerChampion)
+            ? firstRule?.PlayerChampion ?? string.Empty
+            : pack.PlayerChampion;
+        var opponentChampion = string.IsNullOrWhiteSpace(pack.OpponentChampion)
+            ? firstRule?.OpponentChampion ?? string.Empty
+            : pack.OpponentChampion;
+        SelectedPlayerChampion = FindChampion(playerChampion)
+            ?? CreateFallbackChampion(playerChampion, pack.Patch);
+        SelectedOpponentChampion = FindChampion(opponentChampion)
+            ?? CreateFallbackChampion(opponentChampion, pack.Patch);
+        SelectedRole = ParseRole(pack.LaneRole);
+        ClosePicker();
+    }
+
     private IReadOnlyList<ChampionOptionViewModel> FilterAllChampions(string search)
     {
         var normalizedSearch = search.Trim();
@@ -283,6 +310,24 @@ public sealed class MatchupChampionsAndRoleViewModel : ObservableObject
             ? null
             : Champions.FirstOrDefault(champion =>
                 string.Equals(champion.Id, championId, StringComparison.OrdinalIgnoreCase));
+
+    private static ChampionOptionViewModel CreateFallbackChampion(
+        string championId,
+        string patch) => new(
+        championId,
+        championId,
+        new Uri(
+            $"https://ddragon.leagueoflegends.com/cdn/{Uri.EscapeDataString(patch)}/img/champion/{Uri.EscapeDataString(championId)}.png"));
+
+    private static MatchupLaneRole ParseRole(string role) => role.ToLowerInvariant() switch
+    {
+        "top" => MatchupLaneRole.Top,
+        "jungle" => MatchupLaneRole.Jungle,
+        "mid" => MatchupLaneRole.Mid,
+        "adc" or "bottom" or "bot" => MatchupLaneRole.Adc,
+        "support" or "utility" => MatchupLaneRole.Support,
+        _ => MatchupLaneRole.Any
+    };
 
     private void NotifyCatalogChanged()
     {

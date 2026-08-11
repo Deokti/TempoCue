@@ -52,9 +52,12 @@ internal sealed class CoachingPackCardFactory
             _localization.Format("Coaching.Library.Card.Details", role, author),
             _localization.Plural("Count.Advice", adviceCount),
             _localization.Get(GetStateResourceKey(state)),
-            _localization.Get(origin == CoachingPackOrigin.BuiltIn
-                ? "Coaching.Library.Origin.BuiltIn"
-                : "Coaching.Library.Origin.Created"),
+            _localization.Get(origin switch
+            {
+                CoachingPackOrigin.BuiltIn => "Coaching.Library.Origin.BuiltIn",
+                CoachingPackOrigin.Imported => "Coaching.Library.Origin.Imported",
+                _ => "Coaching.Library.Origin.Created"
+            }),
             GetContentLanguageLabel(pack.ContentLanguage),
             _localization.Format("Coaching.Library.Patch", pack.Patch));
     }

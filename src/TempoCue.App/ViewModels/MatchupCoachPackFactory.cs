@@ -5,13 +5,14 @@ namespace TempoCue.App.ViewModels;
 /// <summary>Собирает проверяемую Core-модель из состояния редактора матчапа.</summary>
 internal sealed class MatchupCoachPackFactory
 {
-    private readonly string _instanceId = Guid.NewGuid().ToString("N")[..8];
-
     public CoachPack Create(
         MatchupMainInformationViewModel mainInformation,
         MatchupChampionsAndRoleViewModel champions,
         MatchupContentViewModel content,
-        MatchupSourceDraft sourceDraft)
+        MatchupSourceDraft sourceDraft,
+        string? packId = null,
+        string? forkedFromPackId = null,
+        string? forkedFromAuthor = null)
     {
         ArgumentNullException.ThrowIfNull(mainInformation);
         ArgumentNullException.ThrowIfNull(champions);
@@ -28,7 +29,7 @@ internal sealed class MatchupCoachPackFactory
         return new CoachPack
         {
             SchemaVersion = 2,
-            Id = $"matchup.{NormalizeId(playerChampion.Id)}-vs-{NormalizeId(opponentChampion.Id)}.{_instanceId}",
+            Id = packId ?? CreatePackId(playerChampion.Id, opponentChampion.Id),
             Name = mainInformation.PackName.Trim(),
             Patch = mainInformation.GamePatch,
             Description = mainInformation.ShortDescription.Trim(),
@@ -39,6 +40,8 @@ internal sealed class MatchupCoachPackFactory
             LaneRole = champions.SelectedRole.ToString().ToLowerInvariant(),
             VerifiedOn = DateOnly.FromDateTime(mainInformation.VerifiedOn),
             Source = source,
+            ForkedFromPackId = forkedFromPackId,
+            ForkedFromAuthor = forkedFromAuthor,
             Rules = content.Phases.Select((phase, index) => new CoachRuleDefinition
             {
                 Id = phase.Id,
@@ -112,6 +115,9 @@ internal sealed class MatchupCoachPackFactory
             .Where(static character => char.IsLetterOrDigit(character))
             .Select(static character => char.ToLowerInvariant(character))
             .ToArray());
+
+    private static string CreatePackId(string playerChampion, string opponentChampion) =>
+        $"matchup.{NormalizeId(playerChampion)}-vs-{NormalizeId(opponentChampion)}.{Guid.NewGuid():N}";
 }
 
 internal sealed record MatchupSourceDraft(

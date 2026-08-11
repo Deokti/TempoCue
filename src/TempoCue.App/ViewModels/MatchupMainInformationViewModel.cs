@@ -1,12 +1,15 @@
 using System.Globalization;
 using TempoCue.App.Localization;
 using TempoCue.Application;
+using TempoCue.Core;
 
 namespace TempoCue.App.ViewModels;
 
 /// <summary>Метаданные и состояние готовности первого шага редактора матчапа.</summary>
 public sealed class MatchupMainInformationViewModel : ObservableObject
 {
+    private const int MaxPackNameLength = 80;
+
     private readonly IGamePatchCatalog _gamePatchCatalog;
     private readonly LocalizationService _localization;
     private string _packName = string.Empty;
@@ -16,6 +19,7 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
     private IReadOnlyList<GamePatchOptionViewModel> _gamePatches = [];
     private GamePatchOptionViewModel? _selectedGamePatch;
     private CatalogViewState _gamePatchCatalogState = CatalogViewState.NotLoaded;
+    private DateTime _verifiedOn = DateTime.Today;
 
     public MatchupMainInformationViewModel(
         string defaultLanguageCode,
@@ -36,7 +40,17 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
         new("en-US", "English")
     ];
 
-    public DateTime VerifiedOn { get; } = DateTime.Today;
+    public DateTime VerifiedOn
+    {
+        get => _verifiedOn;
+        private set
+        {
+            if (SetProperty(ref _verifiedOn, value))
+            {
+                OnPropertyChanged(nameof(VerifiedOnDisplayName));
+            }
+        }
+    }
 
     public string DisplayTitle => string.IsNullOrWhiteSpace(PackName)
         ? _localization.Get("Coaching.MatchupEditor.Title")
@@ -116,7 +130,7 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
     public TextLengthFeedback PackNameLengthFeedback => TextLengthFeedback.Create(
         PackName,
         3,
-        80,
+        MaxPackNameLength,
         _localization);
 
     public TextLengthFeedback ShortDescriptionLengthFeedback => TextLengthFeedback.Create(
@@ -160,7 +174,7 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
         GamePatchCatalogState == CatalogViewState.Cached;
 
     public bool IsComplete =>
-        TextLengthFeedback.IsWithin(PackName, 3, 80)
+        TextLengthFeedback.IsWithin(PackName, 3, MaxPackNameLength)
         && TextLengthFeedback.IsWithin(ShortDescription, 10, 240)
         && TextLengthFeedback.IsWithin(Author, 2, 40)
         && IsGamePatchCatalogReady
@@ -202,6 +216,37 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
     {
         GamePatchCatalogState = CatalogViewState.NotLoaded;
         return EnsureGamePatchCatalogLoadedAsync(cancellationToken);
+    }
+
+    public void BeginNew()
+    {
+        PackName = string.Empty;
+        ShortDescription = string.Empty;
+        Author = string.Empty;
+        AdviceLanguageCode = _localization.CurrentLanguageCode;
+        VerifiedOn = DateTime.Today;
+        SelectedGamePatch = _gamePatches.FirstOrDefault(static patch => patch.IsCurrent)
+            ?? _gamePatches.FirstOrDefault();
+    }
+
+    public void Load(CoachPack pack, bool createCopy)
+    {
+        ArgumentNullException.ThrowIfNull(pack);
+        var packName = createCopy
+            ? _localization.Format("Coaching.MatchupEditor.CopyName", pack.Name)
+            : pack.Name;
+        PackName = packName.Length <= MaxPackNameLength
+            ? packName
+            : packName[..MaxPackNameLength].TrimEnd();
+        ShortDescription = pack.Description;
+        Author = createCopy ? string.Empty : pack.Author;
+        AdviceLanguageCode = string.IsNullOrWhiteSpace(pack.ContentLanguage)
+            ? _localization.CurrentLanguageCode
+            : pack.ContentLanguage;
+        VerifiedOn = createCopy
+            ? DateTime.Today
+            : pack.VerifiedOn?.ToDateTime(TimeOnly.MinValue) ?? DateTime.Today;
+        SelectGamePatch(pack.Patch);
     }
 
     public void UpdateLanguage()
@@ -252,5 +297,19 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
             ? null
             : _gamePatches.FirstOrDefault(option =>
                 string.Equals(option.Patch, patch, StringComparison.OrdinalIgnoreCase));
+
+    private void SelectGamePatch(string patch)
+    {
+        var option = FindPatch(patch);
+        if (option is null)
+        {
+            option = CreatePatchOption(patch, false);
+            _gamePatches = [option, .. _gamePatches];
+            OnPropertyChanged(nameof(GamePatches));
+            GamePatchCatalogState = CatalogViewState.Cached;
+        }
+
+        SelectedGamePatch = option;
+    }
 
 }

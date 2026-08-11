@@ -4,5 +4,6 @@ namespace TempoCue.App.ViewModels;
 public enum CoachingPackOrigin
 {
     BuiltIn,
-    CreatedByUser
+    CreatedByUser,
+    Imported
 }

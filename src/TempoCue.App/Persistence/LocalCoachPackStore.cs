@@ -28,7 +28,10 @@ public sealed class LocalCoachPackStore : ICoachPackStore
         }
 
         var stateFiles = await ReadStateFilesAsync(cancellationToken);
-        var packFiles = await ReadPackFilesAsync(stateFiles.States, cancellationToken);
+        var packFiles = await ReadPackFilesAsync(
+            stateFiles.States,
+            stateFiles.Origins,
+            cancellationToken);
 
         return new CoachPackLibrarySnapshot(
             packFiles.Entries
@@ -70,6 +73,7 @@ public sealed class LocalCoachPackStore : ICoachPackStore
                     stateStream,
                     pack.Id,
                     state,
+                    LocalCoachPackOrigin.CreatedByUser,
                     DateTimeOffset.UtcNow,
                     cancellationToken);
             }
@@ -96,6 +100,7 @@ public sealed class LocalCoachPackStore : ICoachPackStore
         var fileStem = CreateSafeFileStem(packId);
         var statePath = Path.Combine(_rootDirectory, $"{fileStem}.state.json");
         var temporaryPath = CreateTemporaryPath(statePath);
+        var origin = await ReadExistingOriginAsync(statePath, cancellationToken);
 
         try
         {
@@ -105,6 +110,7 @@ public sealed class LocalCoachPackStore : ICoachPackStore
                     stateStream,
                     packId,
                     state,
+                    origin,
                     DateTimeOffset.UtcNow,
                     cancellationToken);
             }
@@ -138,6 +144,8 @@ public sealed class LocalCoachPackStore : ICoachPackStore
     {
         var states = new Dictionary<string, LocalCoachPackState>(
             StringComparer.OrdinalIgnoreCase);
+        var origins = new Dictionary<string, LocalCoachPackOrigin>(
+            StringComparer.OrdinalIgnoreCase);
         var invalidFileCount = 0;
         foreach (var statePath in Directory.EnumerateFiles(
                      _rootDirectory,
@@ -152,6 +160,7 @@ public sealed class LocalCoachPackStore : ICoachPackStore
                     stateStream,
                     cancellationToken);
                 states[state.PackId] = state.State;
+                origins[state.PackId] = state.Origin;
             }
             catch (Exception exception) when (IsInvalidStoredFile(exception))
             {
@@ -159,11 +168,12 @@ public sealed class LocalCoachPackStore : ICoachPackStore
             }
         }
 
-        return new StateFilesReadResult(states, invalidFileCount);
+        return new StateFilesReadResult(states, origins, invalidFileCount);
     }
 
     private async Task<PackFilesReadResult> ReadPackFilesAsync(
         IReadOnlyDictionary<string, LocalCoachPackState> states,
+        IReadOnlyDictionary<string, LocalCoachPackOrigin> origins,
         CancellationToken cancellationToken)
     {
         var entries = new List<LocalCoachPackEntry>();
@@ -182,7 +192,10 @@ public sealed class LocalCoachPackStore : ICoachPackStore
                 entries.Add(new LocalCoachPackEntry(
                     pack,
                     states.GetValueOrDefault(pack.Id, LocalCoachPackState.Draft),
-                    File.GetLastWriteTimeUtc(packPath)));
+                    File.GetLastWriteTimeUtc(packPath),
+                    origins.GetValueOrDefault(
+                        pack.Id,
+                        LocalCoachPackOrigin.CreatedByUser)));
             }
             catch (Exception exception) when (IsInvalidStoredFile(exception))
             {
@@ -198,6 +211,27 @@ public sealed class LocalCoachPackStore : ICoachPackStore
         if (!Enum.IsDefined(state))
         {
             throw new ArgumentOutOfRangeException(nameof(state));
+        }
+    }
+
+    private static async Task<LocalCoachPackOrigin> ReadExistingOriginAsync(
+        string statePath,
+        CancellationToken cancellationToken)
+    {
+        if (!File.Exists(statePath))
+        {
+            return LocalCoachPackOrigin.CreatedByUser;
+        }
+
+        try
+        {
+            await using var stream = OpenFile(statePath);
+            var state = await LocalCoachPackStateSerializer.ReadAsync(stream, cancellationToken);
+            return state.Origin;
+        }
+        catch (Exception exception) when (IsInvalidStoredFile(exception))
+        {
+            return LocalCoachPackOrigin.CreatedByUser;
         }
     }
 
@@ -231,6 +265,7 @@ public sealed class LocalCoachPackStore : ICoachPackStore
 
     private sealed record StateFilesReadResult(
         Dictionary<string, LocalCoachPackState> States,
+        Dictionary<string, LocalCoachPackOrigin> Origins,
         int InvalidFileCount);
 
     private sealed record PackFilesReadResult(

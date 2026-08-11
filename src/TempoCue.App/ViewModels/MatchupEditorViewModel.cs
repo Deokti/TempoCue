@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using TempoCue.App.Localization;
 using TempoCue.Application;
+using TempoCue.Core;
 
 namespace TempoCue.App.ViewModels;
 
@@ -9,6 +10,8 @@ public sealed class MatchupEditorViewModel : ObservableObject
 {
     private readonly LocalizationService _localization;
     private int _currentStep = 1;
+    private int _highestVisitedStep = 1;
+    private MatchupEditorMode _mode;
 
     public MatchupEditorViewModel(
         LocalizationService localization,
@@ -33,6 +36,8 @@ public sealed class MatchupEditorViewModel : ObservableObject
         MainInformation.PropertyChanged += MainInformation_PropertyChanged;
         ChampionsAndRole.PropertyChanged += ChampionsAndRole_PropertyChanged;
         Content.PropertyChanged += Content_PropertyChanged;
+        Verification.PropertyChanged += Verification_PropertyChanged;
+        BeginNew();
     }
 
     public int CurrentStep
@@ -42,9 +47,9 @@ public sealed class MatchupEditorViewModel : ObservableObject
         {
             if (SetProperty(ref _currentStep, value))
             {
+                _highestVisitedStep = Math.Max(_highestVisitedStep, value);
                 OnPropertyChanged(nameof(CurrentStepIndex));
-                OnPropertyChanged(nameof(CanMovePrevious));
-                OnPropertyChanged(nameof(CanMoveNext));
+                NotifyNavigationChanged();
             }
         }
     }
@@ -52,6 +57,32 @@ public sealed class MatchupEditorViewModel : ObservableObject
     public int CurrentStepIndex => CurrentStep - 1;
 
     public int TotalSteps => 5;
+
+    public MatchupEditorMode Mode
+    {
+        get => _mode;
+        private set
+        {
+            if (SetProperty(ref _mode, value))
+            {
+                OnPropertyChanged(nameof(IsEditingExisting));
+                OnPropertyChanged(nameof(ReturnsToPackDetails));
+                OnPropertyChanged(nameof(ModeLabel));
+                NotifyNavigationChanged();
+            }
+        }
+    }
+
+    public bool IsEditingExisting => Mode == MatchupEditorMode.Edit;
+
+    public bool ReturnsToPackDetails => Mode is MatchupEditorMode.Edit or MatchupEditorMode.Copy;
+
+    public string ModeLabel => _localization.Get(Mode switch
+    {
+        MatchupEditorMode.Edit => "Coaching.MatchupEditor.Mode.Edit",
+        MatchupEditorMode.Copy => "Coaching.MatchupEditor.Mode.Copy",
+        _ => "Coaching.MatchupEditor.Draft"
+    });
 
     public MatchupMainInformationViewModel MainInformation { get; }
 
@@ -74,30 +105,19 @@ public sealed class MatchupEditorViewModel : ObservableObject
         _ => false
     };
 
+    public bool CanNavigateToStep1 => CanNavigateToStep(1);
+
+    public bool CanNavigateToStep2 => CanNavigateToStep(2);
+
+    public bool CanNavigateToStep3 => CanNavigateToStep(3);
+
+    public bool CanNavigateToStep4 => CanNavigateToStep(4);
+
+    public bool CanNavigateToStep5 => CanNavigateToStep(5);
+
     public bool MoveNext()
     {
-        if (!CanMoveNext)
-        {
-            return false;
-        }
-
-        if (CurrentStep == 2)
-        {
-            Content.SetItemCatalogContext(
-                MainInformation.GamePatch,
-                _localization.CurrentLanguageCode);
-        }
-        else if (CurrentStep == 3)
-        {
-            Verification.Update(MainInformation, ChampionsAndRole, Content);
-        }
-        else if (CurrentStep == 4)
-        {
-            Save.Update(MainInformation, ChampionsAndRole, Content);
-        }
-
-        CurrentStep++;
-        return true;
+        return CanMoveNext && NavigateToStep(CurrentStep + 1);
     }
 
     public bool MovePrevious()
@@ -107,8 +127,82 @@ public sealed class MatchupEditorViewModel : ObservableObject
             return false;
         }
 
-        CurrentStep--;
+        return NavigateToStep(CurrentStep - 1);
+    }
+
+    public bool NavigateToStep(int targetStep)
+    {
+        if (!CanNavigateToStep(targetStep))
+        {
+            return false;
+        }
+
+        PrepareStep(targetStep);
+        CurrentStep = targetStep;
         return true;
+    }
+
+    public bool CanNavigateToStep(int targetStep)
+    {
+        if (targetStep is < 1 or > 5)
+        {
+            return false;
+        }
+
+        if (Mode == MatchupEditorMode.Edit)
+        {
+            return true;
+        }
+
+        if (targetStep > Math.Min(TotalSteps, _highestVisitedStep + 1))
+        {
+            return false;
+        }
+
+        for (var step = 1; step < targetStep; step++)
+        {
+            if (!IsStepComplete(step))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public void BeginNew()
+    {
+        Mode = MatchupEditorMode.Create;
+        _highestVisitedStep = 1;
+        CurrentStep = 1;
+        MainInformation.BeginNew();
+        ChampionsAndRole.BeginNew();
+        Content.BeginNew();
+        Save.BeginNew();
+        NotifyNavigationChanged();
+    }
+
+    public async Task LoadAsync(
+        CoachPack pack,
+        LocalCoachPackState state,
+        bool createCopy,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(pack);
+        await Task.WhenAll(
+            MainInformation.EnsureGamePatchCatalogLoadedAsync(cancellationToken),
+            ChampionsAndRole.EnsureCatalogLoadedAsync(cancellationToken));
+
+        MainInformation.Load(pack, createCopy);
+        ChampionsAndRole.Load(pack);
+        Content.SetItemCatalogContext(pack.Patch, _localization.CurrentLanguageCode);
+        await Content.EnsureItemCatalogLoadedAsync(cancellationToken);
+        Content.Load(pack);
+        Save.Load(pack, state, createCopy);
+        Mode = createCopy ? MatchupEditorMode.Copy : MatchupEditorMode.Edit;
+        _highestVisitedStep = createCopy ? 1 : TotalSteps;
+        CurrentStep = 1;
+        NotifyNavigationChanged();
     }
 
     public void UpdateLanguage(string languageCode)
@@ -118,6 +212,7 @@ public sealed class MatchupEditorViewModel : ObservableObject
         Content.UpdateLanguage(languageCode);
         Verification.UpdateLanguage();
         Save.UpdateLanguage();
+        OnPropertyChanged(nameof(ModeLabel));
     }
 
     private void MainInformation_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -125,6 +220,7 @@ public sealed class MatchupEditorViewModel : ObservableObject
         if (e.PropertyName == nameof(MatchupMainInformationViewModel.IsComplete))
         {
             OnPropertyChanged(nameof(CanMoveNext));
+            NotifyStepAvailabilityChanged();
         }
     }
 
@@ -133,6 +229,7 @@ public sealed class MatchupEditorViewModel : ObservableObject
         if (e.PropertyName == nameof(MatchupChampionsAndRoleViewModel.IsComplete))
         {
             OnPropertyChanged(nameof(CanMoveNext));
+            NotifyStepAvailabilityChanged();
         }
     }
 
@@ -141,6 +238,62 @@ public sealed class MatchupEditorViewModel : ObservableObject
         if (e.PropertyName == nameof(MatchupContentViewModel.IsComplete))
         {
             OnPropertyChanged(nameof(CanMoveNext));
+            NotifyStepAvailabilityChanged();
         }
+    }
+
+    private void Verification_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MatchupVerificationViewModel.CanContinue))
+        {
+            OnPropertyChanged(nameof(CanMoveNext));
+            NotifyStepAvailabilityChanged();
+        }
+    }
+
+    private bool IsStepComplete(int step) => step switch
+    {
+        1 => MainInformation.IsComplete,
+        2 => ChampionsAndRole.IsComplete,
+        3 => Content.IsComplete,
+        4 => Verification.CanContinue,
+        5 => Save.CanSave,
+        _ => false
+    };
+
+    private void PrepareStep(int targetStep)
+    {
+        if (targetStep >= 3)
+        {
+            Content.SetItemCatalogContext(
+                MainInformation.GamePatch,
+                _localization.CurrentLanguageCode);
+        }
+
+        if (targetStep >= 4)
+        {
+            Verification.Update(MainInformation, ChampionsAndRole, Content);
+        }
+
+        if (targetStep >= 5)
+        {
+            Save.Update(MainInformation, ChampionsAndRole, Content);
+        }
+    }
+
+    private void NotifyNavigationChanged()
+    {
+        OnPropertyChanged(nameof(CanMovePrevious));
+        OnPropertyChanged(nameof(CanMoveNext));
+        NotifyStepAvailabilityChanged();
+    }
+
+    private void NotifyStepAvailabilityChanged()
+    {
+        OnPropertyChanged(nameof(CanNavigateToStep1));
+        OnPropertyChanged(nameof(CanNavigateToStep2));
+        OnPropertyChanged(nameof(CanNavigateToStep3));
+        OnPropertyChanged(nameof(CanNavigateToStep4));
+        OnPropertyChanged(nameof(CanNavigateToStep5));
     }
 }

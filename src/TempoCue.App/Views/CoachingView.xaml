@@ -27,7 +27,8 @@
         <views:CoachingPackDetailsView x:Name="CoachingPackDetailsPage"
                                        DataContext="{Binding Details}"
                                        BackRequested="CoachingPackDetailsPage_BackRequested"
-                                       StateChangeRequested="CoachingPackDetailsPage_StateChangeRequested">
+                                       StateChangeRequested="CoachingPackDetailsPage_StateChangeRequested"
+                                       EditRequested="CoachingPackDetailsPage_EditRequested">
             <views:CoachingPackDetailsView.Style>
                 <Style TargetType="views:CoachingPackDetailsView">
                     <Setter Property="Visibility" Value="Collapsed" />

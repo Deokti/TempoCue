@@ -33,6 +33,9 @@ public partial class CoachingView : UserControl
     private async void CoachingPackDetailsPage_StateChangeRequested(object? sender, EventArgs e) =>
         await ViewModel.SetSelectedPackEnabledAsync(!ViewModel.Details.IsEnabled);
 
+    private async void CoachingPackDetailsPage_EditRequested(object? sender, EventArgs e) =>
+        await ViewModel.OpenSelectedPackEditorAsync();
+
     private void PackTypeSelectionPage_BackRequested(object? sender, EventArgs e) =>
         ViewModel.OpenLibrary();
 
@@ -40,7 +43,7 @@ public partial class CoachingView : UserControl
         ViewModel.OpenMatchupEditor();
 
     private void MatchupEditorPage_BackRequested(object? sender, EventArgs e) =>
-        ViewModel.OpenPackTypeSelection();
+        ViewModel.CloseMatchupEditor();
 
     private async void MatchupEditorPage_SaveCompleted(object? sender, EventArgs e)
     {

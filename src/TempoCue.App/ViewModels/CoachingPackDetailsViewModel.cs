@@ -21,6 +21,7 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
     private IReadOnlyList<CoachingPackItemBlockDetailsViewModel> _itemBlocks = [];
     private bool _isItemCatalogLoading;
     private string _itemCatalogMessage = string.Empty;
+    private string _sourceLinkMessage = string.Empty;
     private long _itemCatalogLoadVersion;
     private bool _isDisposed;
 
@@ -79,6 +80,10 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
         ? _localization.Get("Coaching.Details.Disable")
         : _localization.Get("Coaching.Details.Enable");
 
+    public string EditActionLabel => Card?.CanEdit == true
+        ? _localization.Get("Coaching.Details.Edit")
+        : _localization.Get("Coaching.Details.CreateCopy");
+
     public string HeaderDetails => Pack is null
         ? string.Empty
         : _localization.Format(
@@ -106,6 +111,24 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
         : _localization.Get("Coaching.Details.Overview.NotSpecified");
 
     public string SourceLabel => BuildSourceLabel(Pack);
+
+    public Uri? SourceUri => BuildSourceUri(Pack);
+
+    public bool HasSourceUri => SourceUri is not null;
+
+    public string SourceLinkMessage
+    {
+        get => _sourceLinkMessage;
+        private set
+        {
+            if (SetProperty(ref _sourceLinkMessage, value))
+            {
+                OnPropertyChanged(nameof(HasSourceLinkMessage));
+            }
+        }
+    }
+
+    public bool HasSourceLinkMessage => !string.IsNullOrWhiteSpace(SourceLinkMessage);
 
     public CoachingPackDetailsTab CurrentTab
     {
@@ -197,6 +220,7 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
             _items = new Dictionary<int, ItemCatalogEntry>();
             IsItemCatalogLoading = card.Pack.ItemBlocks.Count > 0;
             ItemCatalogMessage = string.Empty;
+            SourceLinkMessage = string.Empty;
             CurrentTab = CoachingPackDetailsTab.Overview;
             NotifyHeaderChanged();
             RebuildContent();
@@ -221,6 +245,9 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
     }
 
     public void ShowOverview() => CurrentTab = CoachingPackDetailsTab.Overview;
+
+    public void ReportSourceLinkOpenFailure() =>
+        SourceLinkMessage = _localization.Get("Coaching.Details.Source.OpenFailed");
 
     public void ShowAdvice() => CurrentTab = CoachingPackDetailsTab.Advice;
 
@@ -423,6 +450,7 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(StateLabel));
         OnPropertyChanged(nameof(IsEnabled));
         OnPropertyChanged(nameof(StateActionLabel));
+        OnPropertyChanged(nameof(EditActionLabel));
         OnPropertyChanged(nameof(HeaderDetails));
         OnPropertyChanged(nameof(Description));
         OnPropertyChanged(nameof(RoleLabel));
@@ -431,6 +459,12 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(PatchLabel));
         OnPropertyChanged(nameof(VerifiedOnLabel));
         OnPropertyChanged(nameof(SourceLabel));
+        OnPropertyChanged(nameof(SourceUri));
+        OnPropertyChanged(nameof(HasSourceUri));
+        if (HasSourceLinkMessage)
+        {
+            SourceLinkMessage = _localization.Get("Coaching.Details.Source.OpenFailed");
+        }
     }
 
     private string GetPowerStateLabel(PowerState powerState) => _localization.Get(powerState switch
@@ -479,5 +513,18 @@ public sealed class CoachingPackDetailsViewModel : ObservableObject, IDisposable
         return string.IsNullOrWhiteSpace(pack.Source.Author)
             ? title
             : $"{title} — {pack.Source.Author}";
+    }
+
+    private static Uri? BuildSourceUri(CoachPack? pack)
+    {
+        if (!Uri.TryCreate(pack?.Source?.Url, UriKind.Absolute, out var sourceUri))
+        {
+            return null;
+        }
+
+        return string.Equals(sourceUri.Scheme, Uri.UriSchemeHttp, StringComparison.OrdinalIgnoreCase)
+               || string.Equals(sourceUri.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase)
+            ? sourceUri
+            : null;
     }
 }

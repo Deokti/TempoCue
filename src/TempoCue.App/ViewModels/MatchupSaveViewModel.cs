@@ -25,6 +25,9 @@ public sealed class MatchupSaveViewModel : ObservableObject
     private string _savedPath = string.Empty;
     private bool _hasSaveError;
     private LocalCoachPackState _savedState = LocalCoachPackState.Draft;
+    private string? _targetPackId;
+    private string? _forkedFromPackId;
+    private string? _forkedFromAuthor;
 
     public MatchupSaveViewModel(
         LocalizationService localization,
@@ -152,6 +155,8 @@ public sealed class MatchupSaveViewModel : ObservableObject
         ? "Coaching.MatchupEditor.Save.Card.State.Enabled"
         : "Coaching.MatchupEditor.Draft");
 
+    public LocalCoachPackState OriginalState => _savedState;
+
     public bool IsSourceComplete => IsPersonalExperience
         || TextLengthFeedback.IsWithin(SourceTitle, 3, 160)
         && TextLengthFeedback.IsWithin(SourceAuthor, 2, 80)
@@ -229,6 +234,33 @@ public sealed class MatchupSaveViewModel : ObservableObject
         NotifyDerivedStateChanged();
     }
 
+    public void BeginNew()
+    {
+        _targetPackId = null;
+        _forkedFromPackId = null;
+        _forkedFromAuthor = null;
+        _savedState = LocalCoachPackState.Draft;
+        SelectedSourceKind = MatchupSourceKind.PersonalExperience;
+        SourceTitle = string.Empty;
+        SourceUrl = string.Empty;
+        SourceAuthor = string.Empty;
+        AuthorPermissionGranted = false;
+        ResetSaveResult();
+        NotifyDerivedStateChanged();
+    }
+
+    public void Load(CoachPack pack, LocalCoachPackState state, bool createCopy)
+    {
+        ArgumentNullException.ThrowIfNull(pack);
+        _targetPackId = createCopy ? null : pack.Id;
+        _forkedFromPackId = createCopy ? pack.Id : pack.ForkedFromPackId;
+        _forkedFromAuthor = createCopy ? pack.Author : pack.ForkedFromAuthor;
+        _savedState = createCopy ? LocalCoachPackState.Draft : state;
+        LoadSource(pack.Source);
+        ResetSaveResult();
+        NotifyDerivedStateChanged();
+    }
+
     public async Task<bool> SaveAsync(
         LocalCoachPackState state,
         CancellationToken cancellationToken = default)
@@ -248,6 +280,7 @@ public sealed class MatchupSaveViewModel : ObservableObject
                 CreateCoachPack(),
                 state,
                 cancellationToken);
+            _targetPackId = result.PackId;
             SavedPath = result.DisplayPath;
             _savedState = result.State;
             OnPropertyChanged(nameof(PackStateLabel));
@@ -296,7 +329,32 @@ public sealed class MatchupSaveViewModel : ObservableObject
                 SourceTitle,
                 SourceUrl,
                 SourceAuthor,
-                AuthorPermissionGranted));
+                AuthorPermissionGranted),
+            _targetPackId,
+            _forkedFromPackId,
+            _forkedFromAuthor);
+    }
+
+    private void LoadSource(CoachPackSource? source)
+    {
+        SelectedSourceKind = source?.Kind switch
+        {
+            CoachPackSourceKind.Article => MatchupSourceKind.Article,
+            CoachPackSourceKind.Video => MatchupSourceKind.Video,
+            CoachPackSourceKind.CommunityGuide => MatchupSourceKind.Guide,
+            _ => MatchupSourceKind.PersonalExperience
+        };
+        SourceTitle = source?.Title ?? string.Empty;
+        SourceUrl = source?.Url ?? string.Empty;
+        SourceAuthor = source?.Author ?? string.Empty;
+        AuthorPermissionGranted = source?.Permission == CoachPackSourcePermission.Granted;
+    }
+
+    private void ResetSaveResult()
+    {
+        SaveStatus = string.Empty;
+        SavedPath = string.Empty;
+        HasSaveError = false;
     }
 
     private void NotifySourceChanged()

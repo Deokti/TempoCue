@@ -42,4 +42,33 @@ public sealed class MatchupEditorNavigationViewTests
             Assert.Equal(CoachingScreen.PackTypeSelection, context.Coaching.CurrentScreen);
         });
     }
+
+    [Fact]
+    public void StepTabs_OpenPreviouslyCompletedPagesAndKeepFuturePageDisabled()
+    {
+        WpfTestHost.Run(() =>
+        {
+            using var context = new MainWindowTestContext();
+            context.Show();
+            context.OpenMatchupContent();
+            var steps = WpfTestHost.Find<ListBox>(
+                context.MatchupEditorPage,
+                "MatchupEditorStepsListBox");
+
+            Assert.Equal(
+                Visibility.Collapsed,
+                WpfTestHost.Find<Button>(context.MatchupEditorPage, "CloseMatchupEditorButton").Visibility);
+            Assert.False(((ListBoxItem)steps.Items[4]).IsEnabled);
+            WpfTestHost.Click((ListBoxItem)steps.Items[0]);
+            Assert.Equal(1, context.Coaching.MatchupEditor.CurrentStep);
+            Assert.Equal(Visibility.Visible, context.MainInformationPage.Visibility);
+
+            WpfTestHost.Click((ListBoxItem)steps.Items[2]);
+            Assert.Equal(3, context.Coaching.MatchupEditor.CurrentStep);
+            Assert.Equal(Visibility.Visible, context.ContentPage.Visibility);
+            CoachingViewTestContext.SaveVisualSnapshotIfRequested(
+                context.Window,
+                "matchup-editor-clickable-steps.png");
+        });
+    }
 }

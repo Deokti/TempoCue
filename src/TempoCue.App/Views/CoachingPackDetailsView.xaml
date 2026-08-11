@@ -158,21 +158,11 @@
                             Content="{Binding StateActionLabel}"
                             Style="{StaticResource SecondaryButton}"
                             Click="StateActionButton_Click" />
-                    <Button Content="{localization:Loc Coaching.Details.Edit}"
+                    <Button x:Name="PackEditActionButton"
+                            Content="{Binding EditActionLabel}"
                             Margin="10,0,0,0"
-                            IsEnabled="False"
-                            ToolTip="{localization:Loc Coaching.Details.Edit.Planned}">
-                        <Button.Style>
-                            <Style TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Card.IsCreatedByUser}" Value="True">
-                                        <Setter Property="Visibility" Value="Visible" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
+                            Style="{StaticResource PrimaryButton}"
+                            Click="EditActionButton_Click" />
                 </StackPanel>
             </Grid>
 
@@ -336,7 +326,42 @@
                                 <TextBlock Grid.Row="10" Text="{localization:Loc Coaching.Details.Overview.VerifiedOn}" Foreground="#7086A2" FontSize="{StaticResource Typography.FontSize.Body}" />
                                 <TextBlock Grid.Row="10" Grid.Column="2" Text="{Binding VerifiedOnLabel}" Foreground="#D9E5F2" FontSize="{StaticResource Typography.FontSize.BodyLarge}" TextWrapping="Wrap" />
                                 <TextBlock Grid.Row="12" Text="{localization:Loc Coaching.Details.Overview.Source}" Foreground="#7086A2" FontSize="{StaticResource Typography.FontSize.Body}" />
-                                <TextBlock Grid.Row="12" Grid.Column="2" Text="{Binding SourceLabel}" Foreground="#D9E5F2" FontSize="{StaticResource Typography.FontSize.BodyLarge}" TextWrapping="Wrap" />
+                                <StackPanel Grid.Row="12" Grid.Column="2">
+                                    <TextBlock Text="{Binding SourceLabel}" Foreground="#D9E5F2" FontSize="{StaticResource Typography.FontSize.BodyLarge}" TextWrapping="Wrap" />
+                                    <TextBlock x:Name="SourceUrlTextBlock" Margin="0,4,0,0" TextWrapping="Wrap">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding HasSourceUri}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                        <Hyperlink NavigateUri="{Binding SourceUri, Mode=OneWay}"
+                                                   Foreground="#55B8F4"
+                                                   RequestNavigate="SourceLink_RequestNavigate">
+                                            <Run Text="{Binding SourceUri, Mode=OneWay}" />
+                                        </Hyperlink>
+                                    </TextBlock>
+                                    <TextBlock Text="{Binding SourceLinkMessage}"
+                                               Foreground="#F1D274"
+                                               FontSize="{StaticResource Typography.FontSize.Caption}"
+                                               TextWrapping="Wrap"
+                                               Margin="0,4,0,0">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding HasSourceLinkMessage}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
                                 <TextBlock Grid.Row="14" Text="{localization:Loc Coaching.Details.Overview.Role}" Foreground="#7086A2" FontSize="{StaticResource Typography.FontSize.Body}" />
                                 <TextBlock Grid.Row="14" Grid.Column="2" Text="{Binding RoleLabel}" Foreground="#D9E5F2" FontSize="{StaticResource Typography.FontSize.BodyLarge}" TextWrapping="Wrap" />
                             </Grid>
@@ -379,7 +404,25 @@
                                                         </StackPanel>
                                                         <TextBlock Grid.Column="1" Text="{Binding LevelRange}" Foreground="#7F93AF" />
                                                     </Grid>
-                                                    <TextBlock Text="{Binding PrimaryAdvice}" Foreground="#F0F5FB" FontSize="{StaticResource Typography.FontSize.BodyLarge}" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,12,0,0" />
+                                                    <TextBlock Text="{Binding PrimaryAdvice}"
+                                                               Foreground="#F0F5FB"
+                                                               FontSize="{StaticResource Typography.FontSize.BodyLarge}"
+                                                               TextWrapping="Wrap"
+                                                               Margin="0,12,0,0">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="FontWeight" Value="Normal" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding HasWhyNow}" Value="True">
+                                                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding HasNextGoal}" Value="True">
+                                                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
                                                     <TextBlock Text="{Binding WhyNow}" Foreground="#91A4BD" FontSize="{StaticResource Typography.FontSize.Body}" TextWrapping="Wrap" Margin="0,5,0,0">
                                                         <TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding HasWhyNow}" Value="True"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style></TextBlock.Style>
                                                     </TextBlock>
@@ -400,16 +443,31 @@
                         <Border Grid.Column="2" Style="{StaticResource ShellCard}">
                             <StackPanel>
                                 <TextBlock Text="{localization:Loc Coaching.Details.Advice.Persistent}" Foreground="#F4F7FB" FontSize="{StaticResource Typography.FontSize.CardTitle}" FontWeight="SemiBold" />
-                                <ItemsControl ItemsSource="{Binding PersistentTips}" Margin="0,10,0,0">
+                                <ItemsControl ItemsSource="{Binding PersistentTips}"
+                                              Margin="0,10,0,0"
+                                              HorizontalContentAlignment="Stretch">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel Margin="0,0,0,12">
-                                                <StackPanel Orientation="Horizontal">
-                                                    <TextBlock Text="{Binding Title}" Foreground="#F4F7FB" FontSize="{StaticResource Typography.FontSize.BodyLarge}" FontWeight="SemiBold" />
-                                                    <Border Background="#202D42" CornerRadius="9" Padding="8,3" Margin="8,0,0,0">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{Binding Title}"
+                                                               Foreground="#F4F7FB"
+                                                               FontSize="{StaticResource Typography.FontSize.BodyLarge}"
+                                                               FontWeight="SemiBold"
+                                                               TextWrapping="Wrap"
+                                                               Margin="0,0,8,0" />
+                                                    <Border Grid.Column="1"
+                                                            Background="#202D42"
+                                                            CornerRadius="9"
+                                                            Padding="8,3"
+                                                            VerticalAlignment="Top">
                                                         <TextBlock Text="{Binding ScopeLabel}" Foreground="#91A4BD" FontSize="{StaticResource Typography.FontSize.Body}" />
                                                     </Border>
-                                                </StackPanel>
+                                                </Grid>
                                                 <TextBlock Text="{Binding Message}" Foreground="#91A4BD" FontSize="{StaticResource Typography.FontSize.Body}" TextWrapping="Wrap" Margin="0,5,0,0" />
                                             </StackPanel>
                                         </DataTemplate>

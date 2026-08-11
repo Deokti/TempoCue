@@ -229,6 +229,7 @@
   <data name="Coaching.Library.StateChangeFailed" xml:space="preserve"><value>Could not save the matchup state.</value></data>
   <data name="Coaching.Library.Origin.BuiltIn" xml:space="preserve"><value>Built in</value></data>
   <data name="Coaching.Library.Origin.Created" xml:space="preserve"><value>Created by you</value></data>
+  <data name="Coaching.Library.Origin.Imported" xml:space="preserve"><value>Added from library</value></data>
   <data name="Coaching.Library.Author.TempoCue" xml:space="preserve"><value>TempoCue</value></data>
   <data name="Coaching.Library.Role.Any" xml:space="preserve"><value>Any role</value></data>
   <data name="Coaching.Library.Language.Russian" xml:space="preserve"><value>Russian</value></data>
@@ -275,11 +276,15 @@
   <data name="Coaching.NewPack.GameControl.Unavailable" xml:space="preserve"><value>Unavailable in this iteration</value></data>
   <data name="Coaching.NewPack.Soon" xml:space="preserve"><value>Soon</value></data>
   <data name="Coaching.MatchupEditor.Back" xml:space="preserve"><value>Back</value></data>
+  <data name="Coaching.MatchupEditor.Close" xml:space="preserve"><value>Close editor</value></data>
   <data name="Coaching.MatchupEditor.Next" xml:space="preserve"><value>Next</value></data>
   <data name="Coaching.MatchupEditor.Mode.Simple" xml:space="preserve"><value>Simple</value></data>
   <data name="Coaching.MatchupEditor.Mode.Advanced" xml:space="preserve"><value>Advanced</value></data>
   <data name="Coaching.MatchupEditor.Title" xml:space="preserve"><value>New matchup</value></data>
   <data name="Coaching.MatchupEditor.Draft" xml:space="preserve"><value>Draft</value></data>
+  <data name="Coaching.MatchupEditor.Mode.Edit" xml:space="preserve"><value>Editing</value></data>
+  <data name="Coaching.MatchupEditor.Mode.Copy" xml:space="preserve"><value>Your copy</value></data>
+  <data name="Coaching.MatchupEditor.CopyName" xml:space="preserve"><value>{0} — my copy</value></data>
   <data name="Coaching.MatchupEditor.StepSummary" xml:space="preserve"><value>Step 1 of 5 · Main information</value></data>
   <data name="Coaching.MatchupEditor.Step.Main" xml:space="preserve"><value>Main information</value></data>
   <data name="Coaching.MatchupEditor.Step.Champions" xml:space="preserve"><value>Champions and role</value></data>
@@ -546,6 +551,7 @@
   <data name="Coaching.MatchupEditor.StepSummary.Save" xml:space="preserve"><value>Step 5 of 5 · Save</value></data>
   <data name="Coaching.MatchupEditor.Save.Action.Draft" xml:space="preserve"><value>Save as draft</value></data>
   <data name="Coaching.MatchupEditor.Save.Action.Enable" xml:space="preserve"><value>Save and enable</value></data>
+  <data name="Coaching.MatchupEditor.Save.Action.Changes" xml:space="preserve"><value>Save changes</value></data>
   <data name="Coaching.MatchupEditor.Save.Check.Title" xml:space="preserve"><value>Pre-save check</value></data>
   <data name="Count.PhaseCompleted.One" xml:space="preserve"><value>{0} phase completed</value></data>
   <data name="Count.PhaseCompleted.Other" xml:space="preserve"><value>{0} phases completed</value></data>
@@ -598,6 +604,7 @@
   <data name="Coaching.Details.Enable" xml:space="preserve"><value>Enable</value></data>
   <data name="Coaching.Details.Header" xml:space="preserve"><value>Matchup · {0} · {1} · {2}</value></data>
   <data name="Coaching.Details.Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Coaching.Details.CreateCopy" xml:space="preserve"><value>Create your copy</value></data>
   <data name="Coaching.Details.Edit.Planned" xml:space="preserve"><value>Editing a saved pack will be added in a later iteration.</value></data>
   <data name="Coaching.Details.Tab.Overview" xml:space="preserve"><value>Overview</value></data>
   <data name="Coaching.Details.Tab.Advice" xml:space="preserve"><value>Advice</value></data>
@@ -619,6 +626,7 @@
   <data name="Coaching.Details.Overview.Role" xml:space="preserve"><value>Role</value></data>
   <data name="Coaching.Details.Overview.NotSpecified" xml:space="preserve"><value>Not specified</value></data>
   <data name="Coaching.Details.Source.PersonalExperience" xml:space="preserve"><value>Author's personal experience</value></data>
+  <data name="Coaching.Details.Source.OpenFailed" xml:space="preserve"><value>Could not open the link in the browser.</value></data>
   <data name="Coaching.Details.Advice.Phases" xml:space="preserve"><value>Matchup phases</value></data>
   <data name="Coaching.Details.Advice.ReadOnly" xml:space="preserve"><value>Read-only. Open the pack editor to change advice.</value></data>
   <data name="Coaching.Details.Advice.Persistent" xml:space="preserve"><value>Persistent tips</value></data>

@@ -62,7 +62,10 @@ public sealed class CoachingNavigationViewTests
         Assert.Equal(5, steps.Items.Count);
         Assert.Equal(0, steps.SelectedIndex);
         Assert.True(steps.IsHitTestVisible);
-        Assert.All(steps.Items.Cast<ListBoxItem>(), item => Assert.False(item.IsHitTestVisible));
+        var stepItems = steps.Items.Cast<ListBoxItem>().ToArray();
+        Assert.All(stepItems, item => Assert.True(item.IsHitTestVisible));
+        Assert.True(stepItems[0].IsEnabled);
+        Assert.All(stepItems[1..], item => Assert.False(item.IsEnabled));
         Assert.False(ScrollViewer.GetCanContentScroll(steps));
         context.Window.UpdateLayout();
         WpfTestHost.Pump(DispatcherPriority.Render);

@@ -61,6 +61,16 @@ public static class CoachPackValidator
             throw new InvalidDataException("Matchup champions must be different.");
         }
 
+        if (string.Equals(pack.Id, pack.ForkedFromPackId, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidDataException("A Coach Pack copy must have its own id.");
+        }
+
+        if (pack.ForkedFromAuthor is not null && string.IsNullOrWhiteSpace(pack.ForkedFromPackId))
+        {
+            throw new InvalidDataException("Fork author requires the source Coach Pack id.");
+        }
+
         ValidateSource(pack.Source);
         EnsureUniqueIds(pack.PersistentTips.Select(static tip => tip.Id), "persistent tip");
         EnsureUniqueIds(pack.ItemBlocks.Select(static block => block.Id), "item block");

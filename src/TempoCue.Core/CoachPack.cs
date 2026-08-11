@@ -41,6 +41,15 @@ public sealed record CoachPack
     /// <summary>Источник знаний и состояние разрешения на его использование.</summary>
     public CoachPackSource? Source { get; init; }
 
+    /// <summary>
+    /// Идентификатор исходного набора, если автор создал самостоятельную копию.
+    /// Поле сохраняет происхождение содержимого, но не даёт прав на обновление оригинала.
+    /// </summary>
+    public string? ForkedFromPackId { get; init; }
+
+    /// <summary>Автор исходного набора на момент создания самостоятельной копии.</summary>
+    public string? ForkedFromAuthor { get; init; }
+
     /// <summary>Все правила, входящие в набор.</summary>
     public IReadOnlyList<CoachRuleDefinition> Rules { get; init; } = [];
 

@@ -6,4 +6,5 @@ namespace TempoCue.Application;
 public sealed record LocalCoachPackEntry(
     CoachPack Pack,
     LocalCoachPackState State,
-    DateTimeOffset SavedAtUtc);
+    DateTimeOffset SavedAtUtc,
+    LocalCoachPackOrigin Origin = LocalCoachPackOrigin.CreatedByUser);

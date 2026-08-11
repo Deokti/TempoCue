@@ -179,6 +179,20 @@ public sealed class MatchupItemBlocksViewModel : ObservableObject
         }
     }
 
+    public void Load(IEnumerable<MatchupItemBlockDraft> blocks)
+    {
+        ArgumentNullException.ThrowIfNull(blocks);
+        Editor.Close();
+        _blocks.Clear();
+        foreach (var draft in blocks)
+        {
+            _blocks.Add(new MatchupItemBlockViewModel(draft, _localization));
+        }
+
+        _nextBlockNumber = 1;
+        NotifyCollectionChanged();
+    }
+
     private bool Move(MatchupItemBlockViewModel block, int offset)
     {
         var currentIndex = EnsureOwnedBlock(block);
@@ -235,7 +249,17 @@ public sealed class MatchupItemBlocksViewModel : ObservableObject
         return -1;
     }
 
-    private string CreateBlockId() => $"item-block-{_nextBlockNumber++}";
+    private string CreateBlockId()
+    {
+        string id;
+        do
+        {
+            id = $"item-block-{_nextBlockNumber++}";
+        }
+        while (_blocks.Any(block => block.Id == id));
+
+        return id;
+    }
 
     private void NotifyCollectionChanged()
     {

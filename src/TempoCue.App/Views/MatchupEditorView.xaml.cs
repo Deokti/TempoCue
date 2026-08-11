@@ -1,5 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 using TempoCue.App.ViewModels;
 using TempoCue.Application;
@@ -42,11 +44,65 @@ public partial class MatchupEditorView : UserControl
         }
     }
 
+    private void CloseMatchupEditorButton_Click(object sender, RoutedEventArgs e) =>
+        BackRequested?.Invoke(this, EventArgs.Empty);
+
+    private void MatchupEditorStepsListBox_SelectionChanged(
+        object sender,
+        SelectionChangedEventArgs e)
+    {
+        var selectedStep = MatchupEditorStepsListBox.SelectedIndex + 1;
+        if (selectedStep == ViewModel.CurrentStep)
+        {
+            return;
+        }
+
+        if (ViewModel.NavigateToStep(selectedStep))
+        {
+            ResetContentScroll();
+        }
+
+        MatchupEditorStepsListBox.SelectedIndex = ViewModel.CurrentStepIndex;
+    }
+
+    private void MatchupEditorStepsListBox_PreviewMouseLeftButtonDown(
+        object sender,
+        MouseButtonEventArgs e)
+    {
+        if (sender is not ListBox stepsListBox
+            || FindStepItem(e.OriginalSource as DependencyObject) is not { IsEnabled: true } stepItem
+            || !int.TryParse(stepItem.Tag?.ToString(), out var selectedStep))
+        {
+            return;
+        }
+
+        if (ViewModel.NavigateToStep(selectedStep))
+        {
+            ResetContentScroll();
+        }
+
+        stepsListBox.SelectedIndex = ViewModel.CurrentStepIndex;
+        e.Handled = true;
+    }
+
+    private static ListBoxItem? FindStepItem(DependencyObject? element)
+    {
+        while (element is not null and not ListBoxItem)
+        {
+            element = VisualTreeHelper.GetParent(element);
+        }
+
+        return element as ListBoxItem;
+    }
+
     private async void SaveDraftButton_Click(object sender, RoutedEventArgs e) =>
         await SaveAndCloseAsync(LocalCoachPackState.Draft);
 
     private async void SaveAndEnableButton_Click(object sender, RoutedEventArgs e) =>
         await SaveAndCloseAsync(LocalCoachPackState.Enabled);
+
+    private async void SaveChangesButton_Click(object sender, RoutedEventArgs e) =>
+        await SaveAndCloseAsync(ViewModel.Save.OriginalState);
 
     private async Task SaveAndCloseAsync(LocalCoachPackState state)
     {

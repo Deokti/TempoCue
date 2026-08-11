@@ -73,7 +73,31 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
     }
 
     public void OpenMatchupEditor() =>
+        OpenNewMatchupEditor();
+
+    public void OpenNewMatchupEditor()
+    {
+        MatchupEditor.BeginNew();
         CurrentScreen = CoachingScreen.MatchupEditor;
+    }
+
+    public async Task OpenSelectedPackEditorAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var card = Details.Card
+            ?? throw new InvalidOperationException("Coach Pack для редактирования не выбран.");
+        await MatchupEditor.LoadAsync(
+            card.Pack,
+            card.State,
+            card.CanCreateCopy,
+            cancellationToken);
+        CurrentScreen = CoachingScreen.MatchupEditor;
+    }
+
+    public void CloseMatchupEditor() =>
+        CurrentScreen = MatchupEditor.ReturnsToPackDetails
+            ? CoachingScreen.PackDetails
+            : CoachingScreen.PackTypeSelection;
 
     public void OpenLibrary() =>
         CurrentScreen = CoachingScreen.Library;

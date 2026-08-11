@@ -1,9 +1,11 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Threading;
 using TempoCue.App.ViewModels;
 using TempoCue.App.Views;
 using TempoCue.Application;
+using TempoCue.Core;
 using static TempoCue.App.Tests.CoachingViewTestContext;
 
 namespace TempoCue.App.Tests;
@@ -16,7 +18,26 @@ public sealed class CoachingPackDetailsViewTests
     public void Library_OpensPackDetailsTabsAndExportPreview() => WpfTestHost.Run(() =>
     {
         using var context = new MainWindowTestContext();
-        var pack = TestCoachPackFactory.CreateDetailedMatchup();
+        var pack = TestCoachPackFactory.CreateDetailedMatchup() with
+        {
+            Source = new CoachPackSource
+            {
+                Kind = CoachPackSourceKind.CommunityGuide,
+                Title = "Ultimate Urgot Guide",
+                Author = "GuideAuthor",
+                Url = "https://example.com/urgot-guide",
+                Permission = CoachPackSourcePermission.Granted
+            },
+            PersistentTips =
+            [
+                new CoachPersistentTipDefinition
+                {
+                    Id = "tip-long-title",
+                    Title = "Можешь специально стоять среди своих миньонов, провоцируя противника",
+                    Message = "Вместе с тобой размен примут и союзные миньоны."
+                }
+            ]
+        };
         context.CoachPackStore.SaveAsync(pack, LocalCoachPackState.Enabled)
             .GetAwaiter()
             .GetResult();
@@ -36,12 +57,30 @@ public sealed class CoachingPackDetailsViewTests
         Assert.Equal(Visibility.Visible, detailsPage.Visibility);
         Assert.True(WpfTestHost.Find<Grid>(detailsPage, "PackOverviewContent").IsVisible);
         Assert.Equal("Urgot против Sett", context.Coaching.Details.Title);
+        Assert.Equal(
+            new Uri("https://example.com/urgot-guide"),
+            context.Coaching.Details.SourceUri);
+        Assert.True(WpfTestHost.Find<TextBlock>(
+            detailsPage,
+            "SourceUrlTextBlock").IsVisible);
         SaveVisualSnapshotIfRequested(context.Window, "coach-pack-overview.png");
 
         WpfTestHost.Click(WpfTestHost.Find<Button>(detailsPage, "PackAdviceTabButton"));
         Assert.True(WpfTestHost.Find<Grid>(detailsPage, "PackAdviceContent").IsVisible);
         Assert.Equal(2, context.Coaching.Details.Phases.Count);
         Assert.Single(context.Coaching.Details.PersistentTips);
+        detailsPage.UpdateLayout();
+        WpfTestHost.Pump(DispatcherPriority.Render);
+        var scopeText = Assert.Single(
+            WpfTestHost.FindVisualDescendants<TextBlock>(detailsPage),
+            text => text.Text is "Весь матч" or "Whole match");
+        var scopeBadge = Assert.IsType<Border>(VisualTreeHelper.GetParent(scopeText));
+        Assert.Equal(VerticalAlignment.Top, scopeBadge.VerticalAlignment);
+        var primaryAdviceTexts = WpfTestHost.FindVisualDescendants<TextBlock>(detailsPage)
+            .Where(text => text.Text == "Содержимое набора остаётся на языке автора.")
+            .ToArray();
+        Assert.Equal(2, primaryAdviceTexts.Length);
+        Assert.All(primaryAdviceTexts, text => Assert.Equal(FontWeights.Normal, text.FontWeight));
         SaveVisualSnapshotIfRequested(context.Window, "coach-pack-advice.png");
 
         WpfTestHost.Click(WpfTestHost.Find<Button>(detailsPage, "PackItemsTabButton"));
