@@ -16,6 +16,7 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
     private readonly SetCoachPackStateUseCase _setCoachPackState;
     private readonly DeleteCoachPackUseCase _deleteCoachPack;
     private readonly CoachingPackCardFactory _cardFactory;
+    private readonly SemaphoreSlim _refreshLock = new(1, 1);
 
     private IReadOnlyList<LocalCoachPackEntry> _localEntries = [];
     private IReadOnlyDictionary<string, ChampionCatalogEntry> _champions =
@@ -148,11 +149,15 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
 
     public async Task RefreshAsync(CancellationToken cancellationToken = default)
     {
-        IsLibraryLoading = true;
-        IsLibraryMessageSuccess = false;
-        LibraryMessage = string.Empty;
+        var lockTaken = false;
         try
         {
+            await _refreshLock.WaitAsync(cancellationToken);
+            lockTaken = true;
+            IsLibraryLoading = true;
+            IsLibraryMessageSuccess = false;
+            LibraryMessage = string.Empty;
+
             var snapshot = await _loadCoachPackLibrary.ExecuteAsync(cancellationToken);
             _localEntries = snapshot.Entries;
             _packStates = snapshot.PackStates;
@@ -184,7 +189,11 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
         }
         finally
         {
-            IsLibraryLoading = false;
+            if (lockTaken)
+            {
+                IsLibraryLoading = false;
+                _refreshLock.Release();
+            }
         }
     }
 

@@ -80,6 +80,29 @@ public sealed class LocalCoachPackStoreTests
         Assert.False(await store.DeleteAsync(pack.Id));
     }
 
+    [Fact]
+    public async Task ConcurrentOperations_KeepPackAndStateFilesReadable()
+    {
+        using var directory = new TestCoachPackDirectory();
+        var store = new LocalCoachPackStore(directory.RootPath);
+        var pack = CreatePack();
+        await store.SaveAsync(pack, LocalCoachPackState.Enabled);
+
+        var operations = Enumerable.Range(0, 20)
+            .Select(index => index % 2 == 0
+                ? store.SetStateAsync(pack.Id, LocalCoachPackState.Enabled)
+                : store.LoadAsync())
+            .ToArray();
+
+        await Task.WhenAll(operations);
+        var snapshot = await store.LoadAsync();
+
+        var entry = Assert.Single(snapshot.Entries);
+        Assert.Equal(pack.Id, entry.Pack.Id);
+        Assert.Equal(LocalCoachPackState.Enabled, entry.State);
+        Assert.Equal(0, snapshot.InvalidFileCount);
+    }
+
     private static CoachPack CreatePack() => new()
     {
         SchemaVersion = 2,

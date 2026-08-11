@@ -9,6 +9,7 @@ namespace TempoCue.App.Persistence;
 public sealed class LocalCoachPackStore : ICoachPackStore
 {
     private readonly string _rootDirectory;
+    private readonly SemaphoreSlim _operationLock = new(1, 1);
 
     public LocalCoachPackStore(string rootDirectory)
     {
@@ -18,6 +19,20 @@ public sealed class LocalCoachPackStore : ICoachPackStore
 
     public async Task<CoachPackLibrarySnapshot> LoadAsync(
         CancellationToken cancellationToken = default)
+    {
+        await _operationLock.WaitAsync(cancellationToken);
+        try
+        {
+            return await LoadCoreAsync(cancellationToken);
+        }
+        finally
+        {
+            _operationLock.Release();
+        }
+    }
+
+    private async Task<CoachPackLibrarySnapshot> LoadCoreAsync(
+        CancellationToken cancellationToken)
     {
         if (!Directory.Exists(_rootDirectory))
         {
@@ -53,6 +68,22 @@ public sealed class LocalCoachPackStore : ICoachPackStore
         ValidateState(state);
         CoachPackValidator.Validate(pack);
 
+        await _operationLock.WaitAsync(cancellationToken);
+        try
+        {
+            return await SaveCoreAsync(pack, state, cancellationToken);
+        }
+        finally
+        {
+            _operationLock.Release();
+        }
+    }
+
+    private async Task<CoachPackSaveResult> SaveCoreAsync(
+        CoachPack pack,
+        LocalCoachPackState state,
+        CancellationToken cancellationToken)
+    {
         Directory.CreateDirectory(_rootDirectory);
         var fileStem = CreateSafeFileStem(pack.Id);
         var packPath = Path.Combine(_rootDirectory, $"{fileStem}.json");
@@ -96,6 +127,23 @@ public sealed class LocalCoachPackStore : ICoachPackStore
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(packId);
         ValidateState(state);
+
+        await _operationLock.WaitAsync(cancellationToken);
+        try
+        {
+            await SetStateCoreAsync(packId, state, cancellationToken);
+        }
+        finally
+        {
+            _operationLock.Release();
+        }
+    }
+
+    private async Task SetStateCoreAsync(
+        string packId,
+        LocalCoachPackState state,
+        CancellationToken cancellationToken)
+    {
         Directory.CreateDirectory(_rootDirectory);
         var fileStem = CreateSafeFileStem(packId);
         var statePath = Path.Combine(_rootDirectory, $"{fileStem}.state.json");
@@ -128,6 +176,22 @@ public sealed class LocalCoachPackStore : ICoachPackStore
         CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(packId);
+
+        await _operationLock.WaitAsync(cancellationToken);
+        try
+        {
+            return await DeleteCoreAsync(packId, cancellationToken);
+        }
+        finally
+        {
+            _operationLock.Release();
+        }
+    }
+
+    private async Task<bool> DeleteCoreAsync(
+        string packId,
+        CancellationToken cancellationToken)
+    {
         if (!Directory.Exists(_rootDirectory))
         {
             return false;
