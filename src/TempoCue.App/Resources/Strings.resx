@@ -426,14 +426,14 @@
   <data name="Coaching.MatchupEditor.Persistent.Source.Inherited" xml:space="preserve"><value>Source: Coach Pack source</value></data>
   <data name="Coaching.MatchupEditor.Persistent.Source.Custom" xml:space="preserve"><value>Source: {0}</value></data>
   <data name="Coaching.MatchupEditor.Persistent.ListTitle" xml:space="preserve"><value>Persistent tips</value></data>
-  <data name="Coaching.MatchupEditor.Persistent.Description" xml:space="preserve"><value>Mechanical knowledge that cannot be tied to an exact moment through Live Client Data. It is available in matchup details and does not replace the active phase advice.</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Description" xml:space="preserve"><value>Mechanical knowledge that cannot be tied to an exact moment through Live Client Data. It remains available in matchup details and is shown by the overlay one tip at a time on eligible level-ups without replacing the active phase advice.</value></data>
   <data name="Coaching.MatchupEditor.Persistent.Add" xml:space="preserve"><value>+ Add tip</value></data>
   <data name="Coaching.MatchupEditor.Persistent.Empty" xml:space="preserve"><value>No persistent tips yet. Add knowledge that remains useful throughout the match or within a selected phase.</value></data>
   <data name="Coaching.MatchupEditor.Persistent.Difference.Title" xml:space="preserve"><value>How this differs from a phase</value></data>
   <data name="Coaching.MatchupEditor.Persistent.Difference.Phase.Title" xml:space="preserve"><value>Phase</value></data>
   <data name="Coaching.MatchupEditor.Persistent.Difference.Phase.Text" xml:space="preserve"><value>Active at a specific moment. It is shown as the main advice and can appear in the overlay.</value></data>
   <data name="Coaching.MatchupEditor.Persistent.Difference.Persistent.Title" xml:space="preserve"><value>Persistent tip</value></data>
-  <data name="Coaching.MatchupEditor.Persistent.Difference.Persistent.Text" xml:space="preserve"><value>Available in matchup details on demand. It does not appear in the overlay or replace the main advice.</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Difference.Persistent.Text" xml:space="preserve"><value>Available in matchup details on demand and can appear in the overlay one tip at a time on level-up. It does not replace the main advice.</value></data>
   <data name="Coaching.MatchupEditor.Items.Editor.AddTitle" xml:space="preserve"><value>New item block</value></data>
   <data name="Coaching.MatchupEditor.Items.Editor.EditTitle" xml:space="preserve"><value>Editing item block: {0}</value></data>
   <data name="Coaching.MatchupEditor.Items.Editor.Description" xml:space="preserve"><value>Name the block and optionally explain when the player should choose it. Items will be added separately.</value></data>
@@ -737,4 +737,6 @@
   <data name="Settings.Overlay.Preview.Danger.Title" xml:space="preserve"><value>The enemy jungler appeared nearby</value></data>
   <data name="Settings.Overlay.Preview.Danger.Message" xml:space="preserve"><value>Third notification · replaces lower-priority cards</value></data>
   <data name="Settings.Overlay.Preview.Close" xml:space="preserve"><value>Close overlay</value></data>
+  <data name="Overlay.Matchup.Dismiss" xml:space="preserve"><value>Hide advice</value></data>
+  <data name="Overlay.Matchup.PersistentTip.Status" xml:space="preserve"><value>Matchup tip</value></data>
 </root>

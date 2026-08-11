@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using TempoCue.App.Coordinators;
 using TempoCue.App.Localization;
 using TempoCue.App.Settings;
 using TempoCue.App.Persistence;
@@ -28,6 +29,7 @@ public partial class App : System.Windows.Application
     private SettingsViewModel? _settingsViewModel;
     private CoachingViewModel? _coachingViewModel;
     private IOverlayPresenter? _overlayPresenter;
+    private ActiveMatchOverlayCoordinator? _activeMatchOverlayCoordinator;
     private readonly CancellationTokenSource _lifetimeCancellation = new();
     private int _overlayPreviewStep;
 
@@ -95,6 +97,10 @@ public partial class App : System.Windows.Application
             LocalizationService.Instance);
         _homeViewModel = homeViewModel;
         _overlayPresenter = new OverlayHost(Dispatcher);
+        _activeMatchOverlayCoordinator = new ActiveMatchOverlayCoordinator(
+            _activeMatchMonitor,
+            _overlayPresenter,
+            LocalizationService.Instance);
         _settingsViewModel = new SettingsViewModel(
             LocalizationService.Instance,
             settingsService,
@@ -246,6 +252,7 @@ public partial class App : System.Windows.Application
     protected override void OnExit(ExitEventArgs e)
     {
         _lifetimeCancellation.Cancel();
+        _activeMatchOverlayCoordinator?.Dispose();
         _overlayPresenter?.Dispose();
         _coachingViewModel?.Dispose();
         _settingsViewModel?.Dispose();

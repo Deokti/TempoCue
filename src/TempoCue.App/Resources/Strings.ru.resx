@@ -434,14 +434,14 @@
   <data name="Coaching.MatchupEditor.Persistent.Source.Inherited" xml:space="preserve"><value>Источник: источник набора</value></data>
   <data name="Coaching.MatchupEditor.Persistent.Source.Custom" xml:space="preserve"><value>Источник: {0}</value></data>
   <data name="Coaching.MatchupEditor.Persistent.ListTitle" xml:space="preserve"><value>Постоянные подсказки</value></data>
-  <data name="Coaching.MatchupEditor.Persistent.Description" xml:space="preserve"><value>Механические знания, которые нельзя привязать к точному моменту через Live Client Data. Они доступны в деталях матчапа и не заменяют совет активной фазы.</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Description" xml:space="preserve"><value>Механические знания, которые нельзя привязать к точному моменту через Live Client Data. Они доступны в деталях матчапа и показываются оверлеем по одной подсказке при подходящем повышении уровня, не заменяя совет активной фазы.</value></data>
   <data name="Coaching.MatchupEditor.Persistent.Add" xml:space="preserve"><value>+ Добавить подсказку</value></data>
   <data name="Coaching.MatchupEditor.Persistent.Empty" xml:space="preserve"><value>Постоянных подсказок пока нет. Добавьте знание, полезное весь матч или в выбранной фазе.</value></data>
   <data name="Coaching.MatchupEditor.Persistent.Difference.Title" xml:space="preserve"><value>Чем это отличается от фазы</value></data>
   <data name="Coaching.MatchupEditor.Persistent.Difference.Phase.Title" xml:space="preserve"><value>Фаза</value></data>
   <data name="Coaching.MatchupEditor.Persistent.Difference.Phase.Text" xml:space="preserve"><value>Активна в конкретный момент. Показывается как главный совет и может попасть в оверлей.</value></data>
   <data name="Coaching.MatchupEditor.Persistent.Difference.Persistent.Title" xml:space="preserve"><value>Постоянная подсказка</value></data>
-  <data name="Coaching.MatchupEditor.Persistent.Difference.Persistent.Text" xml:space="preserve"><value>Доступна в деталях матчапа по запросу. В оверлей не выводится и главный совет не подменяет.</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Difference.Persistent.Text" xml:space="preserve"><value>Доступна в деталях матчапа по запросу и может появляться в оверлее по одной подсказке при повышении уровня. Главный совет она не подменяет.</value></data>
   <data name="Coaching.MatchupEditor.Items.Editor.AddTitle" xml:space="preserve"><value>Новый блок предметов</value></data>
   <data name="Coaching.MatchupEditor.Items.Editor.EditTitle" xml:space="preserve"><value>Редактирование блока: {0}</value></data>
   <data name="Coaching.MatchupEditor.Items.Editor.Description" xml:space="preserve"><value>Назовите блок и при необходимости объясните, когда его выбирать. Предметы добавляются отдельно.</value></data>
@@ -747,4 +747,6 @@
   <data name="Settings.Overlay.Preview.Danger.Title" xml:space="preserve"><value>Лесник соперника появился рядом</value></data>
   <data name="Settings.Overlay.Preview.Danger.Message" xml:space="preserve"><value>Третье уведомление · вытесняет менее важные карточки</value></data>
   <data name="Settings.Overlay.Preview.Close" xml:space="preserve"><value>Закрыть оверлей</value></data>
+  <data name="Overlay.Matchup.Dismiss" xml:space="preserve"><value>Скрыть совет</value></data>
+  <data name="Overlay.Matchup.PersistentTip.Status" xml:space="preserve"><value>Подсказка по матчапу</value></data>
 </root>

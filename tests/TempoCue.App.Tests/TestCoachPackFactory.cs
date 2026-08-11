@@ -9,7 +9,8 @@ internal static class TestCoachPackFactory
         string id = "test.urgot-vs-sett",
         string name = "Urgot vs Sett",
         string patch = "test",
-        IReadOnlyList<CoachRuleDefinition>? rules = null) => new()
+        IReadOnlyList<CoachRuleDefinition>? rules = null,
+        IReadOnlyList<CoachPersistentTipDefinition>? persistentTips = null) => new()
         {
             SchemaVersion = 1,
             Id = id,
@@ -23,7 +24,8 @@ internal static class TestCoachPackFactory
                     8,
                     PowerState.Dangerous,
                     "Test title")
-            ]
+            ],
+            PersistentTips = persistentTips ?? []
         };
 
     public static CoachRuleDefinition CreateRule(
