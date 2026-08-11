@@ -43,6 +43,21 @@ public sealed class SelectActiveCoachPackUseCaseTests
     }
 
     [Fact]
+    public async Task SelectAsync_ReturnsNotFoundWhenBuiltInCatalogAndLibraryAreEmpty()
+    {
+        var store = new StubCoachPackStore(Snapshot());
+        var useCase = new SelectActiveCoachPackUseCase(
+            [],
+            new LoadCoachPackLibraryUseCase(store));
+
+        var selection = await useCase.SelectAsync(CreateMatch());
+
+        Assert.Equal(ActiveCoachPackSelectionState.NotFound, selection.State);
+        Assert.Null(selection.Pack);
+        Assert.Null(selection.Advice);
+    }
+
+    [Fact]
     public async Task SelectAsync_ReturnsConflictForSeveralMatchingUserPacks()
     {
         var first = CreatePack("first", "Альфа", "Первый совет");
@@ -134,7 +149,7 @@ public sealed class SelectActiveCoachPackUseCaseTests
     private static SelectActiveCoachPackUseCase CreateUseCase(
         CoachPack builtIn,
         ICoachPackStore store) => new(
-            builtIn,
+            [builtIn],
             new LoadCoachPackLibraryUseCase(store));
 
     private static CoachPackLibrarySnapshot Snapshot(params LocalCoachPackEntry[] entries) =>

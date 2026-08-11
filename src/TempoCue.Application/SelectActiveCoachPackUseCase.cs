@@ -5,11 +5,11 @@ namespace TempoCue.Application;
 
 /// <summary>
 /// Детерминированно выбирает включённый пользовательский матчап,
-/// а при его отсутствии использует встроенный набор.
+/// а при его отсутствии проверяет встроенные наборы.
 /// </summary>
 public sealed class SelectActiveCoachPackUseCase : IMatchAdviceSelector
 {
-    private readonly CoachPack _builtInPack;
+    private readonly IReadOnlyList<CoachPack> _builtInPacks;
     private readonly LoadCoachPackLibraryUseCase _loadLibrary;
     private readonly SemaphoreSlim _cacheLock = new(1, 1);
 
@@ -18,10 +18,11 @@ public sealed class SelectActiveCoachPackUseCase : IMatchAdviceSelector
     private long _loadedVersion = -1;
 
     public SelectActiveCoachPackUseCase(
-        CoachPack builtInPack,
+        IReadOnlyList<CoachPack> builtInPacks,
         LoadCoachPackLibraryUseCase loadLibrary)
     {
-        _builtInPack = builtInPack ?? throw new ArgumentNullException(nameof(builtInPack));
+        ArgumentNullException.ThrowIfNull(builtInPacks);
+        _builtInPacks = builtInPacks.ToArray();
         _loadLibrary = loadLibrary ?? throw new ArgumentNullException(nameof(loadLibrary));
     }
 
@@ -62,13 +63,22 @@ public sealed class SelectActiveCoachPackUseCase : IMatchAdviceSelector
             return Evaluate(matchingUserPacks[0], matchup);
         }
 
-        var builtInState = library.PackStates.GetValueOrDefault(
-            _builtInPack.Id,
-            LocalCoachPackState.Enabled);
-        return builtInState == LocalCoachPackState.Enabled
-               && AppliesToMatchup(_builtInPack, matchup)
-            ? Evaluate(_builtInPack, matchup)
-            : ActiveCoachPackSelection.NotFound();
+        var matchingBuiltInPacks = _builtInPacks
+            .Where(pack => library.PackStates.GetValueOrDefault(
+                pack.Id,
+                LocalCoachPackState.Enabled) == LocalCoachPackState.Enabled)
+            .Where(pack => AppliesToMatchup(pack, matchup))
+            .OrderBy(static pack => pack.Name, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(static pack => pack.Id, StringComparer.Ordinal)
+            .ToArray();
+
+        return matchingBuiltInPacks.Length switch
+        {
+            0 => ActiveCoachPackSelection.NotFound(),
+            1 => Evaluate(matchingBuiltInPacks[0], matchup),
+            _ => ActiveCoachPackSelection.Conflict(
+                matchingBuiltInPacks.Select(static pack => pack.Name).ToArray())
+        };
     }
 
     /// <summary>

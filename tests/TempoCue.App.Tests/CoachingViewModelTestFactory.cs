@@ -9,7 +9,7 @@ namespace TempoCue.App.Tests;
 internal static class CoachingViewModelTestFactory
 {
     public static CoachingViewModel Create(
-        CoachPack pack,
+        CoachPack builtInPack,
         LocalizationService? localization = null,
         TestCoachPackStore? store = null)
     {
@@ -17,7 +17,7 @@ internal static class CoachingViewModelTestFactory
         var resolvedLocalization = localization ?? LocalizationService.Instance;
         var championCatalog = TestChampionCatalog.Ready();
         var library = new CoachingLibraryViewModel(
-            pack,
+            [builtInPack],
             resolvedLocalization,
             championCatalog,
             new LoadCoachPackLibraryUseCase(resolvedStore),

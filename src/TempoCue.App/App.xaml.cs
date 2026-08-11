@@ -35,15 +35,9 @@ public partial class App : System.Windows.Application
         var settings = settingsService.Load();
         LocalizationService.Instance.SetLanguage(settings.Language);
 
-        // Встроенный набор служит резервным источником, когда пользователь
-        // не включил собственный Coach Pack для текущего матчапа.
-        var packPath = Path.Combine(
-            AppContext.BaseDirectory,
-            "Assets",
-            "CoachPacks",
-            "urgot-vs-sett.json");
-        using var packStream = File.OpenRead(packPath);
-        var pack = CoachPackLoader.Load(packStream);
+        // Каталог может быть пустым: встроенные наборы поставляются только после
+        // отдельной проверки их содержания и актуальности.
+        var builtInPacks = LoadBuiltInCoachPacks();
 
         var coachPackDirectory = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -54,7 +48,7 @@ public partial class App : System.Windows.Application
         var loadCoachPackLibrary = new LoadCoachPackLibraryUseCase(coachPackStore);
         var setCoachPackState = new SetCoachPackStateUseCase(coachPackStore);
         var activeCoachPackSelector = new SelectActiveCoachPackUseCase(
-            pack,
+            builtInPacks,
             loadCoachPackLibrary);
 
         // Инфраструктура матча создаётся здесь, чтобы View и ViewModel не конструировали HTTP-клиенты.
@@ -89,7 +83,7 @@ public partial class App : System.Windows.Application
             _dataDragonClient,
             dataDragonCacheDirectory);
         var coachingLibraryViewModel = new CoachingLibraryViewModel(
-            pack,
+            builtInPacks,
             LocalizationService.Instance,
             _championCatalog,
             loadCoachPackLibrary,
@@ -123,6 +117,28 @@ public partial class App : System.Windows.Application
             _settingsViewModel,
             _coachingViewModel);
         MainWindow.Show();
+    }
+
+    private static IReadOnlyList<CoachPack> LoadBuiltInCoachPacks()
+    {
+        var directory = Path.Combine(
+            AppContext.BaseDirectory,
+            "Assets",
+            "CoachPacks");
+        if (!Directory.Exists(directory))
+        {
+            return [];
+        }
+
+        var packs = new List<CoachPack>();
+        foreach (var path in Directory.EnumerateFiles(directory, "*.json")
+                     .OrderBy(static path => path, StringComparer.OrdinalIgnoreCase))
+        {
+            using var stream = File.OpenRead(path);
+            packs.Add(CoachPackLoader.Load(stream));
+        }
+
+        return packs;
     }
 
     // Освобождение выполняется в обратном порядке владения долгоживущими объектами.

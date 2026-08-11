@@ -9,7 +9,7 @@ namespace TempoCue.App.ViewModels;
 /// <summary>Загружает, локализует и фильтрует карточки библиотеки коучинга.</summary>
 public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
 {
-    private readonly CoachPack _builtInPack;
+    private readonly IReadOnlyList<CoachPack> _builtInPacks;
     private readonly LocalizationService _localization;
     private readonly IChampionCatalog _championCatalog;
     private readonly LoadCoachPackLibraryUseCase _loadCoachPackLibrary;
@@ -28,17 +28,19 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
     private bool _isLibraryLoading;
     private bool _isLibraryLoaded;
     private bool _isChampionCatalogLoaded;
-    private LocalCoachPackState _builtInPackState = LocalCoachPackState.Enabled;
+    private IReadOnlyDictionary<string, LocalCoachPackState> _packStates =
+        new Dictionary<string, LocalCoachPackState>(StringComparer.OrdinalIgnoreCase);
     private bool _isDisposed;
 
     public CoachingLibraryViewModel(
-        CoachPack builtInPack,
+        IReadOnlyList<CoachPack> builtInPacks,
         LocalizationService localization,
         IChampionCatalog championCatalog,
         LoadCoachPackLibraryUseCase loadCoachPackLibrary,
         SetCoachPackStateUseCase setCoachPackState)
     {
-        _builtInPack = builtInPack ?? throw new ArgumentNullException(nameof(builtInPack));
+        ArgumentNullException.ThrowIfNull(builtInPacks);
+        _builtInPacks = builtInPacks.ToArray();
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _championCatalog = championCatalog ?? throw new ArgumentNullException(nameof(championCatalog));
         _loadCoachPackLibrary = loadCoachPackLibrary
@@ -141,9 +143,7 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
         {
             var snapshot = await _loadCoachPackLibrary.ExecuteAsync(cancellationToken);
             _localEntries = snapshot.Entries;
-            _builtInPackState = snapshot.PackStates.GetValueOrDefault(
-                _builtInPack.Id,
-                LocalCoachPackState.Enabled);
+            _packStates = snapshot.PackStates;
             _isLibraryLoaded = true;
             LibraryMessage = snapshot.InvalidFileCount > 0
                 ? _localization.Plural("Count.CoachPackInvalid", snapshot.InvalidFileCount)
@@ -218,25 +218,25 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
 
     private void RebuildCards()
     {
-        var cards = new List<CoachingPackCardViewModel>
-        {
-            _cardFactory.Create(
-                _builtInPack,
+        var cards = _builtInPacks.Select(pack => _cardFactory.Create(
+                pack,
                 CoachingPackOrigin.BuiltIn,
-                _builtInPackState,
-                _champions)
-        };
-        cards.AddRange(_localEntries.Select(entry => _cardFactory.Create(
-            entry.Pack,
-            CoachingPackOrigin.CreatedByUser,
-            entry.State,
-            _champions)));
+                _packStates.GetValueOrDefault(pack.Id, LocalCoachPackState.Enabled),
+                _champions))
+            .Concat(_localEntries.Select(entry => _cardFactory.Create(
+                entry.Pack,
+                CoachingPackOrigin.CreatedByUser,
+                entry.State,
+                _champions)))
+            .ToArray();
         _allCards = cards;
         LibrarySummary = string.Join(
             " · ",
-            _localization.Plural("Count.CoachPack", cards.Count),
+            _localization.Plural("Count.CoachPack", cards.Length),
             _localization.Plural("Count.CoachPackEnabled", cards.Count(static card => card.IsEnabled)),
-            _localization.Plural("Count.CoachPackCreated", cards.Count(static card => card.IsCreatedByUser)));
+            _localization.Plural(
+                "Count.CoachPackCreated",
+                cards.Count(static card => card.IsCreatedByUser)));
         ApplySearch();
     }
 

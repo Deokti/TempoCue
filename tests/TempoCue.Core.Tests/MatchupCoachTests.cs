@@ -95,24 +95,6 @@ public sealed class MatchupCoachTests
     }
 
     [Fact]
-    public void CoachPackLoader_LoadsActualUrgotVersusSettPack()
-    {
-        // Этот тест открывает тот же JSON, который использует WPF-приложение.
-        var packPath = Path.Combine(
-            AppContext.BaseDirectory,
-            "Assets",
-            "CoachPacks",
-            "urgot-vs-sett.json");
-
-        using var packStream = File.OpenRead(packPath);
-        var pack = CoachPackLoader.Load(packStream);
-
-        Assert.Equal("top.urgot-vs-sett.prototype", pack.Id);
-        Assert.Equal(3, pack.Rules.Count);
-        Assert.All(pack.Rules, rule => Assert.Contains("GoliathGames", rule.Source));
-    }
-
-    [Fact]
     public void MatchState_ReturnsAlliesAndEnemies_ForFullTeamComposition()
     {
         var match = CreateFullMatch(level: 1);
