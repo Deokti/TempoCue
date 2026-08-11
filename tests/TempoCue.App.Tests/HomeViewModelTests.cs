@@ -45,7 +45,7 @@ public sealed class HomeViewModelTests
             var snapshot = new MatchSnapshot(match, [], "{}", DateTimeOffset.UtcNow);
             var session = new ActiveMatchSession(
                 new SnapshotSource(snapshot),
-                new MatchupCoach([]),
+                new TestMatchAdviceSelector(),
                 TimeSpan.FromSeconds(1));
             using var currentMatch = new CurrentMatchViewModel(session, localization);
             using var home = new HomeViewModel(currentMatch, localization);

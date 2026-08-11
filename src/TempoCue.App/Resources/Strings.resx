@@ -38,10 +38,24 @@
   <data name="Advice.Waiting.Message" xml:space="preserve"><value>TempoCue polls the local Riot API every second. Once the map loads, advice for the actual game state will appear here.</value></data>
   <data name="Advice.Waiting.Source" xml:space="preserve"><value>The manual simulator on the left remains available for testing the Coach Pack without a match.</value></data>
   <data name="Advice.NoRule.Title" xml:space="preserve"><value>No matching rule found</value></data>
-  <data name="Advice.NoRule.Message" xml:space="preserve"><value>The loaded Coach Pack has no advice for the selected state yet.</value></data>
-  <data name="Advice.NoRule.Source" xml:space="preserve"><value>More matchups will be added in a separate stage.</value></data>
+  <data name="Advice.NoRule.Message" xml:space="preserve"><value>“{0}” has no advice for the player's current level and state.</value></data>
+  <data name="Advice.NoRule.Source" xml:space="preserve"><value>The matchup was found, but none of its phases applies right now.</value></data>
+  <data name="Advice.NoPack.Title" xml:space="preserve"><value>No matchup pack found</value></data>
+  <data name="Advice.NoPack.Message" xml:space="preserve"><value>There is no enabled Coach Pack for this champion pair.</value></data>
+  <data name="Advice.NoPack.Source" xml:space="preserve"><value>Create or enable a matching pack in Coaching.</value></data>
+  <data name="Advice.PackConflict.Title" xml:space="preserve"><value>Several matching packs are enabled</value></data>
+  <data name="Advice.PackConflict.Message" xml:space="preserve"><value>These packs apply to the same matchup: {0}.</value></data>
+  <data name="Advice.PackConflict.Source" xml:space="preserve"><value>Disable the extra packs: TempoCue does not choose advice at random.</value></data>
+  <data name="Advice.LibraryUnavailable.Title" xml:space="preserve"><value>Advice library is unavailable</value></data>
+  <data name="Advice.LibraryUnavailable.Message" xml:space="preserve"><value>TempoCue could not read the local Coach Packs.</value></data>
+  <data name="Advice.LibraryUnavailable.Source" xml:space="preserve"><value>No advice is shown while the library state is unknown.</value></data>
+  <data name="Advice.MatchupUnavailable.Title" xml:space="preserve"><value>Matchup is not determined yet</value></data>
+  <data name="Advice.MatchupUnavailable.Message" xml:space="preserve"><value>The active player's lane opponent could not be determined unambiguously.</value></data>
+  <data name="Advice.MatchupUnavailable.Source" xml:space="preserve"><value>TempoCue does not guess the opponent when match data is ambiguous.</value></data>
   <data name="Power.Waiting" xml:space="preserve"><value>WAITING</value></data>
   <data name="Power.NoRule" xml:space="preserve"><value>NO RULE</value></data>
+  <data name="Power.PackConflict" xml:space="preserve"><value>PACK CONFLICT</value></data>
+  <data name="Power.LibraryUnavailable" xml:space="preserve"><value>NO DATA</value></data>
   <data name="Power.Dangerous" xml:space="preserve"><value>DANGER</value></data>
   <data name="Power.Cautious" xml:space="preserve"><value>CAUTION</value></data>
   <data name="Power.Playable" xml:space="preserve"><value>PLAYABLE</value></data>
@@ -153,6 +167,8 @@
   <data name="Current.Advice.WhyNow" xml:space="preserve"><value>Why now</value></data>
   <data name="Current.Advice.LevelReason" xml:space="preserve"><value>This advice uses the active player's real level {0} and items.</value></data>
   <data name="Current.Advice.WaitingReason" xml:space="preserve"><value>After connecting, advice will be selected using the active player's real level and items.</value></data>
+  <data name="Current.Advice.Pack" xml:space="preserve"><value>Pack: {0}</value></data>
+  <data name="Current.Advice.PackAndSource" xml:space="preserve"><value>Pack: {0} · Source: {1}</value></data>
   <data name="Current.Objective.Title" xml:space="preserve"><value>Nearest objective</value></data>
   <data name="Current.Objective.Dragon" xml:space="preserve"><value>Dragon</value></data>
   <data name="Current.Objective.Pending" xml:space="preserve"><value>Type and timer will appear after objective logic is implemented.</value></data>

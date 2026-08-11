@@ -270,17 +270,20 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         }
         else
         {
-            RenderSnapshot(update.Snapshot, update.Advice);
+            RenderSnapshot(update.Snapshot, update.CoachPackSelection);
         }
 
         StateUpdated?.Invoke(this, EventArgs.Empty);
     }
 
-    private void RenderSnapshot(MatchSnapshot snapshot, CoachAdvice? advice)
+    private void RenderSnapshot(
+        MatchSnapshot snapshot,
+        ActiveCoachPackSelection? selection)
     {
         var match = snapshot.Match;
         var activePlayer = match.GetActivePlayer();
         var matchup = MatchupResolver.Resolve(match);
+        var advice = selection?.Advice;
 
         ConnectionTitle = _localization.Get("Current.Status.Connected");
         ConnectionDetails = _localization.Format(
@@ -318,19 +321,69 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
             OpponentChampionInitials = "—";
         }
 
-        RenderAdvice(advice, activePlayer);
+        RenderAdvice(selection, activePlayer);
         RenderParticipants(match);
         RenderEvents(match, snapshot.Events);
     }
 
-    private void RenderAdvice(CoachAdvice? advice, PlayerState? activePlayer)
+    private void RenderAdvice(
+        ActiveCoachPackSelection? selection,
+        PlayerState? activePlayer)
     {
+        if (selection?.State == ActiveCoachPackSelectionState.Conflict)
+        {
+            RenderUnavailableAdvice(
+                "Advice.PackConflict.Title",
+                "Advice.PackConflict.Message",
+                "Advice.PackConflict.Source",
+                "Power.PackConflict",
+                string.Join(", ", selection.ConflictingPackNames));
+            return;
+        }
+
+        if (selection?.State == ActiveCoachPackSelectionState.LibraryUnavailable)
+        {
+            RenderUnavailableAdvice(
+                "Advice.LibraryUnavailable.Title",
+                "Advice.LibraryUnavailable.Message",
+                "Advice.LibraryUnavailable.Source",
+                "Power.LibraryUnavailable");
+            return;
+        }
+
+        if (selection?.State == ActiveCoachPackSelectionState.MatchupUnavailable)
+        {
+            RenderUnavailableAdvice(
+                "Advice.MatchupUnavailable.Title",
+                "Advice.MatchupUnavailable.Message",
+                "Advice.MatchupUnavailable.Source",
+                "Power.NoRule");
+            return;
+        }
+
+        if (selection is null || selection.State == ActiveCoachPackSelectionState.NotFound)
+        {
+            RenderUnavailableAdvice(
+                "Advice.NoPack.Title",
+                "Advice.NoPack.Message",
+                "Advice.NoPack.Source",
+                "Power.NoRule");
+            return;
+        }
+
+        var advice = selection.Advice;
         if (advice is null)
         {
             AdviceTitle = _localization.Get("Advice.NoRule.Title");
-            AdviceMessage = _localization.Get("Advice.NoRule.Message");
-            AdviceReason = _localization.Get("Advice.NoRule.Source");
-            AdviceSource = string.Empty;
+            AdviceMessage = _localization.Format(
+                "Advice.NoRule.Message",
+                selection.Pack?.Name ?? string.Empty);
+            AdviceReason = activePlayer is null
+                ? _localization.Get("Advice.NoRule.Source")
+                : _localization.Format("Current.Advice.LevelReason", activePlayer.Level);
+            AdviceSource = selection.Pack is null
+                ? string.Empty
+                : _localization.Format("Current.Advice.Pack", selection.Pack.Name);
             PowerStateLabel = _localization.Get("Power.NoRule");
             PowerState = null;
             return;
@@ -338,12 +391,17 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
 
         AdviceTitle = advice.Title;
         AdviceMessage = advice.Message;
-        AdviceReason = activePlayer is null
-            ? advice.Message
+        AdviceReason = string.IsNullOrWhiteSpace(advice.WhyNow)
+            ? activePlayer is null
+                ? advice.Message
+                : _localization.Format("Current.Advice.LevelReason", activePlayer.Level)
+            : advice.WhyNow;
+        AdviceSource = selection.Pack is null
+            ? advice.Source
             : _localization.Format(
-                "Current.Advice.LevelReason",
-                activePlayer.Level);
-        AdviceSource = advice.Source;
+                "Current.Advice.PackAndSource",
+                selection.Pack.Name,
+                advice.Source);
         PowerState = advice.PowerState;
         PowerStateLabel = advice.PowerState switch
         {
@@ -353,6 +411,23 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
             TempoCue.Core.PowerState.Favorable => _localization.Get("Power.Favorable"),
             _ => throw new ArgumentOutOfRangeException(nameof(advice.PowerState))
         };
+    }
+
+    private void RenderUnavailableAdvice(
+        string titleKey,
+        string messageKey,
+        string sourceKey,
+        string powerKey,
+        params object[] messageArguments)
+    {
+        AdviceTitle = _localization.Get(titleKey);
+        AdviceMessage = messageArguments.Length == 0
+            ? _localization.Get(messageKey)
+            : _localization.Format(messageKey, messageArguments);
+        AdviceReason = _localization.Get(sourceKey);
+        AdviceSource = string.Empty;
+        PowerStateLabel = _localization.Get(powerKey);
+        PowerState = null;
     }
 
     private void RenderParticipants(MatchState match)
@@ -535,7 +610,7 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
 
         if (_lastUpdate?.Snapshot is { } snapshot)
         {
-            RenderSnapshot(snapshot, _lastUpdate.Advice);
+            RenderSnapshot(snapshot, _lastUpdate.CoachPackSelection);
         }
         else
         {

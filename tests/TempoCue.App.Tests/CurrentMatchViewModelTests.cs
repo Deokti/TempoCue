@@ -77,6 +77,7 @@ public sealed class CurrentMatchViewModelTests
                     Priority = 10,
                     Title = "Дави короткими разменами",
                     Message = "Не затягивай бой.",
+                    WhyNow = "Sett уже потратил ключевое умение.",
                     Source = "Тестовый Coach Pack"
                 }
             ]);
@@ -94,6 +95,8 @@ public sealed class CurrentMatchViewModelTests
         Assert.Equal("Sett", viewModel.OpponentChampion);
         Assert.Equal("Уровень 9", viewModel.MatchupPhase);
         Assert.Equal("Дави короткими разменами", viewModel.AdviceTitle);
+        Assert.Equal("Sett уже потратил ключевое умение.", viewModel.AdviceReason);
+        Assert.Contains("Тестовый набор", viewModel.AdviceSource);
         Assert.Single(viewModel.Allies);
         Assert.Single(viewModel.Enemies);
         Assert.Equal(2, viewModel.Events.Count);
@@ -188,6 +191,32 @@ public sealed class CurrentMatchViewModelTests
         Assert.Equal(MatchSnapshotReadStatus.GameLoading, viewModel.Status);
         Assert.Equal("ЗАГРУЗКА МАТЧА", viewModel.ConnectionTitle);
         Assert.Contains("ожидаем готовность", viewModel.ConnectionDetails);
+    }
+
+    [Fact]
+    public async Task RefreshAsync_ExplainsConflictingEnabledPacks()
+    {
+        using var context = new CurrentMatchViewModelTestContext();
+        var match = new MatchState
+        {
+            GameTimeSeconds = 540,
+            ActivePlayerId = "urgot-player",
+            Players =
+            [
+                CreatePlayer("urgot-player", "Urgot", TeamSide.Order, PlayerPosition.Top),
+                CreatePlayer("sett-player", "Sett", TeamSide.Chaos, PlayerPosition.Top)
+            ]
+        };
+        var selection = ActiveCoachPackSelection.Conflict(["Первый", "Второй"]);
+        var viewModel = context.CreateViewModel(
+            new MatchSnapshot(match, [], "{}", DateTimeOffset.UtcNow),
+            new TestMatchAdviceSelector(selection));
+
+        await viewModel.RefreshAsync();
+
+        Assert.Equal("КОНФЛИКТ НАБОРОВ", viewModel.PowerStateLabel);
+        Assert.Contains("Первый, Второй", viewModel.AdviceMessage);
+        Assert.Contains("не выбирает рекомендацию случайно", viewModel.AdviceReason);
     }
 
     private static PlayerState CreatePlayer(

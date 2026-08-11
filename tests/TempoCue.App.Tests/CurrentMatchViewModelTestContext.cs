@@ -23,10 +23,17 @@ internal sealed class CurrentMatchViewModelTestContext : IDisposable
     public CurrentMatchViewModel CreateViewModel(
         MatchSnapshotReadResult result,
         IEnumerable<CoachRuleDefinition>? rules = null)
+        => CreateViewModel(
+            result,
+            new TestMatchAdviceSelector(rules));
+
+    public CurrentMatchViewModel CreateViewModel(
+        MatchSnapshotReadResult result,
+        IMatchAdviceSelector adviceSelector)
     {
         var session = new ActiveMatchSession(
             new SnapshotSource(result),
-            new MatchupCoach(rules ?? []),
+            adviceSelector,
             TimeSpan.FromSeconds(1));
         var viewModel = new CurrentMatchViewModel(session, Localization);
         _viewModels.Add(viewModel);
@@ -37,6 +44,11 @@ internal sealed class CurrentMatchViewModelTestContext : IDisposable
         MatchSnapshot snapshot,
         IEnumerable<CoachRuleDefinition>? rules = null) =>
         CreateViewModel(MatchSnapshotReadResult.Success(snapshot), rules);
+
+    public CurrentMatchViewModel CreateViewModel(
+        MatchSnapshot snapshot,
+        IMatchAdviceSelector adviceSelector) =>
+        CreateViewModel(MatchSnapshotReadResult.Success(snapshot), adviceSelector);
 
     public void Dispose()
     {

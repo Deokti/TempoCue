@@ -35,8 +35,8 @@ public partial class App : System.Windows.Application
         var settings = settingsService.Load();
         LocalizationService.Instance.SetLanguage(settings.Language);
 
-        // Встроенный набор остаётся источником правил матча до следующей итерации,
-        // в которой движок будет выбирать включённый набор из локальной библиотеки.
+        // Встроенный набор служит резервным источником, когда пользователь
+        // не включил собственный Coach Pack для текущего матчапа.
         var packPath = Path.Combine(
             AppContext.BaseDirectory,
             "Assets",
@@ -44,13 +44,24 @@ public partial class App : System.Windows.Application
             "urgot-vs-sett.json");
         using var packStream = File.OpenRead(packPath);
         var pack = CoachPackLoader.Load(packStream);
-        var coach = new MatchupCoach(pack.Rules);
+
+        var coachPackDirectory = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "TempoCue",
+            "CoachPacks");
+        var coachPackStore = new LocalCoachPackStore(coachPackDirectory);
+        var saveCoachPack = new SaveCoachPackUseCase(coachPackStore);
+        var loadCoachPackLibrary = new LoadCoachPackLibraryUseCase(coachPackStore);
+        var setCoachPackState = new SetCoachPackStateUseCase(coachPackStore);
+        var activeCoachPackSelector = new SelectActiveCoachPackUseCase(
+            pack,
+            loadCoachPackLibrary);
 
         // Инфраструктура матча создаётся здесь, чтобы View и ViewModel не конструировали HTTP-клиенты.
         _liveClientDataClient = new LiveClientDataClient();
         var activeMatchSession = new ActiveMatchSession(
             _liveClientDataClient,
-            coach,
+            activeCoachPackSelector,
             TimeSpan.FromSeconds(1));
         _currentMatchViewModel = new CurrentMatchViewModel(
             activeMatchSession,
@@ -77,20 +88,14 @@ public partial class App : System.Windows.Application
         _itemCatalog = new DataDragonItemCatalog(
             _dataDragonClient,
             dataDragonCacheDirectory);
-        var coachPackDirectory = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "TempoCue",
-            "CoachPacks");
-        var coachPackStore = new LocalCoachPackStore(coachPackDirectory);
-        var saveCoachPack = new SaveCoachPackUseCase(coachPackStore);
-        var loadCoachPackLibrary = new LoadCoachPackLibraryUseCase(coachPackStore);
-        var setCoachPackState = new SetCoachPackStateUseCase(coachPackStore);
         var coachingLibraryViewModel = new CoachingLibraryViewModel(
             pack,
             LocalizationService.Instance,
             _championCatalog,
             loadCoachPackLibrary,
             setCoachPackState);
+        coachingLibraryViewModel.LibraryChanged += (_, _) =>
+            activeCoachPackSelector.Invalidate();
         var buildLeagueItemSetExport = new BuildLeagueItemSetExportUseCase(
             _championCatalog,
             _itemCatalog);

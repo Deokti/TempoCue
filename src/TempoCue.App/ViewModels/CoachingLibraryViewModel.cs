@@ -110,6 +110,12 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
 
     public bool HasLibraryMessage => !string.IsNullOrWhiteSpace(LibraryMessage);
 
+    /// <summary>
+    /// Сообщает composition root, что наборы или их локальные состояния перечитаны.
+    /// Активный движок использует событие только для инвалидирования своего кеша.
+    /// </summary>
+    public event EventHandler? LibraryChanged;
+
     public bool IsLibraryLoading
     {
         get => _isLibraryLoading;
@@ -143,6 +149,7 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
                 ? _localization.Plural("Count.CoachPackInvalid", snapshot.InvalidFileCount)
                 : string.Empty;
             RebuildCards();
+            LibraryChanged?.Invoke(this, EventArgs.Empty);
 
             if (!_isChampionCatalogLoaded)
             {

@@ -38,10 +38,24 @@
   <data name="Advice.Waiting.Message" xml:space="preserve"><value>TempoCue опрашивает локальный Riot API каждую секунду. После загрузки на карту здесь появится совет для фактического состояния игры.</value></data>
   <data name="Advice.Waiting.Source" xml:space="preserve"><value>Ручной симулятор слева остаётся доступен для проверки Coach Pack без матча.</value></data>
   <data name="Advice.NoRule.Title" xml:space="preserve"><value>Подходящее правило не найдено</value></data>
-  <data name="Advice.NoRule.Message" xml:space="preserve"><value>В загруженном Coach Pack пока нет совета для выбранного состояния.</value></data>
-  <data name="Advice.NoRule.Source" xml:space="preserve"><value>Добавление новых матчапов станет отдельным этапом.</value></data>
+  <data name="Advice.NoRule.Message" xml:space="preserve"><value>В наборе «{0}» нет совета для текущего уровня и состояния игрока.</value></data>
+  <data name="Advice.NoRule.Source" xml:space="preserve"><value>Матчап определён, но ни одна его фаза сейчас не подходит.</value></data>
+  <data name="Advice.NoPack.Title" xml:space="preserve"><value>Набор для матчапа не найден</value></data>
+  <data name="Advice.NoPack.Message" xml:space="preserve"><value>Для этой пары чемпионов нет включённого Coach Pack.</value></data>
+  <data name="Advice.NoPack.Source" xml:space="preserve"><value>Создайте или включите подходящий набор в разделе «Коучинг».</value></data>
+  <data name="Advice.PackConflict.Title" xml:space="preserve"><value>Включено несколько подходящих наборов</value></data>
+  <data name="Advice.PackConflict.Message" xml:space="preserve"><value>Для этого матчапа одновременно подходят: {0}.</value></data>
+  <data name="Advice.PackConflict.Source" xml:space="preserve"><value>Отключите лишние наборы: TempoCue не выбирает рекомендацию случайно.</value></data>
+  <data name="Advice.LibraryUnavailable.Title" xml:space="preserve"><value>Библиотека советов недоступна</value></data>
+  <data name="Advice.LibraryUnavailable.Message" xml:space="preserve"><value>TempoCue не смог прочитать локальные Coach Packs.</value></data>
+  <data name="Advice.LibraryUnavailable.Source" xml:space="preserve"><value>Совет не показывается, пока состояние библиотеки неизвестно.</value></data>
+  <data name="Advice.MatchupUnavailable.Title" xml:space="preserve"><value>Матчап пока не определён</value></data>
+  <data name="Advice.MatchupUnavailable.Message" xml:space="preserve"><value>Не удалось однозначно определить противника активного игрока на линии.</value></data>
+  <data name="Advice.MatchupUnavailable.Source" xml:space="preserve"><value>TempoCue не угадывает соперника при неоднозначных данных матча.</value></data>
   <data name="Power.Waiting" xml:space="preserve"><value>ОЖИДАНИЕ</value></data>
   <data name="Power.NoRule" xml:space="preserve"><value>НЕТ ПРАВИЛА</value></data>
+  <data name="Power.PackConflict" xml:space="preserve"><value>КОНФЛИКТ НАБОРОВ</value></data>
+  <data name="Power.LibraryUnavailable" xml:space="preserve"><value>НЕТ ДАННЫХ</value></data>
   <data name="Power.Dangerous" xml:space="preserve"><value>ОПАСНО</value></data>
   <data name="Power.Cautious" xml:space="preserve"><value>ОСТОРОЖНО</value></data>
   <data name="Power.Playable" xml:space="preserve"><value>МОЖНО ИГРАТЬ</value></data>
@@ -161,6 +175,8 @@
   <data name="Current.Advice.WhyNow" xml:space="preserve"><value>Почему сейчас</value></data>
   <data name="Current.Advice.LevelReason" xml:space="preserve"><value>Совет выбран по реальному уровню {0} и предметам активного игрока.</value></data>
   <data name="Current.Advice.WaitingReason" xml:space="preserve"><value>После подключения совет будет выбран по реальному уровню и предметам активного игрока.</value></data>
+  <data name="Current.Advice.Pack" xml:space="preserve"><value>Набор: {0}</value></data>
+  <data name="Current.Advice.PackAndSource" xml:space="preserve"><value>Набор: {0} · Источник: {1}</value></data>
   <data name="Current.Objective.Title" xml:space="preserve"><value>Ближайшая цель</value></data>
   <data name="Current.Objective.Dragon" xml:space="preserve"><value>Дракон</value></data>
   <data name="Current.Objective.Pending" xml:space="preserve"><value>Тип и таймер появятся после отдельной логики игровых объектов.</value></data>

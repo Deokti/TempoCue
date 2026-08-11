@@ -10,18 +10,18 @@ namespace TempoCue.Application;
 public sealed class ActiveMatchSession
 {
     private readonly IMatchSnapshotSource _snapshotSource;
-    private readonly MatchupCoach _coach;
+    private readonly IMatchAdviceSelector _adviceSelector;
     private readonly TimeSpan _pollingInterval;
     private readonly SemaphoreSlim _readLock = new(1, 1);
     private int _isWatching;
 
     public ActiveMatchSession(
         IMatchSnapshotSource snapshotSource,
-        MatchupCoach coach,
+        IMatchAdviceSelector adviceSelector,
         TimeSpan pollingInterval)
     {
         ArgumentNullException.ThrowIfNull(snapshotSource);
-        ArgumentNullException.ThrowIfNull(coach);
+        ArgumentNullException.ThrowIfNull(adviceSelector);
         if (pollingInterval <= TimeSpan.Zero)
         {
             throw new ArgumentOutOfRangeException(
@@ -30,7 +30,7 @@ public sealed class ActiveMatchSession
         }
 
         _snapshotSource = snapshotSource;
-        _coach = coach;
+        _adviceSelector = adviceSelector;
         _pollingInterval = pollingInterval;
     }
 
@@ -63,11 +63,13 @@ public sealed class ActiveMatchSession
         try
         {
             var result = await _snapshotSource.ReadAsync(cancellationToken);
-            var advice = result.Snapshot is null
+            var selection = result.Snapshot is null
                 ? null
-                : _coach.GetBestAdvice(result.Snapshot.Match);
+                : await _adviceSelector.SelectAsync(
+                    result.Snapshot.Match,
+                    cancellationToken);
 
-            return new ActiveMatchUpdate(result.Status, result.Snapshot, advice);
+            return new ActiveMatchUpdate(result.Status, result.Snapshot, selection);
         }
         finally
         {

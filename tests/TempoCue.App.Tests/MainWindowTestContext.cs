@@ -23,7 +23,7 @@ internal sealed class MainWindowTestContext : IDisposable
 
         var session = new ActiveMatchSession(
             new WaitingSnapshotSource(),
-            new MatchupCoach([]),
+            new TestMatchAdviceSelector(),
             TimeSpan.FromSeconds(1));
         CurrentMatch = new CurrentMatchViewModel(session, Localization);
         Home = new HomeViewModel(CurrentMatch, Localization);
