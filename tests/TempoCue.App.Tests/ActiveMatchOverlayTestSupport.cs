@@ -90,6 +90,8 @@ internal sealed class TestActiveMatchMonitor : IActiveMatchMonitor
 
 internal sealed class RecordingOverlayPresenter : IOverlayPresenter
 {
+    public event EventHandler? SetupDismissed;
+
     public List<OverlayNotification> Notifications { get; } = [];
 
     public OverlayInteractionMode InteractionMode { get; private set; } =
@@ -113,4 +115,6 @@ internal sealed class RecordingOverlayPresenter : IOverlayPresenter
     public void Dispose()
     {
     }
+
+    public void DismissSetup() => SetupDismissed?.Invoke(this, EventArgs.Empty);
 }

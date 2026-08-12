@@ -156,6 +156,8 @@ public sealed class ActiveMatchOverlayCoordinator : IDisposable
 
     private void Show(OverlayNotification notification)
     {
+        // Игровое событие не должно наследовать несохранённый черновик предпросмотра.
+        _presenter.ApplySettings(_overlaySettings.Current.ToPresentationSettings());
         _presenter.SetInteractionMode(OverlayInteractionMode.Game);
         _presenter.Show(notification);
     }

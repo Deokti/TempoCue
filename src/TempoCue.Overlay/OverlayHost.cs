@@ -44,6 +44,9 @@ public sealed class OverlayHost : IOverlayPresenter
     public OverlayInteractionMode InteractionMode { get; private set; } =
         OverlayInteractionMode.Game;
 
+    /// <summary>Сообщает владельцу приложения, что пользователь закрыл режим настройки.</summary>
+    public event EventHandler? SetupDismissed;
+
     public OverlayPresentationSettings Settings => _settings;
 
     internal Window? CurrentWindow => _window;
@@ -283,7 +286,18 @@ public sealed class OverlayHost : IOverlayPresenter
         }
     }
 
-    private void Window_HideRequested(object? sender, EventArgs e) => Hide();
+    private void Window_HideRequested(object? sender, EventArgs e)
+    {
+        var dismissedSetup = InteractionMode is OverlayInteractionMode.Setup;
+        Hide();
+        if (!dismissedSetup)
+        {
+            return;
+        }
+
+        SetInteractionMode(OverlayInteractionMode.Game);
+        SetupDismissed?.Invoke(this, EventArgs.Empty);
+    }
 
     private void Window_AllCardsHidden(object? sender, EventArgs e)
     {

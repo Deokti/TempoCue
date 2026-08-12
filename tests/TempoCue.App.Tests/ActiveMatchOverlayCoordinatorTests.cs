@@ -294,6 +294,38 @@ public sealed class ActiveMatchOverlayCoordinatorTests
     }
 
     [Fact]
+    public void Updated_RestoresSavedPresentationBeforeGameNotification()
+    {
+        var monitor = new TestActiveMatchMonitor();
+        using var presenter = new RecordingOverlayPresenter();
+        presenter.ApplySettings(new OverlayPresentationSettings
+        {
+            Width = 400,
+            BackgroundOpacity = 1
+        });
+        var settings = new OverlaySettingsState(new OverlayUserSettings
+        {
+            Width = 300,
+            BackgroundOpacityPercent = 60
+        });
+        using var coordinator = new ActiveMatchOverlayCoordinator(
+            monitor,
+            presenter,
+            LocalizationService.Instance,
+            settings);
+
+        monitor.Publish(CreateSuccessUpdate(
+            TestCoachPackFactory.CreateMatchup(),
+            CreateAdvice("early", PowerState.Playable, "Фаза"),
+            gameTimeSeconds: 30,
+            level: 1));
+
+        Assert.Equal(OverlayInteractionMode.Game, presenter.InteractionMode);
+        Assert.Equal(300, presenter.Settings.Width);
+        Assert.Equal(0.6, presenter.Settings.BackgroundOpacity);
+    }
+
+    [Fact]
     public void Dispose_UnsubscribesFromMatchUpdates()
     {
         var monitor = new TestActiveMatchMonitor();

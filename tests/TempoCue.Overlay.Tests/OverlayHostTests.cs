@@ -113,6 +113,25 @@ public sealed class OverlayHostTests
     });
 
     [Fact]
+    public void SetupCloseButton_ReturnsToGameModeAndNotifiesOwner() => WpfTestHost.Run(() =>
+    {
+        using var host = new OverlayHost(Dispatcher.CurrentDispatcher);
+        var dismissalCount = 0;
+        host.SetupDismissed += (_, _) => dismissalCount++;
+        host.SetInteractionMode(OverlayInteractionMode.Setup);
+        host.ShowPreview([Create("preview", "Предпросмотр")]);
+        WpfTestHost.Pump();
+        var window = Assert.IsType<OverlayWindow>(host.CurrentWindow);
+        var closeButton = Assert.IsType<Button>(window.PrimaryCardView.FindName("CloseOverlayButton"));
+
+        closeButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        WpfTestHost.Pump();
+
+        Assert.Equal(1, dismissalCount);
+        Assert.Equal(OverlayInteractionMode.Game, host.InteractionMode);
+    });
+
+    [Fact]
     public void Preview_RendersTwoCardsWithoutClippedTextAndCanSaveSnapshot() => WpfTestHost.Run(() =>
     {
         var policy = new OverlayDisplayPolicy();

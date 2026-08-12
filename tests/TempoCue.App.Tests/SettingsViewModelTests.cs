@@ -42,17 +42,13 @@ public sealed class SettingsViewModelTests
         using var settingsContext = new TemporarySettingsContext();
         var service = settingsContext.Service;
         var runtime = new OverlaySettingsState(new OverlayUserSettings());
+        var setup = new TestOverlaySetupSession();
         using var viewModel = new SettingsViewModel(
             LocalizationService.Instance,
             service,
             static () => { },
             runtime,
-            null,
-            static () => new OverlayPresentationSettings
-            {
-                HorizontalPosition = 0.25,
-                VerticalPosition = 0.5
-            });
+            setup);
         Assert.False(viewModel.IsOverlaySettingsDirty);
 
         viewModel.IsOverlayEnabled = false;
@@ -64,6 +60,7 @@ public sealed class SettingsViewModelTests
         Assert.True(viewModel.IsOverlaySettingsDirty);
 
         viewModel.OpenOverlaySetup();
+        setup.MoveTo(0.25, 0.5);
         viewModel.SaveOverlaySettings();
 
         Assert.False(viewModel.IsOverlaySettingsDirty);
@@ -100,5 +97,59 @@ public sealed class SettingsViewModelTests
         Assert.Null(runtime.Current.VerticalPosition);
         Assert.Equal(340, runtime.Current.Width);
         Assert.Equal(80, runtime.Current.BackgroundOpacityPercent);
+        Assert.Equal(PersistentAdviceFrequency.EveryLevel, runtime.Current.PersistentAdviceFrequency);
+    }
+
+    [Fact]
+    public void ActiveOverlaySetup_AppliesDraftAndStopsAfterClosing()
+    {
+        using var settingsContext = new TemporarySettingsContext();
+        var setup = new TestOverlaySetupSession();
+        using var viewModel = new SettingsViewModel(
+            LocalizationService.Instance,
+            settingsContext.Service,
+            static () => { },
+            overlaySetupSession: setup);
+
+        viewModel.OpenOverlaySetup();
+        setup.MoveTo(0.25, 0.5);
+        viewModel.OverlayWidth = 400;
+        viewModel.BackgroundOpacityPercent = 70;
+
+        Assert.Single(setup.OpenedSettings);
+        Assert.Equal(2, setup.AppliedSettings.Count);
+        var liveDraft = setup.AppliedSettings[^1];
+        Assert.Equal(400, liveDraft.Width);
+        Assert.Equal(70, liveDraft.BackgroundOpacityPercent);
+        Assert.Equal(0.25, liveDraft.HorizontalPosition);
+        Assert.Equal(0.5, liveDraft.VerticalPosition);
+
+        viewModel.CloseOverlaySetup();
+        viewModel.OverlayWidth = 340;
+
+        Assert.Equal(1, setup.CloseCount);
+        Assert.Equal(2, setup.AppliedSettings.Count);
+    }
+
+    [Fact]
+    public void ResetOverlaySettings_UpdatesActiveSetupWithDefaultPlacement()
+    {
+        using var settingsContext = new TemporarySettingsContext();
+        var setup = new TestOverlaySetupSession();
+        using var viewModel = new SettingsViewModel(
+            LocalizationService.Instance,
+            settingsContext.Service,
+            static () => { },
+            overlaySetupSession: setup);
+
+        viewModel.OpenOverlaySetup();
+        setup.MoveTo(0.25, 0.5);
+        viewModel.ResetOverlaySettings();
+
+        var defaults = Assert.Single(setup.AppliedSettings);
+        Assert.Equal(340, defaults.Width);
+        Assert.Equal(80, defaults.BackgroundOpacityPercent);
+        Assert.Null(defaults.HorizontalPosition);
+        Assert.Null(defaults.VerticalPosition);
     }
 }

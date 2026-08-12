@@ -747,7 +747,7 @@
   <data name="Settings.Overlay.Persistent.Recommended" xml:space="preserve"><value>recommended</value></data>
   <data name="Settings.Overlay.Persistent.Once.Hint" xml:space="preserve"><value>Tips are introduced gradually and do not start repeating after the list ends.</value></data>
   <data name="Settings.Overlay.Persistent.Level" xml:space="preserve"><value>Repeat in a loop</value></data>
-  <data name="Settings.Overlay.Persistent.Level.Hint" xml:space="preserve"><value>The next tip appears on level up; a tip can repeat after at least three levels.</value></data>
+  <data name="Settings.Overlay.Persistent.Level.Hint" xml:space="preserve"><value>The next tip appears on level up. The same tip does not repeat until at least three levels later.</value></data>
   <data name="Settings.Overlay.Persistent.Disabled" xml:space="preserve"><value>Do not show automatically</value></data>
   <data name="Settings.Overlay.Persistent.Disabled.Hint" xml:space="preserve"><value>Whole-match tips remain available in the Coach Pack details.</value></data>
   <data name="Settings.Overlay.Persistent.ScopeHint" xml:space="preserve"><value>Phase changes and danger alerts are always shown separately and do not depend on this setting.</value></data>

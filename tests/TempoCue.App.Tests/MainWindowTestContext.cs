@@ -17,7 +17,9 @@ internal sealed class MainWindowTestContext : IDisposable
     private readonly TemporarySettingsContext _settingsContext = new();
     private bool _isDisposed;
 
-    public MainWindowTestContext(Action? showOverlayPreview = null)
+    public MainWindowTestContext(
+        Action? showOverlayPreview = null,
+        IOverlaySetupSession? overlaySetupSession = null)
     {
         Localization = LocalizationService.Instance;
         _initialLanguage = Localization.CurrentLanguageCode;
@@ -34,7 +36,8 @@ internal sealed class MainWindowTestContext : IDisposable
         Settings = new SettingsViewModel(
             Localization,
             _settingsContext.Service,
-            showOverlayPreview ?? (static () => { }));
+            showOverlayPreview ?? (static () => { }),
+            overlaySetupSession: overlaySetupSession);
         CoachPackStore = new TestCoachPackStore();
         Coaching = CoachingViewModelTestFactory.Create(
             TestCoachPackFactory.CreateMatchup(),

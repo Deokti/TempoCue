@@ -12,8 +12,7 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
     private readonly AppSettingsService _settings;
     private readonly OverlaySettingsState _overlaySettings;
     private readonly Action _showOverlayPreview;
-    private readonly Action<OverlayUserSettings> _openOverlaySetup;
-    private readonly Func<OverlayPresentationSettings> _captureOverlaySettings;
+    private readonly IOverlaySetupSession? _overlaySetupSession;
     private string _selectedLanguageCode;
     private bool _isOverlayEnabled;
     private int _overlayWidth;
@@ -24,7 +23,8 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
     private double? _horizontalPosition;
     private double? _verticalPosition;
     private OverlayUserSettings _savedOverlaySettings;
-    private bool _captureSetupPlacement;
+    private bool _overlaySetupWasOpened;
+    private bool _isApplyingDraft;
     private bool _isDisposed;
 
     public SettingsViewModel(
@@ -32,15 +32,13 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
         AppSettingsService settings,
         Action showOverlayPreview,
         OverlaySettingsState? overlaySettings = null,
-        Action<OverlayUserSettings>? openOverlaySetup = null,
-        Func<OverlayPresentationSettings>? captureOverlaySettings = null)
+        IOverlaySetupSession? overlaySetupSession = null)
     {
         _localization = localization;
         _settings = settings;
         _showOverlayPreview = showOverlayPreview ?? throw new ArgumentNullException(nameof(showOverlayPreview));
         _overlaySettings = overlaySettings ?? new OverlaySettingsState(settings.Load().Overlay);
-        _openOverlaySetup = openOverlaySetup ?? (_ => _showOverlayPreview());
-        _captureOverlaySettings = captureOverlaySettings ?? (() => BuildOverlaySettings().ToPresentationSettings());
+        _overlaySetupSession = overlaySetupSession;
         _selectedLanguageCode = localization.CurrentLanguageCode;
         var overlay = _overlaySettings.Current;
         _isOverlayEnabled = overlay.IsEnabled;
@@ -53,6 +51,10 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
         _verticalPosition = overlay.VerticalPosition;
         _savedOverlaySettings = overlay;
         _localization.PropertyChanged += Localization_PropertyChanged;
+        if (_overlaySetupSession is not null)
+        {
+            _overlaySetupSession.Dismissed += OverlaySetupSession_Dismissed;
+        }
     }
 
     public IReadOnlyList<LanguageOptionViewModel> Languages { get; } =
@@ -195,16 +197,36 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
     /// <summary>Открывает интерактивный предпросмотр даже для отключённого игрового оверлея.</summary>
     public void OpenOverlaySetup()
     {
-        _captureSetupPlacement = true;
-        _openOverlaySetup(BuildOverlaySettings());
+        if (_overlaySetupSession is null)
+        {
+            _showOverlayPreview();
+            return;
+        }
+
+        CaptureCurrentSetupPlacement();
+        _overlaySetupWasOpened = true;
+        _overlaySetupSession.Open(BuildOverlaySettings());
+    }
+
+    /// <summary>Закрывает предпросмотр и возвращает игровому оверлею сохранённые настройки.</summary>
+    public void CloseOverlaySetup()
+    {
+        if (!IsOverlaySetupActive())
+        {
+            _overlaySetupWasOpened = false;
+            return;
+        }
+
+        _overlaySetupWasOpened = false;
+        _overlaySetupSession?.Close();
     }
 
     public void SaveOverlaySettings()
     {
         var settings = BuildOverlaySettings();
-        if (_captureSetupPlacement)
+        if (IsOverlaySetupActive())
         {
-            settings = settings.WithPlacement(_captureOverlaySettings());
+            settings = settings.WithPlacement(_overlaySetupSession!.CurrentSettings);
         }
 
         settings = settings.Normalize();
@@ -213,13 +235,15 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
         ApplyDraft(settings);
         _savedOverlaySettings = settings;
         NotifyOverlayDraftChanged();
-        _captureSetupPlacement = false;
     }
 
     public void ResetOverlaySettings()
     {
-        _captureSetupPlacement = false;
         ApplyDraft(new OverlayUserSettings());
+        if (IsOverlaySetupActive())
+        {
+            _overlaySetupSession!.ApplyDraft(BuildOverlaySettings());
+        }
     }
 
     public void Dispose()
@@ -231,6 +255,10 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
 
         _isDisposed = true;
         _localization.PropertyChanged -= Localization_PropertyChanged;
+        if (_overlaySetupSession is not null)
+        {
+            _overlaySetupSession.Dismissed -= OverlaySetupSession_Dismissed;
+        }
     }
 
     private void Localization_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -257,15 +285,24 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
 
     private void ApplyDraft(OverlayUserSettings settings)
     {
-        IsOverlayEnabled = settings.IsEnabled;
-        OverlayWidth = settings.Width;
-        BackgroundOpacityPercent = settings.BackgroundOpacityPercent;
-        FixedDurationSeconds = settings.FixedDurationSeconds;
-        _horizontalPosition = settings.HorizontalPosition;
-        _verticalPosition = settings.VerticalPosition;
-        SetDurationMode(settings.DurationMode);
-        SetPersistentAdviceFrequency(settings.PersistentAdviceFrequency);
-        NotifyOverlayDraftChanged();
+        _isApplyingDraft = true;
+        try
+        {
+            IsOverlayEnabled = settings.IsEnabled;
+            OverlayWidth = settings.Width;
+            BackgroundOpacityPercent = settings.BackgroundOpacityPercent;
+            FixedDurationSeconds = settings.FixedDurationSeconds;
+            _horizontalPosition = settings.HorizontalPosition;
+            _verticalPosition = settings.VerticalPosition;
+            SetDurationMode(settings.DurationMode);
+            SetPersistentAdviceFrequency(settings.PersistentAdviceFrequency);
+        }
+        finally
+        {
+            _isApplyingDraft = false;
+        }
+
+        OnPropertyChanged(nameof(IsOverlaySettingsDirty));
     }
 
     private void SetDurationMode(OverlayDurationMode mode)
@@ -295,5 +332,46 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
         NotifyOverlayDraftChanged();
     }
 
-    private void NotifyOverlayDraftChanged() => OnPropertyChanged(nameof(IsOverlaySettingsDirty));
+    private void NotifyOverlayDraftChanged()
+    {
+        OnPropertyChanged(nameof(IsOverlaySettingsDirty));
+        if (_isApplyingDraft || !IsOverlaySetupActive())
+        {
+            return;
+        }
+
+        CaptureCurrentSetupPlacement();
+        _overlaySetupSession!.ApplyDraft(BuildOverlaySettings());
+    }
+
+    private bool IsOverlaySetupActive()
+    {
+        if (!_overlaySetupWasOpened)
+        {
+            return false;
+        }
+
+        if (_overlaySetupSession?.IsActive is true)
+        {
+            return true;
+        }
+
+        _overlaySetupWasOpened = false;
+        return false;
+    }
+
+    private void CaptureCurrentSetupPlacement()
+    {
+        if (!IsOverlaySetupActive())
+        {
+            return;
+        }
+
+        var presentation = _overlaySetupSession!.CurrentSettings;
+        _horizontalPosition = presentation.HorizontalPosition;
+        _verticalPosition = presentation.VerticalPosition;
+    }
+
+    private void OverlaySetupSession_Dismissed(object? sender, EventArgs e) =>
+        _overlaySetupWasOpened = false;
 }

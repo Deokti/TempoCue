@@ -757,7 +757,7 @@
   <data name="Settings.Overlay.Persistent.Recommended" xml:space="preserve"><value>рекомендуется</value></data>
   <data name="Settings.Overlay.Persistent.Once.Hint" xml:space="preserve"><value>Советы появляются постепенно и не повторяются после окончания списка.</value></data>
   <data name="Settings.Overlay.Persistent.Level" xml:space="preserve"><value>Повторять по кругу</value></data>
-  <data name="Settings.Overlay.Persistent.Level.Hint" xml:space="preserve"><value>Следующий совет появляется при повышении уровня; повтор возможен минимум через три уровня.</value></data>
+  <data name="Settings.Overlay.Persistent.Level.Hint" xml:space="preserve"><value>Следующий совет появляется при повышении уровня. Один и тот же совет повторяется не раньше чем через три уровня.</value></data>
   <data name="Settings.Overlay.Persistent.Disabled" xml:space="preserve"><value>Не показывать автоматически</value></data>
   <data name="Settings.Overlay.Persistent.Disabled.Hint" xml:space="preserve"><value>Постоянные советы останутся доступны в подробностях Coach Pack.</value></data>
   <data name="Settings.Overlay.Persistent.ScopeHint" xml:space="preserve"><value>Смена фаз и опасные события всегда показываются отдельно и не зависят от этой настройки.</value></data>

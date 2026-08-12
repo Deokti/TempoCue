@@ -16,7 +16,7 @@ public sealed record OverlayUserSettings
     public int FixedDurationSeconds { get; init; } = OverlayPresentationSettings.DefaultFixedDurationSeconds;
 
     public PersistentAdviceFrequency PersistentAdviceFrequency { get; init; } =
-        PersistentAdviceFrequency.OncePerMatch;
+        PersistentAdviceFrequency.EveryLevel;
 
     public double? HorizontalPosition { get; init; }
 

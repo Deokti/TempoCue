@@ -3,6 +3,8 @@ namespace TempoCue.Overlay;
 /// <summary>Внешняя граница показа и скрытия уведомлений поверх игры.</summary>
 public interface IOverlayPresenter : IDisposable
 {
+    event EventHandler? SetupDismissed;
+
     OverlayInteractionMode InteractionMode { get; }
 
     OverlayPresentationSettings Settings { get; }

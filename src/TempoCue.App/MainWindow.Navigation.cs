@@ -58,6 +58,11 @@ public partial class MainWindow
     /// </summary>
     private void NavigateTo(AppPage page)
     {
+        if (_currentPage is AppPage.Settings && page is not AppPage.Settings)
+        {
+            _settingsViewModel.CloseOverlaySetup();
+        }
+
         _currentPage = page;
 
         HomePage.Visibility = Visibility.Visible;

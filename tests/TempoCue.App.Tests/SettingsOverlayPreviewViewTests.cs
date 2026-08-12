@@ -28,14 +28,15 @@ public sealed class SettingsOverlayPreviewViewTests
             var automaticChoice = WpfTestHost.Find<TempoChoiceCard>(settings, "AutomaticDurationChoice");
             var fixedChoice = WpfTestHost.Find<TempoChoiceCard>(settings, "FixedDurationChoice");
             var fixedPanel = WpfTestHost.Find<Border>(settings, "FixedDurationPanel");
-            var persistentChoice = WpfTestHost.Find<TempoChoiceCard>(settings, "PersistentOnceChoice");
+            var persistentOnceChoice = WpfTestHost.Find<TempoChoiceCard>(settings, "PersistentOnceChoice");
+            var persistentEveryLevelChoice = WpfTestHost.Find<TempoChoiceCard>(settings, "PersistentEveryLevelChoice");
 
             Assert.True(enabledSwitch.IsChecked);
             Assert.True(configureButton.IsEnabled);
             Assert.True(automaticChoice.IsChecked);
             Assert.Equal(Visibility.Collapsed, fixedPanel.Visibility);
-            Assert.True(persistentChoice.IsChecked);
-            Assert.Equal("рекомендуется", persistentChoice.Notice);
+            Assert.Equal("рекомендуется", persistentOnceChoice.Notice);
+            Assert.True(persistentEveryLevelChoice.IsChecked);
 
             var snapshotDirectory = Environment.GetEnvironmentVariable("TEMPOCUE_UI_SNAPSHOT_DIR");
             if (!string.IsNullOrWhiteSpace(snapshotDirectory))
@@ -50,7 +51,7 @@ public sealed class SettingsOverlayPreviewViewTests
             context.Localization.SetLanguage("en-US");
             WpfTestHost.Pump();
             Assert.Equal("Configure overlay", configureButton.Content);
-            Assert.Equal("recommended", persistentChoice.Notice);
+            Assert.Equal("recommended", persistentOnceChoice.Notice);
 
             WpfTestHost.Click(enabledSwitch);
             Assert.False(enabledSwitch.IsChecked);
