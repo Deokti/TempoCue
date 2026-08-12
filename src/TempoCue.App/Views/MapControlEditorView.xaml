@@ -68,10 +68,51 @@
                         Click="MapControlEditorBackButton_Click" />
                 <Button x:Name="MapControlEditorNextButton"
                         Content="{localization:Loc Coaching.MatchupEditor.Next}"
-                        Style="{StaticResource PrimaryButton}"
                         Margin="10,0,0,0"
                         IsEnabled="{Binding CanMoveNext}"
-                        Click="MapControlEditorNextButton_Click" />
+                        Click="MapControlEditorNextButton_Click">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentStep}" Value="5">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button x:Name="MapControlSaveAndEnableButton"
+                        Content="{localization:Loc Coaching.MapControlEditor.Save.Action.Enable}"
+                        Margin="10,0,0,0"
+                        IsEnabled="{Binding Save.CanSave}"
+                        Click="MapControlSaveAndEnableButton_Click">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentStep}" Value="5">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button x:Name="MapControlSaveDraftButton"
+                        Content="{localization:Loc Coaching.MapControlEditor.Save.Action.Draft}"
+                        Margin="10,0,0,0"
+                        IsEnabled="{Binding Save.CanSave}"
+                        Click="MapControlSaveDraftButton_Click">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentStep}" Value="5">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
             </StackPanel>
         </Grid>
 
@@ -169,6 +210,21 @@
                         </Style>
                     </views:MapControlVerificationView.Style>
                 </views:MapControlVerificationView>
+
+                <views:MapControlSaveView x:Name="MapControlSavePage"
+                                          DataContext="{Binding Save}">
+                    <views:MapControlSaveView.Style>
+                        <Style TargetType="views:MapControlSaveView">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding DataContext.CurrentStep, RelativeSource={RelativeSource AncestorType=views:MapControlEditorView}}"
+                                             Value="5">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </views:MapControlSaveView.Style>
+                </views:MapControlSaveView>
             </Grid>
         </ScrollViewer>
     </Grid>

@@ -13,7 +13,8 @@ public sealed class MapControlEditorViewModel : ObservableObject
 
     public MapControlEditorViewModel(
         LocalizationService localization,
-        IGamePatchCatalog gamePatchCatalog)
+        IGamePatchCatalog gamePatchCatalog,
+        SaveMapControlPackUseCase saveMapControlPack)
     {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         MainInformation = new MapControlMainInformationViewModel(
@@ -23,9 +24,11 @@ public sealed class MapControlEditorViewModel : ObservableObject
         Scope = new MapControlScopeViewModel(localization);
         Content = new MapControlContentViewModel(localization);
         Verification = new MapControlVerificationViewModel(localization);
+        Save = new MapControlSaveViewModel(localization, saveMapControlPack);
         MainInformation.PropertyChanged += MainInformation_PropertyChanged;
         Scope.PropertyChanged += Scope_PropertyChanged;
         Content.PropertyChanged += Content_PropertyChanged;
+        Verification.PropertyChanged += Verification_PropertyChanged;
         BeginNew();
     }
 
@@ -37,6 +40,8 @@ public sealed class MapControlEditorViewModel : ObservableObject
 
     public MapControlVerificationViewModel Verification { get; }
 
+    public MapControlSaveViewModel Save { get; }
+
     public int CurrentStep
     {
         get => _currentStep;
@@ -45,15 +50,6 @@ public sealed class MapControlEditorViewModel : ObservableObject
             if (SetProperty(ref _currentStep, value))
             {
                 _highestVisitedStep = Math.Max(_highestVisitedStep, value);
-                if (value == 3)
-                {
-                    Content.SetPatch(MainInformation.GamePatch);
-                }
-                else if (value == 4)
-                {
-                    RefreshVerification();
-                }
-
                 OnPropertyChanged(nameof(CurrentStepIndex));
                 OnPropertyChanged(nameof(StepSummary));
                 NotifyNavigationChanged();
@@ -81,6 +77,7 @@ public sealed class MapControlEditorViewModel : ObservableObject
         1 => MainInformation.IsComplete,
         2 => Scope.IsComplete,
         3 => Content.IsComplete,
+        4 => Verification.CanContinue,
         _ => false
     };
 
@@ -113,6 +110,7 @@ public sealed class MapControlEditorViewModel : ObservableObject
             return false;
         }
 
+        PrepareStep(targetStep);
         CurrentStep = targetStep;
         return true;
     }
@@ -125,10 +123,15 @@ public sealed class MapControlEditorViewModel : ObservableObject
             return false;
         }
 
-        return targetStep == 1
-            || targetStep == 2 && MainInformation.IsComplete
-            || targetStep == 3 && MainInformation.IsComplete && Scope.IsComplete
-            || targetStep == 4 && MainInformation.IsComplete && Scope.IsComplete && Content.IsComplete;
+        for (var step = 1; step < targetStep; step++)
+        {
+            if (!IsStepComplete(step))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public void UpdateLanguage()
@@ -137,6 +140,7 @@ public sealed class MapControlEditorViewModel : ObservableObject
         Scope.UpdateLanguage();
         Content.UpdateLanguage();
         Verification.UpdateLanguage();
+        Save.UpdateLanguage();
         OnPropertyChanged(nameof(StepSummary));
     }
 
@@ -148,6 +152,7 @@ public sealed class MapControlEditorViewModel : ObservableObject
         Scope.BeginNew();
         Content.BeginNew();
         Content.SetPatch(MainInformation.GamePatch);
+        Save.BeginNew();
         OnPropertyChanged(nameof(CurrentStep));
         OnPropertyChanged(nameof(CurrentStepIndex));
         OnPropertyChanged(nameof(StepSummary));
@@ -183,6 +188,43 @@ public sealed class MapControlEditorViewModel : ObservableObject
         {
             OnPropertyChanged(nameof(CanMoveNext));
             NotifyStepAvailabilityChanged();
+        }
+    }
+
+    private void Verification_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MapControlVerificationViewModel.CanContinue))
+        {
+            OnPropertyChanged(nameof(CanMoveNext));
+            NotifyStepAvailabilityChanged();
+        }
+    }
+
+    private bool IsStepComplete(int step) => step switch
+    {
+        1 => MainInformation.IsComplete,
+        2 => Scope.IsComplete,
+        3 => Content.IsComplete,
+        4 => Verification.CanContinue,
+        5 => Save.CanSave,
+        _ => false
+    };
+
+    private void PrepareStep(int targetStep)
+    {
+        if (targetStep >= 3)
+        {
+            Content.SetPatch(MainInformation.GamePatch);
+        }
+
+        if (targetStep >= 4)
+        {
+            RefreshVerification();
+        }
+
+        if (targetStep >= 5)
+        {
+            Save.Update(MainInformation, Scope, Content);
         }
     }
 

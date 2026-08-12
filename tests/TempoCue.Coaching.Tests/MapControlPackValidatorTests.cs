@@ -137,6 +137,45 @@ public sealed class MapControlPackValidatorTests
     }
 
     [Fact]
+    public void Validate_AcceptsExternalSourceWithoutLink()
+    {
+        var pack = MapControlPackTestData.Create() with
+        {
+            Source = new CoachPackSource
+            {
+                Kind = CoachPackSourceKind.Article,
+                Title = "Map control guide",
+                Author = "Guide author",
+                Url = string.Empty,
+                Permission = CoachPackSourcePermission.NotConfirmed
+            }
+        };
+
+        MapControlPackValidator.Validate(pack);
+    }
+
+    [Fact]
+    public void Validate_RejectsExternalSourceWithNonHttpLink()
+    {
+        var pack = MapControlPackTestData.Create() with
+        {
+            Source = new CoachPackSource
+            {
+                Kind = CoachPackSourceKind.Article,
+                Title = "Map control guide",
+                Author = "Guide author",
+                Url = "file:///guide.html",
+                Permission = CoachPackSourcePermission.NotConfirmed
+            }
+        };
+
+        var exception = Assert.Throws<InvalidDataException>(
+            () => MapControlPackValidator.Validate(pack));
+
+        Assert.Contains("HTTP", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public void Validate_RejectsRespawnRuleForOneTimeObjective()
     {
         var original = MapControlPackTestData.Create();

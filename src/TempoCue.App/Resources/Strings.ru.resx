@@ -934,4 +934,26 @@
   <data name="Coaching.MapControlEditor.Verification.Summary.Patch" xml:space="preserve"><value>Патч каталога</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Scope" xml:space="preserve"><value>Область</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Side" xml:space="preserve"><value>Сторона команды</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Title" xml:space="preserve"><value>Источник</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Description" xml:space="preserve"><value>Личный опыт — полноценный источник. Для статьи, видео и тренерских материалов укажите название и автора.</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Personal" xml:space="preserve"><value>Личный опыт</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Article" xml:space="preserve"><value>Статья или гайд</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Video" xml:space="preserve"><value>Видео</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Training" xml:space="preserve"><value>Тренерские материалы</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Name" xml:space="preserve"><value>Название источника · обязательное поле</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Author" xml:space="preserve"><value>Автор источника · обязательное поле</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Link" xml:space="preserve"><value>Ссылка · необязательно</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Validation" xml:space="preserve"><value>Укажите название и автора. Если добавляете ссылку, она должна начинаться с http:// или https://.</value></data>
+  <data name="Coaching.MapControlEditor.Save.Card.Title" xml:space="preserve"><value>Карточка набора</value></data>
+  <data name="Coaching.MapControlEditor.Save.Card.Name" xml:space="preserve"><value>Название</value></data>
+  <data name="Coaching.MapControlEditor.Save.Card.Type" xml:space="preserve"><value>Тип</value></data>
+  <data name="Coaching.MapControlEditor.Save.Card.Scope" xml:space="preserve"><value>Область</value></data>
+  <data name="Coaching.MapControlEditor.Save.Card.Patch" xml:space="preserve"><value>Патч</value></data>
+  <data name="Coaching.MapControlEditor.Save.Card.Language" xml:space="preserve"><value>Язык содержимого</value></data>
+  <data name="Coaching.MapControlEditor.Save.Action.Enable" xml:space="preserve"><value>Сохранить и включить</value></data>
+  <data name="Coaching.MapControlEditor.Save.Action.Draft" xml:space="preserve"><value>Сохранить черновик</value></data>
+  <data name="Coaching.MapControlEditor.Save.Status.Saving" xml:space="preserve"><value>Сохраняем набор контроля карты…</value></data>
+  <data name="Coaching.MapControlEditor.Save.Status.DraftSaved" xml:space="preserve"><value>Черновик сохранён локально.</value></data>
+  <data name="Coaching.MapControlEditor.Save.Status.EnabledSaved" xml:space="preserve"><value>Набор контроля карты сохранён и включён.</value></data>
+  <data name="Coaching.MapControlEditor.Save.Status.Failed" xml:space="preserve"><value>Не удалось сохранить набор. Проверьте доступ к локальным данным TempoCue.</value></data>
 </root>

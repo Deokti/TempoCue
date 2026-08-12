@@ -39,10 +39,12 @@ internal sealed class MainWindowTestContext : IDisposable
             showOverlayPreview ?? (static () => { }),
             overlaySetupSession: overlaySetupSession);
         CoachPackStore = new TestCoachPackStore();
+        MapControlPackStore = new TestMapControlPackStore();
         Coaching = CoachingViewModelTestFactory.Create(
             TestCoachPackFactory.CreateMatchup(),
             Localization,
-            CoachPackStore);
+            CoachPackStore,
+            MapControlPackStore);
         Window = new MainWindow(CurrentMatch, Home, Settings, Coaching);
     }
 
@@ -55,6 +57,8 @@ internal sealed class MainWindowTestContext : IDisposable
     public SettingsViewModel Settings { get; }
 
     public TestCoachPackStore CoachPackStore { get; }
+
+    public TestMapControlPackStore MapControlPackStore { get; }
 
     public CoachingViewModel Coaching { get; }
 

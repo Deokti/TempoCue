@@ -1,5 +1,7 @@
 using TempoCue.App.Localization;
 using TempoCue.App.ViewModels;
+using TempoCue.Application;
+using TempoCue.Coaching;
 
 namespace TempoCue.App.Tests;
 
@@ -138,6 +140,55 @@ public sealed class MapControlEditorViewModelTests
         Assert.Contains("16.15", editor.Verification.Issues.Single().Message);
     }
 
+    [Fact]
+    public async Task CompletedVerification_OpensSaveStepAndSavesEnabledPack()
+    {
+        var store = new TestMapControlPackStore();
+        var editor = CreateEditor(store);
+        await editor.BeginNewAsync();
+        CompleteMainInformation(editor);
+        Assert.True(editor.MoveNext());
+        Assert.True(editor.MoveNext());
+        AddTimedReminder(editor.Content, "Подготовка к объекту", "03:15");
+        Assert.True(editor.MoveNext());
+
+        Assert.True(editor.MoveNext());
+
+        Assert.Equal(5, editor.CurrentStep);
+        Assert.True(editor.Save.CanSave);
+        Assert.Equal(1, editor.Save.TimedReminderCount);
+        Assert.True(await editor.Save.SaveAsync(LocalCoachPackState.Enabled));
+        Assert.Equal(LocalCoachPackState.Enabled, store.SavedState);
+        Assert.NotNull(store.SavedPack);
+        Assert.Equal(editor.MainInformation.PackName, store.SavedPack.Name);
+        Assert.Single(store.SavedPack.TimedReminders);
+    }
+
+    [Fact]
+    public async Task ExternalSource_AllowsMissingLinkButRequiresTitleAndAuthor()
+    {
+        var store = new TestMapControlPackStore();
+        var editor = CreateEditor(store);
+        await editor.BeginNewAsync();
+        CompleteMainInformation(editor);
+        Assert.True(editor.MoveNext());
+        Assert.True(editor.MoveNext());
+        AddTimedReminder(editor.Content, "Подготовка к объекту", "03:15");
+        Assert.True(editor.MoveNext());
+        Assert.True(editor.MoveNext());
+
+        editor.Save.SelectedSourceKind = CoachPackSourceKind.Article;
+        Assert.False(editor.Save.CanSave);
+        editor.Save.SourceTitle = "Гайд по контролю карты";
+        editor.Save.SourceAuthor = "Автор гайда";
+
+        Assert.True(editor.Save.CanSave);
+        Assert.True(await editor.Save.SaveAsync(LocalCoachPackState.Draft));
+        var savedPack = Assert.IsType<MapControlPack>(store.SavedPack);
+        var savedSource = Assert.IsType<CoachPackSource>(savedPack.Source);
+        Assert.Equal(string.Empty, savedSource.Url);
+    }
+
     private static void CompleteMainInformation(MapControlEditorViewModel editor)
     {
         editor.MainInformation.PackName = "Контроль объектов";
@@ -159,7 +210,9 @@ public sealed class MapControlEditorViewModelTests
         Assert.True(content.TimedReminders.SaveEditor());
     }
 
-    private static MapControlEditorViewModel CreateEditor() => new(
+    private static MapControlEditorViewModel CreateEditor(
+        TestMapControlPackStore? store = null) => new(
         LocalizationService.Instance,
-        TestGamePatchCatalog.Ready());
+        TestGamePatchCatalog.Ready(),
+        new SaveMapControlPackUseCase(store ?? new TestMapControlPackStore()));
 }

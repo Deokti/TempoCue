@@ -190,6 +190,9 @@ public partial class CoachingView : UserControl
     private void MapControlEditorPage_BackRequested(object? sender, EventArgs e) =>
         ViewModel.CloseMapControlEditor();
 
+    private void MapControlEditorPage_SaveCompleted(object? sender, EventArgs e) =>
+        ViewModel.OpenLibrary();
+
     private async void MatchupEditorPage_SaveCompleted(object? sender, EventArgs e)
     {
         ViewModel.OpenLibrary();

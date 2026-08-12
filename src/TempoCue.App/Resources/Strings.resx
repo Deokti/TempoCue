@@ -924,4 +924,26 @@
   <data name="Coaching.MapControlEditor.Verification.Summary.Patch" xml:space="preserve"><value>Catalog patch</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Scope" xml:space="preserve"><value>Scope</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Side" xml:space="preserve"><value>Team side</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Title" xml:space="preserve"><value>Source</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Description" xml:space="preserve"><value>Personal experience is a valid source. For an article, video, or coaching material, provide its title and author.</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Personal" xml:space="preserve"><value>Personal experience</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Article" xml:space="preserve"><value>Article or guide</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Video" xml:space="preserve"><value>Video</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Training" xml:space="preserve"><value>Coaching material</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Name" xml:space="preserve"><value>Source title · required</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Author" xml:space="preserve"><value>Source author · required</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Link" xml:space="preserve"><value>Link · optional</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Validation" xml:space="preserve"><value>Provide a source title and author. If a link is provided, it must start with http:// or https://.</value></data>
+  <data name="Coaching.MapControlEditor.Save.Card.Title" xml:space="preserve"><value>Pack card</value></data>
+  <data name="Coaching.MapControlEditor.Save.Card.Name" xml:space="preserve"><value>Name</value></data>
+  <data name="Coaching.MapControlEditor.Save.Card.Type" xml:space="preserve"><value>Type</value></data>
+  <data name="Coaching.MapControlEditor.Save.Card.Scope" xml:space="preserve"><value>Scope</value></data>
+  <data name="Coaching.MapControlEditor.Save.Card.Patch" xml:space="preserve"><value>Patch</value></data>
+  <data name="Coaching.MapControlEditor.Save.Card.Language" xml:space="preserve"><value>Content language</value></data>
+  <data name="Coaching.MapControlEditor.Save.Action.Enable" xml:space="preserve"><value>Save and enable</value></data>
+  <data name="Coaching.MapControlEditor.Save.Action.Draft" xml:space="preserve"><value>Save draft</value></data>
+  <data name="Coaching.MapControlEditor.Save.Status.Saving" xml:space="preserve"><value>Saving Map Control Pack…</value></data>
+  <data name="Coaching.MapControlEditor.Save.Status.DraftSaved" xml:space="preserve"><value>Draft saved locally.</value></data>
+  <data name="Coaching.MapControlEditor.Save.Status.EnabledSaved" xml:space="preserve"><value>Map Control Pack saved and enabled.</value></data>
+  <data name="Coaching.MapControlEditor.Save.Status.Failed" xml:space="preserve"><value>Could not save the pack. Check access to TempoCue local application data.</value></data>
 </root>

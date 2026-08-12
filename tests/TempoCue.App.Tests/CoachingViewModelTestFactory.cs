@@ -11,10 +11,12 @@ internal static class CoachingViewModelTestFactory
     public static CoachingViewModel Create(
         CoachPack builtInPack,
         LocalizationService? localization = null,
-        TestCoachPackStore? store = null)
+        TestCoachPackStore? store = null,
+        TestMapControlPackStore? mapControlStore = null)
     {
         var resolvedStore = store ?? new TestCoachPackStore();
         var resolvedLocalization = localization ?? LocalizationService.Instance;
+        var resolvedMapControlStore = mapControlStore ?? new TestMapControlPackStore();
         var championCatalog = TestChampionCatalog.Ready();
         var library = new CoachingLibraryViewModel(
             [builtInPack],
@@ -47,6 +49,7 @@ internal static class CoachingViewModelTestFactory
             editor,
             new MapControlEditorViewModel(
                 resolvedLocalization,
-                TestGamePatchCatalog.Ready()));
+                TestGamePatchCatalog.Ready(),
+                new SaveMapControlPackUseCase(resolvedMapControlStore)));
     }
 }

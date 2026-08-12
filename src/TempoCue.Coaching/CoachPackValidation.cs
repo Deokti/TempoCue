@@ -22,12 +22,17 @@ internal static class CoachPackValidation
 
         if (string.IsNullOrWhiteSpace(source.Title)
             || string.IsNullOrWhiteSpace(source.Author)
-            || !Uri.TryCreate(source.Url, UriKind.Absolute, out var uri)
-            || uri.Scheme is not ("http" or "https"))
+            || !IsOptionalHttpUrl(source.Url))
         {
-            throw new InvalidDataException("External source requires title, author and HTTP(S) URL.");
+            throw new InvalidDataException(
+                "External source requires title and author; an optional URL must use HTTP(S).");
         }
     }
+
+    private static bool IsOptionalHttpUrl(string value) =>
+        string.IsNullOrWhiteSpace(value)
+        || Uri.TryCreate(value, UriKind.Absolute, out var uri)
+        && uri.Scheme is "http" or "https";
 
     internal static void EnsureUniqueIds(IEnumerable<string> ids, string entityName)
     {

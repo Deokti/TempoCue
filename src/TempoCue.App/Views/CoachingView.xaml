@@ -91,7 +91,8 @@
 
         <views:MapControlEditorView x:Name="MapControlEditorPage"
                                     DataContext="{Binding MapControlEditor}"
-                                    BackRequested="MapControlEditorPage_BackRequested">
+                                    BackRequested="MapControlEditorPage_BackRequested"
+                                    SaveCompleted="MapControlEditorPage_SaveCompleted">
             <views:MapControlEditorView.Style>
                 <Style TargetType="views:MapControlEditorView">
                     <Setter Property="Visibility" Value="Collapsed" />

@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using TempoCue.App.ViewModels;
+using TempoCue.Application;
 
 namespace TempoCue.App.Views;
 
@@ -17,6 +18,8 @@ public partial class MapControlEditorView : UserControl
     }
 
     public event EventHandler? BackRequested;
+
+    public event EventHandler? SaveCompleted;
 
     private MapControlEditorViewModel ViewModel =>
         (MapControlEditorViewModel)DataContext;
@@ -38,6 +41,20 @@ public partial class MapControlEditorView : UserControl
         if (ViewModel.MoveNext())
         {
             ResetContentScroll();
+        }
+    }
+
+    private async void MapControlSaveDraftButton_Click(object sender, RoutedEventArgs e) =>
+        await SaveAndCloseAsync(LocalCoachPackState.Draft);
+
+    private async void MapControlSaveAndEnableButton_Click(object sender, RoutedEventArgs e) =>
+        await SaveAndCloseAsync(LocalCoachPackState.Enabled);
+
+    private async Task SaveAndCloseAsync(LocalCoachPackState state)
+    {
+        if (await ViewModel.Save.SaveAsync(state))
+        {
+            SaveCompleted?.Invoke(this, EventArgs.Empty);
         }
     }
 

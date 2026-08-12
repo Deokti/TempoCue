@@ -55,6 +55,12 @@ public partial class App : System.Windows.Application
             "CoachPacks");
         var coachPackStore = new LocalCoachPackStore(coachPackDirectory);
         var saveCoachPack = new SaveCoachPackUseCase(coachPackStore);
+        var mapControlPackDirectory = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "TempoCue",
+            "MapControlPacks");
+        var mapControlPackStore = new LocalMapControlPackStore(mapControlPackDirectory);
+        var saveMapControlPack = new SaveMapControlPackUseCase(mapControlPackStore);
         var loadCoachPackLibrary = new LoadCoachPackLibraryUseCase(coachPackStore);
         var setCoachPackState = new SetCoachPackStateUseCase(coachPackStore);
         var deleteCoachPack = new DeleteCoachPackUseCase(coachPackStore);
@@ -145,7 +151,8 @@ public partial class App : System.Windows.Application
             saveCoachPack);
         var mapControlEditorViewModel = new MapControlEditorViewModel(
             LocalizationService.Instance,
-            _gamePatchCatalog);
+            _gamePatchCatalog,
+            saveMapControlPack);
         _coachingViewModel = new CoachingViewModel(
             LocalizationService.Instance,
             coachingLibraryViewModel,
