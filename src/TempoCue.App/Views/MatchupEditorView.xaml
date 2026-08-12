@@ -1,0 +1,404 @@
+<UserControl x:Class="TempoCue.App.Views.MatchupEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:localization="clr-namespace:TempoCue.App.Localization"
+             xmlns:views="clr-namespace:TempoCue.App.Views"
+             Background="#080D14"
+             FontFamily="Segoe UI">
+    <UserControl.Resources>
+        <!-- Стили индикаторов шагов редактора матчапа. -->
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Styles/ShellControls.xaml" />
+                <ResourceDictionary Source="../Styles/FormControls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style x:Key="EditorStepsListBox" TargetType="ListBox">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Focusable" Value="False" />
+                <Setter Property="IsTabStop" Value="False" />
+                <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
+                <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
+                <Setter Property="ScrollViewer.CanContentScroll" Value="False" />
+                <Setter Property="ItemsPanel">
+                    <Setter.Value>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8" />
+                        </ItemsPanelTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="EditorStepItem" TargetType="ListBoxItem">
+                <Setter Property="MinHeight" Value="44" />
+                <Setter Property="Background" Value="#0D1625" />
+                <Setter Property="BorderBrush" Value="#263750" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="Padding" Value="13,9" />
+                <Setter Property="Margin" Value="0,0,10,0" />
+                <Setter Property="Focusable" Value="False" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ListBoxItem">
+                            <Border x:Name="StepBorder"
+                                    MinHeight="{TemplateBinding MinHeight}"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="10"
+                                    Padding="{TemplateBinding Padding}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Border x:Name="StepNumberBorder"
+                                            Width="24"
+                                            Height="24"
+                                            Background="#101A2B"
+                                            BorderBrush="#263750"
+                                            BorderThickness="1"
+                                            CornerRadius="12">
+                                        <TextBlock x:Name="StepNumber"
+                                                   Text="{TemplateBinding Tag}"
+                                                   Foreground="#7F93AF"
+                                                   FontSize="{StaticResource Typography.FontSize.Body}"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                    </Border>
+                                    <ContentPresenter x:Name="StepTitle"
+                                                      ContentSource="Content"
+                                                      TextElement.Foreground="#7F93AF"
+                                                      TextElement.FontSize="{StaticResource Typography.FontSize.Body}"
+                                                      VerticalAlignment="Center"
+                                                      Margin="9,0,0,0" />
+                                </StackPanel>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="StepBorder" Property="Background" Value="#16263E" />
+                                    <Setter TargetName="StepBorder" Property="BorderBrush" Value="#4FAAE8" />
+                                    <Setter TargetName="StepNumberBorder" Property="Background" Value="#4FAAE8" />
+                                    <Setter TargetName="StepNumberBorder" Property="BorderBrush" Value="#4FAAE8" />
+                                    <Setter TargetName="StepNumber" Property="Foreground" Value="#071019" />
+                                    <Setter TargetName="StepNumber" Property="FontWeight" Value="Bold" />
+                                    <Setter TargetName="StepTitle" Property="TextElement.Foreground" Value="#F4F7FB" />
+                                    <Setter TargetName="StepTitle" Property="TextElement.FontWeight" Value="SemiBold" />
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.45" />
+                                    <Setter Property="Cursor" Value="Arrow" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <!-- Каркас мастера: заголовок, шаги, содержимое и навигационные действия. -->
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="16" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="16" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Заголовок черновика и кнопки перехода назад/вперёд. -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="20" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock x:Name="MatchupEditorTitleTextBlock"
+                               Text="{Binding MainInformation.DisplayTitle}"
+                               Foreground="#F4F7FB"
+                               FontSize="{StaticResource Typography.FontSize.PageTitle}"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center" />
+                    <Border Background="#1B2A42"
+                            CornerRadius="10"
+                            Padding="9,4"
+                            Margin="12,0,0,0"
+                            VerticalAlignment="Center">
+                        <TextBlock Text="{Binding ModeLabel}"
+                                   Foreground="#A8B8CC"
+                                   FontSize="{StaticResource Typography.FontSize.Caption}"
+                                   FontWeight="SemiBold" />
+                    </Border>
+                </StackPanel>
+                <TextBlock x:Name="MatchupEditorStepSummaryTextBlock"
+                           Foreground="#8EA2BC"
+                           FontSize="{StaticResource Typography.FontSize.Body}"
+                           Margin="0,5,0,0">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Text" Value="{localization:Loc Coaching.MatchupEditor.StepSummary}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentStep}" Value="2">
+                                    <Setter Property="Text" Value="{localization:Loc Coaching.MatchupEditor.StepSummary.Champions}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding CurrentStep}" Value="3">
+                                    <Setter Property="Text" Value="{localization:Loc Coaching.MatchupEditor.StepSummary.Content}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding CurrentStep}" Value="4">
+                                    <Setter Property="Text" Value="{localization:Loc Coaching.MatchupEditor.StepSummary.Verification}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding CurrentStep}" Value="5">
+                                    <Setter Property="Text" Value="{localization:Loc Coaching.MatchupEditor.StepSummary.Save}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </StackPanel>
+
+            <StackPanel Grid.Column="2"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center">
+                <Button x:Name="CloseMatchupEditorButton"
+                        Content="{localization:Loc Coaching.MatchupEditor.Close}"
+                        Margin="0,0,10,0"
+                        Click="CloseMatchupEditorButton_Click">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsEditingExisting}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button x:Name="BackToPackTypeButton"
+                        Content="{localization:Loc Coaching.MatchupEditor.Back}"
+                        Style="{StaticResource SecondaryButton}"
+                        Click="BackToPackTypeButton_Click" />
+                <Button x:Name="MatchupEditorNextButton"
+                        Content="{localization:Loc Coaching.MatchupEditor.Next}"
+                        Margin="10,0,0,0"
+                        IsEnabled="{Binding CanMoveNext}"
+                        Click="MatchupEditorNextButton_Click"
+                        ToolTip="{localization:Loc Coaching.MatchupEditor.Placeholder}">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentStep}" Value="5">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button x:Name="SaveAndEnableButton"
+                        Content="{localization:Loc Coaching.MatchupEditor.Save.Action.Enable}"
+                        Margin="10,0,0,0"
+                        IsEnabled="{Binding Save.CanSave}"
+                        Click="SaveAndEnableButton_Click">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentStep}" Value="5">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsEditingExisting}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button x:Name="SaveDraftButton"
+                        Content="{localization:Loc Coaching.MatchupEditor.Save.Action.Draft}"
+                        Margin="10,0,0,0"
+                        IsEnabled="{Binding Save.CanSave}"
+                        Click="SaveDraftButton_Click">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentStep}" Value="5">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsEditingExisting}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button x:Name="SaveChangesButton"
+                        Content="{localization:Loc Coaching.MatchupEditor.Save.Action.Changes}"
+                        Margin="10,0,0,0"
+                        IsEnabled="{Binding Save.CanSave}"
+                        Click="SaveChangesButton_Click">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding CurrentStep}" Value="5" />
+                                        <Condition Binding="{Binding IsEditingExisting}" Value="True" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- Горизонтальная последовательность шагов; при недостатке ширины появляется прокрутка. -->
+        <Border x:Name="MatchupEditorStepsPanel"
+                Grid.Row="2"
+                Background="#101827"
+                BorderBrush="#263750"
+                BorderThickness="1"
+                CornerRadius="12"
+                Padding="12,10,8,8">
+            <ListBox x:Name="MatchupEditorStepsListBox"
+                     Style="{StaticResource EditorStepsListBox}"
+                     ItemContainerStyle="{StaticResource EditorStepItem}"
+                     SelectedIndex="{Binding CurrentStepIndex, Mode=OneWay}"
+                     PreviewMouseLeftButtonDown="MatchupEditorStepsListBox_PreviewMouseLeftButtonDown"
+                     SelectionChanged="MatchupEditorStepsListBox_SelectionChanged">
+                <ListBox.Resources>
+                    <Style TargetType="ListBoxItem" BasedOn="{StaticResource EditorStepItem}" />
+                    <Style TargetType="ScrollBar" BasedOn="{StaticResource ShellHorizontalScrollBar}" />
+                </ListBox.Resources>
+                <ListBoxItem Tag="1" Content="{localization:Loc Coaching.MatchupEditor.Step.Main}" IsEnabled="{Binding CanNavigateToStep1}" />
+                <ListBoxItem Tag="2" Content="{localization:Loc Coaching.MatchupEditor.Step.Champions}" IsEnabled="{Binding CanNavigateToStep2}" />
+                <ListBoxItem Tag="3" Content="{localization:Loc Coaching.MatchupEditor.Step.MatchupContent}" IsEnabled="{Binding CanNavigateToStep3}" />
+                <ListBoxItem Tag="4" Content="{localization:Loc Coaching.MatchupEditor.Step.Test}" IsEnabled="{Binding CanNavigateToStep4}" />
+                <ListBoxItem Tag="5" Content="{localization:Loc Coaching.MatchupEditor.Step.Save}" IsEnabled="{Binding CanNavigateToStep5}" />
+            </ListBox>
+        </Border>
+
+        <!-- Содержимое активного шага. Видимость отдельных View управляется ViewModel. -->
+        <ScrollViewer x:Name="MatchupEditorContentScrollViewer"
+                      Grid.Row="4"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <ScrollViewer.Resources>
+                <Style TargetType="ScrollBar" BasedOn="{StaticResource ShellScrollBar}" />
+            </ScrollViewer.Resources>
+            <Grid Margin="0,0,8,24">
+                <Grid>
+                    <views:MatchupMainInformationView x:Name="MatchupMainInformationPage"
+                                                      DataContext="{Binding MainInformation}">
+                        <views:MatchupMainInformationView.Style>
+                            <Style TargetType="views:MatchupMainInformationView">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DataContext.CurrentStep, RelativeSource={RelativeSource AncestorType={x:Type views:MatchupEditorView}}}"
+                                                 Value="1">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </views:MatchupMainInformationView.Style>
+                    </views:MatchupMainInformationView>
+                    <views:MatchupChampionsAndRoleView x:Name="MatchupChampionsAndRolePage"
+                                                       DataContext="{Binding ChampionsAndRole}">
+                        <views:MatchupChampionsAndRoleView.Style>
+                            <Style TargetType="views:MatchupChampionsAndRoleView">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DataContext.CurrentStep, RelativeSource={RelativeSource AncestorType={x:Type views:MatchupEditorView}}}"
+                                                 Value="2">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </views:MatchupChampionsAndRoleView.Style>
+                    </views:MatchupChampionsAndRoleView>
+                    <views:MatchupContentView x:Name="MatchupContentPage"
+                                              DataContext="{Binding Content}">
+                        <views:MatchupContentView.Style>
+                            <Style TargetType="views:MatchupContentView">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DataContext.CurrentStep, RelativeSource={RelativeSource AncestorType={x:Type views:MatchupEditorView}}}"
+                                                 Value="3">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </views:MatchupContentView.Style>
+                    </views:MatchupContentView>
+                    <views:MatchupVerificationView x:Name="MatchupVerificationPage"
+                                                   DataContext="{Binding Verification}">
+                        <views:MatchupVerificationView.Style>
+                            <Style TargetType="views:MatchupVerificationView">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DataContext.CurrentStep, RelativeSource={RelativeSource AncestorType={x:Type views:MatchupEditorView}}}"
+                                                 Value="4">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </views:MatchupVerificationView.Style>
+                    </views:MatchupVerificationView>
+                    <views:MatchupSaveView x:Name="MatchupSavePage"
+                                           DataContext="{Binding Save}">
+                        <views:MatchupSaveView.Style>
+                            <Style TargetType="views:MatchupSaveView">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DataContext.CurrentStep, RelativeSource={RelativeSource AncestorType={x:Type views:MatchupEditorView}}}"
+                                                 Value="5">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </views:MatchupSaveView.Style>
+                    </views:MatchupSaveView>
+                </Grid>
+            </Grid>
+        </ScrollViewer>
+
+        <!-- Модальный выбор чемпиона расположен поверх любого шага редактора. -->
+        <views:ChampionPickerDialogView x:Name="ChampionPickerDialog"
+                                        Grid.RowSpan="5"
+                                        Panel.ZIndex="20"
+                                        DataContext="{Binding ChampionsAndRole}">
+            <views:ChampionPickerDialogView.Style>
+                <Style TargetType="views:ChampionPickerDialogView">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsPickerOpen}" Value="True">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </views:ChampionPickerDialogView.Style>
+        </views:ChampionPickerDialogView>
+
+        <!-- Тот же каталог предметов позднее будет использовать раздел сборок и экспорта. -->
+        <views:ItemPickerDialogView x:Name="ItemPickerDialog"
+                                    Grid.RowSpan="5"
+                                    Panel.ZIndex="20"
+                                    DataContext="{Binding Content.ItemPicker}">
+            <views:ItemPickerDialogView.Style>
+                <Style TargetType="views:ItemPickerDialogView">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsOpen}" Value="True">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </views:ItemPickerDialogView.Style>
+        </views:ItemPickerDialogView>
+    </Grid>
+</UserControl>

@@ -22,13 +22,4 @@
     <ProjectReference Include="..\..\src\TempoCue.Core\TempoCue.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <!-- Копируем настоящий Coach Pack в папку тестов, чтобы проверять не только
-         тестовые правила в C#, но и JSON, который загружает приложение. -->
-    <Content Include="..\..\src\TempoCue.App\Assets\CoachPacks\urgot-vs-sett.json"
-             Link="Assets\CoachPacks\urgot-vs-sett.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
 </Project>

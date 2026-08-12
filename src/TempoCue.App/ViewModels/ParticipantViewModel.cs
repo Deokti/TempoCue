@@ -4,6 +4,7 @@ namespace TempoCue.App.ViewModels;
 public sealed record ParticipantViewModel(
     string RoleCode,
     string ChampionInitials,
+    Uri? ChampionImageUri,
     string ChampionName,
     string Details,
     string Kda,

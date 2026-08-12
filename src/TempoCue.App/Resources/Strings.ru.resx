@@ -9,6 +9,10 @@
   <data name="Header.Subtitle" xml:space="preserve"><value>Техническая версия · симулятор и подключение к активному матчу</value></data>
   <data name="Header.CoachPackLoaded" xml:space="preserve"><value>COACH PACK ЗАГРУЖЕН</value></data>
   <data name="Language.Tooltip" xml:space="preserve"><value>Язык интерфейса</value></data>
+  <data name="Validation.Length.Requirement" xml:space="preserve"><value>От {0} до {1} символов.</value></data>
+  <data name="Validation.Length.TooShort" xml:space="preserve"><value>{0} из минимум {1} символов. Максимум: {2}.</value></data>
+  <data name="Validation.Length.Valid" xml:space="preserve"><value>{0} из {1} символов.</value></data>
+  <data name="Validation.Length.TooLong" xml:space="preserve"><value>{0} символов; максимум — {1}.</value></data>
   <data name="Connection.WaitingMatch" xml:space="preserve"><value>ОЖИДАНИЕ МАТЧА</value></data>
   <data name="Connection.PollingEverySecond" xml:space="preserve"><value>Проверка Live Client Data каждую 1 с</value></data>
   <data name="Connection.NextPoll" xml:space="preserve"><value>Следующий запрос через 1 с</value></data>
@@ -34,10 +38,24 @@
   <data name="Advice.Waiting.Message" xml:space="preserve"><value>TempoCue опрашивает локальный Riot API каждую секунду. После загрузки на карту здесь появится совет для фактического состояния игры.</value></data>
   <data name="Advice.Waiting.Source" xml:space="preserve"><value>Ручной симулятор слева остаётся доступен для проверки Coach Pack без матча.</value></data>
   <data name="Advice.NoRule.Title" xml:space="preserve"><value>Подходящее правило не найдено</value></data>
-  <data name="Advice.NoRule.Message" xml:space="preserve"><value>В загруженном Coach Pack пока нет совета для выбранного состояния.</value></data>
-  <data name="Advice.NoRule.Source" xml:space="preserve"><value>Добавление новых матчапов станет отдельным этапом.</value></data>
+  <data name="Advice.NoRule.Message" xml:space="preserve"><value>В наборе «{0}» нет совета для текущего уровня и состояния игрока.</value></data>
+  <data name="Advice.NoRule.Source" xml:space="preserve"><value>Матчап определён, но ни одна его фаза сейчас не подходит.</value></data>
+  <data name="Advice.NoPack.Title" xml:space="preserve"><value>Набор для матчапа не найден</value></data>
+  <data name="Advice.NoPack.Message" xml:space="preserve"><value>Для этой пары чемпионов нет включённого Coach Pack.</value></data>
+  <data name="Advice.NoPack.Source" xml:space="preserve"><value>Создайте или включите подходящий набор в разделе «Коучинг».</value></data>
+  <data name="Advice.PackConflict.Title" xml:space="preserve"><value>Включено несколько подходящих наборов</value></data>
+  <data name="Advice.PackConflict.Message" xml:space="preserve"><value>Для этого матчапа одновременно подходят: {0}.</value></data>
+  <data name="Advice.PackConflict.Source" xml:space="preserve"><value>Отключите лишние наборы: TempoCue не выбирает рекомендацию случайно.</value></data>
+  <data name="Advice.LibraryUnavailable.Title" xml:space="preserve"><value>Библиотека советов недоступна</value></data>
+  <data name="Advice.LibraryUnavailable.Message" xml:space="preserve"><value>TempoCue не смог прочитать локальные Coach Packs.</value></data>
+  <data name="Advice.LibraryUnavailable.Source" xml:space="preserve"><value>Совет не показывается, пока состояние библиотеки неизвестно.</value></data>
+  <data name="Advice.MatchupUnavailable.Title" xml:space="preserve"><value>Матчап пока не определён</value></data>
+  <data name="Advice.MatchupUnavailable.Message" xml:space="preserve"><value>Не удалось однозначно определить противника активного игрока на линии.</value></data>
+  <data name="Advice.MatchupUnavailable.Source" xml:space="preserve"><value>TempoCue не угадывает соперника при неоднозначных данных матча.</value></data>
   <data name="Power.Waiting" xml:space="preserve"><value>ОЖИДАНИЕ</value></data>
   <data name="Power.NoRule" xml:space="preserve"><value>НЕТ ПРАВИЛА</value></data>
+  <data name="Power.PackConflict" xml:space="preserve"><value>КОНФЛИКТ НАБОРОВ</value></data>
+  <data name="Power.LibraryUnavailable" xml:space="preserve"><value>НЕТ ДАННЫХ</value></data>
   <data name="Power.Dangerous" xml:space="preserve"><value>ОПАСНО</value></data>
   <data name="Power.Cautious" xml:space="preserve"><value>ОСТОРОЖНО</value></data>
   <data name="Power.Playable" xml:space="preserve"><value>МОЖНО ИГРАТЬ</value></data>
@@ -69,9 +87,27 @@
   <data name="Count.Player.One" xml:space="preserve"><value>{0} игрок</value></data>
   <data name="Count.Player.Few" xml:space="preserve"><value>{0} игрока</value></data>
   <data name="Count.Player.Many" xml:space="preserve"><value>{0} игроков</value></data>
+  <data name="Count.Champion.One" xml:space="preserve"><value>{0} чемпион</value></data>
+  <data name="Count.Champion.Few" xml:space="preserve"><value>{0} чемпиона</value></data>
+  <data name="Count.Champion.Many" xml:space="preserve"><value>{0} чемпионов</value></data>
   <data name="Count.Item.One" xml:space="preserve"><value>{0} предмет</value></data>
   <data name="Count.Item.Few" xml:space="preserve"><value>{0} предмета</value></data>
   <data name="Count.Item.Many" xml:space="preserve"><value>{0} предметов</value></data>
+  <data name="Count.Advice.One" xml:space="preserve"><value>{0} совет</value></data>
+  <data name="Count.Advice.Few" xml:space="preserve"><value>{0} совета</value></data>
+  <data name="Count.Advice.Many" xml:space="preserve"><value>{0} советов</value></data>
+  <data name="Count.CoachPack.One" xml:space="preserve"><value>{0} набор советов</value></data>
+  <data name="Count.CoachPack.Few" xml:space="preserve"><value>{0} набора советов</value></data>
+  <data name="Count.CoachPack.Many" xml:space="preserve"><value>{0} наборов советов</value></data>
+  <data name="Count.CoachPackEnabled.One" xml:space="preserve"><value>{0} включён</value></data>
+  <data name="Count.CoachPackEnabled.Few" xml:space="preserve"><value>{0} включены</value></data>
+  <data name="Count.CoachPackEnabled.Many" xml:space="preserve"><value>{0} включено</value></data>
+  <data name="Count.CoachPackCreated.One" xml:space="preserve"><value>{0} создан вами</value></data>
+  <data name="Count.CoachPackCreated.Few" xml:space="preserve"><value>{0} созданы вами</value></data>
+  <data name="Count.CoachPackCreated.Many" xml:space="preserve"><value>{0} создано вами</value></data>
+  <data name="Count.CoachPackInvalid.One" xml:space="preserve"><value>{0} повреждённый набор пропущен.</value></data>
+  <data name="Count.CoachPackInvalid.Few" xml:space="preserve"><value>{0} повреждённых набора пропущены.</value></data>
+  <data name="Count.CoachPackInvalid.Many" xml:space="preserve"><value>{0} повреждённых наборов пропущено.</value></data>
   <data name="Nav.Home" xml:space="preserve"><value>Главная</value></data>
   <data name="Nav.CurrentMatch" xml:space="preserve"><value>Текущий матч</value></data>
   <data name="Nav.Coaching" xml:space="preserve"><value>Коучинг</value></data>
@@ -102,21 +138,21 @@
   <data name="Home.Readiness.Title" xml:space="preserve"><value>Готовность системы</value></data>
   <data name="Home.Readiness.Refresh" xml:space="preserve"><value>Обновление данных</value></data>
   <data name="Home.Readiness.Match" xml:space="preserve"><value>Активный матч</value></data>
+  <data name="Home.Readiness.CoachPacks" xml:space="preserve"><value>Наборы советов</value></data>
   <data name="Home.Readiness.Hint" xml:space="preserve"><value>Ничего нажимать не нужно: локальный адрес проверяется каждую секунду.</value></data>
   <data name="Home.Status.Waiting" xml:space="preserve"><value>ожидание</value></data>
   <data name="Home.Status.Connected" xml:space="preserve"><value>подключено</value></data>
   <data name="Home.Status.Error" xml:space="preserve"><value>ошибка</value></data>
   <data name="Home.Status.NotFound" xml:space="preserve"><value>не найден</value></data>
   <data name="Home.Status.Active" xml:space="preserve"><value>идёт</value></data>
-  <data name="Home.Pack.Title" xml:space="preserve"><value>Активный набор советов</value></data>
-  <data name="Home.Pack.Rules" xml:space="preserve"><value>Загружены 3 фазы матчапа</value></data>
-  <data name="Home.Pack.PatchWarning" xml:space="preserve"><value>Требует проверки на актуальном патче</value></data>
-  <data name="Home.Pack.Test" xml:space="preserve"><value>Открыть текущий матч</value></data>
+  <data name="Home.History.Title" xml:space="preserve"><value>История матчей</value></data>
+  <data name="Home.History.Development" xml:space="preserve"><value>В разработке</value></data>
+  <data name="Home.History.Description" xml:space="preserve"><value>Здесь появятся последние матчи и результаты работы коучинга.</value></data>
   <data name="Home.Available.Title" xml:space="preserve"><value>Что работает сейчас</value></data>
   <data name="Home.Available.LiveData" xml:space="preserve"><value>Подключение к Live Client Data</value></data>
   <data name="Home.Available.Participants" xml:space="preserve"><value>Все участники матча</value></data>
   <data name="Home.Available.Matchup" xml:space="preserve"><value>Определение матчапа на линии</value></data>
-  <data name="Home.Available.Advice" xml:space="preserve"><value>Советы Urgot против Sett</value></data>
+  <data name="Home.Available.Advice" xml:space="preserve"><value>Советы из локальной библиотеки</value></data>
   <data name="Home.Available.Json" xml:space="preserve"><value>Исходный JSON матча</value></data>
   <data name="Home.Available.Future" xml:space="preserve"><value>Анализ карты, история, отчёты и оверлей появятся в следующих версиях.</value></data>
   <data name="Current.Status.Connected" xml:space="preserve"><value>ДАННЫЕ МАТЧА ПОЛУЧЕНЫ</value></data>
@@ -139,6 +175,8 @@
   <data name="Current.Advice.WhyNow" xml:space="preserve"><value>Почему сейчас</value></data>
   <data name="Current.Advice.LevelReason" xml:space="preserve"><value>Совет выбран по реальному уровню {0} и предметам активного игрока.</value></data>
   <data name="Current.Advice.WaitingReason" xml:space="preserve"><value>После подключения совет будет выбран по реальному уровню и предметам активного игрока.</value></data>
+  <data name="Current.Advice.Pack" xml:space="preserve"><value>Набор: {0}</value></data>
+  <data name="Current.Advice.PackAndSource" xml:space="preserve"><value>Набор: {0} · Источник: {1}</value></data>
   <data name="Current.Objective.Title" xml:space="preserve"><value>Ближайшая цель</value></data>
   <data name="Current.Objective.Dragon" xml:space="preserve"><value>Дракон</value></data>
   <data name="Current.Objective.Pending" xml:space="preserve"><value>Тип и таймер появятся после отдельной логики игровых объектов.</value></data>
@@ -181,4 +219,564 @@
   <data name="Dragon.Hextech" xml:space="preserve"><value>Хекстековый</value></data>
   <data name="Dragon.Chemtech" xml:space="preserve"><value>Химтековый</value></data>
   <data name="Dragon.Elder" xml:space="preserve"><value>Старший</value></data>
+  <data name="Coaching.Title" xml:space="preserve"><value>Коучинг</value></data>
+  <data name="Coaching.Summary" xml:space="preserve"><value>1 набор советов · 1 включён · 0 созданы вами</value></data>
+  <data name="Coaching.Import" xml:space="preserve"><value>Импортировать файл</value></data>
+  <data name="Coaching.Import.Tooltip" xml:space="preserve"><value>Выбрать файл TempoCue Coach Pack</value></data>
+  <data name="Coaching.Import.Title" xml:space="preserve"><value>Импорт Coach Pack</value></data>
+  <data name="Coaching.Import.Subtitle" xml:space="preserve"><value>Проверьте данные набора перед добавлением в библиотеку.</value></data>
+  <data name="Coaching.Import.Dialog.Filter" xml:space="preserve"><value>TempoCue Coach Pack (*.tempocue.json)|*.tempocue.json|Файлы JSON (*.json)|*.json|Все файлы (*.*)|*.*</value></data>
+  <data name="Coaching.Import.Preview.Description.Empty" xml:space="preserve"><value>Автор не добавил описание.</value></data>
+  <data name="Coaching.Import.Preview.Author" xml:space="preserve"><value>Автор</value></data>
+  <data name="Coaching.Import.Preview.Language" xml:space="preserve"><value>Язык содержимого</value></data>
+  <data name="Coaching.Import.Preview.Patch" xml:space="preserve"><value>Игровой патч</value></data>
+  <data name="Coaching.Import.Preview.Contents" xml:space="preserve"><value>Содержимое</value></data>
+  <data name="Coaching.Import.Status.Loading.Title" xml:space="preserve"><value>Проверяем файл</value></data>
+  <data name="Coaching.Import.Status.Loading.Message" xml:space="preserve"><value>TempoCue проверяет версию схемы и содержимое Coach Pack.</value></data>
+  <data name="Coaching.Import.Status.Ready.Title" xml:space="preserve"><value>Можно импортировать</value></data>
+  <data name="Coaching.Import.Status.Ready.Message" xml:space="preserve"><value>Файл корректен. Coach Pack будет добавлен выключенным, чтобы вы сначала могли его проверить.</value></data>
+  <data name="Coaching.Import.Status.Replacement.Title" xml:space="preserve"><value>Импортированный набор уже установлен</value></data>
+  <data name="Coaching.Import.Status.Replacement.Message" xml:space="preserve"><value>Заменить локальную установку «{0}»? Её состояние «включён» или «выключен» сохранится.</value></data>
+  <data name="Coaching.Import.Status.CreatedConflict.Title" xml:space="preserve"><value>У вашего Coach Pack такой же идентификатор</value></data>
+  <data name="Coaching.Import.Status.CreatedConflict.Message" xml:space="preserve"><value>«{0}» создан вами и не будет перезаписан. Измените идентификатор импортируемого набора или сохраните его отдельной копией.</value></data>
+  <data name="Coaching.Import.Status.BuiltInConflict.Title" xml:space="preserve"><value>У встроенного Coach Pack такой же идентификатор</value></data>
+  <data name="Coaching.Import.Status.BuiltInConflict.Message" xml:space="preserve"><value>«{0}» поставляется вместе с TempoCue и не может быть заменён локальным файлом.</value></data>
+  <data name="Coaching.Import.Status.Invalid.Title" xml:space="preserve"><value>Некорректный файл Coach Pack</value></data>
+  <data name="Coaching.Import.Status.Invalid.Message" xml:space="preserve"><value>JSON повреждён, использует неподдерживаемую схему или содержит противоречивые данные Coach Pack.</value></data>
+  <data name="Coaching.Import.Status.ReadFailed.Title" xml:space="preserve"><value>Не удалось прочитать файл</value></data>
+  <data name="Coaching.Import.Status.ReadFailed.Message" xml:space="preserve"><value>Проверьте, что файл существует и TempoCue разрешено его открывать.</value></data>
+  <data name="Coaching.Import.Status.SaveFailed.Title" xml:space="preserve"><value>Не удалось импортировать Coach Pack</value></data>
+  <data name="Coaching.Import.Status.SaveFailed.Message" xml:space="preserve"><value>TempoCue не удалось сохранить «{0}» в локальную библиотеку. Существующий набор намеренно не изменялся.</value></data>
+  <data name="Coaching.Import.Action.Import" xml:space="preserve"><value>Импортировать</value></data>
+  <data name="Coaching.Import.Action.Replace" xml:space="preserve"><value>Заменить установку</value></data>
+  <data name="Coaching.Import.Action.Cancel" xml:space="preserve"><value>Отмена</value></data>
+  <data name="Coaching.Create" xml:space="preserve"><value>Создать набор советов</value></data>
+  <data name="Coaching.PlannedTooltip" xml:space="preserve"><value>Импорт и редактор правил появятся в следующей итерации.</value></data>
+  <data name="Coaching.Tab.Matchups" xml:space="preserve"><value>Матчапы</value></data>
+  <data name="Coaching.Tab.MapControl" xml:space="preserve"><value>Контроль игры</value></data>
+  <data name="Coaching.Tab.MyPacks" xml:space="preserve"><value>Мои наборы</value></data>
+  <data name="Coaching.Library.Search" xml:space="preserve"><value>Поиск по чемпиону, набору или автору</value></data>
+  <data name="Coaching.Library.Matchup" xml:space="preserve"><value>{0} против {1}</value></data>
+  <data name="Coaching.Library.Card.Details" xml:space="preserve"><value>{0} · {1}</value></data>
+  <data name="Coaching.Library.State.Enabled" xml:space="preserve"><value>Включён</value></data>
+  <data name="Coaching.Library.State.Draft" xml:space="preserve"><value>Черновик</value></data>
+  <data name="Coaching.Library.State.Disabled" xml:space="preserve"><value>Выключен</value></data>
+  <data name="Coaching.Library.Toggle" xml:space="preserve"><value>Включить или выключить этот матчап</value></data>
+  <data name="Coaching.Library.StateChangeFailed" xml:space="preserve"><value>Не удалось сохранить состояние матчапа.</value></data>
+  <data name="Coaching.Library.DeleteFailed" xml:space="preserve"><value>Не удалось удалить Coach Pack.</value></data>
+  <data name="Coaching.Library.Deleted" xml:space="preserve"><value>Coach Pack «{0}» удалён с этого устройства.</value></data>
+  <data name="Coaching.Library.Imported" xml:space="preserve"><value>Coach Pack «{0}» импортирован в локальную библиотеку.</value></data>
+  <data name="Coaching.Library.Exported" xml:space="preserve"><value>Coach Pack «{0}» экспортирован в файл.</value></data>
+  <data name="Coaching.Library.ExportFailed" xml:space="preserve"><value>Не удалось экспортировать Coach Pack в файл.</value></data>
+  <data name="Coaching.Library.Origin.BuiltIn" xml:space="preserve"><value>Встроенный</value></data>
+  <data name="Coaching.Library.Origin.Created" xml:space="preserve"><value>Создан вами</value></data>
+  <data name="Coaching.Library.Origin.Imported" xml:space="preserve"><value>Добавлен из библиотеки</value></data>
+  <data name="Coaching.Library.Author.TempoCue" xml:space="preserve"><value>TempoCue</value></data>
+  <data name="Coaching.Library.Role.Any" xml:space="preserve"><value>Любая роль</value></data>
+  <data name="Coaching.Library.Language.Russian" xml:space="preserve"><value>Русский</value></data>
+  <data name="Coaching.Library.Language.English" xml:space="preserve"><value>Английский</value></data>
+  <data name="Coaching.Library.Language.Unknown" xml:space="preserve"><value>Язык не указан</value></data>
+  <data name="Coaching.Library.Patch" xml:space="preserve"><value>Патч {0}</value></data>
+  <data name="Coaching.Library.Open" xml:space="preserve"><value>Открыть</value></data>
+  <data name="Coaching.Library.Open.Planned" xml:space="preserve"><value>Экран подробностей набора появится в следующей итерации.</value></data>
+  <data name="Coaching.Library.LoadFailed" xml:space="preserve"><value>Не удалось прочитать локально сохранённые наборы советов.</value></data>
+  <data name="Coaching.Library.Empty.Matchups" xml:space="preserve"><value>Матчапы не найдены</value></data>
+  <data name="Coaching.Library.Empty.SearchHint" xml:space="preserve"><value>Очистите поиск или создайте новый набор советов.</value></data>
+  <data name="Coaching.Update.WarningTitle" xml:space="preserve"><value>Набор требует проверки патча</value></data>
+  <data name="Coaching.Update.WarningDescription" xml:space="preserve"><value>Метаданные набора: {0}. До проверки советы считаются черновыми.</value></data>
+  <data name="Coaching.Matchups.LibraryTitle" xml:space="preserve"><value>Установленные матчапы</value></data>
+  <data name="Coaching.Pack.Rules" xml:space="preserve"><value>{0} правил</value></data>
+  <data name="Coaching.Pack.Patch" xml:space="preserve"><value>Патч: {0}</value></data>
+  <data name="Coaching.Pack.DetailsTitle" xml:space="preserve"><value>Правила набора</value></data>
+  <data name="Coaching.Pack.VerificationRequired" xml:space="preserve"><value>Требует проверки</value></data>
+  <data name="Coaching.Rule.LevelRange" xml:space="preserve"><value>ур. {0}–{1}</value></data>
+  <data name="Coaching.Rule.LevelFrom" xml:space="preserve"><value>ур. {0}+</value></data>
+  <data name="Coaching.Rule.Source" xml:space="preserve"><value>Источник: {0}</value></data>
+  <data name="Coaching.Power.Dangerous" xml:space="preserve"><value>Опасно</value></data>
+  <data name="Coaching.Power.Cautious" xml:space="preserve"><value>Осторожно</value></data>
+  <data name="Coaching.Power.Playable" xml:space="preserve"><value>Можно играть</value></data>
+  <data name="Coaching.Power.Favorable" xml:space="preserve"><value>Преимущество</value></data>
+  <data name="Coaching.Empty.MapControl.Title" xml:space="preserve"><value>Наборов контроля карты пока нет</value></data>
+  <data name="Coaching.Empty.MapControl.Description" xml:space="preserve"><value>Здесь будут общие правила: пропажа соперников, перемещения лесника, тайминги объектов и другие события карты.</value></data>
+  <data name="Coaching.Empty.MyPacks.Title" xml:space="preserve"><value>Вы ещё не создавали наборы</value></data>
+  <data name="Coaching.Empty.MyPacks.Description" xml:space="preserve"><value>В следующей итерации здесь появятся черновики и наборы, созданные через визуальный редактор без ручного JSON.</value></data>
+  <data name="Coaching.Sharing.Title" xml:space="preserve"><value>Как будут распространяться наборы сообщества</value></data>
+  <data name="Coaching.Sharing.Description" xml:space="preserve"><value>Сначала — через безопасный импорт и экспорт версионированного файла Coach Pack. Позже этот же формат сможет использовать каталог сообщества.</value></data>
+  <data name="Coaching.Sharing.CommunityPlacement" xml:space="preserve"><value>Установленные наборы других авторов появятся в «Матчапах» или «Контроле карты». В «Моих наборах» останутся только созданные вами.</value></data>
+  <data name="Coaching.NewPack.Back" xml:space="preserve"><value>Назад в библиотеку</value></data>
+  <data name="Coaching.NewPack.Title" xml:space="preserve"><value>Какой набор советов создаём?</value></data>
+  <data name="Coaching.NewPack.Description" xml:space="preserve"><value>Тип определяет, какие вопросы задаст редактор. Позже его можно поменять только пересозданием набора.</value></data>
+  <data name="Coaching.NewPack.ConstructorAsks" xml:space="preserve"><value>Редактор спросит про</value></data>
+  <data name="Coaching.NewPack.Matchup.Title" xml:space="preserve"><value>Матчап</value></data>
+  <data name="Coaching.NewPack.Matchup.Description" xml:space="preserve"><value>Расскажите игроку, как действовать против конкретного чемпиона на разных этапах матча.</value></data>
+  <data name="Coaching.NewPack.Matchup.PromptItems" xml:space="preserve"><value>двух чемпионов и роль · фазы по уровням · рекомендуемые предметы · текст советов</value></data>
+  <data name="Coaching.NewPack.Matchup.Start" xml:space="preserve"><value>Начать · шаг 1 из 7</value></data>
+  <data name="Coaching.NewPack.GameControl.Title" xml:space="preserve"><value>Контроль игры</value></data>
+  <data name="Coaching.NewPack.GameControl.Description" xml:space="preserve"><value>Создайте напоминания о карте, гангах, объектах, пропавших противниках и других игровых событиях.</value></data>
+  <data name="Coaching.NewPack.GameControl.PromptItems" xml:space="preserve"><value>роль и режим · игровую ситуацию из шаблонов · условия по времени и карте · способ показа</value></data>
+  <data name="Coaching.NewPack.GameControl.Unavailable" xml:space="preserve"><value>Недоступно в этой итерации</value></data>
+  <data name="Coaching.NewPack.Soon" xml:space="preserve"><value>Скоро</value></data>
+  <data name="Coaching.MatchupEditor.Back" xml:space="preserve"><value>Назад</value></data>
+  <data name="Coaching.MatchupEditor.Close" xml:space="preserve"><value>Закрыть редактор</value></data>
+  <data name="Coaching.MatchupEditor.Next" xml:space="preserve"><value>Дальше</value></data>
+  <data name="Coaching.MatchupEditor.Mode.Simple" xml:space="preserve"><value>Простой</value></data>
+  <data name="Coaching.MatchupEditor.Mode.Advanced" xml:space="preserve"><value>Расширенный</value></data>
+  <data name="Coaching.MatchupEditor.Title" xml:space="preserve"><value>Новый матчап</value></data>
+  <data name="Coaching.MatchupEditor.Draft" xml:space="preserve"><value>Черновик</value></data>
+  <data name="Coaching.MatchupEditor.Mode.Edit" xml:space="preserve"><value>Редактирование</value></data>
+  <data name="Coaching.MatchupEditor.Mode.Copy" xml:space="preserve"><value>Своя копия</value></data>
+  <data name="Coaching.MatchupEditor.CopyName" xml:space="preserve"><value>{0} — моя копия</value></data>
+  <data name="Coaching.MatchupEditor.StepSummary" xml:space="preserve"><value>Шаг 1 из 5 · Основная информация</value></data>
+  <data name="Coaching.MatchupEditor.Step.Main" xml:space="preserve"><value>Основная информация</value></data>
+  <data name="Coaching.MatchupEditor.Step.Champions" xml:space="preserve"><value>Чемпионы и роль</value></data>
+  <data name="Coaching.MatchupEditor.Step.MatchupContent" xml:space="preserve"><value>Содержание матчапа</value></data>
+  <data name="Coaching.MatchupEditor.Step.Phases" xml:space="preserve"><value>Фазы матчапа</value></data>
+  <data name="Coaching.MatchupEditor.Step.Conditions" xml:space="preserve"><value>Условия</value></data>
+  <data name="Coaching.MatchupEditor.Step.Content" xml:space="preserve"><value>Содержание совета</value></data>
+  <data name="Coaching.MatchupEditor.Step.Test" xml:space="preserve"><value>Проверка</value></data>
+  <data name="Coaching.MatchupEditor.Step.Save" xml:space="preserve"><value>Сохранение</value></data>
+  <data name="Coaching.MatchupEditor.Placeholder" xml:space="preserve"><value>Каркас редактора готов. Поля этого шага появятся в следующей проверяемой итерации.</value></data>
+  <data name="Coaching.MatchupEditor.Main.Description" xml:space="preserve"><value>Эти данные видны в библиотеке и в журнале советов во время матча.</value></data>
+  <data name="Coaching.MatchupEditor.Main.PackName" xml:space="preserve"><value>Название набора</value></data>
+  <data name="Coaching.MatchupEditor.Main.PackName.Hint" xml:space="preserve"><value>От 3 до 80 символов. Чемпионы выбираются на следующем шаге.</value></data>
+  <data name="Coaching.MatchupEditor.Main.ShortDescription" xml:space="preserve"><value>Краткое описание</value></data>
+  <data name="Coaching.MatchupEditor.Main.ShortDescription.Hint" xml:space="preserve"><value>Опишите цель набора в 10–240 символах.</value></data>
+  <data name="Coaching.MatchupEditor.Main.Author" xml:space="preserve"><value>Автор</value></data>
+  <data name="Coaching.MatchupEditor.Main.AdviceLanguage" xml:space="preserve"><value>Язык содержимого</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch" xml:space="preserve"><value>Игровой патч</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch.Hint" xml:space="preserve"><value>Выберите патч, на котором рекомендации проверялись в последний раз.</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch.Current" xml:space="preserve"><value>{0} — текущий</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch.Loading" xml:space="preserve"><value>Загружаем патчи…</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch.LoadError" xml:space="preserve"><value>Не удалось загрузить патчи.</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch.Retry" xml:space="preserve"><value>Повторить</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch.UsingCache" xml:space="preserve"><value>Показан последний сохранённый список патчей.</value></data>
+  <data name="Coaching.MatchupEditor.Main.VerifiedOn" xml:space="preserve"><value>Дата последней проверки</value></data>
+  <data name="Coaching.MatchupEditor.Main.VerifiedOn.Hint" xml:space="preserve"><value>Пока используется дата создания черновика.</value></data>
+  <data name="Coaching.MatchupEditor.Main.LanguageNote.Title" xml:space="preserve"><value>О языке набора</value></data>
+  <data name="Coaching.MatchupEditor.Main.LanguageNote.Description" xml:space="preserve"><value>Интерфейс TempoCue переключается между языками, но текст вашего набора остаётся таким, каким вы его написали — автоматического перевода содержимого нет.</value></data>
+  <data name="Coaching.MatchupEditor.Main.Source" xml:space="preserve"><value>Откуда информация</value></data>
+  <data name="Coaching.MatchupEditor.Main.Source.Personal" xml:space="preserve"><value>Личный опыт</value></data>
+  <data name="Coaching.MatchupEditor.Main.Source.Article" xml:space="preserve"><value>Статья</value></data>
+  <data name="Coaching.MatchupEditor.Main.Source.Video" xml:space="preserve"><value>Видео</value></data>
+  <data name="Coaching.MatchupEditor.Main.Source.Guide" xml:space="preserve"><value>Гайд</value></data>
+  <data name="Coaching.MatchupEditor.Main.Source.Personal.Hint" xml:space="preserve"><value>Личный опыт — полноценный источник, ссылка не требуется.</value></data>
+  <data name="Coaching.MatchupEditor.Main.Source.Link.Hint" xml:space="preserve"><value>Добавьте прямую ссылку, чтобы другие игроки могли проверить рекомендацию.</value></data>
+  <data name="Coaching.MatchupEditor.Main.SourceUrl" xml:space="preserve"><value>Ссылка на источник</value></data>
+  <data name="Coaching.MatchupEditor.Main.Preview.Title" xml:space="preserve"><value>Так это увидит игрок</value></data>
+  <data name="Coaching.MatchupEditor.Main.Preview.Live" xml:space="preserve"><value>обновляется на ходу</value></data>
+  <data name="Coaching.MatchupEditor.Main.Preview.Matchup" xml:space="preserve"><value>Матчап</value></data>
+  <data name="Coaching.MatchupEditor.Main.Preview.EmptyName" xml:space="preserve"><value>Здесь появится название набора</value></data>
+  <data name="Coaching.MatchupEditor.Main.Preview.EmptyDescription" xml:space="preserve"><value>Добавьте краткое описание, чтобы объяснить назначение набора.</value></data>
+  <data name="Coaching.MatchupEditor.Main.Preview.EmptyAuthor" xml:space="preserve"><value>Автор пока не указан</value></data>
+  <data name="Coaching.MatchupEditor.Main.Readiness.Title" xml:space="preserve"><value>Готовность набора</value></data>
+  <data name="Coaching.MatchupEditor.Main.Readiness.Pending" xml:space="preserve"><value>нужны данные</value></data>
+  <data name="Coaching.MatchupEditor.Main.Readiness.Complete" xml:space="preserve"><value>заполнено</value></data>
+  <data name="Coaching.MatchupEditor.Main.Readiness.LinkRequired" xml:space="preserve"><value>нужна ссылка</value></data>
+  <data name="Coaching.MatchupEditor.Main.Readiness.SourceReady" xml:space="preserve"><value>указан</value></data>
+  <data name="Coaching.MatchupEditor.Main.Readiness.NextIteration" xml:space="preserve"><value>Следующий шаг станет доступен после отдельной проверяемой итерации.</value></data>
+  <data name="Coaching.MatchupEditor.StepSummary.Champions" xml:space="preserve"><value>Шаг 2 из 5 · Чемпионы и роль</value></data>
+  <data name="Coaching.MatchupEditor.StepSummary.Content" xml:space="preserve"><value>Шаг 3 из 5 · Содержание матчапа</value></data>
+  <data name="Coaching.MatchupEditor.Content.Tab.Phases" xml:space="preserve"><value>Фазы {0}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Tab.Persistent" xml:space="preserve"><value>Постоянные подсказки {0}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Tab.Items" xml:space="preserve"><value>Предметы {0}</value></data>
+  <data name="Coaching.MatchupEditor.Content.FutureSection" xml:space="preserve"><value>Будет доступно в следующей итерации шага 3</value></data>
+  <data name="Coaching.MatchupEditor.Content.PhasesTitle" xml:space="preserve"><value>Фазы матчапа</value></data>
+  <data name="Coaching.MatchupEditor.Content.PhasesDescription" xml:space="preserve"><value>Разделите матчап на понятные периоды. Порядок карточек задаёт последовательность чтения и будущий стабильный порядок правил.</value></data>
+  <data name="Coaching.MatchupEditor.Content.AddPhase" xml:space="preserve"><value>+ Добавить фазу</value></data>
+  <data name="Coaching.MatchupEditor.Content.Empty.Title" xml:space="preserve"><value>Фаз пока нет</value></data>
+  <data name="Coaching.MatchupEditor.Content.Empty.Description" xml:space="preserve"><value>Добавьте первую фазу и укажите, на каких уровнях действует её основной совет.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Status.EmptyTitle" xml:space="preserve"><value>Добавьте первую фазу</value></data>
+  <data name="Coaching.MatchupEditor.Content.Status.EmptyDescription" xml:space="preserve"><value>На этом шаге будет храниться содержание советов для разных периодов матчапа.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Status.DraftTitle" xml:space="preserve"><value>Черновик фаз заполнен</value></data>
+  <data name="Coaching.MatchupEditor.Content.Status.DraftDescription" xml:space="preserve"><value>Фазы сохраняются при переходах между шагами. Проверка пересечений появится вместе с расширенными условиями.</value></data>
+  <data name="Coaching.MatchupEditor.Content.NextIteration.Title" xml:space="preserve"><value>Следующая итерация</value></data>
+  <data name="Coaching.MatchupEditor.Content.NextIteration.Description" xml:space="preserve"><value>Добавим постоянные подсказки и группы сборки. Сейчас доступны фазы по уровням, рекомендуемые предметы, содержание совета и проверка согласованности.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.AddTitle" xml:space="preserve"><value>Новая фаза</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.EditTitle" xml:space="preserve"><value>Редактирование фазы: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.Description" xml:space="preserve"><value>Укажите период и рекомендацию. Изменения применятся к списку только после нажатия «Готово».</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.Name" xml:space="preserve"><value>Название фазы</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.PowerState" xml:space="preserve"><value>Уровень опасности</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.MinimumLevel" xml:space="preserve"><value>Начинается с уровня</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.MaximumLevel" xml:space="preserve"><value>Заканчивается на уровне</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.ToEnd" xml:space="preserve"><value>До конца матча</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.MeaningTitle" xml:space="preserve"><value>Что это значит</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.MeaningRange" xml:space="preserve"><value>Фаза активна на уровнях {0}–{1}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.MeaningToEnd" xml:space="preserve"><value>Фаза активна на уровнях {0}+</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.MeaningRecommendedItemsSuffix" xml:space="preserve"><value>. Ориентир по предметам: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.ItemsTitle" xml:space="preserve"><value>Рекомендуемые предметы</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.ItemsDescription" xml:space="preserve"><value>Укажите только важные покупки для этой фазы. Они помогают игроку, но не влияют на выбор совета.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.RecommendedItemsTitle" xml:space="preserve"><value>Ориентир для этой фазы</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.RecommendedItemsDescription" xml:space="preserve"><value>Например, стартовая покупка или следующий ключевой предмет. Полный инвентарь перечислять не нужно.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.PrimaryAdvice" xml:space="preserve"><value>Главный совет</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.PrimaryAdviceHint" xml:space="preserve"><value>(его видит игрок первым)</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.WhyNow" xml:space="preserve"><value>Почему сейчас</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.WhyNowHint" xml:space="preserve"><value>(короткое объяснение)</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.NextGoal" xml:space="preserve"><value>Следующая цель</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.NextGoalHint" xml:space="preserve"><value>(что приблизит смену фазы)</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.Cancel" xml:space="preserve"><value>Отмена</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.Done" xml:space="preserve"><value>Готово</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.DeletePhase" xml:space="preserve"><value>Удалить фазу</value></data>
+  <data name="Coaching.MatchupEditor.Content.Edit" xml:space="preserve"><value>Редактировать</value></data>
+  <data name="Coaching.MatchupEditor.Content.Duplicate" xml:space="preserve"><value>Дублировать</value></data>
+  <data name="Coaching.MatchupEditor.Content.Phase.RecommendedItems" xml:space="preserve"><value>Рекомендуемые предметы: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Editor.AddTitle" xml:space="preserve"><value>Новая подсказка</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Editor.EditTitle" xml:space="preserve"><value>Редактирование подсказки: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Editor.Progress" xml:space="preserve"><value>Подсказка {0} из {1}</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.DefaultTitle" xml:space="preserve"><value>Новая подсказка</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Title" xml:space="preserve"><value>Заголовок</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Text" xml:space="preserve"><value>Текст подсказки</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Scope" xml:space="preserve"><value>Где применима</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Scope.WholeMatch" xml:space="preserve"><value>Весь матч</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Scope.Phase" xml:space="preserve"><value>Фаза {0}: {1}</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Source" xml:space="preserve"><value>Источник</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Source.UseCustom" xml:space="preserve"><value>Указать отдельный источник</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Source.InheritedHint" xml:space="preserve"><value>Подсказка будет использовать источник набора, указанный на шаге сохранения.</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Source.Inherited" xml:space="preserve"><value>Источник: источник набора</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Source.Custom" xml:space="preserve"><value>Источник: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.ListTitle" xml:space="preserve"><value>Постоянные подсказки</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Description" xml:space="preserve"><value>Механические знания, которые нельзя привязать к точному моменту через Live Client Data. Они доступны в деталях матчапа и показываются оверлеем по одной подсказке при подходящем повышении уровня, не заменяя совет активной фазы.</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Add" xml:space="preserve"><value>+ Добавить подсказку</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Empty" xml:space="preserve"><value>Постоянных подсказок пока нет. Добавьте знание, полезное весь матч или в выбранной фазе.</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Difference.Title" xml:space="preserve"><value>Чем это отличается от фазы</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Difference.Phase.Title" xml:space="preserve"><value>Фаза</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Difference.Phase.Text" xml:space="preserve"><value>Активна в конкретный момент. Показывается как главный совет и может попасть в оверлей.</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Difference.Persistent.Title" xml:space="preserve"><value>Постоянная подсказка</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Difference.Persistent.Text" xml:space="preserve"><value>Доступна в деталях матчапа по запросу и может появляться в оверлее по одной подсказке при повышении уровня. Главный совет она не подменяет.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.AddTitle" xml:space="preserve"><value>Новый блок предметов</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.EditTitle" xml:space="preserve"><value>Редактирование блока: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.Description" xml:space="preserve"><value>Назовите блок и при необходимости объясните, когда его выбирать. Предметы добавляются отдельно.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.Name" xml:space="preserve"><value>Название блока</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.WhenToChoose" xml:space="preserve"><value>Когда выбирать (необязательно)</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.WhenToChooseHint" xml:space="preserve"><value>Например: когда у противников преимущественно физический урон.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.Delete" xml:space="preserve"><value>Удалить блок</value></data>
+  <data name="Coaching.MatchupEditor.Items.ListTitle" xml:space="preserve"><value>Блоки предметов</value></data>
+  <data name="Coaching.MatchupEditor.Items.Description" xml:space="preserve"><value>Создавайте собственные категории. Их названия и порядок сохранятся при будущем экспорте набора предметов в League.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Add" xml:space="preserve"><value>+ Добавить блок</value></data>
+  <data name="Coaching.MatchupEditor.Items.Empty" xml:space="preserve"><value>Блоков предметов пока нет. Добавьте стартовую покупку, ботинки под ситуацию, ключевую сборку или любую категорию для этого матчапа.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Card.ItemCount" xml:space="preserve"><value>Предметов: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Items.Card.NoHint" xml:space="preserve"><value>Пояснение «когда выбирать» не добавлено</value></data>
+  <data name="Coaching.MatchupEditor.Items.Card.Empty" xml:space="preserve"><value>В этом блоке пока нет предметов.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.ItemsTitle" xml:space="preserve"><value>Предметы блока</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.ItemsDescription" xml:space="preserve"><value>Добавьте покупки и расположите их в том порядке, в котором игрок увидит их в League.</value></data>
+  <data name="Coaching.MatchupEditor.Items.AddItem" xml:space="preserve"><value>+ Предмет</value></data>
+  <data name="Coaching.MatchupEditor.Items.Item.MoveLeft" xml:space="preserve"><value>Переместить предмет влево</value></data>
+  <data name="Coaching.MatchupEditor.Items.Item.MoveRight" xml:space="preserve"><value>Переместить предмет вправо</value></data>
+  <data name="Coaching.MatchupEditor.Items.MoveUp" xml:space="preserve"><value>Переместить блок выше</value></data>
+  <data name="Coaching.MatchupEditor.Items.MoveDown" xml:space="preserve"><value>Переместить блок ниже</value></data>
+  <data name="Coaching.MatchupEditor.Items.Help.Title" xml:space="preserve"><value>Как работают блоки</value></data>
+  <data name="Coaching.MatchupEditor.Items.Help.Text" xml:space="preserve"><value>Блоки не являются фиксированными системными категориями. Автор сам задаёт название, необязательный сценарий выбора, порядок и позже — предметы внутри.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Export.Title" xml:space="preserve"><value>Что попадёт в League</value></data>
+  <data name="Coaching.MatchupEditor.Items.Export.Text" xml:space="preserve"><value>League понимает названия блоков, их порядок и ID предметов. Фазы матчапа, советы и условия остаются в TempoCue.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Loading" xml:space="preserve"><value>Загружаем предметы выбранного патча…</value></data>
+  <data name="Coaching.MatchupEditor.Items.ErrorTitle" xml:space="preserve"><value>Каталог предметов недоступен</value></data>
+  <data name="Coaching.MatchupEditor.Items.ErrorDescription" xml:space="preserve"><value>Можно сохранить фазу без рекомендаций предметов или повторить загрузку.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Retry" xml:space="preserve"><value>Повторить</value></data>
+  <data name="Coaching.MatchupEditor.Items.Select" xml:space="preserve"><value>Выбрать предметы</value></data>
+  <data name="Coaching.MatchupEditor.Items.Change" xml:space="preserve"><value>Изменить</value></data>
+  <data name="Coaching.MatchupEditor.Items.Remove" xml:space="preserve"><value>Убрать предмет</value></data>
+  <data name="Coaching.MatchupEditor.Items.CatalogLoaded" xml:space="preserve"><value>Загружено предметов: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.Title" xml:space="preserve"><value>Выберите предмет</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.Description" xml:space="preserve"><value>Выберите один или несколько предметов из каталога указанного патча.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.RecommendationsTitle" xml:space="preserve"><value>Выберите рекомендуемые предметы</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.RecommendationsDescription" xml:space="preserve"><value>Добавьте только покупки, на которые игроку стоит ориентироваться в этой фазе.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.BlockTitle" xml:space="preserve"><value>Выберите предметы для блока</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.BlockDescription" xml:space="preserve"><value>Выберите одну или несколько покупок. После выбора их порядок можно изменить внутри блока.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.Search" xml:space="preserve"><value>Поиск по названию предмета</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.Price" xml:space="preserve"><value>{0} золота</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.Technical" xml:space="preserve"><value>ID {0} · {1} · патч {2}</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.SelectForDetails" xml:space="preserve"><value>Выберите предмет, чтобы увидеть его стоимость, характеристики и описание.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.NoResults" xml:space="preserve"><value>По выбранным фильтрам предметы не найдены.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.NoStats" xml:space="preserve"><value>Data Dragon не передаёт числовые характеристики этого предмета.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.SourceNote" xml:space="preserve"><value>Предметы, доступные для покупки на Ущелье призывателей в выбранном патче</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.Cancel" xml:space="preserve"><value>Отмена</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.Confirm" xml:space="preserve"><value>Выбрать</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.SelectedCount" xml:space="preserve"><value>Выбрано: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.ConfirmMultiple" xml:space="preserve"><value>Применить · {0}</value></data>
+  <data name="Coaching.MatchupEditor.Items.Category.All" xml:space="preserve"><value>Все</value></data>
+  <data name="Coaching.MatchupEditor.Items.Category.Starter" xml:space="preserve"><value>Стартовые</value></data>
+  <data name="Coaching.MatchupEditor.Items.Category.Boots" xml:space="preserve"><value>Ботинки</value></data>
+  <data name="Coaching.MatchupEditor.Items.Category.Basic" xml:space="preserve"><value>Базовые</value></data>
+  <data name="Coaching.MatchupEditor.Items.Category.Epic" xml:space="preserve"><value>Эпические</value></data>
+  <data name="Coaching.MatchupEditor.Items.Category.Legendary" xml:space="preserve"><value>Легендарные</value></data>
+  <data name="Coaching.MatchupEditor.Items.Sort.Name" xml:space="preserve"><value>По названию</value></data>
+  <data name="Coaching.MatchupEditor.Items.Sort.PriceAscending" xml:space="preserve"><value>Сначала дешёвые</value></data>
+  <data name="Coaching.MatchupEditor.Items.Sort.PriceDescending" xml:space="preserve"><value>Сначала дорогие</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.Health" xml:space="preserve"><value>Здоровье</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.Mana" xml:space="preserve"><value>Мана</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.AttackDamage" xml:space="preserve"><value>Сила атаки</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.AbilityPower" xml:space="preserve"><value>Сила умений</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.Armor" xml:space="preserve"><value>Броня</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.MagicResistance" xml:space="preserve"><value>Сопротивление магии</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.MoveSpeed" xml:space="preserve"><value>Скорость передвижения</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.MoveSpeedPercent" xml:space="preserve"><value>Скорость передвижения</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.AttackSpeed" xml:space="preserve"><value>Скорость атаки</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.LifeSteal" xml:space="preserve"><value>Вампиризм</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.CriticalStrikeChance" xml:space="preserve"><value>Шанс критического удара</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.HealthRegen" xml:space="preserve"><value>Восстановление здоровья</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.ManaRegen" xml:space="preserve"><value>Восстановление маны</value></data>
+  <data name="Coaching.MatchupEditor.Content.Delete" xml:space="preserve"><value>Удалить</value></data>
+  <data name="Coaching.MatchupEditor.Content.DuplicateName" xml:space="preserve"><value>{0} — копия</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Description" xml:space="preserve"><value>Набор советов работает только в этом матчапе: ваш чемпион против выбранного противника на одной линии.</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Player" xml:space="preserve"><value>Я играю на</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Opponent" xml:space="preserve"><value>Мой противник</value></data>
+  <data name="Coaching.MatchupEditor.Champions.SelectionHint" xml:space="preserve"><value>Выберите другого чемпиона в списке ниже.</value></data>
+  <data name="Coaching.MatchupEditor.Champions.SelectPlaceholder" xml:space="preserve"><value>Выберите чемпиона</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Search" xml:space="preserve"><value>Поиск…</value></data>
+  <data name="Coaching.MatchupEditor.Champions.SameChampionError" xml:space="preserve"><value>Чемпионы игрока и противника должны отличаться.</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Role" xml:space="preserve"><value>Роль на линии</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Role.Any" xml:space="preserve"><value>Любая роль</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Loading" xml:space="preserve"><value>Загружаем чемпионов…</value></data>
+  <data name="Coaching.MatchupEditor.Champions.LoadError" xml:space="preserve"><value>Не удалось загрузить список чемпионов</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Retry" xml:space="preserve"><value>Повторить</value></data>
+  <data name="Coaching.MatchupEditor.Champions.UsingCache" xml:space="preserve"><value>Используется сохранённый список чемпионов</value></data>
+  <data name="Coaching.MatchupEditor.Champions.CatalogLoaded" xml:space="preserve"><value>каталог Riot Data Dragon · загружено {0} чемпионов</value></data>
+  <data name="Coaching.MatchupEditor.Champions.CatalogLoading" xml:space="preserve"><value>каталог Riot Data Dragon · загружаем чемпионов</value></data>
+  <data name="Coaching.MatchupEditor.Champions.ReadinessSummary" xml:space="preserve"><value>{0} против {1} · {2}</value></data>
+  <data name="Coaching.MatchupEditor.Champions.CatalogSource" xml:space="preserve"><value>Каталог Riot Data Dragon</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Change" xml:space="preserve"><value>Изменить</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Refresh" xml:space="preserve"><value>Обновить</value></data>
+  <data name="Coaching.MatchupEditor.Champions.LoadErrorDescription" xml:space="preserve"><value>Data Dragon недоступен, а сохранённая копия ещё не создана.</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.PlayerTitle" xml:space="preserve"><value>Выберите своего чемпиона</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.OpponentTitle" xml:space="preserve"><value>Выберите противника</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.PlayerDescription" xml:space="preserve"><value>Чемпион, за которого вы играете в этом матчапе</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.OpponentDescription" xml:space="preserve"><value>Чемпион, против которого вы играете в этом матчапе</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.Close" xml:space="preserve"><value>Закрыть</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.Search" xml:space="preserve"><value>Поиск по имени</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.Empty" xml:space="preserve"><value>Чемпионы не найдены</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.EmptyDescription" xml:space="preserve"><value>Попробуйте изменить поисковый запрос.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.EmptyTitle" xml:space="preserve"><value>Добавьте первую фазу</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.EmptyDescription" xml:space="preserve"><value>Покрытие будет проверено автоматически после сохранения фазы.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.ValidTitle" xml:space="preserve"><value>Фазы согласованы</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.ValidDescription" xml:space="preserve"><value>Для каждого уровня подходит ровно одна фаза.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.WarningTitle" xml:space="preserve"><value>Некоторые уровни остались без совета</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.WarningDescription" xml:space="preserve"><value>Добавьте фазу для пропущенного диапазона уровней.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.ErrorTitle" xml:space="preserve"><value>Найдены конфликты фаз</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.ErrorDescription" xml:space="preserve"><value>Устраните конфликты перед продолжением: одному состоянию игры должна соответствовать только одна фаза.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.CoverageTitle" xml:space="preserve"><value>Покрытие уровней</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.CoverageHint" xml:space="preserve"><value>Проверяется только диапазон уровней. Рекомендуемые предметы не ограничивают фазу.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.CoverageStart" xml:space="preserve"><value>ур. 1</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.CoverageEnd" xml:space="preserve"><value>ур. 18</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.Issue.InvalidRange" xml:space="preserve"><value>У фазы «{0}» указан неверный диапазон уровней.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.Issue.Overlap" xml:space="preserve"><value>Фазы «{0}» и «{1}» могут примениться одновременно на {2}.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.Issue.Gap" xml:space="preserve"><value>На {0} нет подходящей фазы.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.LevelSingle" xml:space="preserve"><value>{0}-м уровне</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.LevelRange" xml:space="preserve"><value>уровнях {0}–{1}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.Coverage.Covered" xml:space="preserve"><value>Уровень {0}: все состояния покрыты</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.Coverage.Uncovered" xml:space="preserve"><value>Уровень {0}: хотя бы одно состояние осталось без фазы</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.Coverage.Ambiguous" xml:space="preserve"><value>Уровень {0}: фазы могут пересекаться</value></data>
+  <data name="Coaching.MatchupEditor.StepSummary.Verification" xml:space="preserve"><value>Шаг 4 из 5 · Проверка</value></data>
+  <data name="Coaching.MatchupEditor.Verification.ActivePhase" xml:space="preserve"><value>Активна фаза {0}: {1}</value></data>
+  <data name="Coaching.MatchupEditor.Verification.ActivePhaseDescription" xml:space="preserve"><value>Фаза активна на {0}</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Selection.Selected" xml:space="preserve"><value>Фаза выбрана</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Selection.SelectedDescription" xml:space="preserve"><value>На {0}-м уровне подходит ровно одна фаза.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Selection.NotFound" xml:space="preserve"><value>Для этого уровня нет фазы</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Selection.NotFoundDescription" xml:space="preserve"><value>На {0}-м уровне игрок не получит совет фазы.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Selection.Ambiguous" xml:space="preserve"><value>Подходит несколько фаз</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Selection.AmbiguousDescription" xml:space="preserve"><value>Перед сохранением устраните конфликт на {0}-м уровне.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Preset" xml:space="preserve"><value>Уровень {0}</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Simulator.Title" xml:space="preserve"><value>Симулятор состояния матча</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Simulator.Description" xml:space="preserve"><value>Меняйте уровень и проверяйте переходы между фазами. Рекомендуемые предметы не переключают фазу.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Simulator.Level" xml:space="preserve"><value>Уровень чемпиона</value></data>
+  <data name="Coaching.MatchupEditor.Verification.RecommendedItems.Title" xml:space="preserve"><value>Рекомендуемые предметы этой фазы</value></data>
+  <data name="Coaching.MatchupEditor.Verification.RecommendedItems.Description" xml:space="preserve"><value>Это рекомендации для покупки, а не условия активации фазы.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.RecommendedItems.Empty" xml:space="preserve"><value>Для выбранной фазы предметы не рекомендованы.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Advice.Title" xml:space="preserve"><value>Главный совет игроку</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Advice.MatchupTag" xml:space="preserve"><value>Матчап</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Advice.Phase" xml:space="preserve"><value>фаза {0}</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Advice.WhyNow" xml:space="preserve"><value>Почему сейчас</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Advice.NextGoal" xml:space="preserve"><value>Дальше</value></data>
+  <data name="Coaching.MatchupEditor.Verification.AdviceSource" xml:space="preserve"><value>{0} против {1} · {2}</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Advice.PreviewHint" xml:space="preserve"><value>Так карточка выглядит в основном окне во время матча.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Persistent.Title" xml:space="preserve"><value>Постоянные подсказки рядом</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Persistent.Empty" xml:space="preserve"><value>Для выбранной фазы нет постоянных подсказок.</value></data>
+  <data name="Coaching.MatchupEditor.StepSummary.Save" xml:space="preserve"><value>Шаг 5 из 5 · Сохранение</value></data>
+  <data name="Coaching.MatchupEditor.Save.Action.Draft" xml:space="preserve"><value>Сохранить как черновик</value></data>
+  <data name="Coaching.MatchupEditor.Save.Action.Enable" xml:space="preserve"><value>Сохранить и включить</value></data>
+  <data name="Coaching.MatchupEditor.Save.Action.Changes" xml:space="preserve"><value>Сохранить изменения</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Title" xml:space="preserve"><value>Проверка перед сохранением</value></data>
+  <data name="Count.PhaseCompleted.One" xml:space="preserve"><value>{0} фаза заполнена</value></data>
+  <data name="Count.PhaseCompleted.Few" xml:space="preserve"><value>{0} фазы заполнены</value></data>
+  <data name="Count.PhaseCompleted.Many" xml:space="preserve"><value>{0} фаз заполнено</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Phases.Ready" xml:space="preserve"><value>Пересечений и пробелов между фазами нет.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Phases.Warning" xml:space="preserve"><value>Набор можно сохранить, но на непокрытых уровнях совет не появится.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Patch" xml:space="preserve"><value>Совместимо с патчем {0}</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Patch.Description" xml:space="preserve"><value>Идентификаторы выбранных предметов получены из каталога Data Dragon.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Permission.Ready" xml:space="preserve"><value>Источник готов</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Permission.Missing" xml:space="preserve"><value>Разрешение автора не подтверждено</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Permission.Personal" xml:space="preserve"><value>Личный опыт не требует разрешения внешнего автора.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Permission.Granted" xml:space="preserve"><value>Разрешение отмечено как полученное.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Permission.LocalOnly" xml:space="preserve"><value>Локальное сохранение доступно. Публикация для сообщества потребует подтверждения.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Title" xml:space="preserve"><value>Источник</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Description" xml:space="preserve"><value>Личный опыт — полноценный источник. Для внешнего материала укажите ссылку и автора.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.PersonalExperience" xml:space="preserve"><value>Личный опыт</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Article" xml:space="preserve"><value>Статья</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Video" xml:space="preserve"><value>Видео</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Guide" xml:space="preserve"><value>Гайд сообщества</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Name" xml:space="preserve"><value>Название источника *</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Author" xml:space="preserve"><value>Автор источника *</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Link" xml:space="preserve"><value>Ссылка *</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.RequiredHint" xml:space="preserve"><value>* Обязательные поля для внешнего источника</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Validation" xml:space="preserve"><value>Укажите название, автора и полную ссылку http:// или https://.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Permission.Checkbox" xml:space="preserve"><value>Разрешение автора на использование получено</value></data>
+  <data name="Coaching.MatchupEditor.Save.Permission.Granted" xml:space="preserve"><value>получено</value></data>
+  <data name="Coaching.MatchupEditor.Save.Permission.NotConfirmed" xml:space="preserve"><value>не подтверждено</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Title" xml:space="preserve"><value>Карточка набора</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Type.Matchup" xml:space="preserve"><value>Матчап</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Matchup" xml:space="preserve"><value>{0} против {1} · {2}</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Author" xml:space="preserve"><value>Автор</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.ContentLanguage" xml:space="preserve"><value>Язык содержимого</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Language" xml:space="preserve"><value>{0} · не переводится автоматически</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.GamePatch" xml:space="preserve"><value>Игровой патч</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.SourceLabel" xml:space="preserve"><value>Источник</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Source" xml:space="preserve"><value>{0} · разрешение: {1}</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Verified" xml:space="preserve"><value>Проверен</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.State" xml:space="preserve"><value>Состояние</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.State.Enabled" xml:space="preserve"><value>Включён</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Ready" xml:space="preserve"><value>Набор готов к локальному сохранению и использованию.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Status.Saving" xml:space="preserve"><value>Сохраняем набор…</value></data>
+  <data name="Coaching.MatchupEditor.Save.Status.DraftSaved" xml:space="preserve"><value>Черновик сохранён локально.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Status.EnabledSaved" xml:space="preserve"><value>Набор сохранён и включён. Подключение к движку будет завершено в следующей итерации библиотеки.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Status.Failed" xml:space="preserve"><value>Не удалось сохранить набор. Проверьте доступ к локальной папке приложения.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Status.Saved" xml:space="preserve"><value>Набор сохранён локально.</value></data>
+  <data name="Count.ItemBlock.One" xml:space="preserve"><value>{0} блок</value></data>
+  <data name="Count.ItemBlock.Few" xml:space="preserve"><value>{0} блока</value></data>
+  <data name="Count.ItemBlock.Many" xml:space="preserve"><value>{0} блоков</value></data>
+  <data name="Coaching.Details.Back" xml:space="preserve"><value>← Назад к библиотеке</value></data>
+  <data name="Coaching.Details.Versus" xml:space="preserve"><value>vs</value></data>
+  <data name="Coaching.Details.Disable" xml:space="preserve"><value>Отключить</value></data>
+  <data name="Coaching.Details.Enable" xml:space="preserve"><value>Включить</value></data>
+  <data name="Coaching.Details.Header" xml:space="preserve"><value>Матчап · {0} · {1} · {2}</value></data>
+  <data name="Coaching.Details.Edit" xml:space="preserve"><value>Редактировать</value></data>
+  <data name="Coaching.Details.CreateCopy" xml:space="preserve"><value>Создать свою копию</value></data>
+  <data name="Coaching.Details.Delete" xml:space="preserve"><value>Удалить</value></data>
+  <data name="Coaching.Details.Delete.Own" xml:space="preserve"><value>Удалить набор</value></data>
+  <data name="Coaching.Details.Delete.Imported" xml:space="preserve"><value>Удалить установку</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Own.Title" xml:space="preserve"><value>Удалить Coach Pack?</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Own.Message" xml:space="preserve"><value>Навсегда удалить «{0}» с этого устройства? Это действие нельзя отменить.</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Own.Action" xml:space="preserve"><value>Удалить навсегда</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Imported.Title" xml:space="preserve"><value>Удалить установленный Coach Pack?</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Imported.Message" xml:space="preserve"><value>Удалить локальную установку «{0}»? Опубликованный оригинал автора не изменится.</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Imported.Action" xml:space="preserve"><value>Удалить установку</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Cancel" xml:space="preserve"><value>Отмена</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Title" xml:space="preserve"><value>Удалить Coach Pack?</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Message" xml:space="preserve"><value>Удалить «{0}» с этого устройства? Это действие нельзя отменить.</value></data>
+  <data name="Coaching.Details.Delete.Failed.Title" xml:space="preserve"><value>Coach Pack не удалён</value></data>
+  <data name="Coaching.Details.Delete.Failed.Message" xml:space="preserve"><value>Не удалось удалить локальные файлы Coach Pack. Закройте программы, которые могут их использовать, и повторите попытку.</value></data>
+  <data name="Coaching.Details.Edit.Planned" xml:space="preserve"><value>Редактирование сохранённого набора появится в следующей итерации.</value></data>
+  <data name="Coaching.Details.Tab.Overview" xml:space="preserve"><value>Обзор</value></data>
+  <data name="Coaching.Details.Tab.Advice" xml:space="preserve"><value>Советы</value></data>
+  <data name="Coaching.Details.Tab.Items" xml:space="preserve"><value>Предметы</value></data>
+  <data name="Coaching.Details.Overview.Description" xml:space="preserve"><value>Краткое описание</value></data>
+  <data name="Coaching.Details.Overview.Description.Empty" xml:space="preserve"><value>Автор не добавил описание.</value></data>
+  <data name="Coaching.Details.Overview.AppliesWhen" xml:space="preserve"><value>Когда применяется</value></data>
+  <data name="Coaching.Details.Overview.Value.MyChampion" xml:space="preserve"><value>Мой чемпион: {0}</value></data>
+  <data name="Coaching.Details.Overview.Value.Opponent" xml:space="preserve"><value>Противник: {0}</value></data>
+  <data name="Coaching.Details.Overview.Value.Role" xml:space="preserve"><value>Роль: {0}</value></data>
+  <data name="Coaching.Details.Overview.About" xml:space="preserve"><value>О наборе</value></data>
+  <data name="Coaching.Details.Overview.Type" xml:space="preserve"><value>Тип набора</value></data>
+  <data name="Coaching.Details.Overview.Type.Matchup" xml:space="preserve"><value>Матчап</value></data>
+  <data name="Coaching.Details.Overview.Author" xml:space="preserve"><value>Автор</value></data>
+  <data name="Coaching.Details.Overview.Language" xml:space="preserve"><value>Язык содержимого</value></data>
+  <data name="Coaching.Details.Overview.Patch" xml:space="preserve"><value>Игровой патч</value></data>
+  <data name="Coaching.Details.Overview.VerifiedOn" xml:space="preserve"><value>Дата проверки</value></data>
+  <data name="Coaching.Details.Overview.Source" xml:space="preserve"><value>Источник</value></data>
+  <data name="Coaching.Details.Overview.Role" xml:space="preserve"><value>Роль</value></data>
+  <data name="Coaching.Details.Overview.NotSpecified" xml:space="preserve"><value>Не указано</value></data>
+  <data name="Coaching.Details.Source.PersonalExperience" xml:space="preserve"><value>Личный опыт автора</value></data>
+  <data name="Coaching.Details.Source.OpenFailed" xml:space="preserve"><value>Не удалось открыть ссылку в браузере.</value></data>
+  <data name="Coaching.Details.ExportPack" xml:space="preserve"><value>Экспортировать набор в файл</value></data>
+  <data name="Coaching.Details.CheckUpdate" xml:space="preserve"><value>Проверить обновление</value></data>
+  <data name="Coaching.Details.MoreActions" xml:space="preserve"><value>Дополнительные действия</value></data>
+  <data name="Coaching.Details.Toggle" xml:space="preserve"><value>Включить или отключить этот Coach Pack</value></data>
+  <data name="Coaching.Details.ExportPack.Hint" xml:space="preserve"><value>Сохранить весь Coach Pack для передачи или резервной копии.</value></data>
+  <data name="Coaching.Details.ExportPack.Filter" xml:space="preserve"><value>Coach Pack TempoCue (*.tempocue.json)|*.tempocue.json|JSON (*.json)|*.json</value></data>
+  <data name="Coaching.Details.ExportPack.Status.Saved" xml:space="preserve"><value>Файл Coach Pack сохранён.</value></data>
+  <data name="Coaching.Details.ExportPack.Status.Failed" xml:space="preserve"><value>Не удалось сохранить Coach Pack. Выберите другую папку и повторите попытку.</value></data>
+  <data name="Coaching.Details.Advice.Phases" xml:space="preserve"><value>Фазы матчапа</value></data>
+  <data name="Coaching.Details.Advice.ReadOnly" xml:space="preserve"><value>Только для чтения. Чтобы изменить советы, откройте редактор набора.</value></data>
+  <data name="Coaching.Details.Advice.Persistent" xml:space="preserve"><value>Постоянные подсказки</value></data>
+  <data name="Coaching.Details.Advice.Persistent.Empty" xml:space="preserve"><value>Автор не добавил постоянные подсказки.</value></data>
+  <data name="Coaching.Details.Items.Title" xml:space="preserve"><value>Блоки предметов</value></data>
+  <data name="Coaching.Details.Items.Description" xml:space="preserve"><value>Названия и порядок заданы автором. Экспорт не изменяет Coach Pack.</value></data>
+  <data name="Coaching.Details.Items.Export" xml:space="preserve"><value>Экспортировать в League</value></data>
+  <data name="Coaching.Details.Items.ExportHint" xml:space="preserve"><value>Если автор обновит блоки предметов, экспортируйте набор заново, чтобы обновить его в League.</value></data>
+  <data name="Coaching.Details.Items.CatalogUnavailable" xml:space="preserve"><value>Каталог предметов Data Dragon недоступен. Показаны технические ID, а экспорт заблокирован до проверки совместимости.</value></data>
+  <data name="Coaching.Details.Items.NoHint" xml:space="preserve"><value>Без пояснения выбора</value></data>
+  <data name="Coaching.Details.Items.Unknown" xml:space="preserve"><value>Предмет №{0}</value></data>
+  <data name="Coaching.Details.Items.EmptyBlock" xml:space="preserve"><value>Автор пока не добавил предметы.</value></data>
+  <data name="Coaching.Export.DefaultTitle" xml:space="preserve"><value>TempoCue — {0}</value></data>
+  <data name="Coaching.Export.Title" xml:space="preserve"><value>Экспорт в League of Legends</value></data>
+  <data name="Coaching.Export.Close" xml:space="preserve"><value>Закрыть экспорт</value></data>
+  <data name="Coaching.Export.Name" xml:space="preserve"><value>Название набора в League</value></data>
+  <data name="Coaching.Export.Champion" xml:space="preserve"><value>Чемпион</value></data>
+  <data name="Coaching.Export.Map" xml:space="preserve"><value>Карта</value></data>
+  <data name="Coaching.Export.Map.SummonersRift" xml:space="preserve"><value>Ущелье призывателей</value></data>
+  <data name="Coaching.Export.Blocks" xml:space="preserve"><value>Блоки для экспорта</value></data>
+  <data name="Coaching.Export.Preview" xml:space="preserve"><value>Предпросмотр набора</value></data>
+  <data name="Coaching.Export.Warning.Matchup" xml:space="preserve"><value>League привязывает набор к чемпиону и карте, но не умеет выбирать его по вражескому чемпиону.</value></data>
+  <data name="Coaching.Export.Warning.Content" xml:space="preserve"><value>В League уходят только названия блоков и предметы. Фазы, советы и условия остаются в TempoCue.</value></data>
+  <data name="Coaching.Export.Install" xml:space="preserve"><value>Установить в League Client</value></data>
+  <data name="Coaching.Export.Install.Planned" xml:space="preserve"><value>Станет доступно после регистрации продукта.</value></data>
+  <data name="Coaching.Export.Download" xml:space="preserve"><value>Скачать .json</value></data>
+  <data name="Coaching.Export.Copy" xml:space="preserve"><value>Скопировать JSON</value></data>
+  <data name="Coaching.Export.Status.TitleRequired" xml:space="preserve"><value>Укажите название набора.</value></data>
+  <data name="Coaching.Export.Status.EmptyBlock" xml:space="preserve"><value>Выбран пустой блок. Снимите его отметку, чтобы продолжить.</value></data>
+  <data name="Coaching.Export.Status.Building" xml:space="preserve"><value>Проверяем совместимость с Data Dragon…</value></data>
+  <data name="Coaching.Export.Status.Ready" xml:space="preserve"><value>Готово: {0} · {1}. Все предметы найдены в каталоге выбранного патча.</value></data>
+  <data name="Coaching.Export.Status.Copied" xml:space="preserve"><value>JSON скопирован. Импортируйте файл или его содержимое через инструменты наборов предметов League.</value></data>
+  <data name="Coaching.Export.Status.ClipboardFailed" xml:space="preserve"><value>Буфер обмена занят. Повторите копирование JSON.</value></data>
+  <data name="Coaching.Export.Status.Downloaded" xml:space="preserve"><value>JSON набора предметов сохранён.</value></data>
+  <data name="Coaching.Export.Status.FileWriteFailed" xml:space="preserve"><value>Не удалось сохранить файл. Выберите другую папку и повторите попытку.</value></data>
+  <data name="Coaching.Export.Status.NoBlocks" xml:space="preserve"><value>Выберите хотя бы один непустой блок.</value></data>
+  <data name="Coaching.Export.Status.ChampionCatalogUnavailable" xml:space="preserve"><value>Каталог чемпионов недоступен, поэтому ID чемпиона League нельзя проверить.</value></data>
+  <data name="Coaching.Export.Status.ChampionNotFound" xml:space="preserve"><value>Чемпион набора не найден в текущем каталоге Data Dragon.</value></data>
+  <data name="Coaching.Export.Status.ItemCatalogUnavailable" xml:space="preserve"><value>Каталог предметов недоступен. Экспорт заблокирован до проверки совместимости предметов.</value></data>
+  <data name="Coaching.Export.Status.ItemsNotFound" xml:space="preserve"><value>В каталоге выбранного патча нет предметов с ID: {0}.</value></data>
+  <data name="Coaching.Export.Status.Failed" xml:space="preserve"><value>Не удалось собрать набор предметов.</value></data>
+  <data name="Settings.Overlay.Section" xml:space="preserve"><value>Игровой оверлей</value></data>
+  <data name="Settings.Overlay.Enabled.Label" xml:space="preserve"><value>Уведомления в игре</value></data>
+  <data name="Settings.Overlay.Enabled.On" xml:space="preserve"><value>Включён</value></data>
+  <data name="Settings.Overlay.Enabled.Off" xml:space="preserve"><value>Выключен</value></data>
+  <data name="Settings.Overlay.Width.Label" xml:space="preserve"><value>Ширина оверлея</value></data>
+  <data name="Settings.Overlay.Opacity.Label" xml:space="preserve"><value>Прозрачность фона</value></data>
+  <data name="Settings.Overlay.Configure.Button" xml:space="preserve"><value>Настроить оверлей</value></data>
+  <data name="Settings.Overlay.Configure.Hint" xml:space="preserve"><value>Открывает безопасный предпросмотр, который можно перетаскивать без активного матча.</value></data>
+  <data name="Settings.Overlay.Configure.Hotkey" xml:space="preserve"><value>или Ctrl + Alt + O</value></data>
+  <data name="Settings.Overlay.Duration.Label" xml:space="preserve"><value>Время показа</value></data>
+  <data name="Settings.Overlay.Duration.Summary" xml:space="preserve"><value>Короткие сообщения 5–8 секунд, длинные советы — до 16 секунд</value></data>
+  <data name="Settings.Overlay.Duration.Automatic" xml:space="preserve"><value>Автоматически</value></data>
+  <data name="Settings.Overlay.Duration.Automatic.Hint" xml:space="preserve"><value>TempoCue выберет время по длине и важности сообщения.</value></data>
+  <data name="Settings.Overlay.Duration.Fixed" xml:space="preserve"><value>Фиксированное время</value></data>
+  <data name="Settings.Overlay.Duration.Fixed.Hint" xml:space="preserve"><value>Все обычные уведомления показываются одинаковое время.</value></data>
+  <data name="Settings.Overlay.Duration.Fixed.Value" xml:space="preserve"><value>Время показа</value></data>
+  <data name="Settings.Overlay.Duration.Warning" xml:space="preserve"><value>Опасные уведомления всегда остаются на экране не менее 6 секунд, чтобы их нельзя было пропустить.</value></data>
+  <data name="Settings.Overlay.Duration.SecondsSuffix" xml:space="preserve"><value>с</value></data>
+  <data name="Settings.Overlay.Persistent.Label" xml:space="preserve"><value>Постоянные советы на весь матч</value></data>
+  <data name="Settings.Overlay.Persistent.Summary" xml:space="preserve"><value>Механические подсказки матчапа, не привязанные к моменту</value></data>
+  <data name="Settings.Overlay.Persistent.Once" xml:space="preserve"><value>Один раз за матч</value></data>
+  <data name="Settings.Overlay.Persistent.Recommended" xml:space="preserve"><value>рекомендуется</value></data>
+  <data name="Settings.Overlay.Persistent.Once.Hint" xml:space="preserve"><value>Советы появляются постепенно и не повторяются после окончания списка.</value></data>
+  <data name="Settings.Overlay.Persistent.Level" xml:space="preserve"><value>Повторять по кругу</value></data>
+  <data name="Settings.Overlay.Persistent.Level.Hint" xml:space="preserve"><value>Следующий совет появляется при повышении уровня. Один и тот же совет повторяется не раньше чем через три уровня.</value></data>
+  <data name="Settings.Overlay.Persistent.Disabled" xml:space="preserve"><value>Не показывать автоматически</value></data>
+  <data name="Settings.Overlay.Persistent.Disabled.Hint" xml:space="preserve"><value>Постоянные советы останутся доступны в подробностях Coach Pack.</value></data>
+  <data name="Settings.Overlay.Persistent.ScopeHint" xml:space="preserve"><value>Смена фаз и опасные события всегда показываются отдельно и не зависят от этой настройки.</value></data>
+  <data name="Settings.Overlay.Reset.Button" xml:space="preserve"><value>Значения по умолчанию</value></data>
+  <data name="Settings.Overlay.Save.Button" xml:space="preserve"><value>Сохранить настройки</value></data>
+  <data name="Settings.Overlay.Unsaved" xml:space="preserve"><value>Есть несохранённые изменения</value></data>
+  <data name="Settings.Overlay.Preview.Label" xml:space="preserve"><value>Предпросмотр оверлея</value></data>
+  <data name="Settings.Overlay.Description" xml:space="preserve"><value>Показывает советы Coach Pack поверх игры. Текст и цветовая полоса остаются полностью непрозрачными.</value></data>
+  <data name="Settings.Overlay.Preview.Button" xml:space="preserve"><value>Показать следующее уведомление</value></data>
+  <data name="Settings.Overlay.Preview.Warning.Label" xml:space="preserve"><value>Осторожно</value></data>
+  <data name="Settings.Overlay.Preview.Warning.Title" xml:space="preserve"><value>Соперник пропал с линии</value></data>
+  <data name="Settings.Overlay.Preview.Warning.Message" xml:space="preserve"><value>Первое уведомление · верхний слот</value></data>
+  <data name="Settings.Overlay.Preview.Information.Label" xml:space="preserve"><value>Событие</value></data>
+  <data name="Settings.Overlay.Preview.Information.Title" xml:space="preserve"><value>Дракон появится через 30 секунд</value></data>
+  <data name="Settings.Overlay.Preview.Information.Message" xml:space="preserve"><value>Второе уведомление · нижний слот</value></data>
+  <data name="Settings.Overlay.Preview.Danger.Label" xml:space="preserve"><value>Опасно</value></data>
+  <data name="Settings.Overlay.Preview.Danger.Title" xml:space="preserve"><value>Лесник соперника появился рядом</value></data>
+  <data name="Settings.Overlay.Preview.Danger.Message" xml:space="preserve"><value>Третье уведомление · вытесняет менее важные карточки</value></data>
+  <data name="Settings.Overlay.Preview.Close" xml:space="preserve"><value>Закрыть оверлей</value></data>
+  <data name="Overlay.Matchup.Dismiss" xml:space="preserve"><value>Скрыть совет</value></data>
+  <data name="Overlay.Matchup.PersistentTip.Status" xml:space="preserve"><value>Подсказка по матчапу</value></data>
 </root>

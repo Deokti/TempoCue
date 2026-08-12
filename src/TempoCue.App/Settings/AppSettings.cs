@@ -4,4 +4,6 @@ namespace TempoCue.App.Settings;
 public sealed record AppSettings
 {
     public string Language { get; init; } = "ru-RU";
+
+    public OverlayUserSettings Overlay { get; init; } = new();
 }

@@ -41,6 +41,17 @@ public sealed record CoachRuleDefinition
     /// <summary>Основной текст совета.</summary>
     public required string Message { get; init; }
 
+    /// <summary>Короткое объяснение, почему совет актуален в этой фазе.</summary>
+    public string WhyNow { get; init; } = string.Empty;
+
+    /// <summary>Следующая цель, приближающая переход к другой фазе.</summary>
+    public string NextGoal { get; init; } = string.Empty;
+
+    /// <summary>
+    /// Рекомендуемые предметы фазы. Они не являются условием выбора правила.
+    /// </summary>
+    public IReadOnlyList<int> RecommendedItemIds { get; init; } = [];
+
     /// <summary>Источник знания или пометка о необходимости проверки.</summary>
     public required string Source { get; init; }
 }

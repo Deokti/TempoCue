@@ -58,7 +58,10 @@ public sealed class MatchupCoach
                 rule.Priority,
                 rule.Source,
                 rule.RequiredItemIds,
-                rule.ExcludedItemIds);
+                rule.ExcludedItemIds,
+                rule.WhyNow,
+                rule.NextGoal,
+                rule.RecommendedItemIds);
     }
 
     private static bool Matches(CoachRuleDefinition rule, MatchupContext matchup)

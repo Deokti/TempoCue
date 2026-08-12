@@ -6,4 +6,7 @@ namespace TempoCue.Application;
 public sealed record ActiveMatchUpdate(
     MatchSnapshotReadStatus Status,
     MatchSnapshot? Snapshot,
-    CoachAdvice? Advice);
+    ActiveCoachPackSelection? CoachPackSelection)
+{
+    public CoachAdvice? Advice => CoachPackSelection?.Advice;
+}

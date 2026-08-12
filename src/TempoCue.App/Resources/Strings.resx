@@ -9,6 +9,10 @@
   <data name="Header.Subtitle" xml:space="preserve"><value>Technical build · simulator and live match connection</value></data>
   <data name="Header.CoachPackLoaded" xml:space="preserve"><value>COACH PACK LOADED</value></data>
   <data name="Language.Tooltip" xml:space="preserve"><value>Interface language</value></data>
+  <data name="Validation.Length.Requirement" xml:space="preserve"><value>From {0} to {1} characters.</value></data>
+  <data name="Validation.Length.TooShort" xml:space="preserve"><value>{0} of at least {1} characters. Maximum: {2}.</value></data>
+  <data name="Validation.Length.Valid" xml:space="preserve"><value>{0} of {1} characters.</value></data>
+  <data name="Validation.Length.TooLong" xml:space="preserve"><value>{0} characters; maximum is {1}.</value></data>
   <data name="Connection.WaitingMatch" xml:space="preserve"><value>WAITING FOR MATCH</value></data>
   <data name="Connection.PollingEverySecond" xml:space="preserve"><value>Checking Live Client Data every 1 s</value></data>
   <data name="Connection.NextPoll" xml:space="preserve"><value>Next request in 1 s</value></data>
@@ -34,10 +38,24 @@
   <data name="Advice.Waiting.Message" xml:space="preserve"><value>TempoCue polls the local Riot API every second. Once the map loads, advice for the actual game state will appear here.</value></data>
   <data name="Advice.Waiting.Source" xml:space="preserve"><value>The manual simulator on the left remains available for testing the Coach Pack without a match.</value></data>
   <data name="Advice.NoRule.Title" xml:space="preserve"><value>No matching rule found</value></data>
-  <data name="Advice.NoRule.Message" xml:space="preserve"><value>The loaded Coach Pack has no advice for the selected state yet.</value></data>
-  <data name="Advice.NoRule.Source" xml:space="preserve"><value>More matchups will be added in a separate stage.</value></data>
+  <data name="Advice.NoRule.Message" xml:space="preserve"><value>“{0}” has no advice for the player's current level and state.</value></data>
+  <data name="Advice.NoRule.Source" xml:space="preserve"><value>The matchup was found, but none of its phases applies right now.</value></data>
+  <data name="Advice.NoPack.Title" xml:space="preserve"><value>No matchup pack found</value></data>
+  <data name="Advice.NoPack.Message" xml:space="preserve"><value>There is no enabled Coach Pack for this champion pair.</value></data>
+  <data name="Advice.NoPack.Source" xml:space="preserve"><value>Create or enable a matching pack in Coaching.</value></data>
+  <data name="Advice.PackConflict.Title" xml:space="preserve"><value>Several matching packs are enabled</value></data>
+  <data name="Advice.PackConflict.Message" xml:space="preserve"><value>These packs apply to the same matchup: {0}.</value></data>
+  <data name="Advice.PackConflict.Source" xml:space="preserve"><value>Disable the extra packs: TempoCue does not choose advice at random.</value></data>
+  <data name="Advice.LibraryUnavailable.Title" xml:space="preserve"><value>Advice library is unavailable</value></data>
+  <data name="Advice.LibraryUnavailable.Message" xml:space="preserve"><value>TempoCue could not read the local Coach Packs.</value></data>
+  <data name="Advice.LibraryUnavailable.Source" xml:space="preserve"><value>No advice is shown while the library state is unknown.</value></data>
+  <data name="Advice.MatchupUnavailable.Title" xml:space="preserve"><value>Matchup is not determined yet</value></data>
+  <data name="Advice.MatchupUnavailable.Message" xml:space="preserve"><value>The active player's lane opponent could not be determined unambiguously.</value></data>
+  <data name="Advice.MatchupUnavailable.Source" xml:space="preserve"><value>TempoCue does not guess the opponent when match data is ambiguous.</value></data>
   <data name="Power.Waiting" xml:space="preserve"><value>WAITING</value></data>
   <data name="Power.NoRule" xml:space="preserve"><value>NO RULE</value></data>
+  <data name="Power.PackConflict" xml:space="preserve"><value>PACK CONFLICT</value></data>
+  <data name="Power.LibraryUnavailable" xml:space="preserve"><value>NO DATA</value></data>
   <data name="Power.Dangerous" xml:space="preserve"><value>DANGER</value></data>
   <data name="Power.Cautious" xml:space="preserve"><value>CAUTION</value></data>
   <data name="Power.Playable" xml:space="preserve"><value>PLAYABLE</value></data>
@@ -68,8 +86,20 @@
   <data name="Log.NoRule" xml:space="preserve"><value>no rule</value></data>
   <data name="Count.Player.One" xml:space="preserve"><value>{0} player</value></data>
   <data name="Count.Player.Other" xml:space="preserve"><value>{0} players</value></data>
+  <data name="Count.Champion.One" xml:space="preserve"><value>{0} champion</value></data>
+  <data name="Count.Champion.Other" xml:space="preserve"><value>{0} champions</value></data>
   <data name="Count.Item.One" xml:space="preserve"><value>{0} item</value></data>
   <data name="Count.Item.Other" xml:space="preserve"><value>{0} items</value></data>
+  <data name="Count.Advice.One" xml:space="preserve"><value>{0} piece of advice</value></data>
+  <data name="Count.Advice.Other" xml:space="preserve"><value>{0} pieces of advice</value></data>
+  <data name="Count.CoachPack.One" xml:space="preserve"><value>{0} advice pack</value></data>
+  <data name="Count.CoachPack.Other" xml:space="preserve"><value>{0} advice packs</value></data>
+  <data name="Count.CoachPackEnabled.One" xml:space="preserve"><value>{0} enabled</value></data>
+  <data name="Count.CoachPackEnabled.Other" xml:space="preserve"><value>{0} enabled</value></data>
+  <data name="Count.CoachPackCreated.One" xml:space="preserve"><value>{0} created by you</value></data>
+  <data name="Count.CoachPackCreated.Other" xml:space="preserve"><value>{0} created by you</value></data>
+  <data name="Count.CoachPackInvalid.One" xml:space="preserve"><value>{0} damaged pack was skipped.</value></data>
+  <data name="Count.CoachPackInvalid.Other" xml:space="preserve"><value>{0} damaged packs were skipped.</value></data>
   <data name="Nav.Home" xml:space="preserve"><value>Home</value></data>
   <data name="Nav.CurrentMatch" xml:space="preserve"><value>Current match</value></data>
   <data name="Nav.Coaching" xml:space="preserve"><value>Coaching</value></data>
@@ -100,21 +130,21 @@
   <data name="Home.Readiness.Title" xml:space="preserve"><value>System readiness</value></data>
   <data name="Home.Readiness.Refresh" xml:space="preserve"><value>Data refresh</value></data>
   <data name="Home.Readiness.Match" xml:space="preserve"><value>Active match</value></data>
+  <data name="Home.Readiness.CoachPacks" xml:space="preserve"><value>Coach Packs</value></data>
   <data name="Home.Readiness.Hint" xml:space="preserve"><value>No action is required: the local endpoint is checked every second.</value></data>
   <data name="Home.Status.Waiting" xml:space="preserve"><value>waiting</value></data>
   <data name="Home.Status.Connected" xml:space="preserve"><value>connected</value></data>
   <data name="Home.Status.Error" xml:space="preserve"><value>error</value></data>
   <data name="Home.Status.NotFound" xml:space="preserve"><value>not found</value></data>
   <data name="Home.Status.Active" xml:space="preserve"><value>active</value></data>
-  <data name="Home.Pack.Title" xml:space="preserve"><value>Active Coach Pack</value></data>
-  <data name="Home.Pack.Rules" xml:space="preserve"><value>3 matchup phases are loaded</value></data>
-  <data name="Home.Pack.PatchWarning" xml:space="preserve"><value>Requires verification on the current patch</value></data>
-  <data name="Home.Pack.Test" xml:space="preserve"><value>Open current match</value></data>
+  <data name="Home.History.Title" xml:space="preserve"><value>Match history</value></data>
+  <data name="Home.History.Development" xml:space="preserve"><value>In development</value></data>
+  <data name="Home.History.Description" xml:space="preserve"><value>Recent matches and coaching results will appear here.</value></data>
   <data name="Home.Available.Title" xml:space="preserve"><value>Available now</value></data>
   <data name="Home.Available.LiveData" xml:space="preserve"><value>Live Client Data connection</value></data>
   <data name="Home.Available.Participants" xml:space="preserve"><value>All match participants</value></data>
   <data name="Home.Available.Matchup" xml:space="preserve"><value>Lane matchup detection</value></data>
-  <data name="Home.Available.Advice" xml:space="preserve"><value>Urgot vs Sett advice</value></data>
+  <data name="Home.Available.Advice" xml:space="preserve"><value>Advice from local Coach Packs</value></data>
   <data name="Home.Available.Json" xml:space="preserve"><value>Raw match JSON</value></data>
   <data name="Home.Available.Future" xml:space="preserve"><value>Map analysis, history, reports, and overlay will be added in later versions.</value></data>
   <data name="Current.Status.Connected" xml:space="preserve"><value>MATCH DATA RECEIVED</value></data>
@@ -137,6 +167,8 @@
   <data name="Current.Advice.WhyNow" xml:space="preserve"><value>Why now</value></data>
   <data name="Current.Advice.LevelReason" xml:space="preserve"><value>This advice uses the active player's real level {0} and items.</value></data>
   <data name="Current.Advice.WaitingReason" xml:space="preserve"><value>After connecting, advice will be selected using the active player's real level and items.</value></data>
+  <data name="Current.Advice.Pack" xml:space="preserve"><value>Pack: {0}</value></data>
+  <data name="Current.Advice.PackAndSource" xml:space="preserve"><value>Pack: {0} · Source: {1}</value></data>
   <data name="Current.Objective.Title" xml:space="preserve"><value>Nearest objective</value></data>
   <data name="Current.Objective.Dragon" xml:space="preserve"><value>Dragon</value></data>
   <data name="Current.Objective.Pending" xml:space="preserve"><value>Type and timer will appear after objective logic is implemented.</value></data>
@@ -179,4 +211,562 @@
   <data name="Dragon.Hextech" xml:space="preserve"><value>Hextech</value></data>
   <data name="Dragon.Chemtech" xml:space="preserve"><value>Chemtech</value></data>
   <data name="Dragon.Elder" xml:space="preserve"><value>Elder</value></data>
+  <data name="Coaching.Title" xml:space="preserve"><value>Coaching</value></data>
+  <data name="Coaching.Summary" xml:space="preserve"><value>1 advice pack · 1 enabled · 0 created by you</value></data>
+  <data name="Coaching.Import" xml:space="preserve"><value>Import file</value></data>
+  <data name="Coaching.Import.Tooltip" xml:space="preserve"><value>Select a TempoCue Coach Pack file</value></data>
+  <data name="Coaching.Import.Title" xml:space="preserve"><value>Import Coach Pack</value></data>
+  <data name="Coaching.Import.Subtitle" xml:space="preserve"><value>Check the pack information before adding it to your library.</value></data>
+  <data name="Coaching.Import.Dialog.Filter" xml:space="preserve"><value>TempoCue Coach Pack (*.tempocue.json)|*.tempocue.json|JSON files (*.json)|*.json|All files (*.*)|*.*</value></data>
+  <data name="Coaching.Import.Preview.Description.Empty" xml:space="preserve"><value>No description was provided by the author.</value></data>
+  <data name="Coaching.Import.Preview.Author" xml:space="preserve"><value>Author</value></data>
+  <data name="Coaching.Import.Preview.Language" xml:space="preserve"><value>Content language</value></data>
+  <data name="Coaching.Import.Preview.Patch" xml:space="preserve"><value>Game patch</value></data>
+  <data name="Coaching.Import.Preview.Contents" xml:space="preserve"><value>Contents</value></data>
+  <data name="Coaching.Import.Status.Loading.Title" xml:space="preserve"><value>Checking file</value></data>
+  <data name="Coaching.Import.Status.Loading.Message" xml:space="preserve"><value>TempoCue is validating the schema and Coach Pack contents.</value></data>
+  <data name="Coaching.Import.Status.Ready.Title" xml:space="preserve"><value>Ready to import</value></data>
+  <data name="Coaching.Import.Status.Ready.Message" xml:space="preserve"><value>The file is valid. The Coach Pack will be added disabled so you can review it first.</value></data>
+  <data name="Coaching.Import.Status.Replacement.Title" xml:space="preserve"><value>An imported pack is already installed</value></data>
+  <data name="Coaching.Import.Status.Replacement.Message" xml:space="preserve"><value>Replace the local installation of “{0}”? Its enabled or disabled state will be preserved.</value></data>
+  <data name="Coaching.Import.Status.CreatedConflict.Title" xml:space="preserve"><value>Your Coach Pack has the same identifier</value></data>
+  <data name="Coaching.Import.Status.CreatedConflict.Message" xml:space="preserve"><value>“{0}” was created by you and will not be overwritten. Change the imported pack identifier or save it as a separate copy.</value></data>
+  <data name="Coaching.Import.Status.BuiltInConflict.Title" xml:space="preserve"><value>A built-in Coach Pack has the same identifier</value></data>
+  <data name="Coaching.Import.Status.BuiltInConflict.Message" xml:space="preserve"><value>“{0}” is supplied by TempoCue and cannot be replaced by a local file.</value></data>
+  <data name="Coaching.Import.Status.Invalid.Title" xml:space="preserve"><value>Invalid Coach Pack file</value></data>
+  <data name="Coaching.Import.Status.Invalid.Message" xml:space="preserve"><value>The JSON is damaged, uses an unsupported schema, or contains inconsistent Coach Pack data.</value></data>
+  <data name="Coaching.Import.Status.ReadFailed.Title" xml:space="preserve"><value>Could not read the file</value></data>
+  <data name="Coaching.Import.Status.ReadFailed.Message" xml:space="preserve"><value>Check that the file still exists and TempoCue has permission to open it.</value></data>
+  <data name="Coaching.Import.Status.SaveFailed.Title" xml:space="preserve"><value>Could not import the Coach Pack</value></data>
+  <data name="Coaching.Import.Status.SaveFailed.Message" xml:space="preserve"><value>TempoCue could not save “{0}” to the local library. The existing pack was not intentionally changed.</value></data>
+  <data name="Coaching.Import.Action.Import" xml:space="preserve"><value>Import</value></data>
+  <data name="Coaching.Import.Action.Replace" xml:space="preserve"><value>Replace installation</value></data>
+  <data name="Coaching.Import.Action.Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Coaching.Create" xml:space="preserve"><value>Create advice pack</value></data>
+  <data name="Coaching.PlannedTooltip" xml:space="preserve"><value>Import and the rule editor will arrive in the next iteration.</value></data>
+  <data name="Coaching.Tab.Matchups" xml:space="preserve"><value>Matchups</value></data>
+  <data name="Coaching.Tab.MapControl" xml:space="preserve"><value>Game control</value></data>
+  <data name="Coaching.Tab.MyPacks" xml:space="preserve"><value>My packs</value></data>
+  <data name="Coaching.Library.Search" xml:space="preserve"><value>Search by champion, pack or author</value></data>
+  <data name="Coaching.Library.Matchup" xml:space="preserve"><value>{0} vs {1}</value></data>
+  <data name="Coaching.Library.Card.Details" xml:space="preserve"><value>{0} · {1}</value></data>
+  <data name="Coaching.Library.State.Enabled" xml:space="preserve"><value>Enabled</value></data>
+  <data name="Coaching.Library.State.Draft" xml:space="preserve"><value>Draft</value></data>
+  <data name="Coaching.Library.State.Disabled" xml:space="preserve"><value>Disabled</value></data>
+  <data name="Coaching.Library.Toggle" xml:space="preserve"><value>Enable or disable this matchup</value></data>
+  <data name="Coaching.Library.StateChangeFailed" xml:space="preserve"><value>Could not save the matchup state.</value></data>
+  <data name="Coaching.Library.DeleteFailed" xml:space="preserve"><value>Could not delete the Coach Pack.</value></data>
+  <data name="Coaching.Library.Deleted" xml:space="preserve"><value>Coach Pack “{0}” was deleted from this device.</value></data>
+  <data name="Coaching.Library.Imported" xml:space="preserve"><value>Coach Pack “{0}” was imported to the local library.</value></data>
+  <data name="Coaching.Library.Exported" xml:space="preserve"><value>Coach Pack “{0}” was exported to a file.</value></data>
+  <data name="Coaching.Library.ExportFailed" xml:space="preserve"><value>Could not export the Coach Pack to a file.</value></data>
+  <data name="Coaching.Library.Origin.BuiltIn" xml:space="preserve"><value>Built in</value></data>
+  <data name="Coaching.Library.Origin.Created" xml:space="preserve"><value>Created by you</value></data>
+  <data name="Coaching.Library.Origin.Imported" xml:space="preserve"><value>Added from library</value></data>
+  <data name="Coaching.Library.Author.TempoCue" xml:space="preserve"><value>TempoCue</value></data>
+  <data name="Coaching.Library.Role.Any" xml:space="preserve"><value>Any role</value></data>
+  <data name="Coaching.Library.Language.Russian" xml:space="preserve"><value>Russian</value></data>
+  <data name="Coaching.Library.Language.English" xml:space="preserve"><value>English</value></data>
+  <data name="Coaching.Library.Language.Unknown" xml:space="preserve"><value>Language not specified</value></data>
+  <data name="Coaching.Library.Patch" xml:space="preserve"><value>Patch {0}</value></data>
+  <data name="Coaching.Library.Open" xml:space="preserve"><value>Open</value></data>
+  <data name="Coaching.Library.Open.Planned" xml:space="preserve"><value>The pack details screen will be added in the next iteration.</value></data>
+  <data name="Coaching.Library.LoadFailed" xml:space="preserve"><value>Could not read locally saved advice packs.</value></data>
+  <data name="Coaching.Library.Empty.Matchups" xml:space="preserve"><value>No matchups found</value></data>
+  <data name="Coaching.Library.Empty.SearchHint" xml:space="preserve"><value>Clear the search or create a new advice pack.</value></data>
+  <data name="Coaching.Update.WarningTitle" xml:space="preserve"><value>Pack patch needs verification</value></data>
+  <data name="Coaching.Update.WarningDescription" xml:space="preserve"><value>Pack metadata: {0}. Advice remains a draft until it is verified.</value></data>
+  <data name="Coaching.Matchups.LibraryTitle" xml:space="preserve"><value>Installed matchups</value></data>
+  <data name="Coaching.Pack.Rules" xml:space="preserve"><value>{0} rules</value></data>
+  <data name="Coaching.Pack.Patch" xml:space="preserve"><value>Patch: {0}</value></data>
+  <data name="Coaching.Pack.DetailsTitle" xml:space="preserve"><value>Pack rules</value></data>
+  <data name="Coaching.Pack.VerificationRequired" xml:space="preserve"><value>Verification required</value></data>
+  <data name="Coaching.Rule.LevelRange" xml:space="preserve"><value>lvl. {0}–{1}</value></data>
+  <data name="Coaching.Rule.LevelFrom" xml:space="preserve"><value>lvl. {0}+</value></data>
+  <data name="Coaching.Rule.Source" xml:space="preserve"><value>Source: {0}</value></data>
+  <data name="Coaching.Power.Dangerous" xml:space="preserve"><value>Danger</value></data>
+  <data name="Coaching.Power.Cautious" xml:space="preserve"><value>Caution</value></data>
+  <data name="Coaching.Power.Playable" xml:space="preserve"><value>Playable</value></data>
+  <data name="Coaching.Power.Favorable" xml:space="preserve"><value>Advantage</value></data>
+  <data name="Coaching.Empty.MapControl.Title" xml:space="preserve"><value>No map-control packs yet</value></data>
+  <data name="Coaching.Empty.MapControl.Description" xml:space="preserve"><value>General rules for missing opponents, jungle movement, objective timings, and other map events will live here.</value></data>
+  <data name="Coaching.Empty.MyPacks.Title" xml:space="preserve"><value>You have not created any packs yet</value></data>
+  <data name="Coaching.Empty.MyPacks.Description" xml:space="preserve"><value>The next iteration will add drafts and packs created in a visual editor without writing JSON by hand.</value></data>
+  <data name="Coaching.Sharing.Title" xml:space="preserve"><value>How community packs will be shared</value></data>
+  <data name="Coaching.Sharing.Description" xml:space="preserve"><value>Initially through safe import and export of a versioned Coach Pack file. A community catalog can use the same format later.</value></data>
+  <data name="Coaching.Sharing.CommunityPlacement" xml:space="preserve"><value>Installed packs from other authors will appear under Matchups or Map control. My packs will contain only packs created by you.</value></data>
+  <data name="Coaching.NewPack.Back" xml:space="preserve"><value>Back to library</value></data>
+  <data name="Coaching.NewPack.Title" xml:space="preserve"><value>What kind of advice pack are we creating?</value></data>
+  <data name="Coaching.NewPack.Description" xml:space="preserve"><value>The type determines which questions the editor asks. Changing it later requires creating a new pack.</value></data>
+  <data name="Coaching.NewPack.ConstructorAsks" xml:space="preserve"><value>The editor will ask about</value></data>
+  <data name="Coaching.NewPack.Matchup.Title" xml:space="preserve"><value>Matchup</value></data>
+  <data name="Coaching.NewPack.Matchup.Description" xml:space="preserve"><value>Explain how to play against a specific champion at different stages of the match.</value></data>
+  <data name="Coaching.NewPack.Matchup.PromptItems" xml:space="preserve"><value>two champions and a role · level-based phases · recommended items · advice text</value></data>
+  <data name="Coaching.NewPack.Matchup.Start" xml:space="preserve"><value>Start · step 1 of 7</value></data>
+  <data name="Coaching.NewPack.GameControl.Title" xml:space="preserve"><value>Game control</value></data>
+  <data name="Coaching.NewPack.GameControl.Description" xml:space="preserve"><value>Create reminders about the map, ganks, objectives, missing opponents and other game events.</value></data>
+  <data name="Coaching.NewPack.GameControl.PromptItems" xml:space="preserve"><value>role and mode · a situation template · time and map conditions · display method</value></data>
+  <data name="Coaching.NewPack.GameControl.Unavailable" xml:space="preserve"><value>Unavailable in this iteration</value></data>
+  <data name="Coaching.NewPack.Soon" xml:space="preserve"><value>Soon</value></data>
+  <data name="Coaching.MatchupEditor.Back" xml:space="preserve"><value>Back</value></data>
+  <data name="Coaching.MatchupEditor.Close" xml:space="preserve"><value>Close editor</value></data>
+  <data name="Coaching.MatchupEditor.Next" xml:space="preserve"><value>Next</value></data>
+  <data name="Coaching.MatchupEditor.Mode.Simple" xml:space="preserve"><value>Simple</value></data>
+  <data name="Coaching.MatchupEditor.Mode.Advanced" xml:space="preserve"><value>Advanced</value></data>
+  <data name="Coaching.MatchupEditor.Title" xml:space="preserve"><value>New matchup</value></data>
+  <data name="Coaching.MatchupEditor.Draft" xml:space="preserve"><value>Draft</value></data>
+  <data name="Coaching.MatchupEditor.Mode.Edit" xml:space="preserve"><value>Editing</value></data>
+  <data name="Coaching.MatchupEditor.Mode.Copy" xml:space="preserve"><value>Your copy</value></data>
+  <data name="Coaching.MatchupEditor.CopyName" xml:space="preserve"><value>{0} — my copy</value></data>
+  <data name="Coaching.MatchupEditor.StepSummary" xml:space="preserve"><value>Step 1 of 5 · Main information</value></data>
+  <data name="Coaching.MatchupEditor.Step.Main" xml:space="preserve"><value>Main information</value></data>
+  <data name="Coaching.MatchupEditor.Step.Champions" xml:space="preserve"><value>Champions and role</value></data>
+  <data name="Coaching.MatchupEditor.Step.MatchupContent" xml:space="preserve"><value>Matchup content</value></data>
+  <data name="Coaching.MatchupEditor.Step.Phases" xml:space="preserve"><value>Matchup phases</value></data>
+  <data name="Coaching.MatchupEditor.Step.Conditions" xml:space="preserve"><value>Conditions</value></data>
+  <data name="Coaching.MatchupEditor.Step.Content" xml:space="preserve"><value>Advice content</value></data>
+  <data name="Coaching.MatchupEditor.Step.Test" xml:space="preserve"><value>Test</value></data>
+  <data name="Coaching.MatchupEditor.Step.Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Coaching.MatchupEditor.Placeholder" xml:space="preserve"><value>The editor shell is ready. Fields for this step will be added in the next verified iteration.</value></data>
+  <data name="Coaching.MatchupEditor.Main.Description" xml:space="preserve"><value>This information appears in the library and in the in-game advice journal.</value></data>
+  <data name="Coaching.MatchupEditor.Main.PackName" xml:space="preserve"><value>Pack name</value></data>
+  <data name="Coaching.MatchupEditor.Main.PackName.Hint" xml:space="preserve"><value>From 3 to 80 characters. Champions are selected on the next step.</value></data>
+  <data name="Coaching.MatchupEditor.Main.ShortDescription" xml:space="preserve"><value>Short description</value></data>
+  <data name="Coaching.MatchupEditor.Main.ShortDescription.Hint" xml:space="preserve"><value>Explain the pack's goal in 10–240 characters.</value></data>
+  <data name="Coaching.MatchupEditor.Main.Author" xml:space="preserve"><value>Author</value></data>
+  <data name="Coaching.MatchupEditor.Main.AdviceLanguage" xml:space="preserve"><value>Content language</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch" xml:space="preserve"><value>Game patch</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch.Hint" xml:space="preserve"><value>Select the patch on which the recommendations were last verified.</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch.Current" xml:space="preserve"><value>{0} — current</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch.Loading" xml:space="preserve"><value>Loading patches…</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch.LoadError" xml:space="preserve"><value>Could not load patches.</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch.Retry" xml:space="preserve"><value>Retry</value></data>
+  <data name="Coaching.MatchupEditor.Main.GamePatch.UsingCache" xml:space="preserve"><value>Showing the last saved patch list.</value></data>
+  <data name="Coaching.MatchupEditor.Main.VerifiedOn" xml:space="preserve"><value>Last verified</value></data>
+  <data name="Coaching.MatchupEditor.Main.VerifiedOn.Hint" xml:space="preserve"><value>The draft creation date is used for now.</value></data>
+  <data name="Coaching.MatchupEditor.Main.LanguageNote.Title" xml:space="preserve"><value>About pack language</value></data>
+  <data name="Coaching.MatchupEditor.Main.LanguageNote.Description" xml:space="preserve"><value>The TempoCue interface can switch languages, but your pack text stays exactly as written — pack content is not translated automatically.</value></data>
+  <data name="Coaching.MatchupEditor.Main.Source" xml:space="preserve"><value>Information source</value></data>
+  <data name="Coaching.MatchupEditor.Main.Source.Personal" xml:space="preserve"><value>Personal experience</value></data>
+  <data name="Coaching.MatchupEditor.Main.Source.Article" xml:space="preserve"><value>Article</value></data>
+  <data name="Coaching.MatchupEditor.Main.Source.Video" xml:space="preserve"><value>Video</value></data>
+  <data name="Coaching.MatchupEditor.Main.Source.Guide" xml:space="preserve"><value>Guide</value></data>
+  <data name="Coaching.MatchupEditor.Main.Source.Personal.Hint" xml:space="preserve"><value>Personal experience is a complete source; no link is required.</value></data>
+  <data name="Coaching.MatchupEditor.Main.Source.Link.Hint" xml:space="preserve"><value>Add a direct link so other players can verify the recommendation.</value></data>
+  <data name="Coaching.MatchupEditor.Main.SourceUrl" xml:space="preserve"><value>Source link</value></data>
+  <data name="Coaching.MatchupEditor.Main.Preview.Title" xml:space="preserve"><value>How players will see it</value></data>
+  <data name="Coaching.MatchupEditor.Main.Preview.Live" xml:space="preserve"><value>updates as you type</value></data>
+  <data name="Coaching.MatchupEditor.Main.Preview.Matchup" xml:space="preserve"><value>Matchup</value></data>
+  <data name="Coaching.MatchupEditor.Main.Preview.EmptyName" xml:space="preserve"><value>The pack name will appear here</value></data>
+  <data name="Coaching.MatchupEditor.Main.Preview.EmptyDescription" xml:space="preserve"><value>Add a short description to explain the pack's purpose.</value></data>
+  <data name="Coaching.MatchupEditor.Main.Preview.EmptyAuthor" xml:space="preserve"><value>The author is not specified yet</value></data>
+  <data name="Coaching.MatchupEditor.Main.Readiness.Title" xml:space="preserve"><value>Pack readiness</value></data>
+  <data name="Coaching.MatchupEditor.Main.Readiness.Pending" xml:space="preserve"><value>needs data</value></data>
+  <data name="Coaching.MatchupEditor.Main.Readiness.Complete" xml:space="preserve"><value>complete</value></data>
+  <data name="Coaching.MatchupEditor.Main.Readiness.LinkRequired" xml:space="preserve"><value>link required</value></data>
+  <data name="Coaching.MatchupEditor.Main.Readiness.SourceReady" xml:space="preserve"><value>specified</value></data>
+  <data name="Coaching.MatchupEditor.Main.Readiness.NextIteration" xml:space="preserve"><value>The next step will become available after its own verified iteration.</value></data>
+  <data name="Coaching.MatchupEditor.StepSummary.Champions" xml:space="preserve"><value>Step 2 of 5 · Champions and role</value></data>
+  <data name="Coaching.MatchupEditor.StepSummary.Content" xml:space="preserve"><value>Step 3 of 5 · Matchup content</value></data>
+  <data name="Coaching.MatchupEditor.Content.Tab.Phases" xml:space="preserve"><value>Phases {0}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Tab.Persistent" xml:space="preserve"><value>Persistent tips {0}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Tab.Items" xml:space="preserve"><value>Items {0}</value></data>
+  <data name="Coaching.MatchupEditor.Content.FutureSection" xml:space="preserve"><value>Available in the next iteration of step 3</value></data>
+  <data name="Coaching.MatchupEditor.Content.PhasesTitle" xml:space="preserve"><value>Matchup phases</value></data>
+  <data name="Coaching.MatchupEditor.Content.PhasesDescription" xml:space="preserve"><value>Split the matchup into clear periods. Card order defines the reading sequence and the future stable rule order.</value></data>
+  <data name="Coaching.MatchupEditor.Content.AddPhase" xml:space="preserve"><value>+ Add phase</value></data>
+  <data name="Coaching.MatchupEditor.Content.Empty.Title" xml:space="preserve"><value>No phases yet</value></data>
+  <data name="Coaching.MatchupEditor.Content.Empty.Description" xml:space="preserve"><value>Add the first phase and specify the levels at which its main advice applies.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Status.EmptyTitle" xml:space="preserve"><value>Add the first phase</value></data>
+  <data name="Coaching.MatchupEditor.Content.Status.EmptyDescription" xml:space="preserve"><value>This step will contain advice for the different periods of the matchup.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Status.DraftTitle" xml:space="preserve"><value>Phase draft is filled</value></data>
+  <data name="Coaching.MatchupEditor.Content.Status.DraftDescription" xml:space="preserve"><value>Phases remain available when moving between steps. Overlap validation will arrive with advanced conditions.</value></data>
+  <data name="Coaching.MatchupEditor.Content.NextIteration.Title" xml:space="preserve"><value>Next iteration</value></data>
+  <data name="Coaching.MatchupEditor.Content.NextIteration.Description" xml:space="preserve"><value>We will add persistent tips and build groups. Level-based phases, recommended items, advice content, and consistency validation are available now.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.AddTitle" xml:space="preserve"><value>New phase</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.EditTitle" xml:space="preserve"><value>Editing phase: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.Description" xml:space="preserve"><value>Specify the period and recommendation. Changes reach the list only after you select Done.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.Name" xml:space="preserve"><value>Phase name</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.PowerState" xml:space="preserve"><value>Danger level</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.MinimumLevel" xml:space="preserve"><value>Starts at level</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.MaximumLevel" xml:space="preserve"><value>Ends at level</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.ToEnd" xml:space="preserve"><value>Until the end of the match</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.MeaningTitle" xml:space="preserve"><value>What it means</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.MeaningRange" xml:space="preserve"><value>Phase is active at levels {0}–{1}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.MeaningToEnd" xml:space="preserve"><value>Phase is active at levels {0}+</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.MeaningRecommendedItemsSuffix" xml:space="preserve"><value>. Item targets: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.ItemsTitle" xml:space="preserve"><value>Recommended items</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.ItemsDescription" xml:space="preserve"><value>Add only important purchases for this phase. They guide the player but do not control which advice is selected.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.RecommendedItemsTitle" xml:space="preserve"><value>Targets for this phase</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.RecommendedItemsDescription" xml:space="preserve"><value>For example, a starting purchase or the next key item. You do not need to list the full inventory.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.PrimaryAdvice" xml:space="preserve"><value>Main advice</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.PrimaryAdviceHint" xml:space="preserve"><value>(the player sees it first)</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.WhyNow" xml:space="preserve"><value>Why now</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.WhyNowHint" xml:space="preserve"><value>(short explanation)</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.NextGoal" xml:space="preserve"><value>Next goal</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.NextGoalHint" xml:space="preserve"><value>(what will move the phase forward)</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.Done" xml:space="preserve"><value>Done</value></data>
+  <data name="Coaching.MatchupEditor.Content.Editor.DeletePhase" xml:space="preserve"><value>Delete phase</value></data>
+  <data name="Coaching.MatchupEditor.Content.Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Coaching.MatchupEditor.Content.Duplicate" xml:space="preserve"><value>Duplicate</value></data>
+  <data name="Coaching.MatchupEditor.Content.Phase.RecommendedItems" xml:space="preserve"><value>Recommended items: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Editor.AddTitle" xml:space="preserve"><value>New tip</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Editor.EditTitle" xml:space="preserve"><value>Editing tip: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Editor.Progress" xml:space="preserve"><value>Tip {0} of {1}</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.DefaultTitle" xml:space="preserve"><value>New tip</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Title" xml:space="preserve"><value>Title</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Text" xml:space="preserve"><value>Tip text</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Scope" xml:space="preserve"><value>Where it applies</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Scope.WholeMatch" xml:space="preserve"><value>Whole match</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Scope.Phase" xml:space="preserve"><value>Phase {0}: {1}</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Source" xml:space="preserve"><value>Source</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Source.UseCustom" xml:space="preserve"><value>Specify a separate source</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Source.InheritedHint" xml:space="preserve"><value>The tip will use the Coach Pack source specified at the save step.</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Source.Inherited" xml:space="preserve"><value>Source: Coach Pack source</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Source.Custom" xml:space="preserve"><value>Source: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.ListTitle" xml:space="preserve"><value>Persistent tips</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Description" xml:space="preserve"><value>Mechanical knowledge that cannot be tied to an exact moment through Live Client Data. It remains available in matchup details and is shown by the overlay one tip at a time on eligible level-ups without replacing the active phase advice.</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Add" xml:space="preserve"><value>+ Add tip</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Empty" xml:space="preserve"><value>No persistent tips yet. Add knowledge that remains useful throughout the match or within a selected phase.</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Difference.Title" xml:space="preserve"><value>How this differs from a phase</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Difference.Phase.Title" xml:space="preserve"><value>Phase</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Difference.Phase.Text" xml:space="preserve"><value>Active at a specific moment. It is shown as the main advice and can appear in the overlay.</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Difference.Persistent.Title" xml:space="preserve"><value>Persistent tip</value></data>
+  <data name="Coaching.MatchupEditor.Persistent.Difference.Persistent.Text" xml:space="preserve"><value>Available in matchup details on demand and can appear in the overlay one tip at a time on level-up. It does not replace the main advice.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.AddTitle" xml:space="preserve"><value>New item block</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.EditTitle" xml:space="preserve"><value>Editing item block: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.Description" xml:space="preserve"><value>Name the block and optionally explain when the player should choose it. Items will be added separately.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.Name" xml:space="preserve"><value>Block name</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.WhenToChoose" xml:space="preserve"><value>When to choose (optional)</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.WhenToChooseHint" xml:space="preserve"><value>For example: when the enemy team has mostly physical damage.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.Delete" xml:space="preserve"><value>Delete block</value></data>
+  <data name="Coaching.MatchupEditor.Items.ListTitle" xml:space="preserve"><value>Item blocks</value></data>
+  <data name="Coaching.MatchupEditor.Items.Description" xml:space="preserve"><value>Create your own categories. Their names and order will be preserved in the future League item set export.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Add" xml:space="preserve"><value>+ Add block</value></data>
+  <data name="Coaching.MatchupEditor.Items.Empty" xml:space="preserve"><value>No item blocks yet. Add a starting purchase, boots for a specific situation, a core build, or any category that fits this matchup.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Card.ItemCount" xml:space="preserve"><value>{0} items</value></data>
+  <data name="Coaching.MatchupEditor.Items.Card.NoHint" xml:space="preserve"><value>No “when to choose” note</value></data>
+  <data name="Coaching.MatchupEditor.Items.Card.Empty" xml:space="preserve"><value>No items in this block yet.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.ItemsTitle" xml:space="preserve"><value>Items in this block</value></data>
+  <data name="Coaching.MatchupEditor.Items.Editor.ItemsDescription" xml:space="preserve"><value>Add purchases and arrange them in the order the player should see in League.</value></data>
+  <data name="Coaching.MatchupEditor.Items.AddItem" xml:space="preserve"><value>+ Item</value></data>
+  <data name="Coaching.MatchupEditor.Items.Item.MoveLeft" xml:space="preserve"><value>Move item left</value></data>
+  <data name="Coaching.MatchupEditor.Items.Item.MoveRight" xml:space="preserve"><value>Move item right</value></data>
+  <data name="Coaching.MatchupEditor.Items.MoveUp" xml:space="preserve"><value>Move block up</value></data>
+  <data name="Coaching.MatchupEditor.Items.MoveDown" xml:space="preserve"><value>Move block down</value></data>
+  <data name="Coaching.MatchupEditor.Items.Help.Title" xml:space="preserve"><value>How item blocks work</value></data>
+  <data name="Coaching.MatchupEditor.Items.Help.Text" xml:space="preserve"><value>Blocks are not fixed system categories. The author chooses the name, optional use case, order, and later the items inside each block.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Export.Title" xml:space="preserve"><value>What goes to League</value></data>
+  <data name="Coaching.MatchupEditor.Items.Export.Text" xml:space="preserve"><value>League understands block names, their order, and item IDs. Matchup phases, advice, and conditions remain in TempoCue.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Loading" xml:space="preserve"><value>Loading items for the selected patch…</value></data>
+  <data name="Coaching.MatchupEditor.Items.ErrorTitle" xml:space="preserve"><value>Item catalog is unavailable</value></data>
+  <data name="Coaching.MatchupEditor.Items.ErrorDescription" xml:space="preserve"><value>You can save a phase without item recommendations or retry loading.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Retry" xml:space="preserve"><value>Retry</value></data>
+  <data name="Coaching.MatchupEditor.Items.Select" xml:space="preserve"><value>Select items</value></data>
+  <data name="Coaching.MatchupEditor.Items.Change" xml:space="preserve"><value>Change</value></data>
+  <data name="Coaching.MatchupEditor.Items.Remove" xml:space="preserve"><value>Remove item</value></data>
+  <data name="Coaching.MatchupEditor.Items.CatalogLoaded" xml:space="preserve"><value>{0} items loaded</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.Title" xml:space="preserve"><value>Select item</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.Description" xml:space="preserve"><value>Select one or more items from the chosen patch.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.RecommendationsTitle" xml:space="preserve"><value>Select recommended items</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.RecommendationsDescription" xml:space="preserve"><value>Add only the purchases the player should target during this phase.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.BlockTitle" xml:space="preserve"><value>Select items for the block</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.BlockDescription" xml:space="preserve"><value>Select one or more purchases. Their order can be changed in the block after selection.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.Search" xml:space="preserve"><value>Search by item name</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.Price" xml:space="preserve"><value>{0} gold</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.Technical" xml:space="preserve"><value>ID {0} · {1} · patch {2}</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.SelectForDetails" xml:space="preserve"><value>Select an item to view its price, stats, and description.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.NoResults" xml:space="preserve"><value>No items match the selected filters.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.NoStats" xml:space="preserve"><value>Data Dragon does not provide numeric stats for this item.</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.SourceNote" xml:space="preserve"><value>Items available for purchase on Summoner's Rift in the selected patch</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.Confirm" xml:space="preserve"><value>Select</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.SelectedCount" xml:space="preserve"><value>Selected: {0}</value></data>
+  <data name="Coaching.MatchupEditor.Items.Picker.ConfirmMultiple" xml:space="preserve"><value>Apply · {0}</value></data>
+  <data name="Coaching.MatchupEditor.Items.Category.All" xml:space="preserve"><value>All</value></data>
+  <data name="Coaching.MatchupEditor.Items.Category.Starter" xml:space="preserve"><value>Starter</value></data>
+  <data name="Coaching.MatchupEditor.Items.Category.Boots" xml:space="preserve"><value>Boots</value></data>
+  <data name="Coaching.MatchupEditor.Items.Category.Basic" xml:space="preserve"><value>Basic</value></data>
+  <data name="Coaching.MatchupEditor.Items.Category.Epic" xml:space="preserve"><value>Epic</value></data>
+  <data name="Coaching.MatchupEditor.Items.Category.Legendary" xml:space="preserve"><value>Legendary</value></data>
+  <data name="Coaching.MatchupEditor.Items.Sort.Name" xml:space="preserve"><value>By name</value></data>
+  <data name="Coaching.MatchupEditor.Items.Sort.PriceAscending" xml:space="preserve"><value>Cheapest first</value></data>
+  <data name="Coaching.MatchupEditor.Items.Sort.PriceDescending" xml:space="preserve"><value>Most expensive first</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.Health" xml:space="preserve"><value>Health</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.Mana" xml:space="preserve"><value>Mana</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.AttackDamage" xml:space="preserve"><value>Attack damage</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.AbilityPower" xml:space="preserve"><value>Ability power</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.Armor" xml:space="preserve"><value>Armor</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.MagicResistance" xml:space="preserve"><value>Magic resistance</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.MoveSpeed" xml:space="preserve"><value>Move speed</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.MoveSpeedPercent" xml:space="preserve"><value>Move speed</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.AttackSpeed" xml:space="preserve"><value>Attack speed</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.LifeSteal" xml:space="preserve"><value>Life steal</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.CriticalStrikeChance" xml:space="preserve"><value>Critical strike chance</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.HealthRegen" xml:space="preserve"><value>Health regeneration</value></data>
+  <data name="Coaching.MatchupEditor.Items.Stat.ManaRegen" xml:space="preserve"><value>Mana regeneration</value></data>
+  <data name="Coaching.MatchupEditor.Content.Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Coaching.MatchupEditor.Content.DuplicateName" xml:space="preserve"><value>{0} — copy</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Description" xml:space="preserve"><value>This advice pack applies only to this matchup: your champion against the selected opponent in the same lane.</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Player" xml:space="preserve"><value>I am playing</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Opponent" xml:space="preserve"><value>My opponent</value></data>
+  <data name="Coaching.MatchupEditor.Champions.SelectionHint" xml:space="preserve"><value>Select another champion from the list below.</value></data>
+  <data name="Coaching.MatchupEditor.Champions.SelectPlaceholder" xml:space="preserve"><value>Select a champion</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Search" xml:space="preserve"><value>Search…</value></data>
+  <data name="Coaching.MatchupEditor.Champions.SameChampionError" xml:space="preserve"><value>The player and opponent must be different champions.</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Role" xml:space="preserve"><value>Lane role</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Role.Any" xml:space="preserve"><value>Any role</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Loading" xml:space="preserve"><value>Loading champions…</value></data>
+  <data name="Coaching.MatchupEditor.Champions.LoadError" xml:space="preserve"><value>Could not load the champion list</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Retry" xml:space="preserve"><value>Try again</value></data>
+  <data name="Coaching.MatchupEditor.Champions.UsingCache" xml:space="preserve"><value>Using the saved champion list</value></data>
+  <data name="Coaching.MatchupEditor.Champions.CatalogLoaded" xml:space="preserve"><value>Riot Data Dragon catalog · {0} champions loaded</value></data>
+  <data name="Coaching.MatchupEditor.Champions.CatalogLoading" xml:space="preserve"><value>Riot Data Dragon catalog · loading champions</value></data>
+  <data name="Coaching.MatchupEditor.Champions.ReadinessSummary" xml:space="preserve"><value>{0} vs {1} · {2}</value></data>
+  <data name="Coaching.MatchupEditor.Champions.CatalogSource" xml:space="preserve"><value>Riot Data Dragon catalog</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Change" xml:space="preserve"><value>Change</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Refresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="Coaching.MatchupEditor.Champions.LoadErrorDescription" xml:space="preserve"><value>Data Dragon is unavailable and no saved copy was found.</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.PlayerTitle" xml:space="preserve"><value>Choose your champion</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.OpponentTitle" xml:space="preserve"><value>Choose the opponent</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.PlayerDescription" xml:space="preserve"><value>The champion you play in this matchup</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.OpponentDescription" xml:space="preserve"><value>The champion you face in this matchup</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.Close" xml:space="preserve"><value>Close</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.Search" xml:space="preserve"><value>Search by name</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.Empty" xml:space="preserve"><value>No champions found</value></data>
+  <data name="Coaching.MatchupEditor.Champions.Picker.EmptyDescription" xml:space="preserve"><value>Try another search query.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.EmptyTitle" xml:space="preserve"><value>Add the first phase</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.EmptyDescription" xml:space="preserve"><value>Coverage will be checked automatically after a phase is saved.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.ValidTitle" xml:space="preserve"><value>Phases are consistent</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.ValidDescription" xml:space="preserve"><value>Exactly one phase applies to every level.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.WarningTitle" xml:space="preserve"><value>Some levels have no advice</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.WarningDescription" xml:space="preserve"><value>Add a phase for the missing level range.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.ErrorTitle" xml:space="preserve"><value>Phase conflicts found</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.ErrorDescription" xml:space="preserve"><value>Resolve the conflicts before continuing: only one phase may apply to a game state.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.CoverageTitle" xml:space="preserve"><value>Level coverage</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.CoverageHint" xml:space="preserve"><value>Only level ranges are checked. Recommended items do not restrict a phase.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.CoverageStart" xml:space="preserve"><value>lvl. 1</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.CoverageEnd" xml:space="preserve"><value>lvl. 18</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.Issue.InvalidRange" xml:space="preserve"><value>“{0}” has an invalid level range.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.Issue.Overlap" xml:space="preserve"><value>“{0}” and “{1}” can both apply at {2}.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.Issue.Gap" xml:space="preserve"><value>No phase applies at {0}.</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.LevelSingle" xml:space="preserve"><value>level {0}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.LevelRange" xml:space="preserve"><value>levels {0}–{1}</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.Coverage.Covered" xml:space="preserve"><value>Level {0}: every state is covered</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.Coverage.Uncovered" xml:space="preserve"><value>Level {0}: at least one state has no phase</value></data>
+  <data name="Coaching.MatchupEditor.Content.Validation.Coverage.Ambiguous" xml:space="preserve"><value>Level {0}: phases can overlap</value></data>
+  <data name="Coaching.MatchupEditor.StepSummary.Verification" xml:space="preserve"><value>Step 4 of 5 · Verification</value></data>
+  <data name="Coaching.MatchupEditor.Verification.ActivePhase" xml:space="preserve"><value>Active phase {0}: {1}</value></data>
+  <data name="Coaching.MatchupEditor.Verification.ActivePhaseDescription" xml:space="preserve"><value>The phase is active at {0}</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Selection.Selected" xml:space="preserve"><value>A phase is selected</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Selection.SelectedDescription" xml:space="preserve"><value>Exactly one phase applies at level {0}.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Selection.NotFound" xml:space="preserve"><value>No phase for this level</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Selection.NotFoundDescription" xml:space="preserve"><value>The player will not receive a phase advice at level {0}.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Selection.Ambiguous" xml:space="preserve"><value>Several phases apply</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Selection.AmbiguousDescription" xml:space="preserve"><value>Resolve the conflict at level {0} before saving.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Preset" xml:space="preserve"><value>Level {0}</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Simulator.Title" xml:space="preserve"><value>Match state simulator</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Simulator.Description" xml:space="preserve"><value>Change the level to verify phase transitions. Recommended items do not switch phases.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Simulator.Level" xml:space="preserve"><value>Champion level</value></data>
+  <data name="Coaching.MatchupEditor.Verification.RecommendedItems.Title" xml:space="preserve"><value>Recommended items for this phase</value></data>
+  <data name="Coaching.MatchupEditor.Verification.RecommendedItems.Description" xml:space="preserve"><value>These are purchase recommendations, not phase activation conditions.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.RecommendedItems.Empty" xml:space="preserve"><value>No items were recommended for the selected phase.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Advice.Title" xml:space="preserve"><value>Main advice to the player</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Advice.MatchupTag" xml:space="preserve"><value>Matchup</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Advice.Phase" xml:space="preserve"><value>phase {0}</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Advice.WhyNow" xml:space="preserve"><value>Why now</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Advice.NextGoal" xml:space="preserve"><value>Next</value></data>
+  <data name="Coaching.MatchupEditor.Verification.AdviceSource" xml:space="preserve"><value>{0} vs {1} · {2}</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Advice.PreviewHint" xml:space="preserve"><value>This is how the advice card will look in the main window during a match.</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Persistent.Title" xml:space="preserve"><value>Persistent tips nearby</value></data>
+  <data name="Coaching.MatchupEditor.Verification.Persistent.Empty" xml:space="preserve"><value>No persistent tips apply to the selected phase.</value></data>
+  <data name="Coaching.MatchupEditor.StepSummary.Save" xml:space="preserve"><value>Step 5 of 5 · Save</value></data>
+  <data name="Coaching.MatchupEditor.Save.Action.Draft" xml:space="preserve"><value>Save as draft</value></data>
+  <data name="Coaching.MatchupEditor.Save.Action.Enable" xml:space="preserve"><value>Save and enable</value></data>
+  <data name="Coaching.MatchupEditor.Save.Action.Changes" xml:space="preserve"><value>Save changes</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Title" xml:space="preserve"><value>Pre-save check</value></data>
+  <data name="Count.PhaseCompleted.One" xml:space="preserve"><value>{0} phase completed</value></data>
+  <data name="Count.PhaseCompleted.Other" xml:space="preserve"><value>{0} phases completed</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Phases.Ready" xml:space="preserve"><value>There are no overlaps or gaps between phases.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Phases.Warning" xml:space="preserve"><value>The pack can be saved, but no advice will appear at uncovered levels.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Patch" xml:space="preserve"><value>Compatible with patch {0}</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Patch.Description" xml:space="preserve"><value>Selected item identifiers came from the Data Dragon catalog.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Permission.Ready" xml:space="preserve"><value>Source is ready</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Permission.Missing" xml:space="preserve"><value>Author permission is not confirmed</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Permission.Personal" xml:space="preserve"><value>Personal experience does not require permission from an external author.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Permission.Granted" xml:space="preserve"><value>Permission is marked as granted.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Check.Permission.LocalOnly" xml:space="preserve"><value>Local saving is available. Community publishing will require confirmation.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Title" xml:space="preserve"><value>Source</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Description" xml:space="preserve"><value>Personal experience is a valid source. For external material, provide its URL and author.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.PersonalExperience" xml:space="preserve"><value>Personal experience</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Article" xml:space="preserve"><value>Article</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Video" xml:space="preserve"><value>Video</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Guide" xml:space="preserve"><value>Community guide</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Name" xml:space="preserve"><value>Source title *</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Author" xml:space="preserve"><value>Source author *</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Link" xml:space="preserve"><value>Link *</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.RequiredHint" xml:space="preserve"><value>* Required fields for an external source</value></data>
+  <data name="Coaching.MatchupEditor.Save.Source.Validation" xml:space="preserve"><value>Provide a title, author, and full http:// or https:// URL.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Permission.Checkbox" xml:space="preserve"><value>Author permission to use this source was granted</value></data>
+  <data name="Coaching.MatchupEditor.Save.Permission.Granted" xml:space="preserve"><value>granted</value></data>
+  <data name="Coaching.MatchupEditor.Save.Permission.NotConfirmed" xml:space="preserve"><value>not confirmed</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Title" xml:space="preserve"><value>Pack card</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Type.Matchup" xml:space="preserve"><value>Matchup</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Matchup" xml:space="preserve"><value>{0} vs {1} · {2}</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Author" xml:space="preserve"><value>Author</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.ContentLanguage" xml:space="preserve"><value>Content language</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Language" xml:space="preserve"><value>{0} · not translated automatically</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.GamePatch" xml:space="preserve"><value>Game patch</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.SourceLabel" xml:space="preserve"><value>Source</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Source" xml:space="preserve"><value>{0} · permission: {1}</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Verified" xml:space="preserve"><value>Verified</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.State" xml:space="preserve"><value>State</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.State.Enabled" xml:space="preserve"><value>Enabled</value></data>
+  <data name="Coaching.MatchupEditor.Save.Card.Ready" xml:space="preserve"><value>The pack is ready for local saving and use.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Status.Saving" xml:space="preserve"><value>Saving pack…</value></data>
+  <data name="Coaching.MatchupEditor.Save.Status.DraftSaved" xml:space="preserve"><value>Draft saved locally.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Status.EnabledSaved" xml:space="preserve"><value>Pack saved and enabled. Engine integration will be completed in the next library iteration.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Status.Failed" xml:space="preserve"><value>Could not save the pack. Check access to the local application folder.</value></data>
+  <data name="Coaching.MatchupEditor.Save.Status.Saved" xml:space="preserve"><value>Pack saved locally.</value></data>
+  <data name="Count.ItemBlock.One" xml:space="preserve"><value>{0} block</value></data>
+  <data name="Count.ItemBlock.Other" xml:space="preserve"><value>{0} blocks</value></data>
+  <data name="Coaching.Details.Back" xml:space="preserve"><value>← Back to library</value></data>
+  <data name="Coaching.Details.Versus" xml:space="preserve"><value>vs</value></data>
+  <data name="Coaching.Details.Disable" xml:space="preserve"><value>Disable</value></data>
+  <data name="Coaching.Details.Enable" xml:space="preserve"><value>Enable</value></data>
+  <data name="Coaching.Details.Header" xml:space="preserve"><value>Matchup · {0} · {1} · {2}</value></data>
+  <data name="Coaching.Details.Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Coaching.Details.CreateCopy" xml:space="preserve"><value>Create your copy</value></data>
+  <data name="Coaching.Details.Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Coaching.Details.Delete.Own" xml:space="preserve"><value>Delete Coach Pack</value></data>
+  <data name="Coaching.Details.Delete.Imported" xml:space="preserve"><value>Remove installation</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Own.Title" xml:space="preserve"><value>Delete Coach Pack?</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Own.Message" xml:space="preserve"><value>Delete “{0}” permanently from this device? This action cannot be undone.</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Own.Action" xml:space="preserve"><value>Delete permanently</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Imported.Title" xml:space="preserve"><value>Remove installed Coach Pack?</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Imported.Message" xml:space="preserve"><value>Remove the local installation of “{0}”? The author's published original will not be changed.</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Imported.Action" xml:space="preserve"><value>Remove installation</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Title" xml:space="preserve"><value>Delete Coach Pack?</value></data>
+  <data name="Coaching.Details.Delete.Confirmation.Message" xml:space="preserve"><value>Delete “{0}” from this device? This action cannot be undone.</value></data>
+  <data name="Coaching.Details.Delete.Failed.Title" xml:space="preserve"><value>Coach Pack was not deleted</value></data>
+  <data name="Coaching.Details.Delete.Failed.Message" xml:space="preserve"><value>Could not delete the local Coach Pack files. Close programs that may be using them and try again.</value></data>
+  <data name="Coaching.Details.Edit.Planned" xml:space="preserve"><value>Editing a saved pack will be added in a later iteration.</value></data>
+  <data name="Coaching.Details.Tab.Overview" xml:space="preserve"><value>Overview</value></data>
+  <data name="Coaching.Details.Tab.Advice" xml:space="preserve"><value>Advice</value></data>
+  <data name="Coaching.Details.Tab.Items" xml:space="preserve"><value>Items</value></data>
+  <data name="Coaching.Details.Overview.Description" xml:space="preserve"><value>Short description</value></data>
+  <data name="Coaching.Details.Overview.Description.Empty" xml:space="preserve"><value>The author did not add a description.</value></data>
+  <data name="Coaching.Details.Overview.AppliesWhen" xml:space="preserve"><value>When it applies</value></data>
+  <data name="Coaching.Details.Overview.Value.MyChampion" xml:space="preserve"><value>My champion: {0}</value></data>
+  <data name="Coaching.Details.Overview.Value.Opponent" xml:space="preserve"><value>Opponent: {0}</value></data>
+  <data name="Coaching.Details.Overview.Value.Role" xml:space="preserve"><value>Role: {0}</value></data>
+  <data name="Coaching.Details.Overview.About" xml:space="preserve"><value>About this pack</value></data>
+  <data name="Coaching.Details.Overview.Type" xml:space="preserve"><value>Pack type</value></data>
+  <data name="Coaching.Details.Overview.Type.Matchup" xml:space="preserve"><value>Matchup</value></data>
+  <data name="Coaching.Details.Overview.Author" xml:space="preserve"><value>Author</value></data>
+  <data name="Coaching.Details.Overview.Language" xml:space="preserve"><value>Content language</value></data>
+  <data name="Coaching.Details.Overview.Patch" xml:space="preserve"><value>Game patch</value></data>
+  <data name="Coaching.Details.Overview.VerifiedOn" xml:space="preserve"><value>Last verified</value></data>
+  <data name="Coaching.Details.Overview.Source" xml:space="preserve"><value>Source</value></data>
+  <data name="Coaching.Details.Overview.Role" xml:space="preserve"><value>Role</value></data>
+  <data name="Coaching.Details.Overview.NotSpecified" xml:space="preserve"><value>Not specified</value></data>
+  <data name="Coaching.Details.Source.PersonalExperience" xml:space="preserve"><value>Author's personal experience</value></data>
+  <data name="Coaching.Details.Source.OpenFailed" xml:space="preserve"><value>Could not open the link in the browser.</value></data>
+  <data name="Coaching.Details.ExportPack" xml:space="preserve"><value>Export Coach Pack to file</value></data>
+  <data name="Coaching.Details.CheckUpdate" xml:space="preserve"><value>Check for updates</value></data>
+  <data name="Coaching.Details.MoreActions" xml:space="preserve"><value>More actions</value></data>
+  <data name="Coaching.Details.Toggle" xml:space="preserve"><value>Enable or disable this Coach Pack</value></data>
+  <data name="Coaching.Details.ExportPack.Hint" xml:space="preserve"><value>Save the complete Coach Pack for sharing or backup.</value></data>
+  <data name="Coaching.Details.ExportPack.Filter" xml:space="preserve"><value>TempoCue Coach Pack (*.tempocue.json)|*.tempocue.json|JSON (*.json)|*.json</value></data>
+  <data name="Coaching.Details.ExportPack.Status.Saved" xml:space="preserve"><value>The Coach Pack file was saved.</value></data>
+  <data name="Coaching.Details.ExportPack.Status.Failed" xml:space="preserve"><value>The Coach Pack could not be saved. Choose another folder and try again.</value></data>
+  <data name="Coaching.Details.Advice.Phases" xml:space="preserve"><value>Matchup phases</value></data>
+  <data name="Coaching.Details.Advice.ReadOnly" xml:space="preserve"><value>Read-only. Open the pack editor to change advice.</value></data>
+  <data name="Coaching.Details.Advice.Persistent" xml:space="preserve"><value>Persistent tips</value></data>
+  <data name="Coaching.Details.Advice.Persistent.Empty" xml:space="preserve"><value>The author did not add persistent tips.</value></data>
+  <data name="Coaching.Details.Items.Title" xml:space="preserve"><value>Item blocks</value></data>
+  <data name="Coaching.Details.Items.Description" xml:space="preserve"><value>Names and order are defined by the author. Export does not change the Coach Pack.</value></data>
+  <data name="Coaching.Details.Items.Export" xml:space="preserve"><value>Export to League</value></data>
+  <data name="Coaching.Details.Items.ExportHint" xml:space="preserve"><value>If the author updates item blocks, export the item set again to refresh it in League.</value></data>
+  <data name="Coaching.Details.Items.CatalogUnavailable" xml:space="preserve"><value>The Data Dragon item catalog is unavailable. Technical item IDs are shown and export is blocked until compatibility can be verified.</value></data>
+  <data name="Coaching.Details.Items.NoHint" xml:space="preserve"><value>No selection note</value></data>
+  <data name="Coaching.Details.Items.Unknown" xml:space="preserve"><value>Item #{0}</value></data>
+  <data name="Coaching.Details.Items.EmptyBlock" xml:space="preserve"><value>The author has not added items yet.</value></data>
+  <data name="Coaching.Export.DefaultTitle" xml:space="preserve"><value>TempoCue — {0}</value></data>
+  <data name="Coaching.Export.Title" xml:space="preserve"><value>Export to League of Legends</value></data>
+  <data name="Coaching.Export.Close" xml:space="preserve"><value>Close export</value></data>
+  <data name="Coaching.Export.Name" xml:space="preserve"><value>Item set name in League</value></data>
+  <data name="Coaching.Export.Champion" xml:space="preserve"><value>Champion</value></data>
+  <data name="Coaching.Export.Map" xml:space="preserve"><value>Map</value></data>
+  <data name="Coaching.Export.Map.SummonersRift" xml:space="preserve"><value>Summoner's Rift</value></data>
+  <data name="Coaching.Export.Blocks" xml:space="preserve"><value>Blocks to export</value></data>
+  <data name="Coaching.Export.Preview" xml:space="preserve"><value>Item set preview</value></data>
+  <data name="Coaching.Export.Warning.Matchup" xml:space="preserve"><value>League associates an item set with a champion and map, but cannot select it by enemy champion.</value></data>
+  <data name="Coaching.Export.Warning.Content" xml:space="preserve"><value>Only block names and items are exported. Phases, advice, and conditions stay in TempoCue.</value></data>
+  <data name="Coaching.Export.Install" xml:space="preserve"><value>Install in League Client</value></data>
+  <data name="Coaching.Export.Install.Planned" xml:space="preserve"><value>Available after product registration.</value></data>
+  <data name="Coaching.Export.Download" xml:space="preserve"><value>Download .json</value></data>
+  <data name="Coaching.Export.Copy" xml:space="preserve"><value>Copy JSON</value></data>
+  <data name="Coaching.Export.Status.TitleRequired" xml:space="preserve"><value>Enter an item set name.</value></data>
+  <data name="Coaching.Export.Status.EmptyBlock" xml:space="preserve"><value>A selected block has no items. Deselect it to continue.</value></data>
+  <data name="Coaching.Export.Status.Building" xml:space="preserve"><value>Checking Data Dragon compatibility…</value></data>
+  <data name="Coaching.Export.Status.Ready" xml:space="preserve"><value>Ready: {0} · {1}. All items were found in the selected patch catalog.</value></data>
+  <data name="Coaching.Export.Status.Copied" xml:space="preserve"><value>JSON copied. Import the file or its contents through League item set tools.</value></data>
+  <data name="Coaching.Export.Status.ClipboardFailed" xml:space="preserve"><value>The clipboard is busy. Try copying the JSON again.</value></data>
+  <data name="Coaching.Export.Status.Downloaded" xml:space="preserve"><value>The item set JSON was saved.</value></data>
+  <data name="Coaching.Export.Status.FileWriteFailed" xml:space="preserve"><value>The file could not be saved. Choose another folder and try again.</value></data>
+  <data name="Coaching.Export.Status.NoBlocks" xml:space="preserve"><value>Select at least one non-empty block.</value></data>
+  <data name="Coaching.Export.Status.ChampionCatalogUnavailable" xml:space="preserve"><value>The champion catalog is unavailable, so the League champion ID cannot be verified.</value></data>
+  <data name="Coaching.Export.Status.ChampionNotFound" xml:space="preserve"><value>The pack champion was not found in the current Data Dragon catalog.</value></data>
+  <data name="Coaching.Export.Status.ItemCatalogUnavailable" xml:space="preserve"><value>The item catalog is unavailable. Export is blocked until item compatibility can be verified.</value></data>
+  <data name="Coaching.Export.Status.ItemsNotFound" xml:space="preserve"><value>These item IDs are absent from the selected patch catalog: {0}.</value></data>
+  <data name="Coaching.Export.Status.Failed" xml:space="preserve"><value>The item set could not be built.</value></data>
+  <data name="Settings.Overlay.Section" xml:space="preserve"><value>Game overlay</value></data>
+  <data name="Settings.Overlay.Enabled.Label" xml:space="preserve"><value>In-game notifications</value></data>
+  <data name="Settings.Overlay.Enabled.On" xml:space="preserve"><value>Enabled</value></data>
+  <data name="Settings.Overlay.Enabled.Off" xml:space="preserve"><value>Disabled</value></data>
+  <data name="Settings.Overlay.Width.Label" xml:space="preserve"><value>Overlay width</value></data>
+  <data name="Settings.Overlay.Opacity.Label" xml:space="preserve"><value>Background opacity</value></data>
+  <data name="Settings.Overlay.Configure.Button" xml:space="preserve"><value>Configure overlay</value></data>
+  <data name="Settings.Overlay.Configure.Hint" xml:space="preserve"><value>Opens a safe preview that you can drag without an active match.</value></data>
+  <data name="Settings.Overlay.Configure.Hotkey" xml:space="preserve"><value>or Ctrl + Alt + O</value></data>
+  <data name="Settings.Overlay.Duration.Label" xml:space="preserve"><value>Display duration</value></data>
+  <data name="Settings.Overlay.Duration.Summary" xml:space="preserve"><value>Short messages 5–8 seconds, long advice up to 16 seconds</value></data>
+  <data name="Settings.Overlay.Duration.Automatic" xml:space="preserve"><value>Automatic</value></data>
+  <data name="Settings.Overlay.Duration.Automatic.Hint" xml:space="preserve"><value>TempoCue chooses a duration based on message length and importance.</value></data>
+  <data name="Settings.Overlay.Duration.Fixed" xml:space="preserve"><value>Fixed time</value></data>
+  <data name="Settings.Overlay.Duration.Fixed.Hint" xml:space="preserve"><value>All regular notifications stay on screen for the same duration.</value></data>
+  <data name="Settings.Overlay.Duration.Fixed.Value" xml:space="preserve"><value>Display duration</value></data>
+  <data name="Settings.Overlay.Duration.Warning" xml:space="preserve"><value>Danger alerts always remain visible for at least 6 seconds so they cannot be missed.</value></data>
+  <data name="Settings.Overlay.Duration.SecondsSuffix" xml:space="preserve"><value>sec</value></data>
+  <data name="Settings.Overlay.Persistent.Label" xml:space="preserve"><value>Whole-match advice</value></data>
+  <data name="Settings.Overlay.Persistent.Summary" xml:space="preserve"><value>Matchup mechanics that are not tied to a specific moment</value></data>
+  <data name="Settings.Overlay.Persistent.Once" xml:space="preserve"><value>Once per match</value></data>
+  <data name="Settings.Overlay.Persistent.Recommended" xml:space="preserve"><value>recommended</value></data>
+  <data name="Settings.Overlay.Persistent.Once.Hint" xml:space="preserve"><value>Tips are introduced gradually and do not start repeating after the list ends.</value></data>
+  <data name="Settings.Overlay.Persistent.Level" xml:space="preserve"><value>Repeat in a loop</value></data>
+  <data name="Settings.Overlay.Persistent.Level.Hint" xml:space="preserve"><value>The next tip appears on level up. The same tip does not repeat until at least three levels later.</value></data>
+  <data name="Settings.Overlay.Persistent.Disabled" xml:space="preserve"><value>Do not show automatically</value></data>
+  <data name="Settings.Overlay.Persistent.Disabled.Hint" xml:space="preserve"><value>Whole-match tips remain available in the Coach Pack details.</value></data>
+  <data name="Settings.Overlay.Persistent.ScopeHint" xml:space="preserve"><value>Phase changes and danger alerts are always shown separately and do not depend on this setting.</value></data>
+  <data name="Settings.Overlay.Reset.Button" xml:space="preserve"><value>Default values</value></data>
+  <data name="Settings.Overlay.Save.Button" xml:space="preserve"><value>Save settings</value></data>
+  <data name="Settings.Overlay.Unsaved" xml:space="preserve"><value>There are unsaved changes</value></data>
+  <data name="Settings.Overlay.Preview.Label" xml:space="preserve"><value>Overlay preview</value></data>
+  <data name="Settings.Overlay.Description" xml:space="preserve"><value>Shows Coach Pack advice over the game. Text and the accent rail stay fully opaque.</value></data>
+  <data name="Settings.Overlay.Preview.Button" xml:space="preserve"><value>Show next notification</value></data>
+  <data name="Settings.Overlay.Preview.Warning.Label" xml:space="preserve"><value>Caution</value></data>
+  <data name="Settings.Overlay.Preview.Warning.Title" xml:space="preserve"><value>An opponent has left their lane</value></data>
+  <data name="Settings.Overlay.Preview.Warning.Message" xml:space="preserve"><value>First notification · top slot</value></data>
+  <data name="Settings.Overlay.Preview.Information.Label" xml:space="preserve"><value>Event</value></data>
+  <data name="Settings.Overlay.Preview.Information.Title" xml:space="preserve"><value>Dragon spawns in 30 seconds</value></data>
+  <data name="Settings.Overlay.Preview.Information.Message" xml:space="preserve"><value>Second notification · bottom slot</value></data>
+  <data name="Settings.Overlay.Preview.Danger.Label" xml:space="preserve"><value>Danger</value></data>
+  <data name="Settings.Overlay.Preview.Danger.Title" xml:space="preserve"><value>The enemy jungler appeared nearby</value></data>
+  <data name="Settings.Overlay.Preview.Danger.Message" xml:space="preserve"><value>Third notification · replaces lower-priority cards</value></data>
+  <data name="Settings.Overlay.Preview.Close" xml:space="preserve"><value>Close overlay</value></data>
+  <data name="Overlay.Matchup.Dismiss" xml:space="preserve"><value>Hide advice</value></data>
+  <data name="Overlay.Matchup.PersistentTip.Status" xml:space="preserve"><value>Matchup tip</value></data>
 </root>

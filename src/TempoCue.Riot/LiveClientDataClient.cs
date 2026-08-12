@@ -16,18 +16,18 @@ public sealed class LiveClientDataClient : IMatchSnapshotSource, IDisposable
 
     private static readonly JsonSerializerOptions ReadOptions = new(JsonSerializerDefaults.Web);
 
-    private static readonly JsonSerializerOptions DisplayOptions = new(JsonSerializerDefaults.Web)
-    {
-        WriteIndented = true
-    };
-
     private readonly HttpClient _httpClient;
     private readonly bool _ownsHttpClient;
     private readonly Func<bool> _isGameProcessRunning;
+    private readonly bool _checkGameProcessBeforeRequest;
 
     /// <summary>Создаёт клиент с настройками для локального HTTPS endpoint League.</summary>
     public LiveClientDataClient()
-        : this(CreateHttpClient(), ownsHttpClient: true, IsLeagueGameRunning)
+        : this(
+            CreateHttpClient(),
+            ownsHttpClient: true,
+            IsLeagueGameRunning,
+            checkGameProcessBeforeRequest: true)
     {
     }
 
@@ -36,26 +36,36 @@ public sealed class LiveClientDataClient : IMatchSnapshotSource, IDisposable
     /// чтобы проверить преобразование ответа без запущенной League of Legends.
     /// </summary>
     public LiveClientDataClient(HttpClient httpClient)
-        : this(httpClient, ownsHttpClient: false, static () => false)
+        : this(
+            httpClient,
+            ownsHttpClient: false,
+            static () => false,
+            checkGameProcessBeforeRequest: false)
     {
     }
 
     /// <summary>Позволяет тестам задать состояние игрового процесса.</summary>
     public LiveClientDataClient(HttpClient httpClient, Func<bool> isGameProcessRunning)
-        : this(httpClient, ownsHttpClient: false, isGameProcessRunning)
+        : this(
+            httpClient,
+            ownsHttpClient: false,
+            isGameProcessRunning,
+            checkGameProcessBeforeRequest: true)
     {
     }
 
     private LiveClientDataClient(
         HttpClient httpClient,
         bool ownsHttpClient,
-        Func<bool> isGameProcessRunning)
+        Func<bool> isGameProcessRunning,
+        bool checkGameProcessBeforeRequest)
     {
         ArgumentNullException.ThrowIfNull(httpClient);
         ArgumentNullException.ThrowIfNull(isGameProcessRunning);
         _httpClient = httpClient;
         _ownsHttpClient = ownsHttpClient;
         _isGameProcessRunning = isGameProcessRunning;
+        _checkGameProcessBeforeRequest = checkGameProcessBeforeRequest;
     }
 
     /// <summary>Получает один полный снимок активного матча.</summary>
@@ -77,11 +87,7 @@ public sealed class LiveClientDataClient : IMatchSnapshotSource, IDisposable
         var match = LiveClientDataMapper.Map(data);
         var events = LiveClientDataMapper.MapEvents(data);
 
-        // Повторная сериализация нужна только для удобного отображения JSON в приложении.
-        using var document = JsonDocument.Parse(rawJson);
-        var displayJson = JsonSerializer.Serialize(document.RootElement, DisplayOptions);
-
-        return new MatchSnapshot(match, events, displayJson, DateTimeOffset.UtcNow);
+        return new MatchSnapshot(match, events, rawJson, DateTimeOffset.UtcNow);
     }
 
     /// <summary>
@@ -93,6 +99,15 @@ public sealed class LiveClientDataClient : IMatchSnapshotSource, IDisposable
     {
         try
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            // Без игрового процесса loopback endpoint заведомо недоступен. Предварительная
+            // проверка не создаёт HTTPS-запросы с таймаутом во время простоя приложения.
+            if (_checkGameProcessBeforeRequest && !_isGameProcessRunning())
+            {
+                return MatchSnapshotReadResult.NoActiveMatch();
+            }
+
             return MatchSnapshotReadResult.Success(
                 await GetSnapshotAsync(cancellationToken));
         }

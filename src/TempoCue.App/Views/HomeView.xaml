@@ -1,0 +1,255 @@
+<UserControl x:Class="TempoCue.App.Views.HomeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:application="clr-namespace:TempoCue.Application;assembly=TempoCue.Application"
+             xmlns:localization="clr-namespace:TempoCue.App.Localization"
+             Background="#080D14"
+             FontFamily="Segoe UI">
+    <UserControl.Resources>
+        <!-- Общие карточки, кнопки и типографика главной страницы. -->
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Styles/ShellControls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <!-- Главная страница: состояние подключения и краткая готовность функций. -->
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="16" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Центральный призыв подключиться к матчу или повторить проверку. -->
+        <Border Style="{StaticResource ShellCard}" Padding="40" MinHeight="154">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="96" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Path Width="64" Height="64"
+                      Data="{StaticResource Icon.MarkCoach}"
+                      Style="{StaticResource TempoIcon}"
+                      Stroke="#34496A"
+                      StrokeThickness="1.5"
+                      StrokeDashArray="3 3"
+                      HorizontalAlignment="Left"
+                      VerticalAlignment="Center" />
+                <StackPanel Grid.Column="1"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left">
+                    <TextBlock Text="{Binding HeroTitle}"
+                               Foreground="#F4F7FB" FontSize="20"
+                               FontWeight="SemiBold"
+                               LineHeight="26"
+                               HorizontalAlignment="Left" />
+                    <TextBlock Text="{Binding HeroDescription}"
+                               Foreground="#91A4BD" FontSize="14"
+                               TextWrapping="Wrap" MaxWidth="560"
+                               Margin="0,8,0,0" LineHeight="20"
+                               HorizontalAlignment="Left" />
+                </StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal"
+                            VerticalAlignment="Center">
+                    <Button Content="{localization:Loc Home.CheckAgain}"
+                            Style="{StaticResource PrimaryButton}"
+                            Click="CheckAgainButton_Click" />
+                    <Button Content="{localization:Loc Home.OpenMatch}"
+                            Style="{StaticResource SecondaryButton}"
+                            Margin="10,0,0,0"
+                            Click="OpenCurrentMatchButton_Click" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Три информационные карточки: система, будущая история и доступные возможности. -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.2*" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Style="{StaticResource ShellCard}">
+                <StackPanel>
+                    <TextBlock Text="{localization:Loc Home.Readiness.Title}"
+                               Foreground="#91A4BD" FontSize="13"
+                               FontWeight="SemiBold" Margin="0,0,0,14" />
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Live Client Data" Foreground="#F4F7FB" FontSize="14" />
+                        <TextBlock Grid.Column="1" Text="{Binding LiveDataValue}" FontSize="13">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="#D6B766" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Status}"
+                                                     Value="{x:Static application:MatchSnapshotReadStatus.Success}">
+                                            <Setter Property="Foreground" Value="#67CDA4" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Status}"
+                                                     Value="{x:Static application:MatchSnapshotReadStatus.Timeout}">
+                                            <Setter Property="Foreground" Value="#E8BB58" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Status}"
+                                                     Value="{x:Static application:MatchSnapshotReadStatus.InvalidData}">
+                                            <Setter Property="Foreground" Value="#E8BB58" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Status}"
+                                                     Value="{x:Static application:MatchSnapshotReadStatus.Failed}">
+                                            <Setter Property="Foreground" Value="#E8BB58" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{localization:Loc Home.Readiness.Refresh}"
+                                   Foreground="#F4F7FB" FontSize="14" />
+                        <TextBlock Grid.Column="1" Text="1 s"
+                                   Foreground="#67CDA4" FontSize="13" />
+                    </Grid>
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{localization:Loc Home.Readiness.Match}"
+                                   Foreground="#F4F7FB" FontSize="14" />
+                        <TextBlock Grid.Column="1" Text="{Binding MatchStatusValue}" FontSize="13">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="#91A4BD" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Status}"
+                                                     Value="{x:Static application:MatchSnapshotReadStatus.Success}">
+                                            <Setter Property="Foreground" Value="#67CDA4" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{localization:Loc Home.Readiness.CoachPacks}"
+                                   Foreground="#F4F7FB" FontSize="14" />
+                        <TextBlock x:Name="CoachPackCountTextBlock"
+                                   Grid.Column="1" Text="{Binding CoachPackCountValue}"
+                                   Foreground="#67CDA4" FontSize="13" />
+                    </Grid>
+                    <Border Height="1" Background="#162235" Margin="0,16,0,14" />
+                    <TextBlock Text="{localization:Loc Home.Readiness.Hint}"
+                               Style="{StaticResource ShellCaption}"
+                               TextWrapping="Wrap" LineHeight="18" />
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="2" Style="{StaticResource ShellCard}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="{localization:Loc Home.History.Title}"
+                               Foreground="#91A4BD" FontSize="13"
+                               FontWeight="SemiBold" />
+                    <StackPanel Grid.Row="1"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                MaxWidth="250">
+                        <Border Width="48" Height="48"
+                                HorizontalAlignment="Center"
+                                Background="#14253C"
+                                BorderBrush="#29435F"
+                                BorderThickness="1"
+                                CornerRadius="10">
+                            <Path Width="22" Height="22"
+                                  Data="{StaticResource Icon.NavHistory}"
+                                  Style="{StaticResource TempoIcon}"
+                                  Stroke="#6FC4EF"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center" />
+                        </Border>
+                        <TextBlock x:Name="HistoryDevelopmentTextBlock"
+                                   Text="{localization:Loc Home.History.Development}"
+                                   Foreground="#ECF3FA"
+                                   FontSize="15"
+                                   FontWeight="SemiBold"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,14,0,0" />
+                        <TextBlock Text="{localization:Loc Home.History.Description}"
+                                   Style="{StaticResource ShellCaption}"
+                                   TextWrapping="Wrap"
+                                   TextAlignment="Center"
+                                   LineHeight="18"
+                                   Margin="0,8,0,0" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="4" Style="{StaticResource ShellCard}">
+                <StackPanel>
+                    <TextBlock Text="{localization:Loc Home.Available.Title}"
+                               Foreground="#91A4BD" FontSize="13"
+                               FontWeight="SemiBold" Margin="0,0,0,16" />
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                        <Path Width="16" Height="16" Margin="0,0,8,0"
+                              Data="{StaticResource Icon.StateOk}"
+                              Style="{StaticResource TempoIcon}"
+                              Stroke="#67CDA4" />
+                        <TextBlock Text="{localization:Loc Home.Available.LiveData}" Foreground="#F4F7FB" FontSize="14" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                        <Path Width="16" Height="16" Margin="0,0,8,0"
+                              Data="{StaticResource Icon.StateOk}"
+                              Style="{StaticResource TempoIcon}"
+                              Stroke="#67CDA4" />
+                        <TextBlock Text="{localization:Loc Home.Available.Participants}" Foreground="#F4F7FB" FontSize="14" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                        <Path Width="16" Height="16" Margin="0,0,8,0"
+                              Data="{StaticResource Icon.StateOk}"
+                              Style="{StaticResource TempoIcon}"
+                              Stroke="#67CDA4" />
+                        <TextBlock Text="{localization:Loc Home.Available.Matchup}" Foreground="#F4F7FB" FontSize="14" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                        <Path Width="16" Height="16" Margin="0,0,8,0"
+                              Data="{StaticResource Icon.StateOk}"
+                              Style="{StaticResource TempoIcon}"
+                              Stroke="#67CDA4" />
+                        <TextBlock Text="{localization:Loc Home.Available.Advice}" Foreground="#F4F7FB" FontSize="14" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Path Width="16" Height="16" Margin="0,0,8,0"
+                              Data="{StaticResource Icon.StateOk}"
+                              Style="{StaticResource TempoIcon}"
+                              Stroke="#67CDA4" />
+                        <TextBlock Text="{localization:Loc Home.Available.Json}" Foreground="#F4F7FB" FontSize="14" />
+                    </StackPanel>
+                    <Border Height="1" Background="#162235" Margin="0,16,0,12" />
+                    <TextBlock Text="{localization:Loc Home.Available.Future}"
+                               Style="{StaticResource ShellCaption}"
+                               TextWrapping="Wrap" LineHeight="18" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

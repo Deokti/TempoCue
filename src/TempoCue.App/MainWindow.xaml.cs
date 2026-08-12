@@ -11,29 +11,45 @@ namespace TempoCue.App;
 public partial class MainWindow : Window
 {
     private readonly CurrentMatchViewModel _currentMatchViewModel;
+    private readonly SettingsViewModel _settingsViewModel;
     private readonly LocalizationService _localization = LocalizationService.Instance;
 
-    public MainWindow(CurrentMatchViewModel currentMatchViewModel)
+    public MainWindow(
+        CurrentMatchViewModel currentMatchViewModel,
+        HomeViewModel homeViewModel,
+        SettingsViewModel settingsViewModel,
+        CoachingViewModel coachingViewModel)
     {
         ArgumentNullException.ThrowIfNull(currentMatchViewModel);
+        ArgumentNullException.ThrowIfNull(homeViewModel);
+        ArgumentNullException.ThrowIfNull(settingsViewModel);
+        ArgumentNullException.ThrowIfNull(coachingViewModel);
         _currentMatchViewModel = currentMatchViewModel;
+        _settingsViewModel = settingsViewModel;
 
+        // Главное окно является composition root для экранов: здесь им назначаются готовые ViewModel.
         InitializeComponent();
-        DataContext = _currentMatchViewModel;
-
-        // Названия языков показаны на самих языках: «Русский» и «English».
-        LanguageComboBox.SelectedValue = _localization.CurrentLanguageCode;
-        _isWindowInitialized = true;
+        WindowWorkAreaBehavior.Attach(this);
+        HomeContentPage.DataContext = homeViewModel;
+        SettingsContentPage.DataContext = settingsViewModel;
+        CoachingContentPage.DataContext = coachingViewModel;
+        CurrentMatchContentPage.DataContext = _currentMatchViewModel;
+        HomeContentPage.OpenCurrentMatchRequested += HomeContentPage_OpenCurrentMatchRequested;
 
         Loaded += MainWindow_Loaded;
+        SourceInitialized += MainWindow_SourceInitialized;
         StateChanged += MainWindow_StateChanged;
         Closed += MainWindow_Closed;
     }
 
+    // После загрузки окно подписывается только на представление состояния;
+    // единый цикл polling принадлежит ActiveMatchMonitor в composition root.
     private void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
         _currentMatchViewModel.StateUpdated += CurrentMatchViewModel_StateUpdated;
-        _currentMatchViewModel.Start();
-        RenderHomeFromCurrentMatch();
+        RenderShellFromCurrentMatch();
     }
+
+    private void HomeContentPage_OpenCurrentMatchRequested(object? sender, EventArgs e) =>
+        NavigateTo(AppPage.CurrentMatch);
 }

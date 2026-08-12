@@ -17,6 +17,45 @@ public sealed record CoachPack
     /// <summary>Патч League of Legends, для которого проверены советы.</summary>
     public required string Patch { get; init; }
 
+    /// <summary>Краткое описание назначения набора.</summary>
+    public string Description { get; init; } = string.Empty;
+
+    /// <summary>Автор содержимого Coach Pack.</summary>
+    public string Author { get; init; } = string.Empty;
+
+    /// <summary>Язык пользовательских советов; приложение не переводит их автоматически.</summary>
+    public string ContentLanguage { get; init; } = string.Empty;
+
+    /// <summary>Чемпион пользователя для матчап-набора.</summary>
+    public string PlayerChampion { get; init; } = string.Empty;
+
+    /// <summary>Чемпион противника для матчап-набора.</summary>
+    public string OpponentChampion { get; init; } = string.Empty;
+
+    /// <summary>Роль, для которой автор проверял рекомендации.</summary>
+    public string LaneRole { get; init; } = string.Empty;
+
+    /// <summary>Дата последней проверки рекомендаций автором.</summary>
+    public DateOnly? VerifiedOn { get; init; }
+
+    /// <summary>Источник знаний и состояние разрешения на его использование.</summary>
+    public CoachPackSource? Source { get; init; }
+
+    /// <summary>
+    /// Идентификатор исходного набора, если автор создал самостоятельную копию.
+    /// Поле сохраняет происхождение содержимого, но не даёт прав на обновление оригинала.
+    /// </summary>
+    public string? ForkedFromPackId { get; init; }
+
+    /// <summary>Автор исходного набора на момент создания самостоятельной копии.</summary>
+    public string? ForkedFromAuthor { get; init; }
+
     /// <summary>Все правила, входящие в набор.</summary>
     public IReadOnlyList<CoachRuleDefinition> Rules { get; init; } = [];
+
+    /// <summary>Подсказки, которые показываются весь матч или в выбранной фазе.</summary>
+    public IReadOnlyList<CoachPersistentTipDefinition> PersistentTips { get; init; } = [];
+
+    /// <summary>Произвольные авторские блоки предметов в заданном порядке.</summary>
+    public IReadOnlyList<CoachItemBlockDefinition> ItemBlocks { get; init; } = [];
 }

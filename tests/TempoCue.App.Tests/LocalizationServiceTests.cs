@@ -1,84 +1,124 @@
-using System.Runtime.ExceptionServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using TempoCue.App.Localization;
 using TempoCue.App.ViewModels;
+using TempoCue.App.Views;
 using TempoCue.Application;
-using TempoCue.Core;
 
 namespace TempoCue.App.Tests;
 
-/// <summary>Проверяет переводы интерфейса и формы слов для обоих языков.</summary>
+/// <summary>Проверяет переводы интерфейса и формы слов для обеих локалей.</summary>
 [Collection(LocalizationCollection.Name)]
 public sealed class LocalizationServiceTests
 {
     [Fact]
-    public void MainWindow_LoadsLocalizedXamlAndUpdatesTitleWithoutRestart()
+    public void ChampionsAndRoleView_ShowsLoadingLayoutFromDesign() => WpfTestHost.Run(() =>
     {
-        Exception? failure = null;
-        var thread = new Thread(() =>
+        var localization = LocalizationService.Instance;
+        var initialLanguage = localization.CurrentLanguageCode;
+        localization.SetLanguage("ru-RU");
+        try
         {
-            try
+            var catalog = new DeferredChampionCatalog();
+            var viewModel = new MatchupChampionsAndRoleViewModel(catalog, localization);
+            var loadTask = viewModel.EnsureCatalogLoadedAsync();
+            var view = new MatchupChampionsAndRoleView
             {
-                var localization = LocalizationService.Instance;
-                localization.SetLanguage("ru-RU");
-
-                var session = new ActiveMatchSession(
-                    new WaitingSnapshotSource(),
-                    new MatchupCoach([]),
-                    TimeSpan.FromSeconds(1));
-                var window = new MainWindow(
-                    new CurrentMatchViewModel(session, localization));
-                window.Show();
-                Dispatcher.CurrentDispatcher.Invoke(
-                    static () => { },
-                    DispatcherPriority.Loaded);
-                Assert.Equal("TempoCue — ассистент для League of Legends", window.Title);
-                Assert.Equal(1280, window.Width);
-                Assert.Equal(720, window.Height);
-                Assert.Equal(ResizeMode.NoResize, window.ResizeMode);
-                Assert.Equal(WindowStyle.None, window.WindowStyle);
-                var currentMatchPage = Assert.IsType<TempoCue.App.Views.CurrentMatchView>(
-                    window.FindName("CurrentMatchContentPage"));
-                var currentMatchButton = Assert.IsType<Button>(
-                    window.FindName("CurrentMatchNavigationButton"));
-                var settingsPage = Assert.IsType<Grid>(window.FindName("SettingsContentPage"));
-                var settingsButton = Assert.IsType<Button>(window.FindName("SettingsNavigationButton"));
-                var settingsTitle = Assert.IsType<TextBlock>(window.FindName("SettingsTitleTextBlock"));
-                Assert.NotNull(window.FindName("LanguageComboBox"));
-
-                currentMatchButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-                Assert.Equal(Visibility.Visible, currentMatchPage.Visibility);
-
-                settingsButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-                Assert.Equal(Visibility.Visible, settingsPage.Visibility);
-                Assert.Equal("Настройки", settingsTitle.Text);
-
-                localization.SetLanguage("en-US");
-                Dispatcher.CurrentDispatcher.Invoke(
-                    static () => { },
-                    DispatcherPriority.DataBind);
-
-                Assert.Equal("TempoCue — League of Legends assistant", window.Title);
-                Assert.Equal("Settings", settingsTitle.Text);
-                window.Close();
-            }
-            catch (Exception exception)
+                DataContext = viewModel
+            };
+            var window = new Window
             {
-                failure = exception;
-            }
-        });
+                Width = 760,
+                Height = 560,
+                Content = view,
+                ShowInTaskbar = false,
+                WindowStyle = WindowStyle.None
+            };
 
-        thread.SetApartmentState(ApartmentState.STA);
-        thread.Start();
-        thread.Join();
+            window.Show();
+            WpfTestHost.Pump(DispatcherPriority.Render);
 
-        if (failure is not null)
-        {
-            ExceptionDispatchInfo.Capture(failure).Throw();
+            Assert.Equal(
+                Visibility.Visible,
+                WpfTestHost.Find<StackPanel>(view, "ChampionCatalogLoadingPanel").Visibility);
+            Assert.Equal(
+                Visibility.Collapsed,
+                WpfTestHost.Find<StackPanel>(view, "ChampionSelectionContent").Visibility);
+            Assert.Equal(
+                Visibility.Visible,
+                WpfTestHost.Find<StackPanel>(view, "MatchupRoleSelectionPanel").Visibility);
+            Assert.Equal(
+                86d,
+                WpfTestHost.Find<Border>(view, "PlayerChampionLoadingCard").ActualHeight);
+            Assert.Equal(
+                new CornerRadius(12),
+                WpfTestHost.Find<Border>(view, "OpponentChampionLoadingCard").CornerRadius);
+            Assert.Equal(5, WpfTestHost.Find<ListBox>(view, "MatchupRoleListBox").Items.Count);
+
+            catalog.Complete(ChampionCatalogLoadResult.Unavailable());
+            WpfTestHost.Pump(DispatcherPriority.Background);
+            loadTask.GetAwaiter().GetResult();
+            window.Close();
         }
-    }
+        finally
+        {
+            localization.SetLanguage(initialLanguage);
+        }
+    });
+
+    [Fact]
+    public void MainWindow_UpdatesVisibleTranslationsWithoutRestart() => WpfTestHost.Run(() =>
+    {
+        using var context = new MainWindowTestContext();
+        context.Show();
+        var settingsPage = WpfTestHost.Find<SettingsView>(context.Window, "SettingsContentPage");
+        var settingsTitle = WpfTestHost.Find<TextBlock>(settingsPage, "SettingsTitleTextBlock");
+        var languageComboBox = WpfTestHost.Find<ComboBox>(settingsPage, "LanguageComboBox");
+        var packTypePage = WpfTestHost.Find<PackTypeSelectionView>(
+            context.CoachingPage,
+            "PackTypeSelectionPage");
+        WpfTestHost.Click(WpfTestHost.Find<Button>(context.Window, "SettingsNavigationButton"));
+        context.Window.UpdateLayout();
+        WpfTestHost.Pump(DispatcherPriority.Render);
+
+        context.Coaching.MatchupEditor.MainInformation
+            .EnsureGamePatchCatalogLoadedAsync()
+            .GetAwaiter()
+            .GetResult();
+        WpfTestHost.Pump();
+        var patchComboBox = WpfTestHost.Find<ComboBox>(
+            context.MainInformationPage,
+            "MatchupPatchComboBox");
+        Assert.Equal("26.15 — текущий", patchComboBox.Text);
+        Assert.Contains(
+            WpfTestHost.FindVisualDescendants<TextBlock>(languageComboBox),
+            textBlock => textBlock.Text == context.Settings.Languages[0].DisplayName);
+
+        context.Localization.SetLanguage("en-US");
+        WpfTestHost.Pump();
+
+        Assert.Equal("TempoCue — League of Legends assistant", context.Window.Title);
+        Assert.Equal("Settings", settingsTitle.Text);
+        Assert.Equal("26.15 — current", patchComboBox.Text);
+        Assert.Equal(
+            "What kind of advice pack are we creating?",
+            WpfTestHost.Find<TextBlock>(packTypePage, "PackTypeTitleTextBlock").Text);
+        Assert.Equal(
+            "Champions and role",
+            WpfTestHost.Find<TextBlock>(
+                context.ChampionsAndRolePage,
+                "MatchupChampionsStepTitleTextBlock").Text);
+
+        context.Coaching.MatchupEditor.ChampionsAndRole
+            .EnsureCatalogLoadedAsync()
+            .GetAwaiter()
+            .GetResult();
+        WpfTestHost.Pump(DispatcherPriority.Render);
+        Assert.Contains(
+            WpfTestHost.FindVisualDescendants<TextBlock>(languageComboBox),
+            textBlock => textBlock.Text == context.Settings.Languages[1].DisplayName);
+    });
 
     [Fact]
     public void SetLanguage_SwitchesTranslationsAndPluralForms()
@@ -93,9 +133,11 @@ public sealed class LocalizationServiceTests
             Assert.Equal("Game state simulator", localization.Get("Header.Title"));
             Assert.Equal("Home", localization.Get("Nav.Home"));
             Assert.Equal("Settings", localization.Get("Settings.Title"));
+            Assert.Equal("Coaching", localization.Get("Coaching.Title"));
+            Assert.Equal("Game control", localization.Get("Coaching.Tab.MapControl"));
             Assert.Equal("Interface language", localization.Get("Settings.Language.Label"));
             Assert.Equal("Available now", localization.Get("Home.Available.Title"));
-            Assert.Equal("v0.2.0", AppVersion.Display);
+            Assert.Equal("v0.3.0", AppVersion.Display);
             Assert.Equal("1 player", localization.Plural("Count.Player", 1));
             Assert.Equal("10 players", localization.Plural("Count.Player", 10));
 
@@ -104,6 +146,8 @@ public sealed class LocalizationServiceTests
             Assert.Equal("Симулятор игрового состояния", localization.Get("Header.Title"));
             Assert.Equal("Главная", localization.Get("Nav.Home"));
             Assert.Equal("Настройки", localization.Get("Settings.Title"));
+            Assert.Equal("Коучинг", localization.Get("Coaching.Title"));
+            Assert.Equal("Контроль игры", localization.Get("Coaching.Tab.MapControl"));
             Assert.Equal("Язык интерфейса", localization.Get("Settings.Language.Label"));
             Assert.Equal("Что работает сейчас", localization.Get("Home.Available.Title"));
             Assert.Equal("1 игрок", localization.Plural("Count.Player", 1));
@@ -128,12 +172,5 @@ public sealed class LocalizationServiceTests
         string expected)
     {
         Assert.Equal(expected, LocalizationService.NormalizeLanguageCode(languageCode));
-    }
-
-    private sealed class WaitingSnapshotSource : IMatchSnapshotSource
-    {
-        public Task<MatchSnapshotReadResult> ReadAsync(
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult(MatchSnapshotReadResult.NoActiveMatch());
     }
 }

@@ -1,6 +1,5 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using TempoCue.App.Localization;
 using TempoCue.Application;
 using TempoCue.Core;
@@ -15,24 +14,30 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
 {
     private const int BlackCleaverItemId = 3071;
 
-    private readonly ActiveMatchSession _session;
+    private readonly IActiveMatchMonitor _monitor;
+    private readonly IChampionCatalog _championCatalog;
     private readonly LocalizationService _localization;
-    private readonly CancellationTokenSource _sessionCancellation = new();
 
     private ActiveMatchUpdate? _lastUpdate;
-    private Task? _watchTask;
+    private IReadOnlyDictionary<string, Uri> _championImages =
+        new Dictionary<string, Uri>(StringComparer.OrdinalIgnoreCase);
+    private CancellationTokenSource? _championCatalogLoadCancellation;
+    private int _championCatalogLoadVersion;
+    private bool _isChampionCatalogLoaded;
     private MatchSnapshotReadStatus _status = MatchSnapshotReadStatus.NoActiveMatch;
     private string _connectionTitle = string.Empty;
     private string _connectionDetails = string.Empty;
     private string _gameTime = "00:00";
     private string _activeChampion = "—";
     private string _activeChampionInitials = "—";
+    private Uri? _activeChampionImageUri;
     private string _activeSummary = "—";
     private string _activePosition = "—";
     private string _activeKda = "0/0/0";
     private string _activeCreepScore = "0 CS";
     private string _opponentChampion = "—";
     private string _opponentChampionInitials = "—";
+    private Uri? _opponentChampionImageUri;
     private string _matchupPhase = "—";
     private string _adviceTitle = string.Empty;
     private string _adviceMessage = string.Empty;
@@ -45,13 +50,21 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
     private bool _isDisposed;
 
     public CurrentMatchViewModel(
-        ActiveMatchSession session,
+        IActiveMatchMonitor monitor,
+        IChampionCatalog championCatalog,
         LocalizationService localization)
     {
-        _session = session;
-        _localization = localization;
+        _monitor = monitor ?? throw new ArgumentNullException(nameof(monitor));
+        _championCatalog = championCatalog ?? throw new ArgumentNullException(nameof(championCatalog));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        _monitor.Updated += Monitor_Updated;
         _localization.PropertyChanged += Localization_PropertyChanged;
         RenderWaiting();
+
+        if (_monitor.CurrentUpdate is { } update)
+        {
+            ApplyUpdate(update);
+        }
     }
 
     public ObservableCollection<ParticipantViewModel> Allies { get; } = [];
@@ -102,6 +115,12 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         private set => SetProperty(ref _activeChampionInitials, value);
     }
 
+    public Uri? ActiveChampionImageUri
+    {
+        get => _activeChampionImageUri;
+        private set => SetProperty(ref _activeChampionImageUri, value);
+    }
+
     public string ActiveSummary
     {
         get => _activeSummary;
@@ -136,6 +155,12 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
     {
         get => _opponentChampionInitials;
         private set => SetProperty(ref _opponentChampionInitials, value);
+    }
+
+    public Uri? OpponentChampionImageUri
+    {
+        get => _opponentChampionImageUri;
+        private set => SetProperty(ref _opponentChampionImageUri, value);
     }
 
     public string MatchupPhase
@@ -194,30 +219,58 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
 
     public int ParticipantCount => Allies.Count + Enemies.Count;
 
-    public void Start()
+    public Task RefreshAsync()
     {
         ObjectDisposedException.ThrowIf(_isDisposed, this);
-        _watchTask ??= WatchAsync(_sessionCancellation.Token);
+        return _monitor.RefreshAsync();
     }
 
-    public void Stop()
-    {
-        if (!_sessionCancellation.IsCancellationRequested)
-        {
-            _sessionCancellation.Cancel();
-        }
-    }
-
-    public async Task RefreshAsync()
+    /// <summary>
+    /// Один раз загружает каталог портретов. При недоступности Data Dragon экран
+    /// продолжает показывать инициалы и может повторить загрузку позднее.
+    /// </summary>
+    public async Task LoadChampionImagesAsync(CancellationToken cancellationToken = default)
     {
         ObjectDisposedException.ThrowIf(_isDisposed, this);
-        if (_sessionCancellation.IsCancellationRequested)
+        if (_isChampionCatalogLoaded)
         {
             return;
         }
 
-        var update = await _session.RefreshAsync(_sessionCancellation.Token);
-        ApplyUpdate(update);
+        var version = Interlocked.Increment(ref _championCatalogLoadVersion);
+        var requestCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        var previousCancellation = Interlocked.Exchange(
+            ref _championCatalogLoadCancellation,
+            requestCancellation);
+        TryCancel(previousCancellation);
+
+        try
+        {
+            var result = await _championCatalog.LoadAsync(
+                _localization.CurrentLanguageCode,
+                requestCancellation.Token);
+            if (_isDisposed || version != Volatile.Read(ref _championCatalogLoadVersion))
+            {
+                return;
+            }
+
+            _championImages = BuildChampionImageLookup(result.Champions);
+            _isChampionCatalogLoaded = result.IsAvailable;
+            RerenderLastUpdate();
+        }
+        catch (OperationCanceledException) when (
+            !cancellationToken.IsCancellationRequested
+            && requestCancellation.IsCancellationRequested)
+        {
+        }
+        finally
+        {
+            Interlocked.CompareExchange(
+                ref _championCatalogLoadCancellation,
+                null,
+                requestCancellation);
+            requestCancellation.Dispose();
+        }
     }
 
     public void Dispose()
@@ -228,39 +281,22 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         }
 
         _isDisposed = true;
+        Interlocked.Increment(ref _championCatalogLoadVersion);
+        TryCancel(Interlocked.Exchange(ref _championCatalogLoadCancellation, null));
+        _monitor.Updated -= Monitor_Updated;
         _localization.PropertyChanged -= Localization_PropertyChanged;
-        Stop();
-        _sessionCancellation.Dispose();
     }
 
-    private async Task WatchAsync(CancellationToken cancellationToken)
-    {
-        try
-        {
-            await foreach (var update in _session.WatchAsync(cancellationToken))
-            {
-                ApplyUpdate(update);
-            }
-        }
-        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-        {
-            // Закрытие приложения штатно завершает сессию наблюдения.
-        }
-        catch (Exception exception)
-        {
-            Trace.TraceError(
-                "Цикл текущего матча завершился с ошибкой ({0}): {1}",
-                exception.GetType().Name,
-                exception.Message);
-            _lastUpdate = null;
-            Status = MatchSnapshotReadStatus.Failed;
-            RenderWaiting();
-            StateUpdated?.Invoke(this, EventArgs.Empty);
-        }
-    }
+    private void Monitor_Updated(object? sender, ActiveMatchUpdateEventArgs e) =>
+        ApplyUpdate(e.Update);
 
     private void ApplyUpdate(ActiveMatchUpdate update)
     {
+        if (_isDisposed)
+        {
+            return;
+        }
+
         _lastUpdate = update;
         Status = update.Status;
 
@@ -270,17 +306,20 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         }
         else
         {
-            RenderSnapshot(update.Snapshot, update.Advice);
+            RenderSnapshot(update.Snapshot, update.CoachPackSelection);
         }
 
         StateUpdated?.Invoke(this, EventArgs.Empty);
     }
 
-    private void RenderSnapshot(MatchSnapshot snapshot, CoachAdvice? advice)
+    private void RenderSnapshot(
+        MatchSnapshot snapshot,
+        ActiveCoachPackSelection? selection)
     {
         var match = snapshot.Match;
         var activePlayer = match.GetActivePlayer();
         var matchup = MatchupResolver.Resolve(match);
+        var advice = selection?.Advice;
 
         ConnectionTitle = _localization.Get("Current.Status.Connected");
         ConnectionDetails = _localization.Format(
@@ -292,6 +331,7 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         {
             ActiveChampion = activePlayer.ChampionName;
             ActiveChampionInitials = GetInitials(activePlayer.ChampionName);
+            ActiveChampionImageUri = FindChampionImage(activePlayer.ChampionName);
             ActiveSummary = _localization.Format(
                 "Current.Player.Level",
                 activePlayer.ChampionName,
@@ -311,26 +351,78 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         {
             OpponentChampion = matchup.Opponent.ChampionName;
             OpponentChampionInitials = GetInitials(matchup.Opponent.ChampionName);
+            OpponentChampionImageUri = FindChampionImage(matchup.Opponent.ChampionName);
         }
         else
         {
             OpponentChampion = "—";
             OpponentChampionInitials = "—";
+            OpponentChampionImageUri = null;
         }
 
-        RenderAdvice(advice, activePlayer);
+        RenderAdvice(selection, activePlayer);
         RenderParticipants(match);
         RenderEvents(match, snapshot.Events);
     }
 
-    private void RenderAdvice(CoachAdvice? advice, PlayerState? activePlayer)
+    private void RenderAdvice(
+        ActiveCoachPackSelection? selection,
+        PlayerState? activePlayer)
     {
+        if (selection?.State == ActiveCoachPackSelectionState.Conflict)
+        {
+            RenderUnavailableAdvice(
+                "Advice.PackConflict.Title",
+                "Advice.PackConflict.Message",
+                "Advice.PackConflict.Source",
+                "Power.PackConflict",
+                string.Join(", ", selection.ConflictingPackNames));
+            return;
+        }
+
+        if (selection?.State == ActiveCoachPackSelectionState.LibraryUnavailable)
+        {
+            RenderUnavailableAdvice(
+                "Advice.LibraryUnavailable.Title",
+                "Advice.LibraryUnavailable.Message",
+                "Advice.LibraryUnavailable.Source",
+                "Power.LibraryUnavailable");
+            return;
+        }
+
+        if (selection?.State == ActiveCoachPackSelectionState.MatchupUnavailable)
+        {
+            RenderUnavailableAdvice(
+                "Advice.MatchupUnavailable.Title",
+                "Advice.MatchupUnavailable.Message",
+                "Advice.MatchupUnavailable.Source",
+                "Power.NoRule");
+            return;
+        }
+
+        if (selection is null || selection.State == ActiveCoachPackSelectionState.NotFound)
+        {
+            RenderUnavailableAdvice(
+                "Advice.NoPack.Title",
+                "Advice.NoPack.Message",
+                "Advice.NoPack.Source",
+                "Power.NoRule");
+            return;
+        }
+
+        var advice = selection.Advice;
         if (advice is null)
         {
             AdviceTitle = _localization.Get("Advice.NoRule.Title");
-            AdviceMessage = _localization.Get("Advice.NoRule.Message");
-            AdviceReason = _localization.Get("Advice.NoRule.Source");
-            AdviceSource = string.Empty;
+            AdviceMessage = _localization.Format(
+                "Advice.NoRule.Message",
+                selection.Pack?.Name ?? string.Empty);
+            AdviceReason = activePlayer is null
+                ? _localization.Get("Advice.NoRule.Source")
+                : _localization.Format("Current.Advice.LevelReason", activePlayer.Level);
+            AdviceSource = selection.Pack is null
+                ? string.Empty
+                : _localization.Format("Current.Advice.Pack", selection.Pack.Name);
             PowerStateLabel = _localization.Get("Power.NoRule");
             PowerState = null;
             return;
@@ -338,12 +430,17 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
 
         AdviceTitle = advice.Title;
         AdviceMessage = advice.Message;
-        AdviceReason = activePlayer is null
-            ? advice.Message
+        AdviceReason = string.IsNullOrWhiteSpace(advice.WhyNow)
+            ? activePlayer is null
+                ? advice.Message
+                : _localization.Format("Current.Advice.LevelReason", activePlayer.Level)
+            : advice.WhyNow;
+        AdviceSource = selection.Pack is null
+            ? advice.Source
             : _localization.Format(
-                "Current.Advice.LevelReason",
-                activePlayer.Level);
-        AdviceSource = advice.Source;
+                "Current.Advice.PackAndSource",
+                selection.Pack.Name,
+                advice.Source);
         PowerState = advice.PowerState;
         PowerStateLabel = advice.PowerState switch
         {
@@ -355,41 +452,57 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         };
     }
 
+    private void RenderUnavailableAdvice(
+        string titleKey,
+        string messageKey,
+        string sourceKey,
+        string powerKey,
+        params object[] messageArguments)
+    {
+        AdviceTitle = _localization.Get(titleKey);
+        AdviceMessage = messageArguments.Length == 0
+            ? _localization.Get(messageKey)
+            : _localization.Format(messageKey, messageArguments);
+        AdviceReason = _localization.Get(sourceKey);
+        AdviceSource = string.Empty;
+        PowerStateLabel = _localization.Get(powerKey);
+        PowerState = null;
+    }
+
     private void RenderParticipants(MatchState match)
     {
-        Allies.Clear();
-        Enemies.Clear();
-
         var activePlayer = match.GetActivePlayer();
         if (activePlayer is null || activePlayer.Team == TeamSide.Unknown)
         {
+            ClearIfNotEmpty(Allies);
+            ClearIfNotEmpty(Enemies);
             HasParticipants = false;
             OnPropertyChanged(nameof(ParticipantCount));
             return;
         }
 
-        foreach (var player in match.Players
-                     .Where(player => player.Team == activePlayer.Team)
-                     .Select(player => player with
-                     {
-                         Position = PlayerPositionResolver.Resolve(match, player)
-                     })
-                     .OrderBy(player => GetPositionOrder(player.Position)))
-        {
-            Allies.Add(CreateParticipant(player, activePlayer.ParticipantId));
-        }
+        var allies = match.Players
+            .Where(player => player.Team == activePlayer.Team)
+            .Select(player => player with
+            {
+                Position = PlayerPositionResolver.Resolve(match, player)
+            })
+            .OrderBy(player => GetPositionOrder(player.Position))
+            .Select(player => CreateParticipant(player, activePlayer.ParticipantId))
+            .ToArray();
+        var enemies = match.Players
+            .Where(player => player.Team != TeamSide.Unknown
+                && player.Team != activePlayer.Team)
+            .Select(player => player with
+            {
+                Position = PlayerPositionResolver.Resolve(match, player)
+            })
+            .OrderBy(player => GetPositionOrder(player.Position))
+            .Select(player => CreateParticipant(player, activePlayer.ParticipantId))
+            .ToArray();
 
-        foreach (var player in match.Players
-                     .Where(player => player.Team != TeamSide.Unknown
-                         && player.Team != activePlayer.Team)
-                     .Select(player => player with
-                     {
-                         Position = PlayerPositionResolver.Resolve(match, player)
-                     })
-                     .OrderBy(player => GetPositionOrder(player.Position)))
-        {
-            Enemies.Add(CreateParticipant(player, activePlayer.ParticipantId));
-        }
+        ReplaceItemsIfChanged(Allies, allies);
+        ReplaceItemsIfChanged(Enemies, enemies);
 
         HasParticipants = Allies.Count + Enemies.Count > 0;
         OnPropertyChanged(nameof(ParticipantCount));
@@ -420,6 +533,7 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         return new ParticipantViewModel(
             GetPositionCode(player.Position),
             GetInitials(player.ChampionName),
+            FindChampionImage(player.ChampionName),
             player.ChampionName,
             details,
             $"{player.Kills}/{player.Deaths}/{player.Assists}",
@@ -430,14 +544,13 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
 
     private void RenderEvents(MatchState match, IReadOnlyList<MatchEvent> events)
     {
-        Events.Clear();
         var activePlayer = match.GetActivePlayer();
+        var renderedEvents = events
+            .OrderByDescending(item => item.GameTimeSeconds)
+            .Select(matchEvent => CreateEvent(match, activePlayer, matchEvent))
+            .ToArray();
 
-        foreach (var matchEvent in events.OrderByDescending(item => item.GameTimeSeconds))
-        {
-            Events.Add(CreateEvent(match, activePlayer, matchEvent));
-        }
-
+        ReplaceItemsIfChanged(Events, renderedEvents);
         HasEvents = Events.Count > 0;
     }
 
@@ -503,12 +616,14 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         GameTime = "00:00";
         ActiveChampion = "—";
         ActiveChampionInitials = "—";
+        ActiveChampionImageUri = null;
         ActiveSummary = _localization.Get("Current.Player.Waiting");
         ActivePosition = "—";
         ActiveKda = "0/0/0";
         ActiveCreepScore = "0 CS";
         OpponentChampion = "—";
         OpponentChampionInitials = "—";
+        OpponentChampionImageUri = null;
         MatchupPhase = "—";
         AdviceTitle = _localization.Get("Advice.Waiting.Title");
         AdviceMessage = _localization.Get("Advice.Waiting.Message");
@@ -516,9 +631,9 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         AdviceSource = string.Empty;
         PowerStateLabel = _localization.Get("Power.Waiting");
         PowerState = null;
-        Allies.Clear();
-        Enemies.Clear();
-        Events.Clear();
+        ClearIfNotEmpty(Allies);
+        ClearIfNotEmpty(Enemies);
+        ClearIfNotEmpty(Events);
         HasParticipants = false;
         HasEvents = false;
         OnPropertyChanged(nameof(ParticipantCount));
@@ -535,7 +650,7 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
 
         if (_lastUpdate?.Snapshot is { } snapshot)
         {
-            RenderSnapshot(snapshot, _lastUpdate.Advice);
+            RenderSnapshot(snapshot, _lastUpdate.CoachPackSelection);
         }
         else
         {
@@ -543,6 +658,30 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         }
 
         StateUpdated?.Invoke(this, EventArgs.Empty);
+    }
+
+    private static void ReplaceItemsIfChanged<T>(
+        ObservableCollection<T> target,
+        IReadOnlyList<T> items)
+    {
+        if (target.Count == items.Count && target.SequenceEqual(items))
+        {
+            return;
+        }
+
+        target.Clear();
+        foreach (var item in items)
+        {
+            target.Add(item);
+        }
+    }
+
+    private static void ClearIfNotEmpty<T>(ObservableCollection<T> target)
+    {
+        if (target.Count > 0)
+        {
+            target.Clear();
+        }
     }
 
     private string GetPhaseLabel(PlayerState player, CoachAdvice? advice)
@@ -564,6 +703,7 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
     {
         ActiveChampion = "—";
         ActiveChampionInitials = "—";
+        ActiveChampionImageUri = null;
         ActiveSummary = _localization.Get("Current.Player.Waiting");
         ActivePosition = "—";
         ActiveKda = "0/0/0";
@@ -623,6 +763,53 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         return letters.Length == 0
             ? "—"
             : new string(letters).ToUpperInvariant();
+    }
+
+    private Uri? FindChampionImage(string championName) =>
+        _championImages.GetValueOrDefault(NormalizeChampionKey(championName));
+
+    private static IReadOnlyDictionary<string, Uri> BuildChampionImageLookup(
+        IReadOnlyList<ChampionCatalogEntry> champions)
+    {
+        var images = new Dictionary<string, Uri>(StringComparer.OrdinalIgnoreCase);
+        foreach (var champion in champions)
+        {
+            images.TryAdd(NormalizeChampionKey(champion.Id), champion.ImageUri);
+            images.TryAdd(NormalizeChampionKey(champion.DisplayName), champion.ImageUri);
+        }
+
+        return images;
+    }
+
+    private static string NormalizeChampionKey(string value) =>
+        string.Concat(value.Where(char.IsLetterOrDigit)).ToUpperInvariant();
+
+    private void RerenderLastUpdate()
+    {
+        if (_lastUpdate?.Snapshot is not { } snapshot)
+        {
+            return;
+        }
+
+        RenderSnapshot(snapshot, _lastUpdate.CoachPackSelection);
+        StateUpdated?.Invoke(this, EventArgs.Empty);
+    }
+
+    private static void TryCancel(CancellationTokenSource? cancellation)
+    {
+        if (cancellation is null)
+        {
+            return;
+        }
+
+        try
+        {
+            cancellation.Cancel();
+        }
+        catch (ObjectDisposedException)
+        {
+            // Завершившийся запрос мог освободить свой CTS одновременно с новой загрузкой.
+        }
     }
 
     private static string FormatTime(double seconds)

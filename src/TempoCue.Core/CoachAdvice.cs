@@ -11,6 +11,9 @@ namespace TempoCue.Core;
 /// <param name="Source">Источник и пояснение происхождения совета.</param>
 /// <param name="RequiredItemIds">Предметы, наличие которых потребовало сработавшее правило.</param>
 /// <param name="ExcludedItemIds">Предметы, отсутствие которых потребовало сработавшее правило.</param>
+/// <param name="WhyNow">Объяснение актуальности совета в текущей фазе.</param>
+/// <param name="NextGoal">Следующая цель, приближающая смену фазы.</param>
+/// <param name="RecommendedItemIds">Предметы, рекомендуемые автором для этой фазы.</param>
 public sealed record CoachAdvice(
     string RuleId,
     string Title,
@@ -19,4 +22,7 @@ public sealed record CoachAdvice(
     int Priority,
     string Source,
     IReadOnlyList<int> RequiredItemIds,
-    IReadOnlyList<int> ExcludedItemIds);
+    IReadOnlyList<int> ExcludedItemIds,
+    string WhyNow,
+    string NextGoal,
+    IReadOnlyList<int> RecommendedItemIds);

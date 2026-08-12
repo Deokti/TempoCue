@@ -25,7 +25,10 @@ public sealed class ActiveMatchSessionTests
                 Source = "Тест"
             }
         ]);
-        var session = new ActiveMatchSession(source, coach, TimeSpan.FromSeconds(1));
+        var session = new ActiveMatchSession(
+            source,
+            new FixedAdviceSelector(coach),
+            TimeSpan.FromSeconds(1));
 
         var update = await session.RefreshAsync();
 
@@ -40,7 +43,7 @@ public sealed class ActiveMatchSessionTests
         var source = new StubSnapshotSource(MatchSnapshotReadResult.NoActiveMatch());
         var session = new ActiveMatchSession(
             source,
-            new MatchupCoach([]),
+            new FixedAdviceSelector(new MatchupCoach([])),
             TimeSpan.FromSeconds(1));
 
         var update = await session.RefreshAsync();
@@ -57,7 +60,7 @@ public sealed class ActiveMatchSessionTests
 
         Assert.Throws<ArgumentOutOfRangeException>(() => new ActiveMatchSession(
             source,
-            new MatchupCoach([]),
+            new FixedAdviceSelector(new MatchupCoach([])),
             TimeSpan.Zero));
     }
 
@@ -95,5 +98,21 @@ public sealed class ActiveMatchSessionTests
         public Task<MatchSnapshotReadResult> ReadAsync(
             CancellationToken cancellationToken = default) =>
             Task.FromResult(result);
+    }
+
+    private sealed class FixedAdviceSelector(MatchupCoach coach) : IMatchAdviceSelector
+    {
+        public ValueTask<ActiveCoachPackSelection> SelectAsync(
+            MatchState match,
+            CancellationToken cancellationToken = default) =>
+            ValueTask.FromResult(ActiveCoachPackSelection.Selected(
+                new CoachPack
+                {
+                    SchemaVersion = 1,
+                    Id = "test",
+                    Name = "Test",
+                    Patch = "test"
+                },
+                coach.GetBestAdvice(match)));
     }
 }

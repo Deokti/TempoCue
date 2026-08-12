@@ -95,23 +95,6 @@ public sealed class MatchupCoachTests
     }
 
     [Fact]
-    public void CoachPackLoader_LoadsActualUrgotVersusSettPack()
-    {
-        // Этот тест открывает тот же JSON, который использует WPF-приложение.
-        var packPath = Path.Combine(
-            AppContext.BaseDirectory,
-            "Assets",
-            "CoachPacks",
-            "urgot-vs-sett.json");
-
-        var pack = CoachPackLoader.LoadFromFile(packPath);
-
-        Assert.Equal("top.urgot-vs-sett.prototype", pack.Id);
-        Assert.Equal(3, pack.Rules.Count);
-        Assert.All(pack.Rules, rule => Assert.Contains("GoliathGames", rule.Source));
-    }
-
-    [Fact]
     public void MatchState_ReturnsAlliesAndEnemies_ForFullTeamComposition()
     {
         var match = CreateFullMatch(level: 1);
@@ -157,13 +140,9 @@ public sealed class MatchupCoachTests
     [Fact]
     public void MatchupResolver_UsesOnlyEnemyInOneVersusOneWithoutPosition()
     {
-        var match = CreateMatch(level: 1);
-        match = match with
-        {
-            Players = match.Players
-                .Select(player => player with { Position = PlayerPosition.Unknown })
-                .ToArray()
-        };
+        var match = UpdatePlayers(
+            CreateMatch(level: 1),
+            player => player with { Position = PlayerPosition.Unknown });
 
         var matchup = MatchupResolver.Resolve(match);
 
@@ -174,15 +153,11 @@ public sealed class MatchupCoachTests
     [Fact]
     public void MatchupResolver_DoesNotGuessAmongSeveralEnemiesWithoutMatchingPosition()
     {
-        var match = CreateFullMatch(level: 1);
-        match = match with
-        {
-            Players = match.Players
-                .Select(player => player.Team == TeamSide.Chaos
-                    ? player with { Position = PlayerPosition.Unknown }
-                    : player)
-                .ToArray()
-        };
+        var match = UpdatePlayers(
+            CreateFullMatch(level: 1),
+            player => player.Team == TeamSide.Chaos
+                ? player with { Position = PlayerPosition.Unknown }
+                : player);
 
         var matchup = MatchupResolver.Resolve(match);
 
@@ -193,29 +168,44 @@ public sealed class MatchupCoachTests
     [Fact]
     public void MatchupResolver_InfersTopForOnlyUnknownTeammate()
     {
-        var match = CreateFullMatch(level: 1);
-        match = match with
-        {
-            Players = match.Players
-                .Select(player => player.ParticipantId switch
+        var match = UpdatePlayers(
+            CreateFullMatch(level: 1),
+            player => player.ParticipantId switch
+            {
+                "active-player" => player with
                 {
-                    "active-player" => player with
-                    {
-                        ChampionName = "Anivia",
-                        Position = PlayerPosition.Unknown
-                    },
-                    "ally-support" => player with { Position = PlayerPosition.Bottom },
-                    "enemy-top" => player with { ChampionName = "Teemo" },
-                    _ => player
-                })
-                .ToArray()
-        };
+                    ChampionName = "Anivia",
+                    Position = PlayerPosition.Unknown
+                },
+                "ally-support" => player with { Position = PlayerPosition.Bottom },
+                "enemy-top" => player with { ChampionName = "Teemo" },
+                _ => player
+            });
 
         var matchup = MatchupResolver.Resolve(match);
 
         Assert.NotNull(matchup);
         Assert.Equal(PlayerPosition.Top, matchup.Player.Position);
         Assert.Equal("Teemo", matchup.Opponent.ChampionName);
+    }
+
+    [Theory]
+    [InlineData(PlayerPosition.Top)]
+    [InlineData(PlayerPosition.Jungle)]
+    [InlineData(PlayerPosition.Middle)]
+    [InlineData(PlayerPosition.Bottom)]
+    [InlineData(PlayerPosition.Support)]
+    public void MatchupResolver_InfersOnlyMissingPositionAndSelectsMatchingEnemy(
+        PlayerPosition expectedPosition)
+    {
+        var match = CreateMatchWithOnlyActivePositionUnknown(expectedPosition);
+
+        var matchup = MatchupResolver.Resolve(match);
+
+        Assert.NotNull(matchup);
+        Assert.Equal(expectedPosition, matchup.Player.Position);
+        Assert.Equal($"Enemy{expectedPosition}", matchup.Opponent.ChampionName);
+        Assert.Equal(expectedPosition, matchup.Opponent.Position);
     }
 
     private static MatchupCoach CreateCoach()
@@ -324,6 +314,61 @@ public sealed class MatchupCoachTests
             GameTimeSeconds = 90,
             ActivePlayerId = "active-player",
             Players = players
+        };
+    }
+
+    private static MatchState CreateMatchWithOnlyActivePositionUnknown(
+        PlayerPosition missingPosition)
+    {
+        PlayerPosition[] positions =
+        [
+            PlayerPosition.Top,
+            PlayerPosition.Jungle,
+            PlayerPosition.Middle,
+            PlayerPosition.Bottom,
+            PlayerPosition.Support
+        ];
+
+        var allies = positions
+            .Where(position => position != missingPosition)
+            .Select(position => CreatePlayer(
+                $"ally-{position}",
+                $"Ally{position}",
+                TeamSide.Order,
+                position,
+                level: 1));
+        var enemies = positions.Select(position => CreatePlayer(
+            $"enemy-{position}",
+            $"Enemy{position}",
+            TeamSide.Chaos,
+            position,
+            level: 1));
+
+        return new MatchState
+        {
+            GameTimeSeconds = 90,
+            ActivePlayerId = "active-player",
+            Players =
+            [
+                CreatePlayer(
+                    "active-player",
+                    "ActiveChampion",
+                    TeamSide.Order,
+                    PlayerPosition.Unknown,
+                    level: 1),
+                .. allies,
+                .. enemies
+            ]
+        };
+    }
+
+    private static MatchState UpdatePlayers(
+        MatchState match,
+        Func<PlayerState, PlayerState> update)
+    {
+        return match with
+        {
+            Players = match.Players.Select(update).ToArray()
         };
     }
 

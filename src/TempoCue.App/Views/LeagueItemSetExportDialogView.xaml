@@ -1,0 +1,200 @@
+<UserControl x:Class="TempoCue.App.Views.LeagueItemSetExportDialogView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:TempoCue.App.Controls"
+             xmlns:converters="clr-namespace:TempoCue.App.Converters"
+             xmlns:localization="clr-namespace:TempoCue.App.Localization"
+             Background="Transparent"
+             FontFamily="Segoe UI"
+             Focusable="True"
+             PreviewKeyDown="LeagueItemSetExportDialogView_PreviewKeyDown">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Styles/ShellControls.xaml" />
+                <ResourceDictionary Source="../Styles/FormControls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <converters:ScaleValueConverter x:Key="ScaleValueConverter" />
+            <Style TargetType="ScrollBar" BasedOn="{StaticResource ShellScrollBar}" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <!-- Затемнение делает экспорт отдельным подтверждаемым действием. -->
+    <Grid Background="#D9080D14">
+        <Border x:Name="LeagueItemSetExportDialogCard"
+                Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource ScaleValueConverter}, ConverterParameter=0.78}"
+                Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource ScaleValueConverter}, ConverterParameter=0.80}"
+                MinWidth="860"
+                MaxWidth="1100"
+                MinHeight="560"
+                MaxHeight="780"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Background="#101827"
+                BorderBrush="#334761"
+                BorderThickness="1"
+                CornerRadius="12">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="1" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="1" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Заголовок и крестик закрытия. -->
+                <Grid Margin="20,16">
+                    <TextBlock Text="{localization:Loc Coaching.Export.Title}"
+                               Foreground="#F4F7FB"
+                               FontSize="{StaticResource Typography.FontSize.SectionTitle}"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center" />
+                    <Button x:Name="CloseLeagueItemSetExportButton"
+                            Width="36" Height="36"
+                            Padding="0"
+                            HorizontalAlignment="Right"
+                            Style="{StaticResource SecondaryButton}"
+                            ToolTip="{localization:Loc Coaching.Export.Close}"
+                            Click="CloseButton_Click">
+                        <Path Width="12" Height="12"
+                              Data="M 1,1 L 11,11 M 11,1 L 1,11"
+                              Stroke="#8FA7C1"
+                              StrokeThickness="1.6"
+                              StrokeStartLineCap="Round"
+                              StrokeEndLineCap="Round"
+                              Stretch="None" />
+                    </Button>
+                </Grid>
+                <Border Grid.Row="1" Background="#263750" />
+
+                <!-- Слева пользователь выбирает блоки, справа видит итоговый JSON. -->
+                <Grid Grid.Row="2" Margin="20,16,12,14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="3*" />
+                        <ColumnDefinition Width="14" />
+                        <ColumnDefinition Width="2*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="12" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid>
+                            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="10" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="{localization:Loc Coaching.Export.Name}" Style="{StaticResource FormFieldLabel}" />
+                                <TextBox x:Name="LeagueItemSetTitleTextBox"
+                                         Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource FormTextBox}"
+                                         LostFocus="ExportTitle_LostFocus" />
+                            </StackPanel>
+                            <Grid Grid.Row="2">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="10" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="{localization:Loc Coaching.Export.Champion}" Style="{StaticResource FormFieldLabel}" />
+                                    <Border Height="36" Background="#0B1421" BorderBrush="#263750" BorderThickness="1" CornerRadius="9" Padding="10,0">
+                                        <TextBlock Text="{Binding ChampionName}" Foreground="#D9E5F2" VerticalAlignment="Center" />
+                                    </Border>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="{localization:Loc Coaching.Export.Map}" Style="{StaticResource FormFieldLabel}" />
+                                    <Border Height="36" Background="#0B1421" BorderBrush="#263750" BorderThickness="1" CornerRadius="9" Padding="10,0">
+                                        <TextBlock Text="{Binding MapName}" Foreground="#D9E5F2" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+
+                        <Grid Grid.Row="2">
+                            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="8" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+                            <Grid>
+                                <TextBlock Text="{localization:Loc Coaching.Export.Blocks}" Foreground="#F4F7FB" FontWeight="SemiBold" />
+                                <TextBlock Text="{Binding SelectionSummary}" Foreground="#7F93AF" HorizontalAlignment="Right" />
+                            </Grid>
+                            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,8,0">
+                                <ItemsControl ItemsSource="{Binding Blocks}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="#111C2D" BorderBrush="#263750" BorderThickness="1" CornerRadius="9" Padding="10" Margin="0,0,0,8">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="28" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                                    <controls:TempoCheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" Click="ExportOption_Changed" VerticalAlignment="Center" />
+                                                    <TextBlock Grid.Column="1" Text="{Binding Order}" Foreground="#7086A2" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                    <StackPanel Grid.Column="2">
+                                                        <TextBlock Text="{Binding Name}" Foreground="#F4F7FB" FontWeight="SemiBold" />
+                                                        <TextBlock Text="{Binding WhenToChoose}" Foreground="#7F93AF" TextTrimming="CharacterEllipsis" Margin="0,3,0,0" />
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="3" HorizontalAlignment="Right">
+                                                        <ItemsControl ItemsSource="{Binding Items}">
+                                                            <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                                            <ItemsControl.ItemTemplate><DataTemplate><Border Width="24" Height="24" Background="#0B1421" CornerRadius="4" Margin="0,0,4,0"><Image Source="{Binding ImageUri}" Stretch="UniformToFill" /></Border></DataTemplate></ItemsControl.ItemTemplate>
+                                                        </ItemsControl>
+                                                        <TextBlock Text="{Binding ItemCountLabel}" Foreground="#7F93AF" FontSize="{StaticResource Typography.FontSize.Caption}" HorizontalAlignment="Right" Margin="0,4,0,0" />
+                                                    </StackPanel>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
+                    </Grid>
+
+                    <Border Grid.Column="2" Background="#0B1421" BorderBrush="#263750" BorderThickness="1" CornerRadius="10" Padding="14">
+                        <Grid>
+                            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="8" /><RowDefinition Height="*" /><RowDefinition Height="10" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                            <TextBlock Text="{localization:Loc Coaching.Export.Preview}" Foreground="#F4F7FB" FontWeight="SemiBold" />
+                            <TextBox Grid.Row="2"
+                                     Text="{Binding Json, Mode=OneWay}"
+                                     IsReadOnly="True"
+                                     AcceptsReturn="True"
+                                     TextWrapping="NoWrap"
+                                     VerticalScrollBarVisibility="Auto"
+                                     HorizontalScrollBarVisibility="Auto"
+                                     Background="#071019"
+                                     Foreground="#9FC3DF"
+                                     BorderBrush="#20344C"
+                                     BorderThickness="1"
+                                     Padding="10"
+                                     FontFamily="Consolas"
+                                     FontSize="12" />
+                            <TextBlock Grid.Row="4" Text="{Binding StatusMessage}" Foreground="#8FBDE0" TextWrapping="Wrap" />
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <Border Grid.Row="3" Background="#263750" />
+
+                <!-- В League попадают только блоки предметов; автоматическая установка пока недоступна. -->
+                <Grid Grid.Row="4" Margin="20,12">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center" MaxWidth="540">
+                        <TextBlock Text="{localization:Loc Coaching.Export.Warning.Matchup}" Foreground="#91A4BD" TextWrapping="Wrap" />
+                        <TextBlock Text="{localization:Loc Coaching.Export.Warning.Content}" Foreground="#657B97" TextWrapping="Wrap" Margin="0,3,0,0" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Content="{localization:Loc Coaching.Export.Install}"
+                                Style="{StaticResource SecondaryButton}"
+                                IsEnabled="False"
+                                ToolTip="{localization:Loc Coaching.Export.Install.Planned}" />
+                        <Button x:Name="DownloadLeagueItemSetButton"
+                                Content="{localization:Loc Coaching.Export.Download}"
+                                Style="{StaticResource SecondaryButton}"
+                                IsEnabled="{Binding CanExport}"
+                                Margin="8,0,0,0"
+                                Click="DownloadJsonButton_Click" />
+                        <Button x:Name="CopyLeagueItemSetButton"
+                                Content="{localization:Loc Coaching.Export.Copy}"
+                                Style="{StaticResource PrimaryButton}"
+                                IsEnabled="{Binding CanExport}"
+                                Margin="8,0,0,0"
+                                Click="CopyJsonButton_Click" />
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

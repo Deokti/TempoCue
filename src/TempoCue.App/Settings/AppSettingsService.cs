@@ -5,36 +5,47 @@ using TempoCue.App.Localization;
 namespace TempoCue.App.Settings;
 
 /// <summary>Читает и сохраняет небольшой пользовательский файл настроек.</summary>
-public static class AppSettingsService
+public sealed class AppSettingsService
 {
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web)
     {
         WriteIndented = true
     };
 
-    private static readonly string SettingsDirectory = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "TempoCue");
+    private readonly string _settingsPath;
 
-    private static readonly string SettingsPath = Path.Combine(SettingsDirectory, "settings.json");
+    public AppSettingsService()
+        : this(Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "TempoCue",
+            "settings.json"))
+    {
+    }
+
+    public AppSettingsService(string settingsPath)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(settingsPath);
+        _settingsPath = settingsPath;
+    }
 
     /// <summary>
     /// При первом запуске выбирает язык Windows: русский для ru, английский для остальных.
     /// Повреждённый файл настроек не должен мешать запуску приложения.
     /// </summary>
-    public static AppSettings Load()
+    public AppSettings Load()
     {
         try
         {
-            if (File.Exists(SettingsPath))
+            if (File.Exists(_settingsPath))
             {
-                var json = File.ReadAllText(SettingsPath);
+                var json = File.ReadAllText(_settingsPath);
                 var settings = JsonSerializer.Deserialize<AppSettings>(json, SerializerOptions);
                 if (settings is not null)
                 {
                     return settings with
                     {
-                        Language = LocalizationService.NormalizeLanguageCode(settings.Language)
+                        Language = LocalizationService.NormalizeLanguageCode(settings.Language),
+                        Overlay = (settings.Overlay ?? new OverlayUserSettings()).Normalize()
                     };
                 }
             }
@@ -60,16 +71,34 @@ public static class AppSettingsService
     }
 
     /// <summary>Сохраняет язык сразу после выбора в интерфейсе.</summary>
-    public static void SaveLanguage(string languageCode)
+    public void SaveLanguage(string languageCode)
+    {
+        var current = Load();
+        Save(current with
+        {
+            Language = LocalizationService.NormalizeLanguageCode(languageCode)
+        });
+    }
+
+    /// <summary>Сохраняет применённые параметры оверлея, не изменяя язык.</summary>
+    public void SaveOverlay(OverlayUserSettings overlay)
+    {
+        ArgumentNullException.ThrowIfNull(overlay);
+        var current = Load();
+        Save(current with { Overlay = overlay.Normalize() });
+    }
+
+    private void Save(AppSettings settings)
     {
         try
         {
-            Directory.CreateDirectory(SettingsDirectory);
-            var settings = new AppSettings
+            var settingsDirectory = Path.GetDirectoryName(_settingsPath);
+            if (!string.IsNullOrWhiteSpace(settingsDirectory))
             {
-                Language = LocalizationService.NormalizeLanguageCode(languageCode)
-            };
-            File.WriteAllText(SettingsPath, JsonSerializer.Serialize(settings, SerializerOptions));
+                Directory.CreateDirectory(settingsDirectory);
+            }
+
+            File.WriteAllText(_settingsPath, JsonSerializer.Serialize(settings, SerializerOptions));
         }
         catch (IOException)
         {
