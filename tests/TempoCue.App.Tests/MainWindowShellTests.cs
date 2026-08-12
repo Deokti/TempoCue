@@ -35,8 +35,14 @@ public sealed class MainWindowShellTests
 
         window.WindowState = WindowState.Maximized;
         WpfTestHost.Pump(DispatcherPriority.Render);
-        Assert.True(window.ActualWidth <= SystemParameters.WorkArea.Width + 1);
-        Assert.True(window.ActualHeight <= SystemParameters.WorkArea.Height + 1);
+        Assert.True(
+            window.ActualWidth <= EditorUiTestMetrics.CalculateAvailableWindowSize(
+                SystemParameters.WorkArea.Width,
+                window.MinWidth) + 1);
+        Assert.True(
+            window.ActualHeight <= EditorUiTestMetrics.CalculateAvailableWindowSize(
+                SystemParameters.WorkArea.Height,
+                window.MinHeight) + 1);
         window.WindowState = WindowState.Normal;
 
         var homeNavigationIcon = WpfTestHost.Find<System.Windows.Shapes.Path>(

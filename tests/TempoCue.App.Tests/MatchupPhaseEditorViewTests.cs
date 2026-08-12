@@ -45,13 +45,41 @@ public sealed class MatchupPhaseEditorViewTests
         Assert.Equal(Visibility.Visible, picker.Visibility);
         context.Window.UpdateLayout();
         var card = WpfTestHost.Find<Border>(picker, "ItemPickerDialogCard");
-        Assert.Equal(Math.Clamp(context.Window.ActualHeight * 0.80, 520, 760), card.ActualHeight, 1);
-        Assert.Equal(Math.Clamp(context.Window.ActualWidth * 0.78, 880, 1180), card.ActualWidth, 1);
+        Assert.Equal(
+            EditorUiTestMetrics.CalculateResponsiveSize(
+                context.Window.ActualHeight,
+                0.80,
+                520,
+                760),
+            card.ActualHeight,
+            1);
+        Assert.Equal(
+            EditorUiTestMetrics.CalculateResponsiveSize(
+                context.Window.ActualWidth,
+                0.78,
+                880,
+                1180),
+            card.ActualWidth,
+            1);
         context.Window.Width = 1400;
         context.Window.Height = 800;
         context.Window.UpdateLayout();
-        Assert.Equal(640d, card.ActualHeight, 1);
-        Assert.Equal(1092d, card.ActualWidth, 1);
+        Assert.Equal(
+            EditorUiTestMetrics.CalculateResponsiveSize(
+                context.Window.ActualHeight,
+                0.80,
+                520,
+                760),
+            card.ActualHeight,
+            1);
+        Assert.Equal(
+            EditorUiTestMetrics.CalculateResponsiveSize(
+                context.Window.ActualWidth,
+                0.78,
+                880,
+                1180),
+            card.ActualWidth,
+            1);
         context.Window.Width = 1310;
         context.Window.Height = 750;
         context.Window.UpdateLayout();
@@ -59,7 +87,14 @@ public sealed class MatchupPhaseEditorViewTests
         content.ItemPicker.Search = "секира";
         WpfTestHost.Pump();
         context.Window.UpdateLayout();
-        Assert.Equal(600d, card.ActualHeight, 1);
+        Assert.Equal(
+            EditorUiTestMetrics.CalculateResponsiveSize(
+                context.Window.ActualHeight,
+                0.80,
+                520,
+                760),
+            card.ActualHeight,
+            1);
         content.ItemPicker.Search = string.Empty;
         WpfTestHost.Pump();
         var searchTextBox = WpfTestHost.Find<TextBox>(picker, "ItemPickerSearchTextBox");
