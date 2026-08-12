@@ -30,6 +30,16 @@ internal partial class OverlayCardView : UserControl
             : Visibility.Collapsed;
     }
 
+    public void SetBackgroundOpacity(double opacity)
+    {
+        var normalizedOpacity = Math.Clamp(opacity, 0, 1);
+        OverlayCard.Background = new SolidColorBrush(Color.FromArgb(
+            (byte)Math.Round(byte.MaxValue * normalizedOpacity),
+            0x10,
+            0x18,
+            0x27));
+    }
+
     public void ShowNotification(
         OverlayNotification notification,
         OverlayDisplayPolicy policy,

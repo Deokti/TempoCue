@@ -14,6 +14,7 @@ internal sealed class MainWindowTestContext : IDisposable
 {
     private readonly string _initialLanguage;
     private readonly ActiveMatchMonitor _activeMatchMonitor;
+    private readonly TemporarySettingsContext _settingsContext = new();
     private bool _isDisposed;
 
     public MainWindowTestContext(Action? showOverlayPreview = null)
@@ -32,7 +33,7 @@ internal sealed class MainWindowTestContext : IDisposable
         Home = new HomeViewModel(CurrentMatch, Localization);
         Settings = new SettingsViewModel(
             Localization,
-            new AppSettingsService(),
+            _settingsContext.Service,
             showOverlayPreview ?? (static () => { }));
         CoachPackStore = new TestCoachPackStore();
         Coaching = CoachingViewModelTestFactory.Create(
@@ -231,6 +232,7 @@ internal sealed class MainWindowTestContext : IDisposable
         Window.Close();
         Coaching.Dispose();
         Settings.Dispose();
+        _settingsContext.Dispose();
         Home.Dispose();
         CurrentMatch.Dispose();
         _activeMatchMonitor.Dispose();

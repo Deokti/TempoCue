@@ -10,6 +10,14 @@ public sealed class OverlayDisplayPolicy
     public const int VisibleSlotCount = 2;
     public const int PendingCapacity = 2;
 
+    public OverlayPresentationSettings PresentationSettings { get; private set; } = new();
+
+    public void ApplySettings(OverlayPresentationSettings settings)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+        PresentationSettings = settings.Normalize();
+    }
+
     public TimeSpan DuplicateSuppressionInterval { get; init; } = TimeSpan.FromSeconds(20);
 
     public TimeSpan LowPriorityCadence { get; init; } = TimeSpan.FromSeconds(8);
@@ -40,6 +48,17 @@ public sealed class OverlayDisplayPolicy
         if (minimumLifetime == Timeout.InfiniteTimeSpan)
         {
             return minimumLifetime;
+        }
+
+        if (PresentationSettings.DurationMode is OverlayDurationMode.Fixed)
+        {
+            var fixedSeconds = PresentationSettings.FixedDurationSeconds;
+            if (notification.Tone is OverlayNotificationTone.Danger)
+            {
+                fixedSeconds = Math.Max(fixedSeconds, 6);
+            }
+
+            return TimeSpan.FromSeconds(fixedSeconds);
         }
 
         var readableCharacterCount = notification.Phrase.Length + notification.Source.Length;

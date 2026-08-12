@@ -1,6 +1,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace TempoCue.Overlay.Tests;
@@ -82,6 +83,32 @@ public sealed class OverlayHostTests
         Assert.Equal(
             "settings.preview.warning",
             Assert.Single(host.CurrentSnapshot.Items).Notification.Key);
+        host.Hide();
+    });
+
+    [Fact]
+    public void Settings_ApplyWidthOpacityAndAllowSetupWhileGameOverlayIsDisabled() => WpfTestHost.Run(() =>
+    {
+        using var host = new OverlayHost(Dispatcher.CurrentDispatcher);
+        host.ApplySettings(new OverlayPresentationSettings
+        {
+            IsEnabled = false,
+            Width = 400,
+            BackgroundOpacity = 0.65
+        });
+
+        host.Show(Create("game", "Игровое уведомление"));
+        Assert.Null(host.CurrentWindow);
+
+        host.SetInteractionMode(OverlayInteractionMode.Setup);
+        host.ShowPreview([Create("preview", "Предпросмотр")]);
+        WpfTestHost.Pump();
+        var window = Assert.IsType<OverlayWindow>(host.CurrentWindow);
+        var card = Assert.IsType<Border>(window.PrimaryCardView.FindName("OverlayCard"));
+        var background = Assert.IsType<SolidColorBrush>(card.Background);
+
+        Assert.Equal(400, window.Width);
+        Assert.Equal((byte)166, background.Color.A);
         host.Hide();
     });
 

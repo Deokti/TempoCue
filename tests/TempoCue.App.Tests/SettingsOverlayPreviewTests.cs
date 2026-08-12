@@ -1,6 +1,4 @@
-using System.IO;
 using TempoCue.App.Localization;
-using TempoCue.App.Settings;
 using TempoCue.App.ViewModels;
 
 namespace TempoCue.App.Tests;
@@ -13,14 +11,10 @@ public sealed class SettingsOverlayPreviewTests
     public void ShowOverlayPreview_InvokesInjectedUiAction()
     {
         var previewCount = 0;
-        var settingsPath = Path.Combine(
-            Path.GetTempPath(),
-            "TempoCue.Tests",
-            Guid.NewGuid().ToString("N"),
-            "settings.json");
+        using var settingsContext = new TemporarySettingsContext();
         using var viewModel = new SettingsViewModel(
             LocalizationService.Instance,
-            new AppSettingsService(settingsPath),
+            settingsContext.Service,
             () => previewCount++);
 
         viewModel.ShowOverlayPreview();

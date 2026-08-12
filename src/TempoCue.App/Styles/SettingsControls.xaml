@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:TempoCue.App.Controls">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="FormControls.xaml" />
     </ResourceDictionary.MergedDictionaries>
@@ -7,10 +8,180 @@
     <!-- Старые ключи сохранены, чтобы настройки использовали общие элементы формы без изменения контракта View. -->
     <Style x:Key="SettingsLanguageComboBoxItem"
            TargetType="ComboBoxItem"
-           BasedOn="{StaticResource FormComboBoxItem}" />
+           BasedOn="{StaticResource FormComboBoxItem}">
+        <Setter Property="FontSize" Value="15" />
+    </Style>
     <Style x:Key="SettingsLanguageComboBox"
            TargetType="ComboBox"
            BasedOn="{StaticResource FormComboBox}">
+        <Setter Property="FontSize" Value="15" />
         <Setter Property="ItemContainerStyle" Value="{StaticResource SettingsLanguageComboBoxItem}" />
+    </Style>
+
+    <!-- Настройки содержат много пояснений, поэтому используют чуть более крупную локальную шкалу. -->
+    <Style x:Key="SettingsCaption" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="#778BA7" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="LineHeight" Value="20" />
+    </Style>
+    <Style x:Key="SettingsFieldLabel"
+           TargetType="TextBlock"
+           BasedOn="{StaticResource FormFieldLabel}">
+        <Setter Property="FontSize" Value="15" />
+    </Style>
+
+    <!-- Горизонтальный ползунок настроек не использует светлую системную тему Windows. -->
+    <Style TargetType="{x:Type controls:TempoSlider}">
+        <Setter Property="Height" Value="20" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:TempoSlider}">
+                    <Grid Background="Transparent">
+                        <Track x:Name="PART_Track" VerticalAlignment="Center">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Command="Slider.DecreaseLarge"
+                                              Background="#4FAAE8"
+                                              BorderThickness="0">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate TargetType="RepeatButton">
+                                            <Border Height="4"
+                                                    Background="{TemplateBinding Background}"
+                                                    CornerRadius="2" />
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.DecreaseRepeatButton>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Command="Slider.IncreaseLarge"
+                                              Background="#263750"
+                                              BorderThickness="0">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate TargetType="RepeatButton">
+                                            <Border Height="4"
+                                                    Background="{TemplateBinding Background}"
+                                                    CornerRadius="2" />
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.IncreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb Width="14" Height="14" Cursor="Hand">
+                                    <Thumb.Template>
+                                        <ControlTemplate TargetType="Thumb">
+                                            <Ellipse x:Name="SliderThumb"
+                                                     Fill="#68BFF2"
+                                                     Stroke="#BEE9FF"
+                                                     StrokeThickness="1" />
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="SliderThumb" Property="Fill" Value="#8BD5F7" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Thumb.Template>
+                                </Thumb>
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.45" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Одинаковый выбор используется для времени показа и постоянных советов. -->
+    <Style TargetType="{x:Type controls:TempoChoiceCard}">
+        <Setter Property="Foreground" Value="#DCE7F5" />
+        <Setter Property="Background" Value="#0C1420" />
+        <Setter Property="BorderBrush" Value="#263750" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:TempoChoiceCard}">
+                    <Border x:Name="ChoiceBorder"
+                            MinHeight="42"
+                            Padding="12,10"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="18" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border x:Name="ChoiceCircle"
+                                    Width="14"
+                                    Height="14"
+                                    VerticalAlignment="Top"
+                                    Margin="0,2,0,0"
+                                    Background="Transparent"
+                                    BorderBrush="#526A86"
+                                    BorderThickness="1.5"
+                                    CornerRadius="7">
+                                <Ellipse x:Name="ChoiceDot"
+                                         Width="6"
+                                         Height="6"
+                                         Fill="#4FAAE8"
+                                         Visibility="Collapsed" />
+                            </Border>
+                            <StackPanel Grid.Column="2">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{TemplateBinding Title}"
+                                               Foreground="#DCE7F5"
+                                               FontSize="14"
+                                               FontWeight="SemiBold"
+                                               VerticalAlignment="Center" />
+                                    <Border x:Name="NoticeBadge"
+                                            Margin="9,0,0,0"
+                                            Padding="8,2"
+                                            Background="#163C34"
+                                            CornerRadius="8">
+                                        <TextBlock Text="{TemplateBinding Notice}"
+                                                   Foreground="#64D5A4"
+                                                   FontSize="12" />
+                                    </Border>
+                                </StackPanel>
+                                <TextBlock x:Name="ChoiceDescription"
+                                           Text="{TemplateBinding Description}"
+                                           Foreground="#91A4BD"
+                                           FontSize="13"
+                                           LineHeight="18"
+                                           TextWrapping="Wrap"
+                                           Margin="0,4,0,0" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="ChoiceBorder" Property="Background" Value="#12233A" />
+                            <Setter TargetName="ChoiceBorder" Property="BorderBrush" Value="#4FAAE8" />
+                            <Setter TargetName="ChoiceCircle" Property="BorderBrush" Value="#4FAAE8" />
+                            <Setter TargetName="ChoiceDot" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ChoiceBorder" Property="BorderBrush" Value="#3F6B91" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="ChoiceBorder" Property="BorderBrush" Value="#8BD5F7" />
+                        </Trigger>
+                        <Trigger Property="Description" Value="">
+                            <Setter TargetName="ChoiceDescription" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="Notice" Value="">
+                            <Setter TargetName="NoticeBadge" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 </ResourceDictionary>

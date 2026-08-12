@@ -45,4 +45,43 @@ public sealed class OverlayNotificationTests
             source,
             dismissLabel));
     }
+
+    [Fact]
+    public void DisplayPolicy_UsesNormalizedFixedDuration()
+    {
+        var policy = new OverlayDisplayPolicy();
+        policy.ApplySettings(new OverlayPresentationSettings
+        {
+            DurationMode = OverlayDurationMode.Fixed,
+            FixedDurationSeconds = 12
+        });
+        var notification = new OverlayNotification(
+            "tip",
+            "Совет",
+            "Короткий совет",
+            "Источник",
+            "Закрыть",
+            OverlayNotificationTone.Coach);
+
+        Assert.Equal(TimeSpan.FromSeconds(12), policy.GetLifetime(notification));
+    }
+
+    [Fact]
+    public void PresentationSettings_ClampUntrustedValues()
+    {
+        var normalized = new OverlayPresentationSettings
+        {
+            Width = 900,
+            BackgroundOpacity = 0.1,
+            FixedDurationSeconds = 60,
+            HorizontalPosition = -2,
+            VerticalPosition = 5
+        }.Normalize();
+
+        Assert.Equal(400, normalized.Width);
+        Assert.Equal(0.6, normalized.BackgroundOpacity);
+        Assert.Equal(20, normalized.FixedDurationSeconds);
+        Assert.Equal(0, normalized.HorizontalPosition);
+        Assert.Equal(1, normalized.VerticalPosition);
+    }
 }

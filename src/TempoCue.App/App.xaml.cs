@@ -42,6 +42,7 @@ public partial class App : System.Windows.Application
         var settingsService = new AppSettingsService();
         var settings = settingsService.Load();
         LocalizationService.Instance.SetLanguage(settings.Language);
+        var overlaySettings = new OverlaySettingsState(settings.Overlay);
 
         // Каталог может быть пустым: встроенные наборы поставляются только после
         // отдельной проверки их содержания и актуальности.
@@ -97,14 +98,21 @@ public partial class App : System.Windows.Application
             LocalizationService.Instance);
         _homeViewModel = homeViewModel;
         _overlayPresenter = new OverlayHost(Dispatcher);
+        _overlayPresenter.ApplySettings(overlaySettings.Current.ToPresentationSettings());
+        overlaySettings.Changed += (_, _) =>
+            _overlayPresenter?.ApplySettings(overlaySettings.Current.ToPresentationSettings());
         _activeMatchOverlayCoordinator = new ActiveMatchOverlayCoordinator(
             _activeMatchMonitor,
             _overlayPresenter,
-            LocalizationService.Instance);
+            LocalizationService.Instance,
+            overlaySettings);
         _settingsViewModel = new SettingsViewModel(
             LocalizationService.Instance,
             settingsService,
-            ShowOverlayPreview);
+            ShowOverlayPreview,
+            overlaySettings,
+            OpenOverlaySetup,
+            () => _overlayPresenter?.Settings ?? overlaySettings.Current.ToPresentationSettings());
         var coachingLibraryViewModel = new CoachingLibraryViewModel(
             builtInPacks,
             LocalizationService.Instance,
@@ -235,6 +243,29 @@ public partial class App : System.Windows.Application
         }
 
         _overlayPreviewStep = (step + 1) % 3;
+    }
+
+    private void OpenOverlaySetup(OverlayUserSettings settings)
+    {
+        if (_overlayPresenter is null)
+        {
+            return;
+        }
+
+        _overlayPresenter.ApplySettings(settings.ToPresentationSettings());
+        _overlayPresenter.SetInteractionMode(OverlayInteractionMode.Setup);
+        var localization = LocalizationService.Instance;
+        _overlayPresenter.ShowPreview(
+        [
+            CreateOverlayPreviewNotification(
+                localization,
+                "Warning",
+                OverlayNotificationTone.Caution),
+            CreateOverlayPreviewNotification(
+                localization,
+                "Information",
+                OverlayNotificationTone.Information)
+        ]);
     }
 
     private static OverlayNotification CreateOverlayPreviewNotification(

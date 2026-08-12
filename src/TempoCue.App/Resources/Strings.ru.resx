@@ -734,8 +734,38 @@
   <data name="Coaching.Export.Status.ItemsNotFound" xml:space="preserve"><value>В каталоге выбранного патча нет предметов с ID: {0}.</value></data>
   <data name="Coaching.Export.Status.Failed" xml:space="preserve"><value>Не удалось собрать набор предметов.</value></data>
   <data name="Settings.Overlay.Section" xml:space="preserve"><value>Игровой оверлей</value></data>
+  <data name="Settings.Overlay.Enabled.Label" xml:space="preserve"><value>Уведомления в игре</value></data>
+  <data name="Settings.Overlay.Enabled.On" xml:space="preserve"><value>Включён</value></data>
+  <data name="Settings.Overlay.Enabled.Off" xml:space="preserve"><value>Выключен</value></data>
+  <data name="Settings.Overlay.Width.Label" xml:space="preserve"><value>Ширина оверлея</value></data>
+  <data name="Settings.Overlay.Opacity.Label" xml:space="preserve"><value>Прозрачность фона</value></data>
+  <data name="Settings.Overlay.Configure.Button" xml:space="preserve"><value>Настроить оверлей</value></data>
+  <data name="Settings.Overlay.Configure.Hint" xml:space="preserve"><value>Открывает безопасный предпросмотр, который можно перетаскивать без активного матча.</value></data>
+  <data name="Settings.Overlay.Configure.Hotkey" xml:space="preserve"><value>или Ctrl + Alt + O</value></data>
+  <data name="Settings.Overlay.Duration.Label" xml:space="preserve"><value>Время показа</value></data>
+  <data name="Settings.Overlay.Duration.Summary" xml:space="preserve"><value>Короткие сообщения 5–8 секунд, длинные советы — до 16 секунд</value></data>
+  <data name="Settings.Overlay.Duration.Automatic" xml:space="preserve"><value>Автоматически</value></data>
+  <data name="Settings.Overlay.Duration.Automatic.Hint" xml:space="preserve"><value>TempoCue выберет время по длине и важности сообщения.</value></data>
+  <data name="Settings.Overlay.Duration.Fixed" xml:space="preserve"><value>Фиксированное время</value></data>
+  <data name="Settings.Overlay.Duration.Fixed.Hint" xml:space="preserve"><value>Все обычные уведомления показываются одинаковое время.</value></data>
+  <data name="Settings.Overlay.Duration.Fixed.Value" xml:space="preserve"><value>Время показа</value></data>
+  <data name="Settings.Overlay.Duration.Warning" xml:space="preserve"><value>Опасные уведомления всегда остаются на экране не менее 6 секунд, чтобы их нельзя было пропустить.</value></data>
+  <data name="Settings.Overlay.Duration.SecondsSuffix" xml:space="preserve"><value>с</value></data>
+  <data name="Settings.Overlay.Persistent.Label" xml:space="preserve"><value>Постоянные советы на весь матч</value></data>
+  <data name="Settings.Overlay.Persistent.Summary" xml:space="preserve"><value>Механические подсказки матчапа, не привязанные к моменту</value></data>
+  <data name="Settings.Overlay.Persistent.Once" xml:space="preserve"><value>Один раз за матч</value></data>
+  <data name="Settings.Overlay.Persistent.Recommended" xml:space="preserve"><value>рекомендуется</value></data>
+  <data name="Settings.Overlay.Persistent.Once.Hint" xml:space="preserve"><value>Советы появляются постепенно и не повторяются после окончания списка.</value></data>
+  <data name="Settings.Overlay.Persistent.Level" xml:space="preserve"><value>Повторять по кругу</value></data>
+  <data name="Settings.Overlay.Persistent.Level.Hint" xml:space="preserve"><value>Следующий совет появляется при повышении уровня; повтор возможен минимум через три уровня.</value></data>
+  <data name="Settings.Overlay.Persistent.Disabled" xml:space="preserve"><value>Не показывать автоматически</value></data>
+  <data name="Settings.Overlay.Persistent.Disabled.Hint" xml:space="preserve"><value>Постоянные советы останутся доступны в подробностях Coach Pack.</value></data>
+  <data name="Settings.Overlay.Persistent.ScopeHint" xml:space="preserve"><value>Смена фаз и опасные события всегда показываются отдельно и не зависят от этой настройки.</value></data>
+  <data name="Settings.Overlay.Reset.Button" xml:space="preserve"><value>Значения по умолчанию</value></data>
+  <data name="Settings.Overlay.Save.Button" xml:space="preserve"><value>Сохранить настройки</value></data>
+  <data name="Settings.Overlay.Unsaved" xml:space="preserve"><value>Есть несохранённые изменения</value></data>
   <data name="Settings.Overlay.Preview.Label" xml:space="preserve"><value>Предпросмотр оверлея</value></data>
-  <data name="Settings.Overlay.Description" xml:space="preserve"><value>Последовательно показывает три уведомления и позволяет проверить заполнение двух слотов и вытеснение по приоритету.</value></data>
+  <data name="Settings.Overlay.Description" xml:space="preserve"><value>Показывает советы Coach Pack поверх игры. Текст и цветовая полоса остаются полностью непрозрачными.</value></data>
   <data name="Settings.Overlay.Preview.Button" xml:space="preserve"><value>Показать следующее уведомление</value></data>
   <data name="Settings.Overlay.Preview.Warning.Label" xml:space="preserve"><value>Осторожно</value></data>
   <data name="Settings.Overlay.Preview.Warning.Title" xml:space="preserve"><value>Соперник пропал с линии</value></data>

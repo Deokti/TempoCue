@@ -724,8 +724,38 @@
   <data name="Coaching.Export.Status.ItemsNotFound" xml:space="preserve"><value>These item IDs are absent from the selected patch catalog: {0}.</value></data>
   <data name="Coaching.Export.Status.Failed" xml:space="preserve"><value>The item set could not be built.</value></data>
   <data name="Settings.Overlay.Section" xml:space="preserve"><value>Game overlay</value></data>
+  <data name="Settings.Overlay.Enabled.Label" xml:space="preserve"><value>In-game notifications</value></data>
+  <data name="Settings.Overlay.Enabled.On" xml:space="preserve"><value>Enabled</value></data>
+  <data name="Settings.Overlay.Enabled.Off" xml:space="preserve"><value>Disabled</value></data>
+  <data name="Settings.Overlay.Width.Label" xml:space="preserve"><value>Overlay width</value></data>
+  <data name="Settings.Overlay.Opacity.Label" xml:space="preserve"><value>Background opacity</value></data>
+  <data name="Settings.Overlay.Configure.Button" xml:space="preserve"><value>Configure overlay</value></data>
+  <data name="Settings.Overlay.Configure.Hint" xml:space="preserve"><value>Opens a safe preview that you can drag without an active match.</value></data>
+  <data name="Settings.Overlay.Configure.Hotkey" xml:space="preserve"><value>or Ctrl + Alt + O</value></data>
+  <data name="Settings.Overlay.Duration.Label" xml:space="preserve"><value>Display duration</value></data>
+  <data name="Settings.Overlay.Duration.Summary" xml:space="preserve"><value>Short messages 5–8 seconds, long advice up to 16 seconds</value></data>
+  <data name="Settings.Overlay.Duration.Automatic" xml:space="preserve"><value>Automatic</value></data>
+  <data name="Settings.Overlay.Duration.Automatic.Hint" xml:space="preserve"><value>TempoCue chooses a duration based on message length and importance.</value></data>
+  <data name="Settings.Overlay.Duration.Fixed" xml:space="preserve"><value>Fixed time</value></data>
+  <data name="Settings.Overlay.Duration.Fixed.Hint" xml:space="preserve"><value>All regular notifications stay on screen for the same duration.</value></data>
+  <data name="Settings.Overlay.Duration.Fixed.Value" xml:space="preserve"><value>Display duration</value></data>
+  <data name="Settings.Overlay.Duration.Warning" xml:space="preserve"><value>Danger alerts always remain visible for at least 6 seconds so they cannot be missed.</value></data>
+  <data name="Settings.Overlay.Duration.SecondsSuffix" xml:space="preserve"><value>sec</value></data>
+  <data name="Settings.Overlay.Persistent.Label" xml:space="preserve"><value>Whole-match advice</value></data>
+  <data name="Settings.Overlay.Persistent.Summary" xml:space="preserve"><value>Matchup mechanics that are not tied to a specific moment</value></data>
+  <data name="Settings.Overlay.Persistent.Once" xml:space="preserve"><value>Once per match</value></data>
+  <data name="Settings.Overlay.Persistent.Recommended" xml:space="preserve"><value>recommended</value></data>
+  <data name="Settings.Overlay.Persistent.Once.Hint" xml:space="preserve"><value>Tips are introduced gradually and do not start repeating after the list ends.</value></data>
+  <data name="Settings.Overlay.Persistent.Level" xml:space="preserve"><value>Repeat in a loop</value></data>
+  <data name="Settings.Overlay.Persistent.Level.Hint" xml:space="preserve"><value>The next tip appears on level up; a tip can repeat after at least three levels.</value></data>
+  <data name="Settings.Overlay.Persistent.Disabled" xml:space="preserve"><value>Do not show automatically</value></data>
+  <data name="Settings.Overlay.Persistent.Disabled.Hint" xml:space="preserve"><value>Whole-match tips remain available in the Coach Pack details.</value></data>
+  <data name="Settings.Overlay.Persistent.ScopeHint" xml:space="preserve"><value>Phase changes and danger alerts are always shown separately and do not depend on this setting.</value></data>
+  <data name="Settings.Overlay.Reset.Button" xml:space="preserve"><value>Default values</value></data>
+  <data name="Settings.Overlay.Save.Button" xml:space="preserve"><value>Save settings</value></data>
+  <data name="Settings.Overlay.Unsaved" xml:space="preserve"><value>There are unsaved changes</value></data>
   <data name="Settings.Overlay.Preview.Label" xml:space="preserve"><value>Overlay preview</value></data>
-  <data name="Settings.Overlay.Description" xml:space="preserve"><value>Shows three notifications in sequence so you can verify two-slot stacking and priority replacement.</value></data>
+  <data name="Settings.Overlay.Description" xml:space="preserve"><value>Shows Coach Pack advice over the game. Text and the accent rail stay fully opaque.</value></data>
   <data name="Settings.Overlay.Preview.Button" xml:space="preserve"><value>Show next notification</value></data>
   <data name="Settings.Overlay.Preview.Warning.Label" xml:space="preserve"><value>Caution</value></data>
   <data name="Settings.Overlay.Preview.Warning.Title" xml:space="preserve"><value>An opponent has left their lane</value></data>

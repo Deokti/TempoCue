@@ -44,6 +44,15 @@ internal partial class OverlayWindow : Window
         ApplyExtendedStyles();
     }
 
+    public void ApplySettings(OverlayPresentationSettings settings)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+        var normalized = settings.Normalize();
+        Width = normalized.Width;
+        PrimaryCard.SetBackgroundOpacity(normalized.BackgroundOpacity);
+        SecondaryCard.SetBackgroundOpacity(normalized.BackgroundOpacity);
+    }
+
     public void ShowNotifications(OverlayScheduleSnapshot snapshot)
     {
         ArgumentNullException.ThrowIfNull(snapshot);

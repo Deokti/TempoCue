@@ -1,5 +1,6 @@
 using TempoCue.App.Coordinators;
 using TempoCue.App.Localization;
+using TempoCue.App.Settings;
 using TempoCue.Application;
 using TempoCue.Core;
 using TempoCue.Overlay;
@@ -236,6 +237,60 @@ public sealed class ActiveMatchOverlayCoordinatorTests
             2,
             presenter.Notifications.Count(notification =>
                 notification.Key.Contains(":tip:general-tip:level:", StringComparison.Ordinal)));
+    }
+
+    [Fact]
+    public void Updated_ShowsEachPersistentTipOnlyOnceWhenConfigured()
+    {
+        var monitor = new TestActiveMatchMonitor();
+        using var presenter = new RecordingOverlayPresenter();
+        var settings = new OverlaySettingsState(new OverlayUserSettings
+        {
+            PersistentAdviceFrequency = PersistentAdviceFrequency.OncePerMatch
+        });
+        using var coordinator = new ActiveMatchOverlayCoordinator(
+            monitor,
+            presenter,
+            LocalizationService.Instance,
+            settings);
+        var pack = TestCoachPackFactory.CreateMatchup(
+            persistentTips: [CreatePersistentTip("only-tip", "Единственный совет")]);
+        var advice = CreateAdvice("early", PowerState.Playable, "Фаза");
+
+        for (var level = 1; level <= 8; level++)
+        {
+            monitor.Publish(CreateSuccessUpdate(pack, advice, level * 30, level));
+        }
+
+        Assert.Equal(2, presenter.Notifications.Count);
+        Assert.Single(
+            presenter.Notifications,
+            notification => notification.Key.Contains(":tip:", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Updated_DoesNotShowPersistentTipsWhenDisabled()
+    {
+        var monitor = new TestActiveMatchMonitor();
+        using var presenter = new RecordingOverlayPresenter();
+        var settings = new OverlaySettingsState(new OverlayUserSettings
+        {
+            PersistentAdviceFrequency = PersistentAdviceFrequency.Disabled
+        });
+        using var coordinator = new ActiveMatchOverlayCoordinator(
+            monitor,
+            presenter,
+            LocalizationService.Instance,
+            settings);
+        var pack = TestCoachPackFactory.CreateMatchup(
+            persistentTips: [CreatePersistentTip("tip", "Совет")]);
+        var advice = CreateAdvice("early", PowerState.Playable, "Фаза");
+
+        monitor.Publish(CreateSuccessUpdate(pack, advice, 30, 1));
+        monitor.Publish(CreateSuccessUpdate(pack, advice, 60, 2));
+
+        Assert.Single(presenter.Notifications);
+        Assert.DoesNotContain(presenter.Notifications, notification => notification.Key.Contains(":tip:", StringComparison.Ordinal));
     }
 
     [Fact]

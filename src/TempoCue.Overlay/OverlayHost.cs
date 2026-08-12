@@ -18,6 +18,8 @@ public sealed class OverlayHost : IOverlayPresenter
 
     private OverlayWindow? _window;
     private OverlayScheduleSnapshot _lastSnapshot = OverlayScheduleSnapshot.Empty;
+    private OverlayPresentationSettings _settings;
+    private bool _isApplyingPosition;
     private bool _isDisposed;
 
     public OverlayHost(
@@ -28,6 +30,8 @@ public sealed class OverlayHost : IOverlayPresenter
         _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
         _timeProvider = timeProvider ?? TimeProvider.System;
         _policy = policy ?? new OverlayDisplayPolicy();
+        _settings = _policy.PresentationSettings.Normalize();
+        _policy.ApplySettings(_settings);
         _scheduler = new OverlayNotificationScheduler(_policy);
         _lifecycleTimer = new DispatcherTimer(
             LifecycleTick,
@@ -40,9 +44,35 @@ public sealed class OverlayHost : IOverlayPresenter
     public OverlayInteractionMode InteractionMode { get; private set; } =
         OverlayInteractionMode.Game;
 
+    public OverlayPresentationSettings Settings => _settings;
+
     internal Window? CurrentWindow => _window;
 
     internal OverlayScheduleSnapshot CurrentSnapshot => _scheduler.Current;
+
+    public void ApplySettings(OverlayPresentationSettings settings)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+        if (!_dispatcher.CheckAccess())
+        {
+            _dispatcher.Invoke(() => ApplySettings(settings));
+            return;
+        }
+
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
+        _settings = settings.Normalize();
+        _policy.ApplySettings(_settings);
+        if (_window is not null)
+        {
+            _window.ApplySettings(_settings);
+            PositionInWorkArea(_window);
+        }
+
+        if (!_settings.IsEnabled && InteractionMode is OverlayInteractionMode.Game)
+        {
+            Hide();
+        }
+    }
 
     public void SetInteractionMode(OverlayInteractionMode mode)
     {
@@ -67,6 +97,11 @@ public sealed class OverlayHost : IOverlayPresenter
         }
 
         ObjectDisposedException.ThrowIf(_isDisposed, this);
+        if (!_settings.IsEnabled && InteractionMode is OverlayInteractionMode.Game)
+        {
+            return;
+        }
+
         var snapshot = _scheduler.Publish(notification, _timeProvider.GetUtcNow());
         ApplySnapshot(snapshot);
     }
@@ -144,6 +179,7 @@ public sealed class OverlayHost : IOverlayPresenter
 
         _window.HideRequested -= Window_HideRequested;
         _window.AllCardsHidden -= Window_AllCardsHidden;
+        _window.LocationChanged -= Window_LocationChanged;
         _window.Close();
         _window = null;
     }
@@ -153,7 +189,9 @@ public sealed class OverlayHost : IOverlayPresenter
         var window = new OverlayWindow(_policy);
         window.HideRequested += Window_HideRequested;
         window.AllCardsHidden += Window_AllCardsHidden;
+        window.LocationChanged += Window_LocationChanged;
         window.SetInteractionMode(InteractionMode);
+        window.ApplySettings(_settings);
         return window;
     }
 
@@ -195,14 +233,44 @@ public sealed class OverlayHost : IOverlayPresenter
                left.Items.Zip(right.Items).All(pair => pair.First == pair.Second);
     }
 
-    private static void PositionInWorkArea(Window window)
+    private void PositionInWorkArea(Window window)
     {
         window.UpdateLayout();
         var workArea = SystemParameters.WorkArea;
-        window.Left = Math.Max(
-            workArea.Left,
-            workArea.Right - window.ActualWidth - WorkAreaRightMargin);
-        window.Top = workArea.Top + WorkAreaTopMargin;
+        var availableWidth = Math.Max(0, workArea.Width - window.ActualWidth);
+        var availableHeight = Math.Max(0, workArea.Height - window.ActualHeight);
+        _isApplyingPosition = true;
+        try
+        {
+            window.Left = _settings.HorizontalPosition is { } horizontal
+                ? workArea.Left + availableWidth * horizontal
+                : Math.Max(workArea.Left, workArea.Right - window.ActualWidth - WorkAreaRightMargin);
+            window.Top = _settings.VerticalPosition is { } vertical
+                ? workArea.Top + availableHeight * vertical
+                : workArea.Top + WorkAreaTopMargin;
+        }
+        finally
+        {
+            _isApplyingPosition = false;
+        }
+    }
+
+    private void Window_LocationChanged(object? sender, EventArgs e)
+    {
+        if (_isApplyingPosition || InteractionMode is not OverlayInteractionMode.Setup || sender is not Window window)
+        {
+            return;
+        }
+
+        var workArea = SystemParameters.WorkArea;
+        var availableWidth = Math.Max(1, workArea.Width - window.ActualWidth);
+        var availableHeight = Math.Max(1, workArea.Height - window.ActualHeight);
+        _settings = _settings with
+        {
+            HorizontalPosition = Math.Clamp((window.Left - workArea.Left) / availableWidth, 0, 1),
+            VerticalPosition = Math.Clamp((window.Top - workArea.Top) / availableHeight, 0, 1)
+        };
+        _policy.ApplySettings(_settings);
     }
 
     private void LifecycleTimer_Tick(object? sender, EventArgs e)

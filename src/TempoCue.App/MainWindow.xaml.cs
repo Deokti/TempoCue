@@ -11,6 +11,7 @@ namespace TempoCue.App;
 public partial class MainWindow : Window
 {
     private readonly CurrentMatchViewModel _currentMatchViewModel;
+    private readonly SettingsViewModel _settingsViewModel;
     private readonly LocalizationService _localization = LocalizationService.Instance;
 
     public MainWindow(
@@ -24,6 +25,7 @@ public partial class MainWindow : Window
         ArgumentNullException.ThrowIfNull(settingsViewModel);
         ArgumentNullException.ThrowIfNull(coachingViewModel);
         _currentMatchViewModel = currentMatchViewModel;
+        _settingsViewModel = settingsViewModel;
 
         // Главное окно является composition root для экранов: здесь им назначаются готовые ViewModel.
         InitializeComponent();
@@ -35,6 +37,7 @@ public partial class MainWindow : Window
         HomeContentPage.OpenCurrentMatchRequested += HomeContentPage_OpenCurrentMatchRequested;
 
         Loaded += MainWindow_Loaded;
+        SourceInitialized += MainWindow_SourceInitialized;
         StateChanged += MainWindow_StateChanged;
         Closed += MainWindow_Closed;
     }

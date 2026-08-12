@@ -95,6 +95,10 @@ internal sealed class RecordingOverlayPresenter : IOverlayPresenter
     public OverlayInteractionMode InteractionMode { get; private set; } =
         OverlayInteractionMode.Setup;
 
+    public OverlayPresentationSettings Settings { get; private set; } = new();
+
+    public void ApplySettings(OverlayPresentationSettings settings) => Settings = settings;
+
     public void SetInteractionMode(OverlayInteractionMode mode) => InteractionMode = mode;
 
     public void Show(OverlayNotification notification) => Notifications.Add(notification);

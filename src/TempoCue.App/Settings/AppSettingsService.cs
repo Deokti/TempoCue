@@ -44,7 +44,8 @@ public sealed class AppSettingsService
                 {
                     return settings with
                     {
-                        Language = LocalizationService.NormalizeLanguageCode(settings.Language)
+                        Language = LocalizationService.NormalizeLanguageCode(settings.Language),
+                        Overlay = (settings.Overlay ?? new OverlayUserSettings()).Normalize()
                     };
                 }
             }
@@ -72,6 +73,23 @@ public sealed class AppSettingsService
     /// <summary>Сохраняет язык сразу после выбора в интерфейсе.</summary>
     public void SaveLanguage(string languageCode)
     {
+        var current = Load();
+        Save(current with
+        {
+            Language = LocalizationService.NormalizeLanguageCode(languageCode)
+        });
+    }
+
+    /// <summary>Сохраняет применённые параметры оверлея, не изменяя язык.</summary>
+    public void SaveOverlay(OverlayUserSettings overlay)
+    {
+        ArgumentNullException.ThrowIfNull(overlay);
+        var current = Load();
+        Save(current with { Overlay = overlay.Normalize() });
+    }
+
+    private void Save(AppSettings settings)
+    {
         try
         {
             var settingsDirectory = Path.GetDirectoryName(_settingsPath);
@@ -80,10 +98,6 @@ public sealed class AppSettingsService
                 Directory.CreateDirectory(settingsDirectory);
             }
 
-            var settings = new AppSettings
-            {
-                Language = LocalizationService.NormalizeLanguageCode(languageCode)
-            };
             File.WriteAllText(_settingsPath, JsonSerializer.Serialize(settings, SerializerOptions));
         }
         catch (IOException)

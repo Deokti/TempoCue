@@ -11,11 +11,27 @@ public partial class SettingsView : UserControl
         InitializeComponent();
     }
 
-    private void ShowOverlayPreviewButton_Click(object sender, System.Windows.RoutedEventArgs e)
+    private void ConfigureOverlayButton_Click(object sender, System.Windows.RoutedEventArgs e)
     {
         if (DataContext is SettingsViewModel viewModel)
         {
-            viewModel.ShowOverlayPreview();
+            viewModel.OpenOverlaySetup();
+        }
+    }
+
+    private void SaveOverlaySettingsButton_Click(object sender, System.Windows.RoutedEventArgs e)
+    {
+        if (DataContext is SettingsViewModel viewModel)
+        {
+            viewModel.SaveOverlaySettings();
+        }
+    }
+
+    private void ResetOverlaySettingsButton_Click(object sender, System.Windows.RoutedEventArgs e)
+    {
+        if (DataContext is SettingsViewModel viewModel)
+        {
+            viewModel.ResetOverlaySettings();
         }
     }
 }

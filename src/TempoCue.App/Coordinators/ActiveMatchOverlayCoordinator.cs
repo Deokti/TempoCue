@@ -1,4 +1,5 @@
 using TempoCue.App.Localization;
+using TempoCue.App.Settings;
 using TempoCue.Application;
 using TempoCue.Core;
 using TempoCue.Overlay;
@@ -17,6 +18,7 @@ public sealed class ActiveMatchOverlayCoordinator : IDisposable
     private readonly IActiveMatchMonitor _monitor;
     private readonly IOverlayPresenter _presenter;
     private readonly LocalizationService _localization;
+    private readonly OverlaySettingsState _overlaySettings;
     private readonly object _stateLock = new();
     private readonly Dictionary<string, int> _persistentTipLevels =
         new(StringComparer.Ordinal);
@@ -30,11 +32,16 @@ public sealed class ActiveMatchOverlayCoordinator : IDisposable
     public ActiveMatchOverlayCoordinator(
         IActiveMatchMonitor monitor,
         IOverlayPresenter presenter,
-        LocalizationService localization)
+        LocalizationService localization,
+        OverlaySettingsState? overlaySettings = null)
     {
         _monitor = monitor ?? throw new ArgumentNullException(nameof(monitor));
         _presenter = presenter ?? throw new ArgumentNullException(nameof(presenter));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        _overlaySettings = overlaySettings ?? new OverlaySettingsState(new OverlayUserSettings
+        {
+            PersistentAdviceFrequency = PersistentAdviceFrequency.EveryLevel
+        });
 
         _monitor.Updated += Monitor_Updated;
         if (_monitor.CurrentUpdate is { } currentUpdate)
@@ -184,6 +191,12 @@ public sealed class ActiveMatchOverlayCoordinator : IDisposable
         string activeRuleId,
         int playerLevel)
     {
+        var frequency = _overlaySettings.Current.PersistentAdviceFrequency;
+        if (frequency is PersistentAdviceFrequency.Disabled)
+        {
+            return null;
+        }
+
         var eligibleTips = pack.PersistentTips
             .Where(tip => tip.ApplicableRuleId is null
                 || string.Equals(
@@ -204,14 +217,17 @@ public sealed class ActiveMatchOverlayCoordinator : IDisposable
 
         var selected = eligibleTips.FirstOrDefault(candidate =>
             !_persistentTipLevels.ContainsKey(candidate.Tip.Id));
-        selected ??= eligibleTips
-            .Where(candidate =>
-                playerLevel - _persistentTipLevels[candidate.Tip.Id]
-                >= PersistentTipRepeatLevelGap)
-            .OrderBy(candidate => _persistentTipLevels[candidate.Tip.Id])
-            .ThenByDescending(candidate => candidate.IsPhaseSpecific)
-            .ThenBy(candidate => candidate.SourceIndex)
-            .FirstOrDefault();
+        if (frequency is PersistentAdviceFrequency.EveryLevel)
+        {
+            selected ??= eligibleTips
+                .Where(candidate =>
+                    playerLevel - _persistentTipLevels[candidate.Tip.Id]
+                    >= PersistentTipRepeatLevelGap)
+                .OrderBy(candidate => _persistentTipLevels[candidate.Tip.Id])
+                .ThenByDescending(candidate => candidate.IsPhaseSpecific)
+                .ThenBy(candidate => candidate.SourceIndex)
+                .FirstOrDefault();
+        }
         if (selected is null)
         {
             return null;
