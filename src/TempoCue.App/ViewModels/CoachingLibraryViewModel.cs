@@ -88,6 +88,8 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
 
     public int TotalPackCount => _allCards.Count;
 
+    public int EnabledPackCount => _allCards.Count(static card => card.IsEnabled);
+
     public string LibrarySummary
     {
         get => _librarySummary;
@@ -312,10 +314,11 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
             .ToArray();
         _allCards = cards;
         OnPropertyChanged(nameof(TotalPackCount));
+        OnPropertyChanged(nameof(EnabledPackCount));
         LibrarySummary = string.Join(
             " · ",
             _localization.Plural("Count.CoachPack", cards.Length),
-            _localization.Plural("Count.CoachPackEnabled", cards.Count(static card => card.IsEnabled)),
+            _localization.Plural("Count.CoachPackEnabled", EnabledPackCount),
             _localization.Plural(
                 "Count.CoachPackCreated",
                 cards.Count(static card => card.IsCreatedByUser)));

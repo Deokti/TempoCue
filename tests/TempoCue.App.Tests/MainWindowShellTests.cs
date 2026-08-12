@@ -5,6 +5,7 @@ using System.Windows.Media;
 using System.Windows.Shell;
 using System.Windows.Threading;
 using TempoCue.App.Views;
+using TempoCue.Application;
 
 namespace TempoCue.App.Tests;
 
@@ -54,6 +55,23 @@ public sealed class MainWindowShellTests
             "В разработке",
             WpfTestHost.Find<TextBlock>(homePage, "HistoryDevelopmentTextBlock").Text);
         CoachingViewTestContext.SaveVisualSnapshotIfRequested(window, "home.png");
+
+        var coachingBadge = WpfTestHost.Find<TextBlock>(
+            window,
+            "CoachingNavigationBadgeTextBlock");
+        Assert.Equal("1", coachingBadge.Text);
+        context.CoachPackStore.AddEntry(
+            TestCoachPackFactory.CreateDetailedMatchup() with
+            {
+                Id = "matchup.second-enabled",
+                Name = "Второй включённый матчап"
+            },
+            LocalCoachPackState.Enabled,
+            LocalCoachPackOrigin.CreatedByUser);
+        context.Coaching.Library.RefreshAsync().GetAwaiter().GetResult();
+        WpfTestHost.Pump(DispatcherPriority.ApplicationIdle);
+        Assert.Equal(2, context.Coaching.Library.EnabledPackCount);
+        Assert.Equal("2", coachingBadge.Text);
 
         var currentMatchPage = WpfTestHost.Find<CurrentMatchView>(
             window,

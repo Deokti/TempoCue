@@ -204,7 +204,10 @@
                                     <TextBlock x:Name="CoachingNavigationTextBlock"
                                                Grid.Column="1" Text="{localization:Loc Nav.Coaching}"
                                                FontSize="14" />
-                                    <TextBlock Grid.Column="2" Text="1"
+                                    <TextBlock x:Name="CoachingNavigationBadgeTextBlock"
+                                               Grid.Column="2"
+                                               Text="{Binding DataContext.Library.EnabledPackCount,
+                                                              ElementName=CoachingContentPage}"
                                                Foreground="#6FC4EF" FontSize="11" />
                                 </Grid>
                             </Button>
