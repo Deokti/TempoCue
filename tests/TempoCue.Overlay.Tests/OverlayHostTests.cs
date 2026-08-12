@@ -11,7 +11,7 @@ public sealed class OverlayHostTests
     private const double ExpectedTopMargin = 80;
 
     [Fact]
-    public void Show_ReusesWindowAndReplacesEqualPriorityCard() => WpfTestHost.Run(() =>
+    public void Show_ReusesWindowAndStacksEqualPriorityCards() => WpfTestHost.Run(() =>
     {
         using var host = new OverlayHost(Dispatcher.CurrentDispatcher);
         var first = Create("first", "Первый совет");
@@ -29,10 +29,20 @@ public sealed class OverlayHostTests
         WpfTestHost.Pump();
 
         Assert.Same(window, host.CurrentWindow);
-        Assert.Same(second, window.PrimaryCardView.DataContext);
+        Assert.Same(first, window.PrimaryCardView.DataContext);
+        Assert.Same(second, window.SecondaryCardView.DataContext);
+        Assert.Equal(Visibility.Visible, window.SecondaryCardView.Visibility);
         Assert.Equal(
             second.Phrase,
-            Assert.IsType<TextBlock>(window.PrimaryCardView.FindName("OverlayPhraseTextBlock")).Text);
+            Assert.IsType<TextBlock>(window.SecondaryCardView.FindName("OverlayPhraseTextBlock")).Text);
+
+        var snapshotDirectory = Environment.GetEnvironmentVariable("TEMPOCUE_UI_SNAPSHOT_DIR");
+        if (!string.IsNullOrWhiteSpace(snapshotDirectory))
+        {
+            WpfTestHost.SavePng(
+                window.OverlayCardsPanel,
+                Path.Combine(snapshotDirectory, "overlay-equal-priority-stack.png"));
+        }
 
         host.Hide();
     });

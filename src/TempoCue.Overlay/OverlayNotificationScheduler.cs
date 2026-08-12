@@ -86,7 +86,7 @@ public sealed class OverlayNotificationScheduler
         if (_visible.Any(item =>
                 _policy.GetPriority(item.Notification.Tone) == incomingPriority))
         {
-            ReplaceSamePriority(notification, now);
+            PlaceNotification(notification, now);
             return CreateSnapshot();
         }
 
@@ -96,7 +96,7 @@ public sealed class OverlayNotificationScheduler
             return CreateSnapshot();
         }
 
-        ReplaceSamePriority(notification, now);
+        PlaceNotification(notification, now);
         return CreateSnapshot();
     }
 
@@ -116,7 +116,7 @@ public sealed class OverlayNotificationScheduler
 
             var pending = _pending[pendingIndex];
             _pending.RemoveAt(pendingIndex);
-            ReplaceSamePriority(pending.Notification, now);
+            PlaceNotification(pending.Notification, now);
         }
 
         return CreateSnapshot();
@@ -158,35 +158,27 @@ public sealed class OverlayNotificationScheduler
         SortVisible();
     }
 
-    private void ReplaceSamePriority(OverlayNotification notification, DateTimeOffset now)
+    private void PlaceNotification(OverlayNotification notification, DateTimeOffset now)
     {
-        var priority = _policy.GetPriority(notification.Tone);
-        var samePriorityIndex = _visible.FindIndex(item =>
-            _policy.GetPriority(item.Notification.Tone) == priority);
-        if (samePriorityIndex >= 0)
+        if (_visible.Count < OverlayDisplayPolicy.VisibleSlotCount)
         {
-            _visible.RemoveAt(samePriorityIndex);
             Show(notification, now);
             return;
         }
 
-        if (_visible.Count >= OverlayDisplayPolicy.VisibleSlotCount)
+        var lowest = _visible
+            .Select((item, index) => (item, index))
+            .OrderBy(pair => _policy.GetPriority(pair.item.Notification.Tone))
+            .ThenBy(pair => pair.item.Sequence)
+            .First();
+        if (_policy.GetPriority(notification.Tone) <
+            _policy.GetPriority(lowest.item.Notification.Tone))
         {
-            var lowest = _visible
-                .Select((item, index) => (item, index))
-                .OrderBy(pair => _policy.GetPriority(pair.item.Notification.Tone))
-                .ThenBy(pair => pair.item.Sequence)
-                .First();
-            if (_policy.GetPriority(notification.Tone) <
-                _policy.GetPriority(lowest.item.Notification.Tone))
-            {
-                Enqueue(notification, now);
-                return;
-            }
-
-            _visible.RemoveAt(lowest.index);
+            Enqueue(notification, now);
+            return;
         }
 
+        _visible.RemoveAt(lowest.index);
         Show(notification, now);
     }
 
@@ -216,17 +208,9 @@ public sealed class OverlayNotificationScheduler
     }
 
     private bool CanShowNow(OverlayNotification notification, DateTimeOffset now)
-    {
-        if (notification.Tone is OverlayNotificationTone.Coach &&
-            _visible.Any(item => _policy.IsWarning(item.Notification.Tone)))
-        {
-            return false;
-        }
-
-        return _policy.BypassesCadence(notification.Tone) ||
-               _lastLowPriorityShownAt is null ||
-               now - _lastLowPriorityShownAt >= _policy.LowPriorityCadence;
-    }
+        => _policy.BypassesCadence(notification.Tone) ||
+           _lastLowPriorityShownAt is null ||
+           now - _lastLowPriorityShownAt >= _policy.LowPriorityCadence;
 
     private int FindNextPendingIndex(DateTimeOffset now)
     {
@@ -274,7 +258,7 @@ public sealed class OverlayNotificationScheduler
     {
         var byPriority = _policy.GetPriority(right.Notification.Tone)
             .CompareTo(_policy.GetPriority(left.Notification.Tone));
-        return byPriority != 0 ? byPriority : right.Sequence.CompareTo(left.Sequence);
+        return byPriority != 0 ? byPriority : left.Sequence.CompareTo(right.Sequence);
     });
 
     private OverlayScheduleSnapshot CreateSnapshot() =>

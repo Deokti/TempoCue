@@ -5,7 +5,7 @@ public sealed class OverlayNotificationSchedulerTests
     private static readonly DateTimeOffset Start = new(2026, 8, 11, 7, 0, 0, TimeSpan.Zero);
 
     [Fact]
-    public void Publish_OrdersTwoDifferentPrioritiesAndReplacesEqualPriority()
+    public void Publish_OrdersTwoDifferentPrioritiesAndReplacesLowestWhenSlotsAreFull()
     {
         var scheduler = new OverlayNotificationScheduler();
         scheduler.Publish(Create("caution", OverlayNotificationTone.Caution), Start);
@@ -23,6 +23,31 @@ public sealed class OverlayNotificationSchedulerTests
     }
 
     [Fact]
+    public void Publish_StacksEqualPriorityCardsInArrivalOrderWithIndependentLifetime()
+    {
+        var scheduler = new OverlayNotificationScheduler();
+        scheduler.Publish(
+            Create("first-coach", OverlayNotificationTone.Coach),
+            Start);
+
+        var second = scheduler.Publish(
+            Create("second-coach", OverlayNotificationTone.Coach),
+            Start.AddSeconds(1));
+
+        Assert.Equal(
+            ["first-coach", "second-coach"],
+            second.Items.Select(item => item.Notification.Key));
+        Assert.Equal(Start.AddSeconds(7), second.Items[0].ExpiresAt);
+        Assert.Equal(Start.AddSeconds(8), second.Items[1].ExpiresAt);
+
+        var afterFirstExpiration = scheduler.Advance(Start.AddSeconds(7));
+
+        Assert.Equal(
+            "second-coach",
+            Assert.Single(afterFirstExpiration.Items).Notification.Key);
+    }
+
+    [Fact]
     public void Publish_DangerImmediatelyClearsLowerPriorityCards()
     {
         var scheduler = new OverlayNotificationScheduler();
@@ -37,17 +62,17 @@ public sealed class OverlayNotificationSchedulerTests
     }
 
     [Fact]
-    public void Publish_CoachWaitsUntilWarningExpires()
+    public void Publish_CoachUsesSecondarySlotBelowVisibleWarning()
     {
         var scheduler = new OverlayNotificationScheduler();
         scheduler.Publish(Create("caution", OverlayNotificationTone.Caution), Start);
-        scheduler.Publish(Create("coach", OverlayNotificationTone.Coach), Start.AddSeconds(1));
+        var snapshot = scheduler.Publish(
+            Create("coach", OverlayNotificationTone.Coach),
+            Start.AddSeconds(1));
 
-        Assert.Equal("caution", Assert.Single(scheduler.Current.Items).Notification.Key);
-
-        var afterWarning = scheduler.Advance(Start.AddSeconds(6));
-
-        Assert.Equal("coach", Assert.Single(afterWarning.Items).Notification.Key);
+        Assert.Equal(
+            ["caution", "coach"],
+            snapshot.Items.Select(item => item.Notification.Key));
     }
 
     [Fact]
