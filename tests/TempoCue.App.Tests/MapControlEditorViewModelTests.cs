@@ -28,8 +28,34 @@ public sealed class MapControlEditorViewModelTests
         Assert.True(editor.CanMoveNext);
         Assert.True(editor.MoveNext());
         Assert.Equal(2, editor.CurrentStep);
-        Assert.False(editor.CanMoveNext);
-        Assert.False(editor.CanNavigateToStep3);
+        Assert.True(editor.CanMoveNext);
+        Assert.True(editor.CanNavigateToStep3);
+    }
+
+    [Fact]
+    public void Scope_TracksMultipleRolesAndNeverAllowsEmptySelection()
+    {
+        var editor = CreateEditor();
+        var scope = editor.Scope;
+
+        Assert.True(scope.AllRolesSelected);
+        Assert.Equal(5, scope.SelectedRoles.Count);
+
+        scope.RoleOptions.Single(option => option.Role == TempoCue.Coaching.MapControlRole.Top)
+            .IsSelected = true;
+        scope.RoleOptions.Single(option => option.Role == TempoCue.Coaching.MapControlRole.Jungle)
+            .IsSelected = true;
+
+        Assert.False(scope.AllRolesSelected);
+        Assert.Equal(2, scope.SelectedRoles.Count);
+
+        foreach (var option in scope.RoleOptions.ToArray())
+        {
+            option.IsSelected = false;
+        }
+
+        Assert.True(scope.IsComplete);
+        Assert.Single(scope.SelectedRoles);
     }
 
     [Fact]

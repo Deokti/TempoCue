@@ -328,6 +328,23 @@
   <data name="Coaching.MapControlEditor.Main.Map" xml:space="preserve"><value>Map</value></data>
   <data name="Coaching.MapControlEditor.Main.SummonersRift" xml:space="preserve"><value>Summoner's Rift</value></data>
   <data name="Coaching.MapControlEditor.Main.FirstVersion" xml:space="preserve"><value>First version</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Title" xml:space="preserve"><value>Scope</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Description" xml:space="preserve"><value>The pack will not activate when the player's role or team side does not match. The simulator verifies the same restrictions on step four.</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Roles" xml:space="preserve"><value>Roles</value></data>
+  <data name="Coaching.MapControlEditor.Scope.AllRoles" xml:space="preserve"><value>All roles</value></data>
+  <data name="Coaching.MapControlEditor.Scope.TeamSide" xml:space="preserve"><value>Team side</value></data>
+  <data name="Coaching.MapControlEditor.Scope.AnySide" xml:space="preserve"><value>Any</value></data>
+  <data name="Coaching.MapControlEditor.Scope.BlueSide" xml:space="preserve"><value>Blue</value></data>
+  <data name="Coaching.MapControlEditor.Scope.RedSide" xml:space="preserve"><value>Red</value></data>
+  <data name="Coaching.MapControlEditor.Scope.GameMode.Title" xml:space="preserve"><value>About game modes</value></data>
+  <data name="Coaching.MapControlEditor.Scope.GameMode.Description" xml:space="preserve"><value>Normal and ranked matches are not separated: the first version does not receive a sufficiently reliable signal for that distinction.</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Result.Title" xml:space="preserve"><value>Result</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Result.Hint" xml:space="preserve"><value>The summary updates immediately, so you can see exactly what will be saved in the pack.</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Summary" xml:space="preserve"><value>The pack applies on Summoner's Rift to {0} on {1}.</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Summary.AllRoles" xml:space="preserve"><value>all roles</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Summary.AnySide" xml:space="preserve"><value>both team sides</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Summary.BlueSide" xml:space="preserve"><value>the blue side</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Summary.RedSide" xml:space="preserve"><value>the red side</value></data>
   <data name="Coaching.MapControlEditor.FutureStep" xml:space="preserve"><value>The fields for this step will be added in the next verified iteration.</value></data>
   <data name="Coaching.NewPack.Soon" xml:space="preserve"><value>Soon</value></data>
   <data name="Coaching.MatchupEditor.Back" xml:space="preserve"><value>Back</value></data>

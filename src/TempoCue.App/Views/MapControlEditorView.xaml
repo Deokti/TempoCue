@@ -123,21 +123,36 @@
                     </views:MapControlMainInformationView.Style>
                 </views:MapControlMainInformationView>
 
-                <!-- Следующий шаг присутствует в маршруте, но будет реализован отдельной итерацией. -->
+                <views:MapControlScopeView x:Name="MapControlScopePage"
+                                           DataContext="{Binding Scope}">
+                    <views:MapControlScopeView.Style>
+                        <Style TargetType="views:MapControlScopeView">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding DataContext.CurrentStep, RelativeSource={RelativeSource AncestorType=views:MapControlEditorView}}"
+                                             Value="2">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </views:MapControlScopeView.Style>
+                </views:MapControlScopeView>
+
+                <!-- Третий шаг присутствует в маршруте, но будет реализован следующей проверяемой итерацией. -->
                 <Border x:Name="MapControlFutureStepCard"
                         Padding="20">
                     <Border.Style>
                         <Style TargetType="Border" BasedOn="{StaticResource ShellCard}">
                             <Setter Property="Visibility" Value="Collapsed" />
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding CurrentStep}" Value="2">
+                                <DataTrigger Binding="{Binding CurrentStep}" Value="3">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
                     <StackPanel>
-                        <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Step.Scope}"
+                        <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Step.Content}"
                                    Foreground="#F4F7FB"
                                    FontSize="{StaticResource Typography.FontSize.SectionTitle}"
                                    FontWeight="SemiBold" />

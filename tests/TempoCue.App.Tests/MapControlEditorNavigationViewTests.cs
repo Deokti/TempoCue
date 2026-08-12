@@ -55,5 +55,20 @@ public sealed class MapControlEditorNavigationViewTests
         Assert.True(WpfTestHost.Find<Button>(
             context.MapControlEditorPage,
             "MapControlEditorNextButton").IsEnabled);
+
+        WpfTestHost.Click(
+            WpfTestHost.Find<Button>(context.MapControlEditorPage, "MapControlEditorNextButton"),
+            DispatcherPriority.ApplicationIdle);
+
+        Assert.Equal(Visibility.Visible, WpfTestHost.Find<MapControlScopeView>(
+            context.MapControlEditorPage,
+            "MapControlScopePage").Visibility);
+        Assert.Equal(Visibility.Collapsed, WpfTestHost.Find<MapControlMainInformationView>(
+            context.MapControlEditorPage,
+            "MapControlMainInformationPage").Visibility);
+        Assert.True(stepItems[2].IsEnabled);
+        SaveVisualSnapshotIfRequested(
+            context.Window,
+            "map-control-editor-step2.png");
     });
 }

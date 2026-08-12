@@ -48,6 +48,20 @@ public sealed class MapControlPackValidatorTests
     }
 
     [Fact]
+    public void Validate_RejectsPackWithoutApplicableRoles()
+    {
+        var pack = MapControlPackTestData.Create() with
+        {
+            Applicability = new MapControlApplicability { Roles = [] }
+        };
+
+        var exception = Assert.Throws<InvalidDataException>(
+            () => MapControlPackValidator.Validate(pack));
+
+        Assert.Contains("role", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public void Validate_RejectsRespawnRuleForOneTimeObjective()
     {
         var original = MapControlPackTestData.Create();

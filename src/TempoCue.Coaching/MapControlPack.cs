@@ -42,6 +42,9 @@ public sealed record MapControlPack
     /// <summary>Автор исходного набора на момент создания копии.</summary>
     public string? ForkedFromAuthor { get; init; }
 
+    /// <summary>Роли и сторона команды, для которых набор может быть активирован.</summary>
+    public MapControlApplicability Applicability { get; init; } = new();
+
     /// <summary>Правила напоминаний в стабильном авторском порядке.</summary>
     public IReadOnlyList<MapObjectiveReminderRule> Rules { get; init; } = [];
 }

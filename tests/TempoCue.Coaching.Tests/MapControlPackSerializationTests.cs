@@ -19,6 +19,8 @@ public sealed class MapControlPackSerializationTests
         Assert.Equal(MapControlPack.SupportedPackType, loaded.PackType);
         Assert.Equal(pack.Id, loaded.Id);
         Assert.Equal(pack.Source, loaded.Source);
+        Assert.Equal(pack.Applicability.Roles, loaded.Applicability.Roles);
+        Assert.Equal(pack.Applicability.TeamSide, loaded.Applicability.TeamSide);
         Assert.Equal(pack.Rules, loaded.Rules);
     }
 

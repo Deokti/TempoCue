@@ -21,6 +21,11 @@ internal static class MapControlPackTestData
                 Kind = CoachPackSourceKind.PersonalExperience,
                 Permission = CoachPackSourcePermission.NotRequired
             },
+            Applicability = new MapControlApplicability
+            {
+                Roles = [MapControlRole.Top, MapControlRole.Support],
+                TeamSide = MapControlTeamSide.Blue
+            },
             Rules =
             [
                 new MapObjectiveReminderRule(

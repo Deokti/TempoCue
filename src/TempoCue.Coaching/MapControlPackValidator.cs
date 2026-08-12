@@ -49,6 +49,8 @@ public static class MapControlPackValidator
             throw new InvalidDataException("Fork author requires the source Map Control Pack id.");
         }
 
+        ValidateApplicability(pack.Applicability);
+
         if (pack.Rules.Count == 0)
         {
             throw new InvalidDataException("Map Control Pack must contain at least one rule.");
@@ -77,6 +79,23 @@ public static class MapControlPackValidator
             }
 
             MapObjectiveReminderRuleValidator.Validate(rule, timing);
+        }
+    }
+
+    private static void ValidateApplicability(MapControlApplicability? applicability)
+    {
+        if (applicability is null
+            || applicability.Roles is null
+            || applicability.Roles.Count == 0)
+        {
+            throw new InvalidDataException("Map Control Pack must apply to at least one role.");
+        }
+
+        if (!Enum.IsDefined(applicability.TeamSide)
+            || applicability.Roles.Any(static role => !Enum.IsDefined(role))
+            || applicability.Roles.Distinct().Count() != applicability.Roles.Count)
+        {
+            throw new InvalidDataException("Map Control Pack applicability is invalid.");
         }
     }
 }

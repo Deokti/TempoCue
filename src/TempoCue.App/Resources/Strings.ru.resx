@@ -336,6 +336,23 @@
   <data name="Coaching.MapControlEditor.Main.Map" xml:space="preserve"><value>Карта</value></data>
   <data name="Coaching.MapControlEditor.Main.SummonersRift" xml:space="preserve"><value>Ущелье призывателей</value></data>
   <data name="Coaching.MapControlEditor.Main.FirstVersion" xml:space="preserve"><value>Первая версия</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Title" xml:space="preserve"><value>Область применения</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Description" xml:space="preserve"><value>Набор не сработает, если роль или сторона игрока не совпадают. Эти же ограничения проверяет симулятор на четвёртом шаге.</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Roles" xml:space="preserve"><value>Роли</value></data>
+  <data name="Coaching.MapControlEditor.Scope.AllRoles" xml:space="preserve"><value>Все роли</value></data>
+  <data name="Coaching.MapControlEditor.Scope.TeamSide" xml:space="preserve"><value>Сторона команды</value></data>
+  <data name="Coaching.MapControlEditor.Scope.AnySide" xml:space="preserve"><value>Любая</value></data>
+  <data name="Coaching.MapControlEditor.Scope.BlueSide" xml:space="preserve"><value>Синяя</value></data>
+  <data name="Coaching.MapControlEditor.Scope.RedSide" xml:space="preserve"><value>Красная</value></data>
+  <data name="Coaching.MapControlEditor.Scope.GameMode.Title" xml:space="preserve"><value>Про режим игры</value></data>
+  <data name="Coaching.MapControlEditor.Scope.GameMode.Description" xml:space="preserve"><value>Обычные и ранговые матчи не разделяются: первая версия не получает для этого достаточно надёжного сигнала.</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Result.Title" xml:space="preserve"><value>Что получится</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Result.Hint" xml:space="preserve"><value>Резюме обновляется сразу — так видно, что именно сохранится в наборе.</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Summary" xml:space="preserve"><value>Набор применяется на карте «Ущелье призывателей» для: {0}; сторона: {1}.</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Summary.AllRoles" xml:space="preserve"><value>все роли</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Summary.AnySide" xml:space="preserve"><value>любая</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Summary.BlueSide" xml:space="preserve"><value>синяя</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Summary.RedSide" xml:space="preserve"><value>красная</value></data>
   <data name="Coaching.MapControlEditor.FutureStep" xml:space="preserve"><value>Поля этого шага появятся в следующей проверяемой итерации.</value></data>
   <data name="Coaching.NewPack.Soon" xml:space="preserve"><value>Скоро</value></data>
   <data name="Coaching.MatchupEditor.Back" xml:space="preserve"><value>Назад</value></data>

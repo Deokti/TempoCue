@@ -20,11 +20,15 @@ public sealed class MapControlEditorViewModel : ObservableObject
             localization.CurrentLanguageCode,
             gamePatchCatalog,
             localization);
+        Scope = new MapControlScopeViewModel(localization);
         MainInformation.PropertyChanged += MainInformation_PropertyChanged;
+        Scope.PropertyChanged += Scope_PropertyChanged;
         BeginNew();
     }
 
     public MapControlMainInformationViewModel MainInformation { get; }
+
+    public MapControlScopeViewModel Scope { get; }
 
     public int CurrentStep
     {
@@ -56,7 +60,12 @@ public sealed class MapControlEditorViewModel : ObservableObject
 
     public bool CanMovePrevious => CurrentStep > 1;
 
-    public bool CanMoveNext => CurrentStep == 1 && MainInformation.IsComplete;
+    public bool CanMoveNext => CurrentStep switch
+    {
+        1 => MainInformation.IsComplete,
+        2 => Scope.IsComplete,
+        _ => false
+    };
 
     public bool CanNavigateToStep1 => CanNavigateToStep(1);
 
@@ -100,12 +109,14 @@ public sealed class MapControlEditorViewModel : ObservableObject
         }
 
         return targetStep == 1
-            || targetStep == 2 && MainInformation.IsComplete;
+            || targetStep == 2 && MainInformation.IsComplete
+            || targetStep == 3 && MainInformation.IsComplete && Scope.IsComplete;
     }
 
     public void UpdateLanguage()
     {
         MainInformation.UpdateLanguage();
+        Scope.UpdateLanguage();
         OnPropertyChanged(nameof(StepSummary));
     }
 
@@ -114,7 +125,17 @@ public sealed class MapControlEditorViewModel : ObservableObject
         _highestVisitedStep = 1;
         CurrentStep = 1;
         MainInformation.BeginNew();
+        Scope.BeginNew();
         NotifyNavigationChanged();
+    }
+
+    private void Scope_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MapControlScopeViewModel.IsComplete))
+        {
+            OnPropertyChanged(nameof(CanMoveNext));
+            NotifyStepAvailabilityChanged();
+        }
     }
 
     private void MainInformation_PropertyChanged(object? sender, PropertyChangedEventArgs e)
