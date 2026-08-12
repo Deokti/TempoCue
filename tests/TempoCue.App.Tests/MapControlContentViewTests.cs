@@ -58,6 +58,48 @@ public sealed class MapControlContentViewTests
             SaveVisualSnapshotIfRequested(context.Window, "map-control-editor-step3-objects.png");
         });
 
+    [Fact]
+    public void ThirdStep_AddsPersistentTipFromDedicatedTab() =>
+        WpfTestHost.Run(() =>
+        {
+            using var context = new MainWindowTestContext();
+            var contentPage = OpenMapControlContent(context);
+            var content = context.Coaching.MapControlEditor.Content;
+
+            WpfTestHost.Click(WpfTestHost.Find<Button>(
+                contentPage,
+                "MapPersistentTipsTabButton"));
+            Assert.True(content.IsPersistentTipsSection);
+            var persistentPage = WpfTestHost.Find<MapControlPersistentTipsView>(
+                contentPage,
+                "MapControlPersistentTipsPage");
+            Assert.Equal(Visibility.Visible, persistentPage.Visibility);
+
+            WpfTestHost.Click(WpfTestHost.Find<Button>(
+                persistentPage,
+                "AddMapPersistentTipButton"));
+            content.PersistentTips.Editor.Title = "Не отдавайте реку без обзора";
+            content.PersistentTips.Editor.Message =
+                "Проверяйте подходы к объекту до начала командного боя.";
+            content.PersistentTips.Editor.SelectedScope = new(
+                TempoCue.Coaching.MapControlPersistentTipScopeKind.SpecificObjective,
+                MapObjectiveKind.ElementalDragon);
+            WpfTestHost.Pump();
+            SaveVisualSnapshotIfRequested(
+                context.Window,
+                "map-control-editor-persistent-tip-editor.png");
+
+            WpfTestHost.Click(WpfTestHost.Find<Button>(
+                persistentPage,
+                "SaveMapPersistentTipButton"));
+
+            Assert.Single(content.PersistentTips.Tips);
+            Assert.Contains("1", content.PersistentTipsTabLabel, StringComparison.Ordinal);
+            SaveVisualSnapshotIfRequested(
+                context.Window,
+                "map-control-editor-persistent-tips.png");
+        });
+
     private static MapControlContentView OpenMapControlContent(MainWindowTestContext context)
     {
         var libraryPage = OpenLibrary(context);

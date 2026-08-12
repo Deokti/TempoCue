@@ -97,6 +97,22 @@ internal static class MapControlContentText
                 TriggerName(rule.Trigger, localization).ToLowerInvariant())
             : TriggerName(rule.Trigger, localization);
 
+    public static string PersistentTipScopeName(
+        MapControlPersistentTipScope scope,
+        LocalizationService localization) =>
+        scope.Kind switch
+        {
+            MapControlPersistentTipScopeKind.WholeMatch => localization.Get(
+                "Coaching.MapControlEditor.Content.Persistent.Scope.WholeMatch"),
+            MapControlPersistentTipScopeKind.BeforeFirstObjective => localization.Get(
+                "Coaching.MapControlEditor.Content.Persistent.Scope.BeforeFirstObjective"),
+            MapControlPersistentTipScopeKind.WhileAnyObjectiveAvailable => localization.Get(
+                "Coaching.MapControlEditor.Content.Persistent.Scope.WhileObjectiveAvailable"),
+            MapControlPersistentTipScopeKind.SpecificObjective when scope.Objective is { } objective =>
+                ObjectiveName(objective, localization),
+            _ => throw new ArgumentOutOfRangeException(nameof(scope), scope, null)
+        };
+
     public static string FormatTime(TimeSpan value) =>
         $"{(int)value.TotalMinutes:00}:{value.Seconds:00}";
 }

@@ -48,6 +48,17 @@ internal static class MapControlPackTestData
                     "Подготовьте обзор и завершите покупку.",
                     "Убийство дракона подтверждено игровым событием.",
                     "Собраться у нижней реки.")
+            ],
+            PersistentTips =
+            [
+                new MapControlPersistentTip
+                {
+                    Id = "river-without-vision",
+                    Title = "Отход без обзора",
+                    Message = "Если обзора в реке нет, считайте, что противник рядом.",
+                    Scope = new MapControlPersistentTipScope(
+                        MapControlPersistentTipScopeKind.WholeMatch)
+                }
             ]
         };
 }

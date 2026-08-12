@@ -37,6 +37,23 @@ public sealed class MapControlPackValidatorTests
     }
 
     [Fact]
+    public void Validate_RejectsObjectiveScopeWithoutObjective()
+    {
+        var original = MapControlPackTestData.Create();
+        var invalidTip = original.PersistentTips[0] with
+        {
+            Scope = new MapControlPersistentTipScope(
+                MapControlPersistentTipScopeKind.SpecificObjective)
+        };
+        var pack = original with { PersistentTips = [invalidTip] };
+
+        var exception = Assert.Throws<InvalidDataException>(
+            () => MapControlPackValidator.Validate(pack));
+
+        Assert.Contains("objective", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public void Validate_RejectsPackWithoutRequiredMetadata()
     {
         var pack = MapControlPackTestData.Create() with { Description = string.Empty };

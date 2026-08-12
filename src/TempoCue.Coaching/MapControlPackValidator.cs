@@ -67,6 +67,9 @@ public static class MapControlPackValidator
         CoachPackValidation.EnsureUniqueIds(
             pack.Rules.Select(static rule => rule.Id),
             "map reminder rule");
+        CoachPackValidation.EnsureUniqueIds(
+            pack.PersistentTips.Select(static tip => tip.Id),
+            "map persistent tip");
 
         var timings = timingSet.Objectives.ToDictionary(static timing => timing.Objective);
         foreach (var rule in pack.Rules)
@@ -79,6 +82,11 @@ public static class MapControlPackValidator
             }
 
             MapObjectiveReminderRuleValidator.Validate(rule, timing);
+        }
+
+        foreach (var tip in pack.PersistentTips)
+        {
+            MapControlPersistentTipValidator.Validate(tip);
         }
     }
 

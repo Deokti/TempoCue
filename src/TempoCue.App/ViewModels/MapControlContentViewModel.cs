@@ -15,18 +15,40 @@ public sealed class MapControlContentViewModel : ObservableObject
     private MapObjectiveTimingSet? _timingSet;
     private bool _isObjectivePickerOpen;
     private int _nextRuleNumber = 1;
+    private MapControlContentSection _section;
 
     public MapControlContentViewModel(LocalizationService localization)
     {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         Rules = new ReadOnlyObservableCollection<MapControlObjectiveRuleViewModel>(_rules);
         Editor = new MapControlObjectiveRuleEditorViewModel(localization);
+        PersistentTips = new MapControlPersistentTipsViewModel(localization);
         Editor.PropertyChanged += Editor_PropertyChanged;
+        PersistentTips.PropertyChanged += PersistentTips_PropertyChanged;
     }
 
     public ReadOnlyObservableCollection<MapControlObjectiveRuleViewModel> Rules { get; }
 
     public MapControlObjectiveRuleEditorViewModel Editor { get; }
+
+    public MapControlPersistentTipsViewModel PersistentTips { get; }
+
+    public MapControlContentSection Section
+    {
+        get => _section;
+        private set
+        {
+            if (SetProperty(ref _section, value))
+            {
+                OnPropertyChanged(nameof(IsObjectsSection));
+                OnPropertyChanged(nameof(IsPersistentTipsSection));
+            }
+        }
+    }
+
+    public bool IsObjectsSection => Section == MapControlContentSection.Objects;
+
+    public bool IsPersistentTipsSection => Section == MapControlContentSection.PersistentTips;
 
     public IReadOnlyList<MapControlObjectiveOptionViewModel> ObjectiveOptions
     {
@@ -44,7 +66,10 @@ public sealed class MapControlContentViewModel : ObservableObject
 
     public bool HasRules => RuleCount > 0;
 
-    public bool IsComplete => HasRules && !Editor.IsOpen;
+    public bool IsComplete =>
+        HasRules
+        && !Editor.IsOpen
+        && PersistentTips.IsComplete;
 
     public string ObjectsTabLabel => _localization.Format(
         "Coaching.MapControlEditor.Content.Tab.Objects",
@@ -56,7 +81,7 @@ public sealed class MapControlContentViewModel : ObservableObject
 
     public string PersistentTipsTabLabel => _localization.Format(
         "Coaching.MapControlEditor.Content.Tab.Persistent",
-        0);
+        PersistentTips.Count);
 
     public string PatchKnowledgeNotice => _timingSet is null
         ? _localization.Get("Coaching.MapControlEditor.Content.CatalogUnavailable")
@@ -85,6 +110,18 @@ public sealed class MapControlContentViewModel : ObservableObject
 
         Editor.Close();
         IsObjectivePickerOpen = true;
+    }
+
+    public void ShowObjects()
+    {
+        IsObjectivePickerOpen = false;
+        Section = MapControlContentSection.Objects;
+    }
+
+    public void ShowPersistentTips()
+    {
+        IsObjectivePickerOpen = false;
+        Section = MapControlContentSection.PersistentTips;
     }
 
     public void CloseObjectivePicker() => IsObjectivePickerOpen = false;
@@ -250,6 +287,7 @@ public sealed class MapControlContentViewModel : ObservableObject
     {
         Editor.Close();
         IsObjectivePickerOpen = false;
+        Section = MapControlContentSection.Objects;
         foreach (var rule in _rules)
         {
             rule.PropertyChanged -= Rule_PropertyChanged;
@@ -257,6 +295,7 @@ public sealed class MapControlContentViewModel : ObservableObject
 
         _rules.Clear();
         _nextRuleNumber = 1;
+        PersistentTips.BeginNew();
         NotifyRulesChanged();
     }
 
@@ -264,6 +303,7 @@ public sealed class MapControlContentViewModel : ObservableObject
     {
         RebuildObjectiveOptions();
         Editor.UpdateLanguage();
+        PersistentTips.UpdateLanguage();
         foreach (var rule in _rules)
         {
             rule.UpdateLanguage();
@@ -331,6 +371,19 @@ public sealed class MapControlContentViewModel : ObservableObject
     {
         if (e.PropertyName is nameof(MapControlObjectiveRuleEditorViewModel.IsOpen)
             or nameof(MapControlObjectiveRuleEditorViewModel.CanSave))
+        {
+            OnPropertyChanged(nameof(IsComplete));
+        }
+    }
+
+    private void PersistentTips_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MapControlPersistentTipsViewModel.Count))
+        {
+            OnPropertyChanged(nameof(PersistentTipsTabLabel));
+        }
+
+        if (e.PropertyName == nameof(MapControlPersistentTipsViewModel.IsComplete))
         {
             OnPropertyChanged(nameof(IsComplete));
         }

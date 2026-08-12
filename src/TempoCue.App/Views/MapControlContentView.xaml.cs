@@ -11,6 +11,12 @@ public partial class MapControlContentView : UserControl
     private MapControlContentViewModel ViewModel =>
         (MapControlContentViewModel)DataContext;
 
+    private void MapObjectsTabButton_Click(object sender, RoutedEventArgs e) =>
+        ViewModel.ShowObjects();
+
+    private void MapPersistentTipsTabButton_Click(object sender, RoutedEventArgs e) =>
+        ViewModel.ShowPersistentTips();
+
     private void AddMapObjectiveRuleButton_Click(object sender, RoutedEventArgs e) =>
         ViewModel.OpenObjectivePicker();
 

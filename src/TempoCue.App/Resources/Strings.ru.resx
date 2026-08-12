@@ -877,4 +877,19 @@
   <data name="Coaching.MapControlEditor.Content.Editor.WhyNow" xml:space="preserve"><value>Почему сейчас (короткое объяснение)</value></data>
   <data name="Coaching.MapControlEditor.Content.Editor.NextGoal" xml:space="preserve"><value>Следующая цель (что подготовить к объекту)</value></data>
   <data name="Coaching.MapControlEditor.Content.Editor.Done" xml:space="preserve"><value>Готово</value></data>
+  <data name="Coaching.MapControlEditor.Content.DuplicateName" xml:space="preserve"><value>{0} — копия</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.ListTitle" xml:space="preserve"><value>Постоянные подсказки</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Description" xml:space="preserve"><value>Игрок открывает эти подсказки в деталях набора. Они не всплывают во время матча и не заменяют активный совет.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Add" xml:space="preserve"><value>+ Добавить подсказку</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Empty" xml:space="preserve"><value>Постоянных подсказок пока нет. Добавьте первую, если набору нужна справочная рекомендация.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Editor.AddTitle" xml:space="preserve"><value>Постоянная подсказка</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Editor.EditTitle" xml:space="preserve"><value>Редактирование подсказки</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Editor.Progress" xml:space="preserve"><value>Подсказка {0} из {1}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Title" xml:space="preserve"><value>Заголовок</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Message" xml:space="preserve"><value>Текст (одно-два предложения)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Scope" xml:space="preserve"><value>Где применима</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Scope.WholeMatch" xml:space="preserve"><value>Весь матч</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Scope.BeforeFirstObjective" xml:space="preserve"><value>До первого объекта</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Scope.WhileObjectiveAvailable" xml:space="preserve"><value>Пока доступен любой объект</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Scope.Hint" xml:space="preserve"><value>«Любой объект» — Дракон, Личинки Бездны, Герольд или Барон уже появились и ещё не были взяты.</value></data>
 </root>

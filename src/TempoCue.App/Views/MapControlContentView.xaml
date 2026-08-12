@@ -5,6 +5,7 @@
              xmlns:coaching="clr-namespace:TempoCue.Coaching;assembly=TempoCue.Coaching"
              xmlns:converters="clr-namespace:TempoCue.App.Converters"
              xmlns:localization="clr-namespace:TempoCue.App.Localization"
+             xmlns:views="clr-namespace:TempoCue.App.Views"
              Background="Transparent"
              FontFamily="Segoe UI">
     <UserControl.Resources>
@@ -20,6 +21,26 @@
             <Style x:Key="MapContentTab" TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
                 <Setter Property="Padding" Value="18,9" />
                 <Setter Property="Margin" Value="0,0,8,0" />
+            </Style>
+            <Style x:Key="MapObjectsTab" TargetType="Button" BasedOn="{StaticResource MapContentTab}">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsObjectsSection}" Value="True">
+                        <Setter Property="Background" Value="#1D3352" />
+                        <Setter Property="BorderBrush" Value="#4FAAE8" />
+                        <Setter Property="Foreground" Value="#F4F7FB" />
+                        <Setter Property="FontWeight" Value="SemiBold" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+            <Style x:Key="MapPersistentTipsTab" TargetType="Button" BasedOn="{StaticResource MapContentTab}">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsPersistentTipsSection}" Value="True">
+                        <Setter Property="Background" Value="#1D3352" />
+                        <Setter Property="BorderBrush" Value="#4FAAE8" />
+                        <Setter Property="Foreground" Value="#F4F7FB" />
+                        <Setter Property="FontWeight" Value="SemiBold" />
+                    </DataTrigger>
+                </Style.Triggers>
             </Style>
 
             <Style x:Key="MapRuleOption" TargetType="ListBoxItem">
@@ -173,23 +194,34 @@
 
     <Grid>
         <StackPanel>
-            <!-- Три типа содержимого остаются видимыми; в этой итерации доступен только редактор объектов. -->
+            <!-- Типы содержимого переключают независимые редакторы внутри третьего шага. -->
             <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
                 <Button x:Name="MapObjectsTabButton"
                         Content="{Binding ObjectsTabLabel}"
-                        Style="{StaticResource PrimaryButton}"
-                        Padding="18,9"
-                        Margin="0,0,8,0" />
+                        Style="{StaticResource MapObjectsTab}"
+                        Click="MapObjectsTabButton_Click" />
                 <Button x:Name="MapTimedRemindersTabButton"
                         Content="{Binding TimedRemindersTabLabel}"
                         Style="{StaticResource MapContentTab}"
                         IsEnabled="False" />
                 <Button x:Name="MapPersistentTipsTabButton"
                         Content="{Binding PersistentTipsTabLabel}"
-                        Style="{StaticResource MapContentTab}"
-                        IsEnabled="False" />
+                        Style="{StaticResource MapPersistentTipsTab}"
+                        Click="MapPersistentTipsTabButton_Click" />
             </StackPanel>
 
+            <!-- Содержимое правил объектов скрывается целиком при переходе к подсказкам. -->
+            <StackPanel>
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsObjectsSection}" Value="True">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
             <Border Background="#142234"
                     BorderBrush="#31516F"
                     BorderThickness="1"
@@ -470,6 +502,20 @@
                     </ItemsControl>
                 </StackPanel>
             </Border>
+            </StackPanel>
+
+            <views:MapControlPersistentTipsView x:Name="MapControlPersistentTipsPage">
+                <views:MapControlPersistentTipsView.Style>
+                    <Style TargetType="views:MapControlPersistentTipsView">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsPersistentTipsSection}" Value="True">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </views:MapControlPersistentTipsView.Style>
+            </views:MapControlPersistentTipsView>
         </StackPanel>
 
         <!-- Выбор объекта — модальное состояние поверх третьего шага. -->

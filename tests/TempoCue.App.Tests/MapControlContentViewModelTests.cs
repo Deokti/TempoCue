@@ -77,6 +77,40 @@ public sealed class MapControlContentViewModelTests
         Assert.Equal(2, content.RuleCount);
     }
 
+    [Fact]
+    public void PersistentTips_CanBeCreatedEditedDuplicatedAndReordered()
+    {
+        var content = CreateContent();
+        content.ShowPersistentTips();
+        content.PersistentTips.BeginAdd();
+        content.PersistentTips.Editor.Title = "Не отдавайте реку без обзора";
+        content.PersistentTips.Editor.Message =
+            "Заранее поставьте обзор и оставьте путь для безопасного отхода.";
+        content.PersistentTips.Editor.SelectedScope = new(
+            MapControlPersistentTipScopeKind.SpecificObjective,
+            MapObjectiveKind.BaronNashor);
+
+        Assert.True(content.PersistentTips.SaveEditor());
+        var original = Assert.Single(content.PersistentTips.Tips);
+        Assert.Equal(MapObjectiveKind.BaronNashor, original.Scope.Objective);
+        Assert.Equal(1, content.PersistentTips.Count);
+        Assert.Contains("1", content.PersistentTipsTabLabel, StringComparison.Ordinal);
+
+        var copy = content.PersistentTips.Duplicate(original);
+        Assert.Equal(2, content.PersistentTips.Count);
+        Assert.NotEqual(original.Id, copy.Id);
+        Assert.True(content.PersistentTips.Move(copy, -1));
+        Assert.Same(copy, content.PersistentTips.Tips[0]);
+
+        content.PersistentTips.BeginEdit(original);
+        content.PersistentTips.Editor.Message =
+            "Перед входом в реку обновите обзор и проверьте пути отхода.";
+        Assert.True(content.PersistentTips.SaveEditor());
+        Assert.Contains("обновите обзор", original.Message, StringComparison.Ordinal);
+        Assert.True(content.PersistentTips.Delete(copy));
+        Assert.Single(content.PersistentTips.Snapshot);
+    }
+
     private static MapControlContentViewModel CreateContent()
     {
         var content = new MapControlContentViewModel(LocalizationService.Instance);

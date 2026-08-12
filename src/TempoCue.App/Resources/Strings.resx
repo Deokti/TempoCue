@@ -867,4 +867,19 @@
   <data name="Coaching.MapControlEditor.Content.Editor.WhyNow" xml:space="preserve"><value>Why now (short explanation)</value></data>
   <data name="Coaching.MapControlEditor.Content.Editor.NextGoal" xml:space="preserve"><value>Next goal (what to prepare before the objective)</value></data>
   <data name="Coaching.MapControlEditor.Content.Editor.Done" xml:space="preserve"><value>Done</value></data>
+  <data name="Coaching.MapControlEditor.Content.DuplicateName" xml:space="preserve"><value>{0} — copy</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.ListTitle" xml:space="preserve"><value>Persistent tips</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Description" xml:space="preserve"><value>The player opens these tips in the pack details. They do not pop up during the match and do not replace active advice.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Add" xml:space="preserve"><value>+ Add tip</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Empty" xml:space="preserve"><value>No persistent tips yet. Add the first one when the pack needs reference advice.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Editor.AddTitle" xml:space="preserve"><value>Persistent tip</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Editor.EditTitle" xml:space="preserve"><value>Edit persistent tip</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Editor.Progress" xml:space="preserve"><value>Tip {0} of {1}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Title" xml:space="preserve"><value>Title</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Message" xml:space="preserve"><value>Text (one or two sentences)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Scope" xml:space="preserve"><value>Where it applies</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Scope.WholeMatch" xml:space="preserve"><value>Whole match</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Scope.BeforeFirstObjective" xml:space="preserve"><value>Before the first objective</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Scope.WhileObjectiveAvailable" xml:space="preserve"><value>While any objective is available</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Scope.Hint" xml:space="preserve"><value>“Any objective” means Dragon, Void Grubs, Rift Herald, or Baron has spawned and has not been taken yet.</value></data>
 </root>
