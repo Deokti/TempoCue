@@ -8,7 +8,7 @@ public sealed record MapObjectiveReminderRule(
     TimeSpan LeadTime,
     MapObjectiveReminderRecurrence Recurrence,
     MapObjectiveReminderPriority Priority,
-    string Title,
     string Message,
     string WhyNow,
-    string NextGoal);
+    string NextGoal,
+    bool IsEnabled = true);

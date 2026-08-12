@@ -808,4 +808,63 @@
   <data name="Settings.Overlay.Preview.Close" xml:space="preserve"><value>Close overlay</value></data>
   <data name="Overlay.Matchup.Dismiss" xml:space="preserve"><value>Hide advice</value></data>
   <data name="Overlay.Matchup.PersistentTip.Status" xml:space="preserve"><value>Matchup tip</value></data>
+  <data name="Coaching.MapControlEditor.Content.Tab.Objects" xml:space="preserve"><value>Objectives · {0}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Tab.Timed" xml:space="preserve"><value>Timed reminders · {0}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Tab.Persistent" xml:space="preserve"><value>Persistent tips · {0}</value></data>
+  <data name="Coaching.MapControlEditor.Content.CatalogTitle" xml:space="preserve"><value>TempoCue knows the objective schedule</value></data>
+  <data name="Coaching.MapControlEditor.Content.CatalogUnavailable" xml:space="preserve"><value>Select a supported game patch on step one.</value></data>
+  <data name="Coaching.MapControlEditor.Content.CatalogCurrentPatch" xml:space="preserve"><value>Timings are verified for patch {0}. You only choose when and what TempoCue should remind you about.</value></data>
+  <data name="Coaching.MapControlEditor.Content.CatalogPreviousPatch" xml:space="preserve"><value>Patch {0} uses the latest verified timings from patch {1}. Rules remain active and are marked for review.</value></data>
+  <data name="Coaching.MapControlEditor.Content.RulesTitle" xml:space="preserve"><value>Objective rules</value></data>
+  <data name="Coaching.MapControlEditor.Content.RulesDescription" xml:space="preserve"><value>TempoCue supplies spawn and respawn times from the patch catalog. Set only the reminder moment and advice.</value></data>
+  <data name="Coaching.MapControlEditor.Content.AddRule" xml:space="preserve"><value>+ Add objective rule</value></data>
+  <data name="Coaching.MapControlEditor.Content.EmptyRules" xml:space="preserve"><value>No objective rules yet. Add the first one to continue.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Coaching.MapControlEditor.Content.Duplicate" xml:space="preserve"><value>Duplicate</value></data>
+  <data name="Coaching.MapControlEditor.Content.Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Coaching.MapControlEditor.Content.DeleteRule" xml:space="preserve"><value>Delete rule</value></data>
+  <data name="Coaching.MapControlEditor.Content.Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Coaching.MapControlEditor.Content.Picker.Title" xml:space="preserve"><value>Choose an objective</value></data>
+  <data name="Coaching.MapControlEditor.Content.Picker.Description" xml:space="preserve"><value>The objective determines which patch timing TempoCue uses.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Picker.Notice" xml:space="preserve"><value>Only objectives supported by the timing catalog are available. Minimap-dependent conditions are not included in this release.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Objective.Dragon" xml:space="preserve"><value>Dragon</value></data>
+  <data name="Coaching.MapControlEditor.Content.Objective.Grubs" xml:space="preserve"><value>Void Grubs</value></data>
+  <data name="Coaching.MapControlEditor.Content.Objective.Herald" xml:space="preserve"><value>Rift Herald</value></data>
+  <data name="Coaching.MapControlEditor.Content.Objective.Baron" xml:space="preserve"><value>Baron Nashor</value></data>
+  <data name="Coaching.MapControlEditor.Content.Objective.Respawns" xml:space="preserve"><value>Initial spawn and respawn after a confirmed kill</value></data>
+  <data name="Coaching.MapControlEditor.Content.Objective.Once" xml:space="preserve"><value>One scheduled spawn in the current timing catalog</value></data>
+  <data name="Coaching.MapControlEditor.Content.Objective.TimingRespawns" xml:space="preserve"><value>First {0} · respawn {1}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Objective.TimingOnce" xml:space="preserve"><value>Spawn {0}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Priority.Information" xml:space="preserve"><value>Information</value></data>
+  <data name="Coaching.MapControlEditor.Content.Priority.Caution" xml:space="preserve"><value>Caution</value></data>
+  <data name="Coaching.MapControlEditor.Content.Priority.Important" xml:space="preserve"><value>Important</value></data>
+  <data name="Coaching.MapControlEditor.Content.Recurrence.Once" xml:space="preserve"><value>Once per match</value></data>
+  <data name="Coaching.MapControlEditor.Content.Recurrence.EveryCycle" xml:space="preserve"><value>Every available cycle</value></data>
+  <data name="Coaching.MapControlEditor.Content.Recurrence.Once.Description" xml:space="preserve"><value>The reminder is shown only for the first matching event.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Recurrence.EveryCycle.Initial.Description" xml:space="preserve"><value>Shown for the first spawn and repeated for every respawn after a confirmed kill.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Recurrence.EveryCycle.Respawn.Description" xml:space="preserve"><value>Repeated before every next spawn after a confirmed kill.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Recurrence.EveryCycle.AfterKill.Description" xml:space="preserve"><value>Repeated after every confirmed objective kill.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Recurrence.EveryCycle.Unavailable.Description" xml:space="preserve"><value>Unavailable: the selected objective has no respawn cycle.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Trigger.BeforeInitial" xml:space="preserve"><value>Before the first spawn</value></data>
+  <data name="Coaching.MapControlEditor.Content.Trigger.AtInitial" xml:space="preserve"><value>At the first spawn</value></data>
+  <data name="Coaching.MapControlEditor.Content.Trigger.BeforeRespawn" xml:space="preserve"><value>Before the next spawn after a kill</value></data>
+  <data name="Coaching.MapControlEditor.Content.Trigger.AfterKill" xml:space="preserve"><value>Immediately after a kill</value></data>
+  <data name="Coaching.MapControlEditor.Content.Trigger.BeforeInitial.Description" xml:space="preserve"><value>Calculated from the system time of the objective's first spawn.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Trigger.AtInitial.Description" xml:space="preserve"><value>Triggers exactly at the time TempoCue reads from the timing catalog.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Trigger.BeforeRespawn.Description" xml:space="preserve"><value>Requires a Live Client Data kill event. Available only for respawning objectives.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Trigger.AfterKill.Description" xml:space="preserve"><value>Triggers when either team kills the objective.</value></data>
+  <data name="Coaching.MapControlEditor.Content.TriggerSummary.Before" xml:space="preserve"><value>{0} sec. {1}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.Title" xml:space="preserve"><value>Objective rule: {0}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.Timing.Respawns" xml:space="preserve"><value>TempoCue timing: first spawn at {0}, respawn {1} after a confirmed kill.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.Timing.Once" xml:space="preserve"><value>TempoCue timing: scheduled spawn at {0}; this objective does not use a respawn cycle.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.Trigger" xml:space="preserve"><value>When to show the reminder</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.LeadTime" xml:space="preserve"><value>Lead time</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.Recurrence" xml:space="preserve"><value>Repeat</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.Priority" xml:space="preserve"><value>Priority</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.LiveSummaryTitle" xml:space="preserve"><value>How it will work</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.LiveSummary" xml:space="preserve"><value>{0}; {1}.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.Message" xml:space="preserve"><value>Main advice (the player sees it first)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.WhyNow" xml:space="preserve"><value>Why now (short explanation)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.NextGoal" xml:space="preserve"><value>Next goal (what to prepare before the objective)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.Done" xml:space="preserve"><value>Done</value></data>
 </root>

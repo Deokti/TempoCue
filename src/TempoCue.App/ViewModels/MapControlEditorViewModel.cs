@@ -21,14 +21,18 @@ public sealed class MapControlEditorViewModel : ObservableObject
             gamePatchCatalog,
             localization);
         Scope = new MapControlScopeViewModel(localization);
+        Content = new MapControlContentViewModel(localization);
         MainInformation.PropertyChanged += MainInformation_PropertyChanged;
         Scope.PropertyChanged += Scope_PropertyChanged;
+        Content.PropertyChanged += Content_PropertyChanged;
         BeginNew();
     }
 
     public MapControlMainInformationViewModel MainInformation { get; }
 
     public MapControlScopeViewModel Scope { get; }
+
+    public MapControlContentViewModel Content { get; }
 
     public int CurrentStep
     {
@@ -38,6 +42,11 @@ public sealed class MapControlEditorViewModel : ObservableObject
             if (SetProperty(ref _currentStep, value))
             {
                 _highestVisitedStep = Math.Max(_highestVisitedStep, value);
+                if (value == 3)
+                {
+                    Content.SetPatch(MainInformation.GamePatch);
+                }
+
                 OnPropertyChanged(nameof(CurrentStepIndex));
                 OnPropertyChanged(nameof(StepSummary));
                 NotifyNavigationChanged();
@@ -64,6 +73,7 @@ public sealed class MapControlEditorViewModel : ObservableObject
     {
         1 => MainInformation.IsComplete,
         2 => Scope.IsComplete,
+        3 => Content.IsComplete,
         _ => false
     };
 
@@ -110,13 +120,15 @@ public sealed class MapControlEditorViewModel : ObservableObject
 
         return targetStep == 1
             || targetStep == 2 && MainInformation.IsComplete
-            || targetStep == 3 && MainInformation.IsComplete && Scope.IsComplete;
+            || targetStep == 3 && MainInformation.IsComplete && Scope.IsComplete
+            || targetStep == 4 && MainInformation.IsComplete && Scope.IsComplete && Content.IsComplete;
     }
 
     public void UpdateLanguage()
     {
         MainInformation.UpdateLanguage();
         Scope.UpdateLanguage();
+        Content.UpdateLanguage();
         OnPropertyChanged(nameof(StepSummary));
     }
 
@@ -126,6 +138,8 @@ public sealed class MapControlEditorViewModel : ObservableObject
         CurrentStep = 1;
         MainInformation.BeginNew();
         Scope.BeginNew();
+        Content.BeginNew();
+        Content.SetPatch(MainInformation.GamePatch);
         NotifyNavigationChanged();
     }
 
@@ -141,6 +155,20 @@ public sealed class MapControlEditorViewModel : ObservableObject
     private void MainInformation_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(MapControlMainInformationViewModel.IsComplete))
+        {
+            OnPropertyChanged(nameof(CanMoveNext));
+            NotifyStepAvailabilityChanged();
+        }
+
+        if (e.PropertyName == nameof(MapControlMainInformationViewModel.GamePatch))
+        {
+            Content.SetPatch(MainInformation.GamePatch);
+        }
+    }
+
+    private void Content_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MapControlContentViewModel.IsComplete))
         {
             OnPropertyChanged(nameof(CanMoveNext));
             NotifyStepAvailabilityChanged();

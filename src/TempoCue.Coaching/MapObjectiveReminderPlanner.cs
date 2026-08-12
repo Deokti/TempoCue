@@ -13,12 +13,25 @@ public sealed class MapObjectiveReminderPlanner
         ArgumentNullException.ThrowIfNull(killEvents);
         MapObjectiveReminderRuleValidator.Validate(rule, timing);
 
+        if (!rule.IsEnabled)
+        {
+            return [];
+        }
+
         return rule.Trigger switch
         {
             MapObjectiveReminderTrigger.BeforeInitialSpawn =>
-            [BuildInitialOccurrence(rule, timing, timing.InitialSpawnTime - rule.LeadTime)],
+                BuildInitialOccurrences(
+                    rule,
+                    timing,
+                    killEvents,
+                    timing.InitialSpawnTime - rule.LeadTime),
             MapObjectiveReminderTrigger.AtInitialSpawn =>
-            [BuildInitialOccurrence(rule, timing, timing.InitialSpawnTime)],
+                BuildInitialOccurrences(
+                    rule,
+                    timing,
+                    killEvents,
+                    timing.InitialSpawnTime),
             MapObjectiveReminderTrigger.BeforeRespawn =>
                 BuildEventOccurrences(rule, timing, killEvents, beforeRespawn: true),
             MapObjectiveReminderTrigger.AfterKill =>
@@ -26,6 +39,26 @@ public sealed class MapObjectiveReminderPlanner
             _ => throw new InvalidDataException(
                 $"Rule '{rule.Id}' has an unsupported trigger: {rule.Trigger}.")
         };
+    }
+
+    private static IReadOnlyList<MapObjectiveReminderOccurrence> BuildInitialOccurrences(
+        MapObjectiveReminderRule rule,
+        MapObjectiveTiming timing,
+        IReadOnlyCollection<MapObjectiveKillEvent> killEvents,
+        TimeSpan initialTriggerTime)
+    {
+        var initialOccurrence = BuildInitialOccurrence(rule, timing, initialTriggerTime);
+        if (rule.Recurrence == MapObjectiveReminderRecurrence.OncePerMatch)
+        {
+            return [initialOccurrence];
+        }
+
+        var respawnOccurrences = BuildEventOccurrences(
+            rule,
+            timing,
+            killEvents,
+            beforeRespawn: true);
+        return [initialOccurrence, .. respawnOccurrences];
     }
 
     private static MapObjectiveReminderOccurrence BuildInitialOccurrence(

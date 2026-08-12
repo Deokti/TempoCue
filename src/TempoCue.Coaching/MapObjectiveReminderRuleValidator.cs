@@ -17,13 +17,12 @@ public static class MapObjectiveReminderRuleValidator
         }
 
         if (string.IsNullOrWhiteSpace(rule.Id)
-            || string.IsNullOrWhiteSpace(rule.Title)
             || string.IsNullOrWhiteSpace(rule.Message)
             || string.IsNullOrWhiteSpace(rule.WhyNow)
             || string.IsNullOrWhiteSpace(rule.NextGoal))
         {
             throw new InvalidDataException(
-                "Map objective reminder requires id, title, message, explanation and next goal.");
+                "Map objective reminder requires id, message, explanation and next goal.");
         }
 
         if (rule.Objective != timing.Objective)
@@ -47,11 +46,18 @@ public static class MapObjectiveReminderRuleValidator
                         $"Rule '{rule.Id}' is scheduled before the match starts.");
                 }
 
-                EnsureInitialTriggerDoesNotRepeat(rule);
+                EnsureRepeatingInitialTriggerCanRespawn(rule, timing);
+                if (rule.Recurrence == MapObjectiveReminderRecurrence.EveryCycle
+                    && timing.RespawnDelay is { } initialReminderRespawnDelay
+                    && rule.LeadTime > initialReminderRespawnDelay)
+                {
+                    throw new InvalidDataException(
+                        $"Rule '{rule.Id}' is scheduled before the objective was killed.");
+                }
                 break;
             case MapObjectiveReminderTrigger.AtInitialSpawn:
                 EnsureZeroLeadTime(rule);
-                EnsureInitialTriggerDoesNotRepeat(rule);
+                EnsureRepeatingInitialTriggerCanRespawn(rule, timing);
                 break;
             case MapObjectiveReminderTrigger.BeforeRespawn:
                 EnsurePositiveLeadTime(rule);
@@ -95,12 +101,15 @@ public static class MapObjectiveReminderRuleValidator
         }
     }
 
-    private static void EnsureInitialTriggerDoesNotRepeat(MapObjectiveReminderRule rule)
+    private static void EnsureRepeatingInitialTriggerCanRespawn(
+        MapObjectiveReminderRule rule,
+        MapObjectiveTiming timing)
     {
-        if (rule.Recurrence != MapObjectiveReminderRecurrence.OncePerMatch)
+        if (rule.Recurrence == MapObjectiveReminderRecurrence.EveryCycle
+            && !timing.Respawns)
         {
             throw new InvalidDataException(
-                $"Rule '{rule.Id}' has only one initial spawn and cannot repeat every cycle.");
+                $"Rule '{rule.Id}' cannot repeat because objective '{rule.Objective}' does not respawn.");
         }
     }
 }

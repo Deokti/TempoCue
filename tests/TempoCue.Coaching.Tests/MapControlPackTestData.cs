@@ -35,7 +35,6 @@ internal static class MapControlPackTestData
                     TimeSpan.FromSeconds(45),
                     MapObjectiveReminderRecurrence.OncePerMatch,
                     MapObjectiveReminderPriority.Important,
-                    "Подготовьтесь к дракону",
                     "Освободите линию и поставьте обзор заранее.",
                     "До первого дракона осталось меньше минуты.",
                     "Подойти к реке вместе с командой."),
@@ -46,7 +45,6 @@ internal static class MapControlPackTestData
                     TimeSpan.FromMinutes(1),
                     MapObjectiveReminderRecurrence.EveryCycle,
                     MapObjectiveReminderPriority.Caution,
-                    "Дракон скоро возродится",
                     "Подготовьте обзор и завершите покупку.",
                     "Убийство дракона подтверждено игровым событием.",
                     "Собраться у нижней реки.")

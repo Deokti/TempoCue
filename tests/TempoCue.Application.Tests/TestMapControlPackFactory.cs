@@ -30,7 +30,6 @@ internal static class TestMapControlPackFactory
                     TimeSpan.FromSeconds(45),
                     MapObjectiveReminderRecurrence.OncePerMatch,
                     MapObjectiveReminderPriority.Important,
-                    "Подготовьтесь к дракону",
                     "Освободите линию заранее.",
                     "До появления осталось меньше минуты.",
                     "Подойти к реке вместе с командой.")

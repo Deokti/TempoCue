@@ -60,6 +60,39 @@ public sealed class MapObjectiveReminderPlannerTests
     }
 
     [Fact]
+    public void Build_RepeatingInitialReminder_IncludesFirstSpawnAndConfirmedRespawns()
+    {
+        var result = _planner.Build(
+            CreateRule(
+                MapObjectiveReminderTrigger.BeforeInitialSpawn,
+                TimeSpan.FromSeconds(60),
+                MapObjectiveReminderRecurrence.EveryCycle),
+            DragonTiming,
+            [
+                new MapObjectiveKillEvent(4, MapObjectiveKind.ElementalDragon, TimeSpan.FromMinutes(7)),
+                new MapObjectiveKillEvent(9, MapObjectiveKind.ElementalDragon, TimeSpan.FromMinutes(14))
+            ]);
+
+        Assert.Collection(
+            result,
+            first =>
+            {
+                Assert.Equal(TimeSpan.FromMinutes(4), first.TriggerTime);
+                Assert.Null(first.SourceEventId);
+            },
+            second =>
+            {
+                Assert.Equal(TimeSpan.FromMinutes(11), second.TriggerTime);
+                Assert.Equal(4, second.SourceEventId);
+            },
+            third =>
+            {
+                Assert.Equal(TimeSpan.FromMinutes(18), third.TriggerTime);
+                Assert.Equal(9, third.SourceEventId);
+            });
+    }
+
+    [Fact]
     public void Build_UsesFirstChronologicalKill_ForOncePerMatchRule()
     {
         var result = _planner.Build(
@@ -110,6 +143,26 @@ public sealed class MapObjectiveReminderPlannerTests
         Assert.Contains("does not respawn", exception.Message, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public void Build_RejectsRepeatingInitialRule_ForObjectiveWithoutRespawn()
+    {
+        var grubsTiming = new MapObjectiveTiming(
+            MapObjectiveKind.VoidGrubs,
+            TimeSpan.FromMinutes(8),
+            null);
+
+        var exception = Assert.Throws<InvalidDataException>(() => _planner.Build(
+            CreateRule(
+                MapObjectiveReminderTrigger.BeforeInitialSpawn,
+                TimeSpan.FromSeconds(30),
+                MapObjectiveReminderRecurrence.EveryCycle,
+                MapObjectiveKind.VoidGrubs),
+            grubsTiming,
+            []));
+
+        Assert.Contains("does not respawn", exception.Message, StringComparison.Ordinal);
+    }
+
     [Theory]
     [InlineData(MapObjectiveReminderTrigger.AtInitialSpawn)]
     [InlineData(MapObjectiveReminderTrigger.AfterKill)]
@@ -134,7 +187,6 @@ public sealed class MapObjectiveReminderPlannerTests
             leadTime ?? TimeSpan.Zero,
             recurrence,
             MapObjectiveReminderPriority.Caution,
-            "Подготовьтесь к объекту",
             "Заранее освободите линию и поставьте обзор.",
             "До появления объекта осталось мало времени.",
             "Подойти к реке вместе с командой.");
