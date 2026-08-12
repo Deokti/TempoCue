@@ -100,6 +100,50 @@ public sealed class MapControlContentViewTests
                 "map-control-editor-persistent-tips.png");
         });
 
+    [Fact]
+    public void ThirdStep_AddsTimedReminderAndKeepsSortedListVisible() =>
+        WpfTestHost.Run(() =>
+        {
+            using var context = new MainWindowTestContext();
+            var contentPage = OpenMapControlContent(context);
+            var content = context.Coaching.MapControlEditor.Content;
+
+            WpfTestHost.Click(WpfTestHost.Find<Button>(
+                contentPage,
+                "MapTimedRemindersTabButton"));
+            Assert.True(content.IsTimedRemindersSection);
+            var timedPage = WpfTestHost.Find<MapControlTimedRemindersView>(
+                contentPage,
+                "MapControlTimedRemindersPage");
+            Assert.Equal(Visibility.Visible, timedPage.Visibility);
+
+            WpfTestHost.Click(WpfTestHost.Find<Button>(
+                timedPage,
+                "AddMapTimedReminderButton"));
+            content.TimedReminders.Editor.GameTimeInput = "30";
+            content.TimedReminders.Editor.Title = "Ранний ганк";
+            content.TimedReminders.Editor.Message =
+                "Не уходи далеко от своей башни без информации о леснике.";
+            content.TimedReminders.Editor.WhyNow =
+                "Лесник обычно заканчивает первый круг и ищет уязвимую линию.";
+            content.TimedReminders.Editor.NextGoal =
+                "Отойди ближе к башне и дождись безопасного обзора.";
+            WpfTestHost.Pump();
+            SaveVisualSnapshotIfRequested(
+                context.Window,
+                "map-control-editor-timed-reminder-editor.png");
+
+            WpfTestHost.Click(WpfTestHost.Find<Button>(
+                timedPage,
+                "SaveMapTimedReminderButton"));
+
+            Assert.Single(content.TimedReminders.Reminders);
+            Assert.Equal("30:00", content.TimedReminders.Reminders[0].GameTimeLabel);
+            SaveVisualSnapshotIfRequested(
+                context.Window,
+                "map-control-editor-timed-reminders.png");
+        });
+
     private static MapControlContentView OpenMapControlContent(MainWindowTestContext context)
     {
         var libraryPage = OpenLibrary(context);

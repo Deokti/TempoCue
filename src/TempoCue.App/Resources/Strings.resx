@@ -868,6 +868,21 @@
   <data name="Coaching.MapControlEditor.Content.Editor.NextGoal" xml:space="preserve"><value>Next goal (what to prepare before the objective)</value></data>
   <data name="Coaching.MapControlEditor.Content.Editor.Done" xml:space="preserve"><value>Done</value></data>
   <data name="Coaching.MapControlEditor.Content.DuplicateName" xml:space="preserve"><value>{0} — copy</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.ListTitle" xml:space="preserve"><value>Game-time reminders</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Description" xml:space="preserve"><value>Bound to an exact match minute rather than a system event. Cards are sorted automatically by time.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Add" xml:space="preserve"><value>+ Add reminder</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Empty" xml:space="preserve"><value>No timed reminders yet. Add the first one when advice should appear at a specific match time.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Editor.Title" xml:space="preserve"><value>Timed reminder</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Editor.Progress" xml:space="preserve"><value>Reminder {0} of {1}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.GameTime" xml:space="preserve"><value>Game time</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.GameTime.Hint" xml:space="preserve"><value>Enter minutes (30) or MMSS (1330 = 13:30). 15-second step; once per match.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Name" xml:space="preserve"><value>Name</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Message" xml:space="preserve"><value>Main advice</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.WhyNow" xml:space="preserve"><value>Why now</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.NextGoal" xml:space="preserve"><value>Next goal</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Future.Title" xml:space="preserve"><value>Available after mini-map analysis</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Future.Description" xml:space="preserve"><value>The first version does not analyze the mini-map image, so these conditions cannot be selected yet.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Future.Items" xml:space="preserve"><value>Enemy jungler spotted · Opponent missing from lane · Enemy ward placed · Team grouped at an objective</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.ListTitle" xml:space="preserve"><value>Persistent tips</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.Description" xml:space="preserve"><value>The player opens these tips in the pack details. They do not pop up during the match and do not replace active advice.</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.Add" xml:space="preserve"><value>+ Add tip</value></data>

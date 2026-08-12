@@ -22,14 +22,18 @@ public sealed class MapControlContentViewModel : ObservableObject
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         Rules = new ReadOnlyObservableCollection<MapControlObjectiveRuleViewModel>(_rules);
         Editor = new MapControlObjectiveRuleEditorViewModel(localization);
+        TimedReminders = new MapControlTimedRemindersViewModel(localization);
         PersistentTips = new MapControlPersistentTipsViewModel(localization);
         Editor.PropertyChanged += Editor_PropertyChanged;
+        TimedReminders.PropertyChanged += TimedReminders_PropertyChanged;
         PersistentTips.PropertyChanged += PersistentTips_PropertyChanged;
     }
 
     public ReadOnlyObservableCollection<MapControlObjectiveRuleViewModel> Rules { get; }
 
     public MapControlObjectiveRuleEditorViewModel Editor { get; }
+
+    public MapControlTimedRemindersViewModel TimedReminders { get; }
 
     public MapControlPersistentTipsViewModel PersistentTips { get; }
 
@@ -41,12 +45,15 @@ public sealed class MapControlContentViewModel : ObservableObject
             if (SetProperty(ref _section, value))
             {
                 OnPropertyChanged(nameof(IsObjectsSection));
+                OnPropertyChanged(nameof(IsTimedRemindersSection));
                 OnPropertyChanged(nameof(IsPersistentTipsSection));
             }
         }
     }
 
     public bool IsObjectsSection => Section == MapControlContentSection.Objects;
+
+    public bool IsTimedRemindersSection => Section == MapControlContentSection.TimedReminders;
 
     public bool IsPersistentTipsSection => Section == MapControlContentSection.PersistentTips;
 
@@ -66,9 +73,15 @@ public sealed class MapControlContentViewModel : ObservableObject
 
     public bool HasRules => RuleCount > 0;
 
-    public bool IsComplete =>
+    public bool HasContent =>
         HasRules
+        || TimedReminders.Count > 0
+        || PersistentTips.Count > 0;
+
+    public bool IsComplete =>
+        HasContent
         && !Editor.IsOpen
+        && TimedReminders.IsComplete
         && PersistentTips.IsComplete;
 
     public string ObjectsTabLabel => _localization.Format(
@@ -77,7 +90,7 @@ public sealed class MapControlContentViewModel : ObservableObject
 
     public string TimedRemindersTabLabel => _localization.Format(
         "Coaching.MapControlEditor.Content.Tab.Timed",
-        0);
+        TimedReminders.Count);
 
     public string PersistentTipsTabLabel => _localization.Format(
         "Coaching.MapControlEditor.Content.Tab.Persistent",
@@ -122,6 +135,12 @@ public sealed class MapControlContentViewModel : ObservableObject
     {
         IsObjectivePickerOpen = false;
         Section = MapControlContentSection.PersistentTips;
+    }
+
+    public void ShowTimedReminders()
+    {
+        IsObjectivePickerOpen = false;
+        Section = MapControlContentSection.TimedReminders;
     }
 
     public void CloseObjectivePicker() => IsObjectivePickerOpen = false;
@@ -295,6 +314,7 @@ public sealed class MapControlContentViewModel : ObservableObject
 
         _rules.Clear();
         _nextRuleNumber = 1;
+        TimedReminders.BeginNew();
         PersistentTips.BeginNew();
         NotifyRulesChanged();
     }
@@ -303,6 +323,7 @@ public sealed class MapControlContentViewModel : ObservableObject
     {
         RebuildObjectiveOptions();
         Editor.UpdateLanguage();
+        TimedReminders.UpdateLanguage();
         PersistentTips.UpdateLanguage();
         foreach (var rule in _rules)
         {
@@ -381,9 +402,26 @@ public sealed class MapControlContentViewModel : ObservableObject
         if (e.PropertyName == nameof(MapControlPersistentTipsViewModel.Count))
         {
             OnPropertyChanged(nameof(PersistentTipsTabLabel));
+            OnPropertyChanged(nameof(HasContent));
+            OnPropertyChanged(nameof(IsComplete));
         }
 
         if (e.PropertyName == nameof(MapControlPersistentTipsViewModel.IsComplete))
+        {
+            OnPropertyChanged(nameof(IsComplete));
+        }
+    }
+
+    private void TimedReminders_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MapControlTimedRemindersViewModel.Count))
+        {
+            OnPropertyChanged(nameof(TimedRemindersTabLabel));
+            OnPropertyChanged(nameof(HasContent));
+            OnPropertyChanged(nameof(IsComplete));
+        }
+
+        if (e.PropertyName == nameof(MapControlTimedRemindersViewModel.IsComplete))
         {
             OnPropertyChanged(nameof(IsComplete));
         }
@@ -393,6 +431,7 @@ public sealed class MapControlContentViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(RuleCount));
         OnPropertyChanged(nameof(HasRules));
+        OnPropertyChanged(nameof(HasContent));
         OnPropertyChanged(nameof(IsComplete));
         OnPropertyChanged(nameof(ObjectsTabLabel));
     }

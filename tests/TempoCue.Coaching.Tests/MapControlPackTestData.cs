@@ -49,6 +49,19 @@ internal static class MapControlPackTestData
                     "Убийство дракона подтверждено игровым событием.",
                     "Собраться у нижней реки.")
             ],
+            TimedReminders =
+            [
+                new MapControlTimedReminder
+                {
+                    Id = "early-gank",
+                    GameTime = TimeSpan.FromMinutes(3) + TimeSpan.FromSeconds(15),
+                    Priority = MapObjectiveReminderPriority.Caution,
+                    Title = "Ранний ганк",
+                    Message = "Не уходите далеко от своей башни.",
+                    WhyNow = "Лесник обычно заканчивает первый круг.",
+                    NextGoal = "Дождаться обзора и безопасной информации."
+                }
+            ],
             PersistentTips =
             [
                 new MapControlPersistentTip

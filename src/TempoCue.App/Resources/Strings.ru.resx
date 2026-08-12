@@ -878,6 +878,21 @@
   <data name="Coaching.MapControlEditor.Content.Editor.NextGoal" xml:space="preserve"><value>Следующая цель (что подготовить к объекту)</value></data>
   <data name="Coaching.MapControlEditor.Content.Editor.Done" xml:space="preserve"><value>Готово</value></data>
   <data name="Coaching.MapControlEditor.Content.DuplicateName" xml:space="preserve"><value>{0} — копия</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.ListTitle" xml:space="preserve"><value>Напоминания по игровому времени</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Description" xml:space="preserve"><value>Привязаны к конкретной минуте матча, а не к системному событию. Карточки автоматически сортируются по времени.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Add" xml:space="preserve"><value>+ Добавить напоминание</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Empty" xml:space="preserve"><value>Напоминаний по времени пока нет. Добавьте первое, если совет должен появиться в конкретный момент матча.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Editor.Title" xml:space="preserve"><value>Напоминание по времени</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Editor.Progress" xml:space="preserve"><value>Напоминание {0} из {1}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.GameTime" xml:space="preserve"><value>Игровое время</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.GameTime.Hint" xml:space="preserve"><value>Введите минуты (30) или ММСС (1330 = 13:30). Шаг 15 секунд; один раз за матч.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Name" xml:space="preserve"><value>Название</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Message" xml:space="preserve"><value>Главный совет</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.WhyNow" xml:space="preserve"><value>Почему сейчас</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.NextGoal" xml:space="preserve"><value>Следующая цель</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Future.Title" xml:space="preserve"><value>Появится после анализа мини-карты</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Future.Description" xml:space="preserve"><value>Первая версия не анализирует изображение мини-карты, поэтому такие условия пока нельзя выбрать.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Future.Items" xml:space="preserve"><value>Вражеский лесник замечен · Противник пропал с линии · Поставлен вражеский вард · Команда собралась у объекта</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.ListTitle" xml:space="preserve"><value>Постоянные подсказки</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.Description" xml:space="preserve"><value>Игрок открывает эти подсказки в деталях набора. Они не всплывают во время матча и не заменяют активный совет.</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.Add" xml:space="preserve"><value>+ Добавить подсказку</value></data>

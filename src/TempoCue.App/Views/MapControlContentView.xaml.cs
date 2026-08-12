@@ -14,6 +14,9 @@ public partial class MapControlContentView : UserControl
     private void MapObjectsTabButton_Click(object sender, RoutedEventArgs e) =>
         ViewModel.ShowObjects();
 
+    private void MapTimedRemindersTabButton_Click(object sender, RoutedEventArgs e) =>
+        ViewModel.ShowTimedReminders();
+
     private void MapPersistentTipsTabButton_Click(object sender, RoutedEventArgs e) =>
         ViewModel.ShowPersistentTips();
 

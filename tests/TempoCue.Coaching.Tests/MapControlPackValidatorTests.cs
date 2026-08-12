@@ -54,6 +54,22 @@ public sealed class MapControlPackValidatorTests
     }
 
     [Fact]
+    public void Validate_RejectsTimedReminderOutsideFifteenSecondStep()
+    {
+        var original = MapControlPackTestData.Create();
+        var invalidReminder = original.TimedReminders[0] with
+        {
+            GameTime = TimeSpan.FromSeconds(17)
+        };
+        var pack = original with { TimedReminders = [invalidReminder] };
+
+        var exception = Assert.Throws<InvalidDataException>(
+            () => MapControlPackValidator.Validate(pack));
+
+        Assert.Contains("15-second", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void Validate_RejectsPackWithoutRequiredMetadata()
     {
         var pack = MapControlPackTestData.Create() with { Description = string.Empty };

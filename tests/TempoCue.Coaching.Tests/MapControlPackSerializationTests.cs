@@ -22,6 +22,7 @@ public sealed class MapControlPackSerializationTests
         Assert.Equal(pack.Applicability.Roles, loaded.Applicability.Roles);
         Assert.Equal(pack.Applicability.TeamSide, loaded.Applicability.TeamSide);
         Assert.Equal(pack.Rules, loaded.Rules);
+        Assert.Equal(pack.TimedReminders, loaded.TimedReminders);
         Assert.Equal(pack.PersistentTips, loaded.PersistentTips);
     }
 

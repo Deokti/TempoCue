@@ -48,6 +48,9 @@ public sealed record MapControlPack
     /// <summary>Правила напоминаний в стабильном авторском порядке.</summary>
     public IReadOnlyList<MapObjectiveReminderRule> Rules { get; init; } = [];
 
+    /// <summary>Одноразовые напоминания, привязанные к игровому времени.</summary>
+    public IReadOnlyList<MapControlTimedReminder> TimedReminders { get; init; } = [];
+
     /// <summary>Справочные подсказки в стабильном авторском порядке.</summary>
     public IReadOnlyList<MapControlPersistentTip> PersistentTips { get; init; } = [];
 }

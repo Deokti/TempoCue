@@ -68,6 +68,9 @@ public static class MapControlPackValidator
             pack.Rules.Select(static rule => rule.Id),
             "map reminder rule");
         CoachPackValidation.EnsureUniqueIds(
+            pack.TimedReminders.Select(static reminder => reminder.Id),
+            "map timed reminder");
+        CoachPackValidation.EnsureUniqueIds(
             pack.PersistentTips.Select(static tip => tip.Id),
             "map persistent tip");
 
@@ -87,6 +90,11 @@ public static class MapControlPackValidator
         foreach (var tip in pack.PersistentTips)
         {
             MapControlPersistentTipValidator.Validate(tip);
+        }
+
+        foreach (var reminder in pack.TimedReminders)
+        {
+            MapControlTimedReminderValidator.Validate(reminder);
         }
     }
 

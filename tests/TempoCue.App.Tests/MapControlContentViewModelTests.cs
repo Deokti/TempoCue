@@ -111,6 +111,75 @@ public sealed class MapControlContentViewModelTests
         Assert.Single(content.PersistentTips.Snapshot);
     }
 
+    [Fact]
+    public void TimedReminders_AreSavedOnceAndSortedByGameTime()
+    {
+        var content = CreateContent();
+        content.ShowTimedReminders();
+
+        AddTimedReminder(content, TimeSpan.FromMinutes(12), "Обнови обзор");
+        AddTimedReminder(content, TimeSpan.FromMinutes(3) + TimeSpan.FromSeconds(15), "Ранний ганк");
+
+        Assert.True(content.IsTimedRemindersSection);
+        Assert.Equal(2, content.TimedReminders.Count);
+        Assert.Equal("03:15", content.TimedReminders.Reminders[0].GameTimeLabel);
+        Assert.Equal("Ранний ганк", content.TimedReminders.Reminders[0].Title);
+        Assert.Equal("12:00", content.TimedReminders.Reminders[1].GameTimeLabel);
+        Assert.Contains("2", content.TimedRemindersTabLabel, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void DuplicateNewTimedReminder_SavesOriginalAndOpensIndependentCopy()
+    {
+        var content = CreateContent();
+        content.TimedReminders.BeginAdd();
+        FillTimedReminder(content.TimedReminders.Editor, "Ранний обзор реки");
+
+        Assert.True(content.TimedReminders.DuplicateEditor());
+
+        Assert.Equal(2, content.TimedReminders.Count);
+        var original = content.TimedReminders.Reminders[0];
+        var duplicate = content.TimedReminders.Reminders[1];
+        Assert.True(content.TimedReminders.Editor.IsOpen);
+        Assert.NotEqual(original.Id, duplicate.Id);
+        Assert.Equal(duplicate.Id, content.TimedReminders.Editor.EditingReminderId);
+        Assert.StartsWith(original.Title, duplicate.Title, StringComparison.Ordinal);
+        Assert.Equal(duplicate.Title, content.TimedReminders.Editor.Title);
+    }
+
+    [Fact]
+    public void TimedReminderGameTimeInput_AcceptsMinutesOrMmss()
+    {
+        var editor = new MapControlTimedReminderEditorViewModel(LocalizationService.Instance);
+        editor.BeginNew();
+
+        editor.GameTimeInput = "30";
+        Assert.Equal(TimeSpan.FromMinutes(30), editor.GameTime);
+        Assert.Equal("30:00", editor.GameTimeInput);
+
+        editor.GameTimeInput = "1330";
+        Assert.Equal(TimeSpan.FromMinutes(13) + TimeSpan.FromSeconds(30), editor.GameTime);
+
+        editor.GameTimeInput = "1347";
+        Assert.Equal(TimeSpan.FromMinutes(13) + TimeSpan.FromSeconds(30), editor.GameTime);
+    }
+
+    [Fact]
+    public void ContentStep_AllowsAnySingleCompletedContentType()
+    {
+        var timedContent = CreateContent();
+        AddTimedReminder(timedContent, TimeSpan.FromMinutes(10), "Проверь реку");
+        Assert.True(timedContent.IsComplete);
+
+        var persistentContent = CreateContent();
+        persistentContent.PersistentTips.BeginAdd();
+        persistentContent.PersistentTips.Editor.Title = "Сохраняй обзор";
+        persistentContent.PersistentTips.Editor.Message =
+            "Проверяй доступность обзора перед выходом к нейтральному объекту.";
+        Assert.True(persistentContent.PersistentTips.SaveEditor());
+        Assert.True(persistentContent.IsComplete);
+    }
+
     private static MapControlContentViewModel CreateContent()
     {
         var content = new MapControlContentViewModel(LocalizationService.Instance);
@@ -135,5 +204,30 @@ public sealed class MapControlContentViewModelTests
         editor.Message = message;
         editor.WhyNow = "До появления объекта осталось мало времени.";
         editor.NextGoal = "Подойти к реке вместе с командой.";
+    }
+
+    private static void AddTimedReminder(
+        MapControlContentViewModel content,
+        TimeSpan gameTime,
+        string title)
+    {
+        content.TimedReminders.BeginAdd();
+        while (content.TimedReminders.Editor.GameTime < gameTime)
+        {
+            content.TimedReminders.Editor.IncreaseGameTime();
+        }
+
+        FillTimedReminder(content.TimedReminders.Editor, title);
+        Assert.True(content.TimedReminders.SaveEditor());
+    }
+
+    private static void FillTimedReminder(
+        MapControlTimedReminderEditorViewModel editor,
+        string title)
+    {
+        editor.Title = title;
+        editor.Message = "Не уходи далеко от безопасной позиции.";
+        editor.WhyNow = "Сейчас повышается риск неожиданной атаки.";
+        editor.NextGoal = "Дождись обзора и информации о сопернике.";
     }
 }
