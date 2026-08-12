@@ -181,26 +181,25 @@
                     <Separator Margin="0,18" Background="#263750" />
 
                     <!-- Длительность влияет на новые уведомления, но не меняет их приоритет. -->
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel>
                         <TextBlock Text="{localization:Loc Settings.Overlay.Duration.Label}"
                                    Foreground="#F4F7FB"
                                    FontSize="16"
                                    FontWeight="SemiBold" />
                         <TextBlock Text="{localization:Loc Settings.Overlay.Duration.Summary}"
                                    Style="{StaticResource SettingsCaption}"
-                                   Margin="12,2,0,0" />
+                                   TextWrapping="Wrap"
+                                   Margin="0,4,0,0" />
                     </StackPanel>
                     <UniformGrid Columns="2" Margin="0,12,0,0">
                         <controls:TempoChoiceCard x:Name="AutomaticDurationChoice"
                                                   GroupName="OverlayDuration"
                                                   Title="{localization:Loc Settings.Overlay.Duration.Automatic}"
-                                                  Description="{localization:Loc Settings.Overlay.Duration.Automatic.Hint}"
                                                   IsChecked="{Binding IsAutomaticDuration, Mode=TwoWay}"
                                                   Margin="0,0,6,0" />
                         <controls:TempoChoiceCard x:Name="FixedDurationChoice"
                                                   GroupName="OverlayDuration"
                                                   Title="{localization:Loc Settings.Overlay.Duration.Fixed}"
-                                                  Description="{localization:Loc Settings.Overlay.Duration.Fixed.Hint}"
                                                   IsChecked="{Binding IsFixedDuration, Mode=TwoWay}"
                                                   Margin="6,0,0,0" />
                     </UniformGrid>
@@ -270,14 +269,15 @@
                     <Separator Margin="0,18" Background="#263750" />
 
                     <!-- Постоянные советы не затрагивают фазовые советы и опасные события. -->
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel>
                         <TextBlock Text="{localization:Loc Settings.Overlay.Persistent.Label}"
                                    Foreground="#F4F7FB"
                                    FontSize="16"
                                    FontWeight="SemiBold" />
                         <TextBlock Text="{localization:Loc Settings.Overlay.Persistent.Summary}"
                                    Style="{StaticResource SettingsCaption}"
-                                   Margin="12,2,0,0" />
+                                   TextWrapping="Wrap"
+                                   Margin="0,4,0,0" />
                     </StackPanel>
                     <StackPanel Margin="0,12,0,0">
                         <controls:TempoChoiceCard x:Name="PersistentOnceChoice"
