@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Globalization;
 using System.IO;
 using TempoCue.App.Localization;
 using TempoCue.Application;
@@ -80,21 +79,18 @@ public sealed class MapControlPackDetailsViewModel : ObservableObject, IDisposab
             AuthorLabel,
             Card?.OriginLabel ?? string.Empty);
 
-    public string Description => string.IsNullOrWhiteSpace(Pack?.Description)
-        ? _localization.Get("Coaching.Details.Overview.Description.Empty")
-        : Pack.Description;
+    public string Description =>
+        CoachPackDetailsPresentation.Description(_localization, Pack?.Description);
 
-    public string AuthorLabel => string.IsNullOrWhiteSpace(Pack?.Author)
-        ? _localization.Get("Coaching.Library.Author.TempoCue")
-        : Pack.Author;
+    public string AuthorLabel =>
+        CoachPackDetailsPresentation.Author(_localization, Pack?.Author);
 
     public string ContentLanguageLabel => Card?.ContentLanguageLabel ?? string.Empty;
 
     public string PatchLabel => Pack?.Patch ?? string.Empty;
 
-    public string VerifiedOnLabel => Pack?.VerifiedOn is DateOnly verifiedOn
-        ? verifiedOn.ToString("D", CultureInfo.CurrentUICulture)
-        : _localization.Get("Coaching.Details.Overview.NotSpecified");
+    public string VerifiedOnLabel =>
+        CoachPackDetailsPresentation.VerifiedOn(_localization, Pack?.VerifiedOn);
 
     public string RolesLabel => Pack is null
         ? string.Empty
@@ -109,9 +105,10 @@ public sealed class MapControlPackDetailsViewModel : ObservableObject, IDisposab
             _ => "Coaching.MapControlEditor.Scope.Summary.AnySide"
         });
 
-    public string SourceLabel => BuildSourceLabel(Pack);
+    public string SourceLabel =>
+        CoachPackDetailsPresentation.SourceLabel(_localization, Pack?.Source);
 
-    public Uri? SourceUri => BuildSourceUri(Pack);
+    public Uri? SourceUri => CoachPackDetailsPresentation.SourceUri(Pack?.Source);
 
     public bool HasSourceUri => SourceUri is not null;
 
@@ -397,39 +394,6 @@ public sealed class MapControlPackDetailsViewModel : ObservableObject, IDisposab
             MapControlRole.Support => "SUPPORT",
             _ => role.ToString().ToUpperInvariant()
         }));
-    }
-
-    private string BuildSourceLabel(MapControlPack? pack)
-    {
-        if (pack?.Source is null)
-        {
-            return _localization.Get("Coaching.Details.Overview.NotSpecified");
-        }
-
-        if (pack.Source.Kind == CoachPackSourceKind.PersonalExperience)
-        {
-            return _localization.Get("Coaching.Details.Source.PersonalExperience");
-        }
-
-        var title = string.IsNullOrWhiteSpace(pack.Source.Title)
-            ? _localization.Get("Coaching.Details.Overview.NotSpecified")
-            : pack.Source.Title;
-        return string.IsNullOrWhiteSpace(pack.Source.Author)
-            ? title
-            : $"{title} — {pack.Source.Author}";
-    }
-
-    private static Uri? BuildSourceUri(MapControlPack? pack)
-    {
-        if (!Uri.TryCreate(pack?.Source?.Url, UriKind.Absolute, out var sourceUri))
-        {
-            return null;
-        }
-
-        return string.Equals(sourceUri.Scheme, Uri.UriSchemeHttp, StringComparison.OrdinalIgnoreCase)
-            || string.Equals(sourceUri.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase)
-            ? sourceUri
-            : null;
     }
 
     private void SetExportStatus(ExportStatus status)

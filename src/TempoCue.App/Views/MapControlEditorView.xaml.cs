@@ -1,9 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Threading;
 using TempoCue.App.ViewModels;
 using TempoCue.Application;
 
@@ -28,7 +25,7 @@ public partial class MapControlEditorView : UserControl
     {
         if (ViewModel.MovePrevious())
         {
-            ResetContentScroll();
+            EditorWizardNavigation.ResetScroll(MapControlEditorContentScrollViewer);
         }
         else
         {
@@ -40,7 +37,7 @@ public partial class MapControlEditorView : UserControl
     {
         if (ViewModel.MoveNext())
         {
-            ResetContentScroll();
+            EditorWizardNavigation.ResetScroll(MapControlEditorContentScrollViewer);
         }
     }
 
@@ -70,8 +67,7 @@ public partial class MapControlEditorView : UserControl
         object sender,
         MouseButtonEventArgs e)
     {
-        if (FindStepItem(e.OriginalSource as DependencyObject) is not { IsEnabled: true } stepItem
-            || !int.TryParse(stepItem.Tag?.ToString(), out var selectedStep))
+        if (!EditorWizardNavigation.TryGetStep(e, out var selectedStep))
         {
             return;
         }
@@ -82,35 +78,10 @@ public partial class MapControlEditorView : UserControl
 
     private void NavigateToStep(int selectedStep)
     {
-        if (selectedStep < 1
-            || selectedStep > ViewModel.TotalSteps
-            || selectedStep == ViewModel.CurrentStep)
-        {
-            return;
-        }
-
-        if (ViewModel.NavigateToStep(selectedStep))
-        {
-            ResetContentScroll();
-        }
-
-        MapControlEditorStepsListBox.SetCurrentValue(
-            Selector.SelectedIndexProperty,
-            ViewModel.CurrentStepIndex);
+        EditorWizardNavigation.Navigate(
+            ViewModel,
+            MapControlEditorStepsListBox,
+            MapControlEditorContentScrollViewer,
+            selectedStep);
     }
-
-    private static ListBoxItem? FindStepItem(DependencyObject? element)
-    {
-        while (element is not null and not ListBoxItem)
-        {
-            element = VisualTreeHelper.GetParent(element);
-        }
-
-        return element as ListBoxItem;
-    }
-
-    private void ResetContentScroll() =>
-        Dispatcher.BeginInvoke(
-            DispatcherPriority.Loaded,
-            new Action(MapControlEditorContentScrollViewer.ScrollToTop));
 }
