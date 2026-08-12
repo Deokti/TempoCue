@@ -142,14 +142,14 @@ public sealed class MapControlTimedReminderEditorViewModel : ObservableObject
     public TextLengthFeedback WhyNowLengthFeedback => TextLengthFeedback.Create(
         WhyNow, 3, 240, _localization);
 
-    public TextLengthFeedback NextGoalLengthFeedback => TextLengthFeedback.Create(
-        NextGoal, 3, 240, _localization);
+    public TextLengthFeedback NextGoalLengthFeedback => TextLengthFeedback.CreateOptional(
+        NextGoal, 240, _localization);
 
     public bool CanSave =>
         TextLengthFeedback.IsWithin(Title, 3, 80)
         && TextLengthFeedback.IsWithin(Message, 3, 240)
         && TextLengthFeedback.IsWithin(WhyNow, 3, 240)
-        && TextLengthFeedback.IsWithin(NextGoal, 3, 240);
+        && TextLengthFeedback.IsOptionalWithin(NextGoal, 240);
 
     public void BeginNew()
     {

@@ -11,6 +11,48 @@ namespace TempoCue.App.Tests;
 public sealed class MapControlEditorNavigationViewTests
 {
     [Fact]
+    public void ReopenAfterLeavingThirdStep_ResetsVisibleAndSelectedStep() => WpfTestHost.Run(() =>
+    {
+        using var context = new MainWindowTestContext();
+        var libraryPage = OpenLibrary(context);
+        WpfTestHost.Click(WpfTestHost.Find<Button>(libraryPage, "CreatePackButton"));
+        var packTypePage = WpfTestHost.Find<PackTypeSelectionView>(
+            context.CoachingPage,
+            "PackTypeSelectionPage");
+        var gameControlButton = WpfTestHost.Find<Button>(
+            packTypePage,
+            "GameControlPackTypeButton");
+        WpfTestHost.Click(gameControlButton, DispatcherPriority.ApplicationIdle);
+
+        FillMainInformation(context, "Первый набор");
+        var next = WpfTestHost.Find<Button>(
+            context.MapControlEditorPage,
+            "MapControlEditorNextButton");
+        var back = WpfTestHost.Find<Button>(
+            context.MapControlEditorPage,
+            "MapControlEditorBackButton");
+        WpfTestHost.Click(next, DispatcherPriority.ApplicationIdle);
+        WpfTestHost.Click(next, DispatcherPriority.ApplicationIdle);
+        Assert.Equal(3, context.Coaching.MapControlEditor.CurrentStep);
+
+        WpfTestHost.Click(back, DispatcherPriority.ApplicationIdle);
+        WpfTestHost.Click(back, DispatcherPriority.ApplicationIdle);
+        WpfTestHost.Click(back, DispatcherPriority.ApplicationIdle);
+        Assert.Equal(Visibility.Visible, packTypePage.Visibility);
+
+        WpfTestHost.Click(gameControlButton, DispatcherPriority.ApplicationIdle);
+        var steps = WpfTestHost.Find<ListBox>(
+            context.MapControlEditorPage,
+            "MapControlEditorStepsListBox");
+        Assert.Equal(1, context.Coaching.MapControlEditor.CurrentStep);
+        Assert.Equal(0, steps.SelectedIndex);
+
+        FillMainInformation(context, "Второй набор");
+        Assert.Equal(1, context.Coaching.MapControlEditor.CurrentStep);
+        Assert.Equal(0, steps.SelectedIndex);
+    });
+
+    [Fact]
     public void PackTypeSelection_OpensMapControlEditor() => WpfTestHost.Run(() =>
     {
         using var context = new MainWindowTestContext();
@@ -71,4 +113,15 @@ public sealed class MapControlEditorNavigationViewTests
             context.Window,
             "map-control-editor-step2.png");
     });
+
+    private static void FillMainInformation(
+        MainWindowTestContext context,
+        string packName)
+    {
+        var form = context.Coaching.MapControlEditor.MainInformation;
+        form.PackName = packName;
+        form.ShortDescription =
+            "Напоминания о подготовке и появлении нейтральных объектов.";
+        WpfTestHost.Pump();
+    }
 }

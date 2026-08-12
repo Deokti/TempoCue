@@ -19,10 +19,11 @@ public static class MapObjectiveReminderRuleValidator
         if (string.IsNullOrWhiteSpace(rule.Id)
             || string.IsNullOrWhiteSpace(rule.Message)
             || string.IsNullOrWhiteSpace(rule.WhyNow)
-            || string.IsNullOrWhiteSpace(rule.NextGoal))
+            || rule.NextGoal is null
+            || rule.NextGoal.Length > 160)
         {
             throw new InvalidDataException(
-                "Map objective reminder requires id, message, explanation and next goal.");
+                "Map objective reminder requires id, message and explanation.");
         }
 
         if (rule.Objective != timing.Objective)

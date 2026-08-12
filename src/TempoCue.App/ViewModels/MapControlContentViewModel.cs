@@ -96,12 +96,12 @@ public sealed class MapControlContentViewModel : ObservableObject
         "Coaching.MapControlEditor.Content.Tab.Persistent",
         PersistentTips.Count);
 
-    public string PatchKnowledgeNotice => _timingSet is null
+    public string RulesDescription => _timingSet is null
         ? _localization.Get("Coaching.MapControlEditor.Content.CatalogUnavailable")
         : _localization.Format(
             _timingSet.IsUsingPreviousPatchData
-                ? "Coaching.MapControlEditor.Content.CatalogPreviousPatch"
-                : "Coaching.MapControlEditor.Content.CatalogCurrentPatch",
+                ? "Coaching.MapControlEditor.Content.RulesDescriptionPreviousPatch"
+                : "Coaching.MapControlEditor.Content.RulesDescriptionCurrentPatch",
             _timingSet.RequestedPatch,
             _timingSet.VerifiedThroughPatch);
 
@@ -111,7 +111,7 @@ public sealed class MapControlContentViewModel : ObservableObject
             ? timingSet
             : null;
         RebuildObjectiveOptions();
-        OnPropertyChanged(nameof(PatchKnowledgeNotice));
+        OnPropertyChanged(nameof(RulesDescription));
     }
 
     public void OpenObjectivePicker()
@@ -333,7 +333,7 @@ public sealed class MapControlContentViewModel : ObservableObject
         OnPropertyChanged(nameof(ObjectsTabLabel));
         OnPropertyChanged(nameof(TimedRemindersTabLabel));
         OnPropertyChanged(nameof(PersistentTipsTabLabel));
-        OnPropertyChanged(nameof(PatchKnowledgeNotice));
+        OnPropertyChanged(nameof(RulesDescription));
     }
 
     private void RebuildObjectiveOptions()

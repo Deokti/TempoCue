@@ -35,6 +35,8 @@ public sealed class MapControlTimedReminderViewModel : ObservableObject
 
     public string NextGoal => _reminder.NextGoal;
 
+    public bool HasNextGoal => !string.IsNullOrWhiteSpace(NextGoal);
+
     internal MapControlTimedReminder Reminder => _reminder;
 
     internal void Replace(MapControlTimedReminder reminder)

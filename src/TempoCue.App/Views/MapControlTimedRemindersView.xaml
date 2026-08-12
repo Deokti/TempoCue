@@ -138,19 +138,29 @@
                 <TextBlock DataContext="{Binding TimedReminders.Editor.MessageLengthFeedback}"
                            Text="{Binding Text}" Style="{StaticResource FormLengthFeedback}" />
 
-                <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Content.Timed.WhyNow}"
-                           Style="{StaticResource FormFieldLabel}" Margin="0,12,0,7" />
-                <TextBox Text="{Binding TimedReminders.Editor.WhyNow, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         Style="{StaticResource FormTextBox}" MaxLength="240" />
-                <TextBlock DataContext="{Binding TimedReminders.Editor.WhyNowLengthFeedback}"
-                           Text="{Binding Text}" Style="{StaticResource FormLengthFeedback}" />
-
-                <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Content.Timed.NextGoal}"
-                           Style="{StaticResource FormFieldLabel}" Margin="0,12,0,7" />
-                <TextBox Text="{Binding TimedReminders.Editor.NextGoal, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         Style="{StaticResource FormTextBox}" MaxLength="240" />
-                <TextBlock DataContext="{Binding TimedReminders.Editor.NextGoalLengthFeedback}"
-                           Text="{Binding Text}" Style="{StaticResource FormLengthFeedback}" />
+                <Grid x:Name="MapTimedReminderContextGrid" Margin="0,12,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Content.Timed.WhyNow}"
+                                   Style="{StaticResource FormFieldLabel}" Margin="0,0,0,7" />
+                        <TextBox Text="{Binding TimedReminders.Editor.WhyNow, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource FormTextBox}" MaxLength="240" />
+                        <TextBlock DataContext="{Binding TimedReminders.Editor.WhyNowLengthFeedback}"
+                                   Text="{Binding Text}" Style="{StaticResource FormLengthFeedback}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Content.Timed.NextGoal}"
+                                   Style="{StaticResource FormFieldLabel}" Margin="0,0,0,7" />
+                        <TextBox Text="{Binding TimedReminders.Editor.NextGoal, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource FormTextBox}" MaxLength="240" />
+                        <TextBlock DataContext="{Binding TimedReminders.Editor.NextGoalLengthFeedback}"
+                                   Text="{Binding Text}" Style="{StaticResource FormLengthFeedback}" />
+                    </StackPanel>
+                </Grid>
 
                 <Border Height="1" Background="#263750" Margin="0,14" />
                 <Grid>
@@ -280,7 +290,7 @@
                                                FontWeight="SemiBold"
                                                TextWrapping="Wrap"
                                                Margin="0,9,0,0" />
-                                    <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Content.Timed.WhyNow}"
+                                    <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Content.Card.WhyNow}"
                                                Foreground="#7F93AF"
                                                FontSize="{StaticResource Typography.FontSize.Caption}"
                                                Margin="0,9,0,0" />
@@ -289,15 +299,26 @@
                                                FontSize="{StaticResource Typography.FontSize.Body}"
                                                TextWrapping="Wrap"
                                                Margin="0,3,0,0" />
-                                    <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Content.Timed.NextGoal}"
-                                               Foreground="#7F93AF"
-                                               FontSize="{StaticResource Typography.FontSize.Caption}"
-                                               Margin="0,9,0,0" />
-                                    <TextBlock Text="{Binding NextGoal}"
-                                               Foreground="#C8D5E5"
-                                               FontSize="{StaticResource Typography.FontSize.Body}"
-                                               TextWrapping="Wrap"
-                                               Margin="0,3,0,0" />
+                                    <StackPanel Margin="0,9,0,0">
+                                        <StackPanel.Style>
+                                            <Style TargetType="StackPanel">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding HasNextGoal}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </StackPanel.Style>
+                                        <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Content.Card.Preparation}"
+                                                   Foreground="#7F93AF"
+                                                   FontSize="{StaticResource Typography.FontSize.Caption}" />
+                                        <TextBlock Text="{Binding NextGoal}"
+                                                   Foreground="#C8D5E5"
+                                                   FontSize="{StaticResource Typography.FontSize.Body}"
+                                                   TextWrapping="Wrap"
+                                                   Margin="0,3,0,0" />
+                                    </StackPanel>
                                     <Grid Margin="0,12,0,0">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />

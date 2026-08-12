@@ -159,8 +159,9 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
     public async Task OpenNewMapControlEditorAsync(
         CancellationToken cancellationToken = default)
     {
+        var initialization = MapControlEditor.BeginNewAsync(cancellationToken);
         CurrentScreen = CoachingScreen.MapControlEditor;
-        await MapControlEditor.BeginNewAsync(cancellationToken);
+        await initialization;
     }
 
     public async Task OpenSelectedPackEditorAsync(

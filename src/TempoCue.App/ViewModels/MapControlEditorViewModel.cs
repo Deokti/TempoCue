@@ -135,11 +135,14 @@ public sealed class MapControlEditorViewModel : ObservableObject
     private void BeginNew()
     {
         _highestVisitedStep = 1;
-        CurrentStep = 1;
+        _currentStep = 1;
         MainInformation.BeginNew();
         Scope.BeginNew();
         Content.BeginNew();
         Content.SetPatch(MainInformation.GamePatch);
+        OnPropertyChanged(nameof(CurrentStep));
+        OnPropertyChanged(nameof(CurrentStepIndex));
+        OnPropertyChanged(nameof(StepSummary));
         NotifyNavigationChanged();
     }
 

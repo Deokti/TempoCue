@@ -208,7 +208,7 @@ public sealed class MapControlObjectiveRuleEditorViewModel : ObservableObject
         _timing is not null
         && Message.Trim().Length is >= 3 and <= 200
         && WhyNow.Trim().Length is >= 3 and <= 240
-        && NextGoal.Trim().Length is >= 3 and <= 160
+        && NextGoal.Trim().Length <= 160
         && IsTriggerAvailable(SelectedTrigger);
 
     public string LiveSummary => _timing is null

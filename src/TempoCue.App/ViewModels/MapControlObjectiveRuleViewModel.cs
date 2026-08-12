@@ -37,6 +37,8 @@ public sealed class MapControlObjectiveRuleViewModel : ObservableObject
 
     public string NextGoal => _rule.NextGoal;
 
+    public bool HasNextGoal => !string.IsNullOrWhiteSpace(NextGoal);
+
     public bool IsEnabled
     {
         get => _rule.IsEnabled;
@@ -72,6 +74,7 @@ public sealed class MapControlObjectiveRuleViewModel : ObservableObject
         OnPropertyChanged(nameof(Message));
         OnPropertyChanged(nameof(WhyNow));
         OnPropertyChanged(nameof(NextGoal));
+        OnPropertyChanged(nameof(HasNextGoal));
         OnPropertyChanged(nameof(IsEnabled));
     }
 }

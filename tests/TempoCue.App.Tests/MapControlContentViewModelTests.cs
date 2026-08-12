@@ -26,6 +26,26 @@ public sealed class MapControlContentViewModelTests
     }
 
     [Fact]
+    public void AdvicePreparation_IsOptionalForObjectiveAndTimedReminder()
+    {
+        var content = CreateContent();
+
+        content.BeginAddRule(MapObjectiveKind.ElementalDragon);
+        FillRequiredAdvice(content.Editor);
+        content.Editor.NextGoal = string.Empty;
+        Assert.True(content.Editor.CanSave);
+        Assert.True(content.SaveEditor());
+        Assert.Empty(Assert.Single(content.Rules).NextGoal);
+
+        content.TimedReminders.BeginAdd();
+        FillTimedReminder(content.TimedReminders.Editor, "Проверь реку");
+        content.TimedReminders.Editor.NextGoal = string.Empty;
+        Assert.True(content.TimedReminders.Editor.CanSave);
+        Assert.True(content.TimedReminders.SaveEditor());
+        Assert.Empty(Assert.Single(content.TimedReminders.Reminders).NextGoal);
+    }
+
+    [Fact]
     public void VoidGrubs_DisablesRespawnTrigger()
     {
         var content = CreateContent();

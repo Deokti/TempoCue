@@ -10,6 +10,7 @@
   <data name="Header.CoachPackLoaded" xml:space="preserve"><value>COACH PACK ЗАГРУЖЕН</value></data>
   <data name="Language.Tooltip" xml:space="preserve"><value>Язык интерфейса</value></data>
   <data name="Validation.Length.Requirement" xml:space="preserve"><value>От {0} до {1} символов.</value></data>
+  <data name="Validation.Length.Optional" xml:space="preserve"><value>Необязательно, до {0} символов.</value></data>
   <data name="Validation.Length.TooShort" xml:space="preserve"><value>{0} из минимум {1} символов. Максимум: {2}.</value></data>
   <data name="Validation.Length.Valid" xml:space="preserve"><value>{0} из {1} символов.</value></data>
   <data name="Validation.Length.TooLong" xml:space="preserve"><value>{0} символов; максимум — {1}.</value></data>
@@ -826,7 +827,8 @@
   <data name="Coaching.MapControlEditor.Content.CatalogCurrentPatch" xml:space="preserve"><value>Тайминги проверены для патча {0}. Вы выбираете только момент и текст напоминания.</value></data>
   <data name="Coaching.MapControlEditor.Content.CatalogPreviousPatch" xml:space="preserve"><value>Для патча {0} используются последние проверенные тайминги патча {1}. Правила остаются активными и помечаются для проверки.</value></data>
   <data name="Coaching.MapControlEditor.Content.RulesTitle" xml:space="preserve"><value>Правила по объектам</value></data>
-  <data name="Coaching.MapControlEditor.Content.RulesDescription" xml:space="preserve"><value>Время появления и возрождения TempoCue берёт из каталога патча. Укажите только момент напоминания и совет.</value></data>
+  <data name="Coaching.MapControlEditor.Content.RulesDescriptionCurrentPatch" xml:space="preserve"><value>TempoCue использует проверенные тайминги объектов для патча {1}. Укажите только момент напоминания и совет.</value></data>
+  <data name="Coaching.MapControlEditor.Content.RulesDescriptionPreviousPatch" xml:space="preserve"><value>Для патча {0} используются последние проверенные тайминги патча {1}. Правила остаются активными и помечаются для проверки.</value></data>
   <data name="Coaching.MapControlEditor.Content.AddRule" xml:space="preserve"><value>+ Добавить правило объекта</value></data>
   <data name="Coaching.MapControlEditor.Content.EmptyRules" xml:space="preserve"><value>Правил объектов пока нет. Добавьте первое, чтобы продолжить.</value></data>
   <data name="Coaching.MapControlEditor.Content.Edit" xml:space="preserve"><value>Редактировать</value></data>
@@ -875,7 +877,9 @@
   <data name="Coaching.MapControlEditor.Content.Editor.LiveSummary" xml:space="preserve"><value>{0}; {1}.</value></data>
   <data name="Coaching.MapControlEditor.Content.Editor.Message" xml:space="preserve"><value>Главный совет (его игрок видит первым)</value></data>
   <data name="Coaching.MapControlEditor.Content.Editor.WhyNow" xml:space="preserve"><value>Почему сейчас (короткое объяснение)</value></data>
-  <data name="Coaching.MapControlEditor.Content.Editor.NextGoal" xml:space="preserve"><value>Следующая цель (что подготовить к объекту)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.NextGoal" xml:space="preserve"><value>Что подготовить к объекту (необязательно)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Card.WhyNow" xml:space="preserve"><value>Почему сейчас</value></data>
+  <data name="Coaching.MapControlEditor.Content.Card.Preparation" xml:space="preserve"><value>Что подготовить к объекту</value></data>
   <data name="Coaching.MapControlEditor.Content.Editor.Done" xml:space="preserve"><value>Готово</value></data>
   <data name="Coaching.MapControlEditor.Content.DuplicateName" xml:space="preserve"><value>{0} — копия</value></data>
   <data name="Coaching.MapControlEditor.Content.Timed.ListTitle" xml:space="preserve"><value>Напоминания по игровому времени</value></data>
@@ -886,10 +890,10 @@
   <data name="Coaching.MapControlEditor.Content.Timed.Editor.Progress" xml:space="preserve"><value>Напоминание {0} из {1}</value></data>
   <data name="Coaching.MapControlEditor.Content.Timed.GameTime" xml:space="preserve"><value>Игровое время</value></data>
   <data name="Coaching.MapControlEditor.Content.Timed.GameTime.Hint" xml:space="preserve"><value>Введите минуты (30) или ММСС (1330 = 13:30). Шаг 15 секунд; один раз за матч.</value></data>
-  <data name="Coaching.MapControlEditor.Content.Timed.Name" xml:space="preserve"><value>Название</value></data>
-  <data name="Coaching.MapControlEditor.Content.Timed.Message" xml:space="preserve"><value>Главный совет</value></data>
-  <data name="Coaching.MapControlEditor.Content.Timed.WhyNow" xml:space="preserve"><value>Почему сейчас</value></data>
-  <data name="Coaching.MapControlEditor.Content.Timed.NextGoal" xml:space="preserve"><value>Следующая цель</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Name" xml:space="preserve"><value>Название (короткое название в списке)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Message" xml:space="preserve"><value>Главный совет (его игрок видит первым)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.WhyNow" xml:space="preserve"><value>Почему сейчас (короткое объяснение)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.NextGoal" xml:space="preserve"><value>Что подготовить к объекту (необязательно)</value></data>
   <data name="Coaching.MapControlEditor.Content.Timed.Future.Title" xml:space="preserve"><value>Появится после анализа мини-карты</value></data>
   <data name="Coaching.MapControlEditor.Content.Timed.Future.Description" xml:space="preserve"><value>Первая версия не анализирует изображение мини-карты, поэтому такие условия пока нельзя выбрать.</value></data>
   <data name="Coaching.MapControlEditor.Content.Timed.Future.Items" xml:space="preserve"><value>Вражеский лесник замечен · Противник пропал с линии · Поставлен вражеский вард · Команда собралась у объекта</value></data>

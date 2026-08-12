@@ -19,6 +19,9 @@ public sealed class MapControlContentViewTests
             var contentPage = OpenMapControlContent(context);
 
             Assert.Equal(Visibility.Visible, contentPage.Visibility);
+            var tabsPanel = WpfTestHost.Find<Border>(contentPage, "MapContentTabsPanel");
+            Assert.Equal(new Thickness(4), tabsPanel.Padding);
+            Assert.Equal(new CornerRadius(12), tabsPanel.CornerRadius);
             Assert.False(context.Coaching.MapControlEditor.CanMoveNext);
             WpfTestHost.Click(WpfTestHost.Find<Button>(contentPage, "AddMapObjectiveRuleButton"));
 
@@ -120,6 +123,11 @@ public sealed class MapControlContentViewTests
             WpfTestHost.Click(WpfTestHost.Find<Button>(
                 timedPage,
                 "AddMapTimedReminderButton"));
+            var contextFields = WpfTestHost.Find<Grid>(
+                timedPage,
+                "MapTimedReminderContextGrid");
+            Assert.Equal(3, contextFields.ColumnDefinitions.Count);
+            Assert.Equal(new GridLength(16), contextFields.ColumnDefinitions[1].Width);
             content.TimedReminders.Editor.GameTimeInput = "30";
             content.TimedReminders.Editor.Title = "Ранний ганк";
             content.TimedReminders.Editor.Message =

@@ -10,6 +10,7 @@
   <data name="Header.CoachPackLoaded" xml:space="preserve"><value>COACH PACK LOADED</value></data>
   <data name="Language.Tooltip" xml:space="preserve"><value>Interface language</value></data>
   <data name="Validation.Length.Requirement" xml:space="preserve"><value>From {0} to {1} characters.</value></data>
+  <data name="Validation.Length.Optional" xml:space="preserve"><value>Optional, up to {0} characters.</value></data>
   <data name="Validation.Length.TooShort" xml:space="preserve"><value>{0} of at least {1} characters. Maximum: {2}.</value></data>
   <data name="Validation.Length.Valid" xml:space="preserve"><value>{0} of {1} characters.</value></data>
   <data name="Validation.Length.TooLong" xml:space="preserve"><value>{0} characters; maximum is {1}.</value></data>
@@ -816,7 +817,8 @@
   <data name="Coaching.MapControlEditor.Content.CatalogCurrentPatch" xml:space="preserve"><value>Timings are verified for patch {0}. You only choose when and what TempoCue should remind you about.</value></data>
   <data name="Coaching.MapControlEditor.Content.CatalogPreviousPatch" xml:space="preserve"><value>Patch {0} uses the latest verified timings from patch {1}. Rules remain active and are marked for review.</value></data>
   <data name="Coaching.MapControlEditor.Content.RulesTitle" xml:space="preserve"><value>Objective rules</value></data>
-  <data name="Coaching.MapControlEditor.Content.RulesDescription" xml:space="preserve"><value>TempoCue supplies spawn and respawn times from the patch catalog. Set only the reminder moment and advice.</value></data>
+  <data name="Coaching.MapControlEditor.Content.RulesDescriptionCurrentPatch" xml:space="preserve"><value>TempoCue uses the verified objective timings for patch {1}. Set only the reminder moment and advice.</value></data>
+  <data name="Coaching.MapControlEditor.Content.RulesDescriptionPreviousPatch" xml:space="preserve"><value>Patch {0} uses the latest verified timings from patch {1}. Rules remain active and are marked for review.</value></data>
   <data name="Coaching.MapControlEditor.Content.AddRule" xml:space="preserve"><value>+ Add objective rule</value></data>
   <data name="Coaching.MapControlEditor.Content.EmptyRules" xml:space="preserve"><value>No objective rules yet. Add the first one to continue.</value></data>
   <data name="Coaching.MapControlEditor.Content.Edit" xml:space="preserve"><value>Edit</value></data>
@@ -865,7 +867,9 @@
   <data name="Coaching.MapControlEditor.Content.Editor.LiveSummary" xml:space="preserve"><value>{0}; {1}.</value></data>
   <data name="Coaching.MapControlEditor.Content.Editor.Message" xml:space="preserve"><value>Main advice (the player sees it first)</value></data>
   <data name="Coaching.MapControlEditor.Content.Editor.WhyNow" xml:space="preserve"><value>Why now (short explanation)</value></data>
-  <data name="Coaching.MapControlEditor.Content.Editor.NextGoal" xml:space="preserve"><value>Next goal (what to prepare before the objective)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.NextGoal" xml:space="preserve"><value>What to prepare for the objective (optional)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Card.WhyNow" xml:space="preserve"><value>Why now</value></data>
+  <data name="Coaching.MapControlEditor.Content.Card.Preparation" xml:space="preserve"><value>What to prepare for the objective</value></data>
   <data name="Coaching.MapControlEditor.Content.Editor.Done" xml:space="preserve"><value>Done</value></data>
   <data name="Coaching.MapControlEditor.Content.DuplicateName" xml:space="preserve"><value>{0} — copy</value></data>
   <data name="Coaching.MapControlEditor.Content.Timed.ListTitle" xml:space="preserve"><value>Game-time reminders</value></data>
@@ -876,10 +880,10 @@
   <data name="Coaching.MapControlEditor.Content.Timed.Editor.Progress" xml:space="preserve"><value>Reminder {0} of {1}</value></data>
   <data name="Coaching.MapControlEditor.Content.Timed.GameTime" xml:space="preserve"><value>Game time</value></data>
   <data name="Coaching.MapControlEditor.Content.Timed.GameTime.Hint" xml:space="preserve"><value>Enter minutes (30) or MMSS (1330 = 13:30). 15-second step; once per match.</value></data>
-  <data name="Coaching.MapControlEditor.Content.Timed.Name" xml:space="preserve"><value>Name</value></data>
-  <data name="Coaching.MapControlEditor.Content.Timed.Message" xml:space="preserve"><value>Main advice</value></data>
-  <data name="Coaching.MapControlEditor.Content.Timed.WhyNow" xml:space="preserve"><value>Why now</value></data>
-  <data name="Coaching.MapControlEditor.Content.Timed.NextGoal" xml:space="preserve"><value>Next goal</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Name" xml:space="preserve"><value>Name (short label in the list)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Message" xml:space="preserve"><value>Main advice (the player sees it first)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.WhyNow" xml:space="preserve"><value>Why now (short explanation)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.NextGoal" xml:space="preserve"><value>What to prepare for the objective (optional)</value></data>
   <data name="Coaching.MapControlEditor.Content.Timed.Future.Title" xml:space="preserve"><value>Available after mini-map analysis</value></data>
   <data name="Coaching.MapControlEditor.Content.Timed.Future.Description" xml:space="preserve"><value>The first version does not analyze the mini-map image, so these conditions cannot be selected yet.</value></data>
   <data name="Coaching.MapControlEditor.Content.Timed.Future.Items" xml:space="preserve"><value>Enemy jungler spotted · Opponent missing from lane · Enemy ward placed · Team grouped at an objective</value></data>

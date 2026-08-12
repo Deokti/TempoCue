@@ -13,10 +13,11 @@ public static class MapControlTimedReminderValidator
             || reminder.Title.Trim().Length is < 3 or > 80
             || reminder.Message.Trim().Length is < 3 or > 240
             || reminder.WhyNow.Trim().Length is < 3 or > 240
-            || reminder.NextGoal.Trim().Length is < 3 or > 240)
+            || reminder.NextGoal is null
+            || reminder.NextGoal.Trim().Length > 240)
         {
             throw new InvalidDataException(
-                "Map Control timed reminder requires a valid id and complete advice text.");
+                "Map Control timed reminder requires a valid id and advice text.");
         }
 
         if (reminder.GameTime < TimeSpan.Zero
