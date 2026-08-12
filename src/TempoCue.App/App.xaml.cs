@@ -70,6 +70,9 @@ public partial class App : System.Windows.Application
         var importCoachPack = new ImportCoachPackUseCase(
             coachPackStore,
             builtInPacks.Select(static pack => pack.Id));
+        var importMapControlPack = new ImportMapControlPackUseCase(
+            mapControlPackStore,
+            []);
         var activeCoachPackSelector = new SelectActiveCoachPackUseCase(
             builtInPacks,
             loadCoachPackLibrary);
@@ -169,7 +172,9 @@ public partial class App : System.Windows.Application
             mapControlPackDetailsViewModel,
             new CoachPackImportDialogViewModel(
                 LocalizationService.Instance,
-                importCoachPack),
+                new ImportPortableCoachPackUseCase(
+                    importCoachPack,
+                    importMapControlPack)),
             new PackTypeSelectionViewModel(),
             matchupEditorViewModel,
             mapControlEditorViewModel);

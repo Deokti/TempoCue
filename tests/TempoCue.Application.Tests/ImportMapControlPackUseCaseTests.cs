@@ -3,6 +3,27 @@ namespace TempoCue.Application.Tests;
 public sealed class ImportMapControlPackUseCaseTests
 {
     [Fact]
+    public async Task PortableImport_DetectsMapControlPackAndUsesMapControlStore()
+    {
+        var store = new TestMapControlPackStore();
+        var useCase = new ImportPortableCoachPackUseCase(
+            new ImportCoachPackUseCase(new UnusedCoachPackStore(), []),
+            new ImportMapControlPackUseCase(store, []));
+        var pack = TestMapControlPackFactory.Create("map-control.portable-import");
+        await using var source = await CreatePortableStreamAsync(pack);
+
+        var preview = await useCase.InspectAsync(source);
+        var result = await useCase.ExecuteAsync(preview);
+
+        Assert.NotNull(preview.MapControlPack);
+        Assert.Null(preview.MatchupPack);
+        Assert.True(result.Succeeded);
+        var entry = Assert.Single((await store.LoadAsync()).Entries);
+        Assert.Equal(pack.Id, entry.Pack.Id);
+        Assert.Equal(LocalCoachPackOrigin.Imported, entry.Origin);
+    }
+
+    [Fact]
     public async Task InspectAndExecute_NewPack_ImportsItDisabled()
     {
         var store = new TestMapControlPackStore();
@@ -76,5 +97,35 @@ public sealed class ImportMapControlPackUseCaseTests
         await MapControlPackWriter.WriteAsync(stream, pack);
         stream.Position = 0;
         return stream;
+    }
+
+    private sealed class UnusedCoachPackStore : ICoachPackStore
+    {
+        public Task<CoachPackLibrarySnapshot> LoadAsync(
+            CancellationToken cancellationToken = default) =>
+            throw new InvalidOperationException("Matchup store must not be used for a map pack.");
+
+        public Task<CoachPackSaveResult> SaveAsync(
+            CoachPack pack,
+            LocalCoachPackState state,
+            CancellationToken cancellationToken = default) =>
+            throw new InvalidOperationException("Matchup store must not be used for a map pack.");
+
+        public Task<CoachPackSaveResult> ImportAsync(
+            CoachPack pack,
+            LocalCoachPackState state,
+            CancellationToken cancellationToken = default) =>
+            throw new InvalidOperationException("Matchup store must not be used for a map pack.");
+
+        public Task SetStateAsync(
+            string packId,
+            LocalCoachPackState state,
+            CancellationToken cancellationToken = default) =>
+            throw new InvalidOperationException("Matchup store must not be used for a map pack.");
+
+        public Task<bool> DeleteAsync(
+            string packId,
+            CancellationToken cancellationToken = default) =>
+            throw new InvalidOperationException("Matchup store must not be used for a map pack.");
     }
 }

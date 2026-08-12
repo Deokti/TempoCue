@@ -75,4 +75,40 @@ public sealed class CoachPackImportViewTests
         Assert.False(WpfTestHost.Find<Button>(dialog, "ConfirmImportButton").IsVisible);
         SaveVisualSnapshotIfRequested(context.Window, "coach-pack-import-invalid.png");
     });
+
+    [Fact]
+    public void ValidMapControlPack_ShowsPreviewAndCanBeImportedFromDialog() => WpfTestHost.Run(() =>
+    {
+        using var context = new MainWindowTestContext();
+        OpenLibrary(context);
+        var pack = TestMapControlPackFactory.Create("map-control.import-view.new") with
+        {
+            Name = "Контроль нейтральных объектов",
+            Description = "Напоминания о нейтральных объектах и подготовке к ним."
+        };
+        using var source = new MemoryStream();
+        MapControlPackWriter.WriteAsync(source, pack).GetAwaiter().GetResult();
+        source.Position = 0;
+
+        context.Coaching.OpenImportAsync(source).GetAwaiter().GetResult();
+        WpfTestHost.Pump(DispatcherPriority.ApplicationIdle);
+
+        var dialog = context.CoachPackImportDialog;
+        Assert.Equal(Visibility.Visible, dialog.Visibility);
+        Assert.True(context.Coaching.Import.IsMapControlPreview);
+        Assert.Contains("Контроль карты", context.Coaching.Import.PreviewContextLabel);
+        var confirmButton = WpfTestHost.Find<Button>(dialog, "ConfirmImportButton");
+        Assert.True(confirmButton.IsVisible);
+        Assert.True(confirmButton.IsEnabled);
+        SaveVisualSnapshotIfRequested(context.Window, "map-control-pack-import-preview.png");
+
+        WpfTestHost.Click(confirmButton);
+        WpfTestHost.Pump(DispatcherPriority.ApplicationIdle);
+
+        Assert.False(context.Coaching.Import.IsOpen);
+        var card = context.Coaching.Library.FindMapControlCard(pack.Id);
+        Assert.NotNull(card);
+        Assert.Equal(CoachingPackOrigin.Imported, card.Origin);
+        Assert.False(card.IsEnabled);
+    });
 }

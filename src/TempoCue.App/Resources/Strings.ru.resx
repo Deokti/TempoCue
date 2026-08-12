@@ -232,6 +232,9 @@
   <data name="Coaching.Import.Preview.Language" xml:space="preserve"><value>Язык содержимого</value></data>
   <data name="Coaching.Import.Preview.Patch" xml:space="preserve"><value>Игровой патч</value></data>
   <data name="Coaching.Import.Preview.Contents" xml:space="preserve"><value>Содержимое</value></data>
+  <data name="Coaching.Import.Preview.Matchup.Context" xml:space="preserve"><value>{0} · {1}</value></data>
+  <data name="Coaching.Import.Preview.Matchup.Contents" xml:space="preserve"><value>{0} · {1}</value></data>
+  <data name="Coaching.Import.Preview.MapControl.Context" xml:space="preserve"><value>Контроль карты · {0} · сторона: {1}</value></data>
   <data name="Coaching.Import.Status.Loading.Title" xml:space="preserve"><value>Проверяем файл</value></data>
   <data name="Coaching.Import.Status.Loading.Message" xml:space="preserve"><value>TempoCue проверяет версию схемы и содержимое Coach Pack.</value></data>
   <data name="Coaching.Import.Status.Ready.Title" xml:space="preserve"><value>Можно импортировать</value></data>

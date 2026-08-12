@@ -169,15 +169,11 @@
                                    Foreground="#F4F7FB"
                                    FontSize="{StaticResource Typography.FontSize.SectionTitle}"
                                    FontWeight="SemiBold" />
-                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                            <TextBlock Text="{Binding MatchupLabel}"
-                                       Foreground="#67C7F5"
-                                       FontSize="{StaticResource Typography.FontSize.Body}" />
-                            <TextBlock Text=" · " Foreground="#5F7592" />
-                            <TextBlock Text="{Binding RoleLabel}"
-                                       Foreground="#AFC0D6"
-                                       FontSize="{StaticResource Typography.FontSize.Body}" />
-                        </StackPanel>
+                        <TextBlock Text="{Binding PreviewContextLabel}"
+                                   Foreground="#67C7F5"
+                                   FontSize="{StaticResource Typography.FontSize.Body}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,5,0,0" />
                         <TextBlock Text="{Binding Description}"
                                    Foreground="#AFC0D6"
                                    FontSize="{StaticResource Typography.FontSize.BodyLarge}"
@@ -212,11 +208,11 @@
                             <TextBlock Grid.Row="6"
                                        Text="{localization:Loc Coaching.Import.Preview.Contents}"
                                        Foreground="#7188A6" />
-                            <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal">
-                                <TextBlock Text="{Binding AdviceCountLabel}" Foreground="#E7EEF8" />
-                                <TextBlock Text=" · " Foreground="#5F7592" />
-                                <TextBlock Text="{Binding ItemBlockCountLabel}" Foreground="#E7EEF8" />
-                            </StackPanel>
+                            <TextBlock Grid.Row="6"
+                                       Grid.Column="1"
+                                       Text="{Binding PreviewContentsLabel}"
+                                       Foreground="#E7EEF8"
+                                       TextWrapping="Wrap" />
                         </Grid>
                     </StackPanel>
                 </Border>

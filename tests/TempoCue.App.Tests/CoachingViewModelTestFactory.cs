@@ -42,7 +42,9 @@ internal static class CoachingViewModelTestFactory
             new ExportCoachPackUseCase());
         var import = new CoachPackImportDialogViewModel(
             resolvedLocalization,
-            new ImportCoachPackUseCase(resolvedStore, [builtInPack.Id]));
+            new ImportPortableCoachPackUseCase(
+                new ImportCoachPackUseCase(resolvedStore, [builtInPack.Id]),
+                new ImportMapControlPackUseCase(resolvedMapControlStore, [])));
         return new CoachingViewModel(
             resolvedLocalization,
             library,
