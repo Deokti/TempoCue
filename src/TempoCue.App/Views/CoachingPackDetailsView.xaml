@@ -15,34 +15,6 @@
                 <ResourceDictionary Source="../Styles/FormControls.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- Кнопки вкладок повторяют компактный сегментированный контрол макета. -->
-            <Style x:Key="DetailsTabButton" TargetType="Button">
-                <Setter Property="Height" Value="34" />
-                <Setter Property="Padding" Value="17,6" />
-                <Setter Property="Foreground" Value="#7F93AF" />
-                <Setter Property="Background" Value="Transparent" />
-                <Setter Property="BorderThickness" Value="0" />
-                <Setter Property="FontSize" Value="{StaticResource Typography.FontSize.BodyLarge}" />
-                <Setter Property="Cursor" Value="Hand" />
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="Button">
-                            <Border x:Name="TabBorder"
-                                    Background="{TemplateBinding Background}"
-                                    CornerRadius="14"
-                                    Padding="{TemplateBinding Padding}">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="TabBorder" Property="Background" Value="#16243A" />
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-
             <!-- В заголовке наборов переключатель меньше карточного, чтобы не увеличивать строку действий. -->
             <Style x:Key="DetailsCompactSwitch"
                    TargetType="ToggleButton"
@@ -226,19 +198,13 @@
             </Grid>
 
             <!-- Вкладки содержат только данные выбранного набора и не открывают редактор. -->
-            <Border Grid.Row="2"
-                    Background="#0D1625"
-                    BorderBrush="#263750"
-                    BorderThickness="1"
-                    CornerRadius="18"
-                    Padding="3"
-                    HorizontalAlignment="Left">
+            <Border Grid.Row="2" Style="{StaticResource PackDetailsTabsContainer}">
                 <StackPanel Orientation="Horizontal">
                     <Button x:Name="PackOverviewTabButton"
                             Content="{localization:Loc Coaching.Details.Tab.Overview}"
                             Click="OverviewTabButton_Click">
                         <Button.Style>
-                            <Style TargetType="Button" BasedOn="{StaticResource DetailsTabButton}">
+                            <Style TargetType="Button" BasedOn="{StaticResource PackDetailsTabButton}">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding IsOverviewTab}" Value="True">
                                         <Setter Property="Foreground" Value="#F4F7FB" />
@@ -253,7 +219,7 @@
                             Content="{localization:Loc Coaching.Details.Tab.Advice}"
                             Click="AdviceTabButton_Click">
                         <Button.Style>
-                            <Style TargetType="Button" BasedOn="{StaticResource DetailsTabButton}">
+                            <Style TargetType="Button" BasedOn="{StaticResource PackDetailsTabButton}">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding IsAdviceTab}" Value="True">
                                         <Setter Property="Foreground" Value="#F4F7FB" />
@@ -268,7 +234,7 @@
                             Content="{localization:Loc Coaching.Details.Tab.Items}"
                             Click="ItemsTabButton_Click">
                         <Button.Style>
-                            <Style TargetType="Button" BasedOn="{StaticResource DetailsTabButton}">
+                            <Style TargetType="Button" BasedOn="{StaticResource PackDetailsTabButton}">
                                 <Setter Property="Visibility" Value="Collapsed" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding HasItemBlocks}" Value="True">

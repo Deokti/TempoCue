@@ -18,6 +18,7 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
     private readonly DeleteCoachPackUseCase _deleteCoachPack;
     private readonly LoadMapControlPackLibraryUseCase _loadMapControlPackLibrary;
     private readonly SetMapControlPackStateUseCase _setMapControlPackState;
+    private readonly DeleteMapControlPackUseCase _deleteMapControlPack;
     private readonly CoachingPackCardFactory _cardFactory;
     private readonly MapControlPackCardFactory _mapControlCardFactory;
     private readonly SemaphoreSlim _refreshLock = new(1, 1);
@@ -52,7 +53,8 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
         SetCoachPackStateUseCase setCoachPackState,
         DeleteCoachPackUseCase deleteCoachPack,
         LoadMapControlPackLibraryUseCase loadMapControlPackLibrary,
-        SetMapControlPackStateUseCase setMapControlPackState)
+        SetMapControlPackStateUseCase setMapControlPackState,
+        DeleteMapControlPackUseCase deleteMapControlPack)
     {
         ArgumentNullException.ThrowIfNull(builtInPacks);
         _builtInPacks = builtInPacks.ToArray();
@@ -68,6 +70,8 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
             ?? throw new ArgumentNullException(nameof(loadMapControlPackLibrary));
         _setMapControlPackState = setMapControlPackState
             ?? throw new ArgumentNullException(nameof(setMapControlPackState));
+        _deleteMapControlPack = deleteMapControlPack
+            ?? throw new ArgumentNullException(nameof(deleteMapControlPack));
         _cardFactory = new CoachingPackCardFactory(localization);
         _mapControlCardFactory = new MapControlPackCardFactory(localization);
         _localization.PropertyChanged += Localization_PropertyChanged;
@@ -266,6 +270,12 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
         }
     }
 
+    public MapControlPackCardViewModel? FindMapControlCard(string packId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(packId);
+        return _allMapControlCards.FirstOrDefault(card => card.Pack.Id == packId);
+    }
+
     public async Task<bool> SetMapControlPackEnabledAsync(
         MapControlPackCardViewModel card,
         bool isEnabled,
@@ -411,6 +421,41 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
         MyPackCards = filteredCards
             .Where(static card => card.IsCreatedByUser)
             .ToArray();
+    }
+
+    public async Task<bool> DeleteMapControlPackAsync(
+        MapControlPackCardViewModel card,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(card);
+        IsLibraryMessageSuccess = false;
+        if (!card.CanDelete)
+        {
+            return false;
+        }
+
+        try
+        {
+            if (!await _deleteMapControlPack.ExecuteAsync(card.Pack.Id, cancellationToken))
+            {
+                LibraryMessage = _localization.Get("Coaching.Library.DeleteFailed");
+                return false;
+            }
+
+            await RefreshAsync(cancellationToken);
+            IsLibraryMessageSuccess = true;
+            LibraryMessage = _localization.Format("Coaching.Library.Deleted", card.Title);
+            return true;
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            return false;
+        }
+        catch (Exception exception) when (IsExpectedLibraryException(exception))
+        {
+            LibraryMessage = _localization.Get("Coaching.Library.DeleteFailed");
+            return false;
+        }
     }
 
     private bool MatchesMapControlSearch(MapControlPackCardViewModel card)

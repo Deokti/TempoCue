@@ -43,7 +43,8 @@ public sealed class CoachingLibraryViewModelTests
             new SetCoachPackStateUseCase(store),
             new DeleteCoachPackUseCase(store),
             new LoadMapControlPackLibraryUseCase(mapControlStore),
-            new SetMapControlPackStateUseCase(mapControlStore));
+            new SetMapControlPackStateUseCase(mapControlStore),
+            new DeleteMapControlPackUseCase(mapControlStore));
     }
 
     private static CoachPack CreatePack(string id) =>

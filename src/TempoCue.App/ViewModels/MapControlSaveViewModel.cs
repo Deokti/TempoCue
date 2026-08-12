@@ -20,6 +20,8 @@ public sealed class MapControlSaveViewModel : ObservableObject
     private string _sourceAuthor = string.Empty;
     private string _sourceUrl = string.Empty;
     private string? _targetPackId;
+    private string? _forkedFromPackId;
+    private string? _forkedFromAuthor;
     private bool _isSaving;
     private bool _hasSaveError;
     private string _saveStatus = string.Empty;
@@ -163,10 +165,25 @@ public sealed class MapControlSaveViewModel : ObservableObject
     public void BeginNew()
     {
         _targetPackId = null;
+        _forkedFromPackId = null;
+        _forkedFromAuthor = null;
         SelectedSourceKind = CoachPackSourceKind.PersonalExperience;
         SourceTitle = string.Empty;
         SourceAuthor = string.Empty;
         SourceUrl = string.Empty;
+        ResetSaveResult();
+    }
+
+    public void Load(MapControlPack pack, bool createCopy)
+    {
+        ArgumentNullException.ThrowIfNull(pack);
+        _targetPackId = createCopy ? null : pack.Id;
+        _forkedFromPackId = createCopy ? pack.Id : pack.ForkedFromPackId;
+        _forkedFromAuthor = createCopy ? pack.Author : pack.ForkedFromAuthor;
+        SelectedSourceKind = pack.Source?.Kind ?? CoachPackSourceKind.PersonalExperience;
+        SourceTitle = pack.Source?.Title ?? string.Empty;
+        SourceAuthor = pack.Source?.Author ?? string.Empty;
+        SourceUrl = pack.Source?.Url ?? string.Empty;
         ResetSaveResult();
     }
 
@@ -242,7 +259,9 @@ public sealed class MapControlSaveViewModel : ObservableObject
                 SourceTitle,
                 SourceUrl,
                 SourceAuthor),
-            _targetPackId);
+            _targetPackId,
+            _forkedFromPackId,
+            _forkedFromAuthor);
     }
 
     private void ResetSaveResult()

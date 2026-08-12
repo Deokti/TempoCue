@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using TempoCue.App.Localization;
 using TempoCue.Application;
+using TempoCue.Coaching;
 
 namespace TempoCue.App.ViewModels;
 
@@ -10,6 +11,7 @@ public sealed class MapControlEditorViewModel : ObservableObject
     private readonly LocalizationService _localization;
     private int _currentStep = 1;
     private int _highestVisitedStep = 1;
+    private MatchupEditorMode _mode;
 
     public MapControlEditorViewModel(
         LocalizationService localization,
@@ -60,6 +62,32 @@ public sealed class MapControlEditorViewModel : ObservableObject
     public int CurrentStepIndex => CurrentStep - 1;
 
     public int TotalSteps => 5;
+
+    public MatchupEditorMode Mode
+    {
+        get => _mode;
+        private set
+        {
+            if (SetProperty(ref _mode, value))
+            {
+                OnPropertyChanged(nameof(IsEditingExisting));
+                OnPropertyChanged(nameof(ReturnsToPackDetails));
+                OnPropertyChanged(nameof(ModeLabel));
+                NotifyNavigationChanged();
+            }
+        }
+    }
+
+    public bool IsEditingExisting => Mode == MatchupEditorMode.Edit;
+
+    public bool ReturnsToPackDetails => Mode is MatchupEditorMode.Edit or MatchupEditorMode.Copy;
+
+    public string ModeLabel => _localization.Get(Mode switch
+    {
+        MatchupEditorMode.Edit => "Coaching.MatchupEditor.Mode.Edit",
+        MatchupEditorMode.Copy => "Coaching.MatchupEditor.Mode.Copy",
+        _ => "Coaching.MatchupEditor.Draft"
+    });
 
     public string StepSummary => _localization.Get(CurrentStep switch
     {
@@ -117,8 +145,17 @@ public sealed class MapControlEditorViewModel : ObservableObject
 
     public bool CanNavigateToStep(int targetStep)
     {
-        if (targetStep is < 1 or > 5
-            || targetStep > Math.Min(TotalSteps, _highestVisitedStep + 1))
+        if (targetStep is < 1 or > 5)
+        {
+            return false;
+        }
+
+        if (Mode == MatchupEditorMode.Edit)
+        {
+            return true;
+        }
+
+        if (targetStep > Math.Min(TotalSteps, _highestVisitedStep + 1))
         {
             return false;
         }
@@ -142,10 +179,31 @@ public sealed class MapControlEditorViewModel : ObservableObject
         Verification.UpdateLanguage();
         Save.UpdateLanguage();
         OnPropertyChanged(nameof(StepSummary));
+        OnPropertyChanged(nameof(ModeLabel));
+    }
+
+    public async Task LoadAsync(
+        MapControlPack pack,
+        LocalCoachPackState state,
+        bool createCopy,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(pack);
+        await MainInformation.EnsureGamePatchCatalogLoadedAsync(cancellationToken);
+        MainInformation.Load(pack, createCopy);
+        Scope.Load(pack.Applicability);
+        Content.SetPatch(pack.Patch);
+        Content.Load(pack);
+        Save.Load(pack, createCopy);
+        Mode = createCopy ? MatchupEditorMode.Copy : MatchupEditorMode.Edit;
+        _highestVisitedStep = createCopy ? 1 : TotalSteps;
+        CurrentStep = 1;
+        NotifyNavigationChanged();
     }
 
     private void BeginNew()
     {
+        Mode = MatchupEditorMode.Create;
         _highestVisitedStep = 1;
         _currentStep = 1;
         MainInformation.BeginNew();

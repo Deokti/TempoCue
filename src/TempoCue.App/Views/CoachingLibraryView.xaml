@@ -269,17 +269,17 @@
                             </Border>
                         </WrapPanel>
 
-                        <!-- Экран просмотра появится в следующей итерации; кнопка уже занимает итоговое место. -->
                         <Grid Grid.Row="3">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <Button Content="{localization:Loc Coaching.Library.Open}"
+                            <Button x:Name="OpenMapControlPackButton"
+                                    Content="{localization:Loc Coaching.Library.Open}"
                                     Style="{StaticResource SecondaryButton}"
                                     HorizontalAlignment="Left"
-                                    IsEnabled="False"
-                                    ToolTip="{localization:Loc Coaching.MapControl.Library.OpenUnavailable}" />
+                                    Click="OpenMapControlPackButton_Click" />
                             <ToggleButton x:Name="MapControlPackEnabledToggle"
                                           Grid.Column="1"
                                           Style="{StaticResource TempoSwitch}"
@@ -287,6 +287,13 @@
                                           ToolTip="{localization:Loc Coaching.Library.Toggle}"
                                           AutomationProperties.Name="{localization:Loc Coaching.Library.Toggle}"
                                           Click="MapControlPackEnabledToggle_Click" />
+                            <views:CoachPackActionsMenu Grid.Column="2"
+                                                       Margin="8,0,0,0"
+                                                       CanExport="True"
+                                                       CanDelete="{Binding CanDelete}"
+                                                       DeleteActionLabel="{Binding DeleteActionLabel}"
+                                                       ExportRequested="MapControlPackActionsMenu_ExportRequested"
+                                                       DeleteRequested="MapControlPackActionsMenu_DeleteRequested" />
                         </Grid>
                     </Grid>
                 </Border>

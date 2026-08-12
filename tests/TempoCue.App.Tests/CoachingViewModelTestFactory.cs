@@ -26,7 +26,8 @@ internal static class CoachingViewModelTestFactory
             new SetCoachPackStateUseCase(resolvedStore),
             new DeleteCoachPackUseCase(resolvedStore),
             new LoadMapControlPackLibraryUseCase(resolvedMapControlStore),
-            new SetMapControlPackStateUseCase(resolvedMapControlStore));
+            new SetMapControlPackStateUseCase(resolvedMapControlStore),
+            new DeleteMapControlPackUseCase(resolvedMapControlStore));
         var itemCatalog = TestItemCatalog.Ready();
         var editor = new MatchupEditorViewModel(
             resolvedLocalization,
@@ -46,6 +47,9 @@ internal static class CoachingViewModelTestFactory
             resolvedLocalization,
             library,
             details,
+            new MapControlPackDetailsViewModel(
+                resolvedLocalization,
+                new ExportMapControlPackUseCase()),
             import,
             new PackTypeSelectionViewModel(),
             editor,

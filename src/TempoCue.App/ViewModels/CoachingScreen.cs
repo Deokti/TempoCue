@@ -5,6 +5,7 @@ public enum CoachingScreen
 {
     Library,
     PackDetails,
+    MapControlPackDetails,
     PackTypeSelection,
     MatchupEditor,
     MapControlEditor

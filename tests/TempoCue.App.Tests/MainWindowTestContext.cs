@@ -73,6 +73,9 @@ internal sealed class MainWindowTestContext : IDisposable
     public CoachingPackDetailsView CoachingPackDetailsPage =>
         WpfTestHost.Find<CoachingPackDetailsView>(CoachingPage, "CoachingPackDetailsPage");
 
+    public MapControlPackDetailsView MapControlPackDetailsPage =>
+        WpfTestHost.Find<MapControlPackDetailsView>(CoachingPage, "MapControlPackDetailsPage");
+
     public CoachPackImportDialogView CoachPackImportDialog =>
         WpfTestHost.Find<CoachPackImportDialogView>(CoachingPage, "CoachPackImportDialog");
 

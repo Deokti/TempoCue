@@ -951,4 +951,22 @@
   <data name="Coaching.MapControlEditor.Save.Status.DraftSaved" xml:space="preserve"><value>Draft saved locally.</value></data>
   <data name="Coaching.MapControlEditor.Save.Status.EnabledSaved" xml:space="preserve"><value>Map Control Pack saved and enabled.</value></data>
   <data name="Coaching.MapControlEditor.Save.Status.Failed" xml:space="preserve"><value>Could not save the pack. Check access to TempoCue local application data.</value></data>
+  <data name="Coaching.MapControl.Details.Header" xml:space="preserve"><value>Map control · {0} · {1} · {2}</value></data>
+  <data name="Coaching.MapControl.Details.Export.Filter" xml:space="preserve"><value>TempoCue Map Control Pack (*.tempocue.json)|*.tempocue.json|JSON (*.json)|*.json</value></data>
+  <data name="Coaching.MapControl.Details.Tab.Overview" xml:space="preserve"><value>Overview</value></data>
+  <data name="Coaching.MapControl.Details.Tab.Objectives" xml:space="preserve"><value>Objectives</value></data>
+  <data name="Coaching.MapControl.Details.Tab.Timed" xml:space="preserve"><value>Timed reminders</value></data>
+  <data name="Coaching.MapControl.Details.Tab.Persistent" xml:space="preserve"><value>Persistent tips</value></data>
+  <data name="Coaching.MapControl.Details.Overview.Type" xml:space="preserve"><value>Map control</value></data>
+  <data name="Coaching.MapControl.Details.Overview.Roles" xml:space="preserve"><value>Roles</value></data>
+  <data name="Coaching.MapControl.Details.Overview.TeamSide" xml:space="preserve"><value>Team side</value></data>
+  <data name="Coaching.MapControl.Details.Overview.Content" xml:space="preserve"><value>Pack content</value></data>
+  <data name="Coaching.MapControl.Details.Overview.ContentValue" xml:space="preserve"><value>{0} objective rules · {1} timed reminders · {2} persistent tips</value></data>
+  <data name="Coaching.MapControl.Details.Objectives.Title" xml:space="preserve"><value>Objective rules</value></data>
+  <data name="Coaching.MapControl.Details.Objectives.Empty" xml:space="preserve"><value>This pack does not contain objective rules.</value></data>
+  <data name="Coaching.MapControl.Details.Timed.Title" xml:space="preserve"><value>Timed reminders</value></data>
+  <data name="Coaching.MapControl.Details.Timed.Empty" xml:space="preserve"><value>This pack does not contain timed reminders.</value></data>
+  <data name="Coaching.MapControl.Details.Persistent.Title" xml:space="preserve"><value>Persistent tips</value></data>
+  <data name="Coaching.MapControl.Details.Persistent.Empty" xml:space="preserve"><value>This pack does not contain persistent tips.</value></data>
+  <data name="Coaching.MapControl.Details.ReadOnly" xml:space="preserve"><value>Read-only. Open the pack editor to change its content.</value></data>
 </root>

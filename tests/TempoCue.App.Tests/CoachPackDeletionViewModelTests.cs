@@ -63,4 +63,29 @@ public sealed class CoachPackDeletionViewModelTests
         Assert.Equal(CoachingScreen.PackDetails, viewModel.CurrentScreen);
         Assert.NotNull(viewModel.Library.FindCard(builtInPack.Id));
     }
+
+    [Fact]
+    public async Task DeleteSelectedPackAsync_RemovesLocalMapControlPackAndReturnsToLibrary()
+    {
+        var store = new TestMapControlPackStore();
+        var pack = TestMapControlPackFactory.Create("map-control.local.delete-test");
+        await store.SaveAsync(pack, LocalCoachPackState.Enabled);
+        using var viewModel = CoachingViewModelTestFactory.Create(
+            TestCoachPackFactory.CreateMatchup(),
+            LocalizationService.Instance,
+            mapControlStore: store);
+        await viewModel.Library.EnsureLoadedAsync();
+        var card = viewModel.Library.FindMapControlCard(pack.Id);
+        Assert.NotNull(card);
+        viewModel.OpenMapControlPackDetails(card);
+
+        var deleted = await viewModel.DeleteSelectedPackAsync();
+
+        Assert.True(deleted);
+        Assert.Equal(CoachingScreen.Library, viewModel.CurrentScreen);
+        Assert.Null(viewModel.Library.FindMapControlCard(pack.Id));
+        Assert.True(viewModel.Library.IsLibraryMessageSuccess);
+        Assert.Contains(card.Title, viewModel.Library.LibraryMessage);
+        Assert.Empty((await store.LoadAsync()).Entries);
+    }
 }

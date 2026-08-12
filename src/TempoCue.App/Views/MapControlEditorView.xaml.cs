@@ -44,6 +44,9 @@ public partial class MapControlEditorView : UserControl
         }
     }
 
+    private void CloseMapControlEditorButton_Click(object sender, RoutedEventArgs e) =>
+        BackRequested?.Invoke(this, EventArgs.Empty);
+
     private async void MapControlSaveDraftButton_Click(object sender, RoutedEventArgs e) =>
         await SaveAndCloseAsync(LocalCoachPackState.Draft);
 

@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using TempoCue.App.Localization;
 using TempoCue.Application;
+using TempoCue.Coaching;
 
 namespace TempoCue.App.ViewModels;
 
@@ -115,6 +116,22 @@ public sealed class MapControlMainInformationViewModel : ObservableObject
         ShortDescription = string.Empty;
         ContentLanguageCode = _localization.CurrentLanguageCode;
         PatchSelection.ResetToCurrent();
+    }
+
+    public void Load(MapControlPack pack, bool createCopy)
+    {
+        ArgumentNullException.ThrowIfNull(pack);
+        var packName = createCopy
+            ? _localization.Format("Coaching.MatchupEditor.CopyName", pack.Name)
+            : pack.Name;
+        PackName = packName.Length <= MaximumNameLength
+            ? packName
+            : packName[..MaximumNameLength].TrimEnd();
+        ShortDescription = pack.Description;
+        ContentLanguageCode = string.IsNullOrWhiteSpace(pack.ContentLanguage)
+            ? _localization.CurrentLanguageCode
+            : pack.ContentLanguage;
+        PatchSelection.SelectPatch(pack.Patch);
     }
 
     public void UpdateLanguage()

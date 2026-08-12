@@ -63,6 +63,7 @@ public partial class App : System.Windows.Application
         var saveMapControlPack = new SaveMapControlPackUseCase(mapControlPackStore);
         var loadMapControlPackLibrary = new LoadMapControlPackLibraryUseCase(mapControlPackStore);
         var setMapControlPackState = new SetMapControlPackStateUseCase(mapControlPackStore);
+        var deleteMapControlPack = new DeleteMapControlPackUseCase(mapControlPackStore);
         var loadCoachPackLibrary = new LoadCoachPackLibraryUseCase(coachPackStore);
         var setCoachPackState = new SetCoachPackStateUseCase(coachPackStore);
         var deleteCoachPack = new DeleteCoachPackUseCase(coachPackStore);
@@ -133,7 +134,8 @@ public partial class App : System.Windows.Application
             setCoachPackState,
             deleteCoachPack,
             loadMapControlPackLibrary,
-            setMapControlPackState);
+            setMapControlPackState,
+            deleteMapControlPack);
         coachingLibraryViewModel.LibraryChanged += (_, _) =>
         {
             activeCoachPackSelector.Invalidate();
@@ -147,6 +149,9 @@ public partial class App : System.Windows.Application
             _itemCatalog,
             buildLeagueItemSetExport,
             new ExportCoachPackUseCase());
+        var mapControlPackDetailsViewModel = new MapControlPackDetailsViewModel(
+            LocalizationService.Instance,
+            new ExportMapControlPackUseCase());
         var matchupEditorViewModel = new MatchupEditorViewModel(
             LocalizationService.Instance,
             _gamePatchCatalog,
@@ -161,6 +166,7 @@ public partial class App : System.Windows.Application
             LocalizationService.Instance,
             coachingLibraryViewModel,
             coachingPackDetailsViewModel,
+            mapControlPackDetailsViewModel,
             new CoachPackImportDialogViewModel(
                 LocalizationService.Instance,
                 importCoachPack),

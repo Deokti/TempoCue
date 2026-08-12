@@ -93,6 +93,38 @@ public partial class CoachingView : UserControl
         ShowDeleteConfirmation();
     }
 
+    private void CoachingLibraryPage_MapControlPackOpenRequested(
+        object? sender,
+        MapControlPackEventArgs e) =>
+        ViewModel.OpenMapControlPackDetails(e.Card);
+
+    private async void CoachingLibraryPage_MapControlPackExportRequested(
+        object? sender,
+        MapControlPackEventArgs e)
+    {
+        ViewModel.SelectMapControlPackForActions(e.Card);
+        var result = await MapControlPackExportFileDialog.ShowAsync(
+            Window.GetWindow(this),
+            ViewModel.MapControlDetails);
+        if (result.HasValue)
+        {
+            ViewModel.Library.ReportExportResult(e.Card.Title, result.Value);
+        }
+    }
+
+    private void CoachingLibraryPage_MapControlPackDeleteRequested(
+        object? sender,
+        MapControlPackEventArgs e)
+    {
+        if (!e.Card.CanDelete)
+        {
+            return;
+        }
+
+        ViewModel.SelectMapControlPackForActions(e.Card);
+        ShowDeleteConfirmation();
+    }
+
     private void CoachingPackDetailsPage_BackRequested(object? sender, EventArgs e)
     {
         ViewModel.Details.Export.Close();
@@ -122,6 +154,33 @@ public partial class CoachingView : UserControl
         }
 
         ShowDeleteConfirmation();
+    }
+
+    private void MapControlPackDetailsPage_BackRequested(object? sender, EventArgs e) =>
+        ViewModel.OpenLibrary();
+
+    private async void MapControlPackDetailsPage_StateChangeRequested(object? sender, EventArgs e)
+    {
+        try
+        {
+            await ViewModel.SetSelectedMapControlPackEnabledAsync(
+                !ViewModel.MapControlDetails.IsEnabled);
+        }
+        finally
+        {
+            MapControlPackDetailsPage.CompleteStateChange();
+        }
+    }
+
+    private async void MapControlPackDetailsPage_EditRequested(object? sender, EventArgs e) =>
+        await ViewModel.OpenSelectedMapControlPackEditorAsync();
+
+    private void MapControlPackDetailsPage_DeleteRequested(object? sender, EventArgs e)
+    {
+        if (ViewModel.MapControlDetails.CanDelete)
+        {
+            ShowDeleteConfirmation();
+        }
     }
 
     private void ShowDeleteConfirmation()
@@ -166,8 +225,8 @@ public partial class CoachingView : UserControl
         {
             MessageBox.Show(
                 Window.GetWindow(this),
-                ViewModel.Details.DeleteFailureMessage,
-                ViewModel.Details.DeleteFailureTitle,
+                ViewModel.DeleteFailureMessage,
+                ViewModel.DeleteFailureTitle,
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
         }
@@ -190,8 +249,11 @@ public partial class CoachingView : UserControl
     private void MapControlEditorPage_BackRequested(object? sender, EventArgs e) =>
         ViewModel.CloseMapControlEditor();
 
-    private void MapControlEditorPage_SaveCompleted(object? sender, EventArgs e) =>
+    private async void MapControlEditorPage_SaveCompleted(object? sender, EventArgs e)
+    {
         ViewModel.OpenLibrary();
+        await ViewModel.Library.RefreshAsync();
+    }
 
     private async void MatchupEditorPage_SaveCompleted(object? sender, EventArgs e)
     {

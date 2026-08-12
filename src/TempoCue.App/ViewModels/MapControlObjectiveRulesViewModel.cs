@@ -243,6 +243,18 @@ public sealed class MapControlObjectiveRulesViewModel : ObservableObject
         NotifyRulesChanged();
     }
 
+    public void Load(IEnumerable<MapObjectiveReminderRule> rules)
+    {
+        ArgumentNullException.ThrowIfNull(rules);
+        BeginNew();
+        foreach (var rule in rules)
+        {
+            SubscribeAndAdd(new MapControlObjectiveRuleViewModel(rule, _localization));
+        }
+
+        NotifyRulesChanged();
+    }
+
     public void UpdateLanguage()
     {
         RebuildObjectiveOptions();

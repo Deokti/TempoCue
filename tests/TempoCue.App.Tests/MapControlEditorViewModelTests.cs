@@ -189,6 +189,25 @@ public sealed class MapControlEditorViewModelTests
         Assert.Equal(string.Empty, savedSource.Url);
     }
 
+    [Fact]
+    public async Task LoadExistingPack_PopulatesAllStepsAndPreservesIdentityOnSave()
+    {
+        var store = new TestMapControlPackStore();
+        var editor = CreateEditor(store);
+        var pack = TestMapControlPackFactory.Create("map-control.edit-test");
+
+        await editor.LoadAsync(pack, LocalCoachPackState.Enabled, createCopy: false);
+
+        Assert.True(editor.IsEditingExisting);
+        Assert.True(editor.ReturnsToPackDetails);
+        Assert.Equal(pack.Name, editor.MainInformation.PackName);
+        Assert.Single(editor.Content.Rules);
+        Assert.True(editor.CanNavigateToStep5);
+        Assert.True(editor.NavigateToStep(5));
+        Assert.True(await editor.Save.SaveAsync(LocalCoachPackState.Enabled));
+        Assert.Equal(pack.Id, store.SavedPack?.Id);
+    }
+
     private static void CompleteMainInformation(MapControlEditorViewModel editor)
     {
         editor.MainInformation.PackName = "Контроль объектов";

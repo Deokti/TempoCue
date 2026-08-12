@@ -10,7 +10,9 @@ internal sealed class MapControlPackFactory
         MapControlScopeViewModel scope,
         MapControlContentViewModel content,
         MapControlSourceDraft sourceDraft,
-        string? packId = null)
+        string? packId = null,
+        string? forkedFromPackId = null,
+        string? forkedFromAuthor = null)
     {
         ArgumentNullException.ThrowIfNull(mainInformation);
         ArgumentNullException.ThrowIfNull(scope);
@@ -29,6 +31,8 @@ internal sealed class MapControlPackFactory
             ContentLanguage = mainInformation.ContentLanguageCode,
             VerifiedOn = DateOnly.FromDateTime(DateTime.Today),
             Source = CreateSource(sourceDraft),
+            ForkedFromPackId = forkedFromPackId,
+            ForkedFromAuthor = forkedFromAuthor,
             Applicability = new MapControlApplicability
             {
                 Roles = scope.SelectedRoles.ToArray(),

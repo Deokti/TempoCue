@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using TempoCue.App.Localization;
+using TempoCue.Coaching;
 using TempoCue.Core;
 
 namespace TempoCue.App.ViewModels;
@@ -145,6 +146,18 @@ public sealed class MapControlContentViewModel : ObservableObject
         TimedReminders.BeginNew();
         PersistentTips.BeginNew();
         NotifyObjectiveRuleBindings();
+    }
+
+    public void Load(MapControlPack pack)
+    {
+        ArgumentNullException.ThrowIfNull(pack);
+        ObjectiveRules.Load(pack.Rules);
+        TimedReminders.Load(pack.TimedReminders);
+        PersistentTips.Load(pack.PersistentTips);
+        Section = MapControlContentSection.Objects;
+        NotifyObjectiveRuleBindings();
+        OnPropertyChanged(nameof(HasContent));
+        OnPropertyChanged(nameof(IsComplete));
     }
 
     public void UpdateLanguage()

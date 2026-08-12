@@ -14,7 +14,8 @@ public sealed record MapControlPackCardViewModel(
     string StateLabel,
     string OriginLabel,
     string ContentLanguageLabel,
-    string PatchLabel)
+    string PatchLabel,
+    string DeleteActionLabel)
 {
     public bool IsEnabled => State == LocalCoachPackState.Enabled;
 
@@ -23,4 +24,11 @@ public sealed record MapControlPackCardViewModel(
     public bool IsDisabled => State == LocalCoachPackState.Disabled;
 
     public bool IsCreatedByUser => Origin == CoachingPackOrigin.CreatedByUser;
+
+    public bool CanEdit => Origin == CoachingPackOrigin.CreatedByUser;
+
+    public bool CanCreateCopy => !CanEdit;
+
+    public bool CanDelete => Origin != CoachingPackOrigin.BuiltIn;
+
 }

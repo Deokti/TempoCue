@@ -158,6 +158,18 @@ public sealed class MapControlTimedRemindersViewModel : ObservableObject
         NotifyCollectionChanged();
     }
 
+    public void Load(IEnumerable<MapControlTimedReminder> reminders)
+    {
+        ArgumentNullException.ThrowIfNull(reminders);
+        BeginNew();
+        foreach (var reminder in reminders.OrderBy(static value => value.GameTime))
+        {
+            _reminders.Add(new MapControlTimedReminderViewModel(reminder, _localization));
+        }
+
+        NotifyCollectionChanged();
+    }
+
     public void UpdateLanguage()
     {
         Editor.UpdateLanguage();

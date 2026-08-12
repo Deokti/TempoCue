@@ -175,6 +175,18 @@ public sealed class MapControlPersistentTipsViewModel : ObservableObject
         NotifyCollectionChanged();
     }
 
+    public void Load(IEnumerable<MapControlPersistentTip> tips)
+    {
+        ArgumentNullException.ThrowIfNull(tips);
+        BeginNew();
+        foreach (var tip in tips)
+        {
+            _tips.Add(new MapControlPersistentTipViewModel(tip, _localization));
+        }
+
+        NotifyCollectionChanged();
+    }
+
     public void UpdateLanguage()
     {
         Editor.UpdateLanguage();

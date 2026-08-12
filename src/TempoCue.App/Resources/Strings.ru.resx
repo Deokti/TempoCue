@@ -961,4 +961,22 @@
   <data name="Coaching.MapControlEditor.Save.Status.DraftSaved" xml:space="preserve"><value>Черновик сохранён локально.</value></data>
   <data name="Coaching.MapControlEditor.Save.Status.EnabledSaved" xml:space="preserve"><value>Набор контроля карты сохранён и включён.</value></data>
   <data name="Coaching.MapControlEditor.Save.Status.Failed" xml:space="preserve"><value>Не удалось сохранить набор. Проверьте доступ к локальным данным TempoCue.</value></data>
+  <data name="Coaching.MapControl.Details.Header" xml:space="preserve"><value>Контроль карты · {0} · {1} · {2}</value></data>
+  <data name="Coaching.MapControl.Details.Export.Filter" xml:space="preserve"><value>Набор контроля карты TempoCue (*.tempocue.json)|*.tempocue.json|JSON (*.json)|*.json</value></data>
+  <data name="Coaching.MapControl.Details.Tab.Overview" xml:space="preserve"><value>Обзор</value></data>
+  <data name="Coaching.MapControl.Details.Tab.Objectives" xml:space="preserve"><value>Объекты</value></data>
+  <data name="Coaching.MapControl.Details.Tab.Timed" xml:space="preserve"><value>По времени</value></data>
+  <data name="Coaching.MapControl.Details.Tab.Persistent" xml:space="preserve"><value>Постоянные</value></data>
+  <data name="Coaching.MapControl.Details.Overview.Type" xml:space="preserve"><value>Контроль карты</value></data>
+  <data name="Coaching.MapControl.Details.Overview.Roles" xml:space="preserve"><value>Роли</value></data>
+  <data name="Coaching.MapControl.Details.Overview.TeamSide" xml:space="preserve"><value>Сторона команды</value></data>
+  <data name="Coaching.MapControl.Details.Overview.Content" xml:space="preserve"><value>Содержание набора</value></data>
+  <data name="Coaching.MapControl.Details.Overview.ContentValue" xml:space="preserve"><value>Правила объектов: {0} · по времени: {1} · постоянные: {2}</value></data>
+  <data name="Coaching.MapControl.Details.Objectives.Title" xml:space="preserve"><value>Правила по объектам</value></data>
+  <data name="Coaching.MapControl.Details.Objectives.Empty" xml:space="preserve"><value>В наборе нет правил по объектам.</value></data>
+  <data name="Coaching.MapControl.Details.Timed.Title" xml:space="preserve"><value>Напоминания по времени</value></data>
+  <data name="Coaching.MapControl.Details.Timed.Empty" xml:space="preserve"><value>В наборе нет напоминаний по времени.</value></data>
+  <data name="Coaching.MapControl.Details.Persistent.Title" xml:space="preserve"><value>Постоянные подсказки</value></data>
+  <data name="Coaching.MapControl.Details.Persistent.Empty" xml:space="preserve"><value>В наборе нет постоянных подсказок.</value></data>
+  <data name="Coaching.MapControl.Details.ReadOnly" xml:space="preserve"><value>Только для чтения. Чтобы изменить содержимое, откройте редактор набора.</value></data>
 </root>

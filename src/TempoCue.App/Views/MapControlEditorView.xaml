@@ -51,6 +51,16 @@
                                    FontSize="{StaticResource Typography.FontSize.Caption}"
                                    FontWeight="SemiBold" />
                     </Border>
+                    <Border Background="#1B2A42"
+                            CornerRadius="10"
+                            Padding="9,4"
+                            Margin="8,0,0,0"
+                            VerticalAlignment="Center">
+                        <TextBlock Text="{Binding ModeLabel}"
+                                   Foreground="#A8B8CC"
+                                   FontSize="{StaticResource Typography.FontSize.Caption}"
+                                   FontWeight="SemiBold" />
+                    </Border>
                 </StackPanel>
                 <TextBlock x:Name="MapControlEditorStepSummaryTextBlock"
                            Text="{Binding StepSummary}"
@@ -62,6 +72,21 @@
             <StackPanel Grid.Column="2"
                         Orientation="Horizontal"
                         VerticalAlignment="Center">
+                <Button x:Name="CloseMapControlEditorButton"
+                        Content="{localization:Loc Coaching.MatchupEditor.Close}"
+                        Margin="0,0,10,0"
+                        Click="CloseMapControlEditorButton_Click">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsEditingExisting}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
                 <Button x:Name="MapControlEditorBackButton"
                         Content="{localization:Loc Coaching.MatchupEditor.Back}"
                         Style="{StaticResource SecondaryButton}"

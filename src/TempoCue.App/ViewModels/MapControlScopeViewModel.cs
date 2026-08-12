@@ -99,6 +99,23 @@ public sealed class MapControlScopeViewModel : ObservableObject
         NotifySelectionChanged();
     }
 
+    public void Load(MapControlApplicability applicability)
+    {
+        ArgumentNullException.ThrowIfNull(applicability);
+        _isRestoringRequiredRole = true;
+        var selectsAllRoles = applicability.Roles.Count == MapControlRoleValues.All.Count
+            && MapControlRoleValues.All.All(applicability.Roles.Contains);
+        _allRolesSelected = selectsAllRoles;
+        foreach (var option in RoleOptions)
+        {
+            option.IsSelected = !selectsAllRoles && applicability.Roles.Contains(option.Role);
+        }
+
+        _isRestoringRequiredRole = false;
+        SelectedTeamSide = applicability.TeamSide;
+        NotifySelectionChanged();
+    }
+
     public void UpdateLanguage()
     {
         OnPropertyChanged(nameof(RolesSummary));

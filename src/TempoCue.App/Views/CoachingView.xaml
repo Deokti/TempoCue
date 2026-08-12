@@ -21,7 +21,10 @@
                                    ImportRequested="CoachingLibraryPage_ImportRequested"
                                    PackOpenRequested="CoachingLibraryPage_PackOpenRequested"
                                    PackExportRequested="CoachingLibraryPage_PackExportRequested"
-                                   PackDeleteRequested="CoachingLibraryPage_PackDeleteRequested">
+                                   PackDeleteRequested="CoachingLibraryPage_PackDeleteRequested"
+                                   MapControlPackOpenRequested="CoachingLibraryPage_MapControlPackOpenRequested"
+                                   MapControlPackExportRequested="CoachingLibraryPage_MapControlPackExportRequested"
+                                   MapControlPackDeleteRequested="CoachingLibraryPage_MapControlPackDeleteRequested">
             <views:CoachingLibraryView.Style>
                 <Style TargetType="views:CoachingLibraryView">
                     <Setter Property="Visibility" Value="Collapsed" />
@@ -53,6 +56,25 @@
                 </Style>
             </views:CoachingPackDetailsView.Style>
         </views:CoachingPackDetailsView>
+
+        <views:MapControlPackDetailsView x:Name="MapControlPackDetailsPage"
+                                         DataContext="{Binding MapControlDetails}"
+                                         BackRequested="MapControlPackDetailsPage_BackRequested"
+                                         StateChangeRequested="MapControlPackDetailsPage_StateChangeRequested"
+                                         EditRequested="MapControlPackDetailsPage_EditRequested"
+                                         DeleteRequested="MapControlPackDetailsPage_DeleteRequested">
+            <views:MapControlPackDetailsView.Style>
+                <Style TargetType="views:MapControlPackDetailsView">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding DataContext.CurrentScreen, RelativeSource={RelativeSource AncestorType=views:CoachingView}}"
+                                     Value="{x:Static viewModels:CoachingScreen.MapControlPackDetails}">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </views:MapControlPackDetailsView.Style>
+        </views:MapControlPackDetailsView>
 
         <views:PackTypeSelectionView x:Name="PackTypeSelectionPage"
                                      DataContext="{Binding PackTypeSelection}"
@@ -140,12 +162,12 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <TextBlock Text="{Binding Details.DeleteConfirmationTitle}"
+                    <TextBlock Text="{Binding DeleteConfirmationTitle}"
                                Foreground="#F4F7FB"
                                FontSize="{StaticResource Typography.FontSize.SectionTitle}"
                                FontWeight="SemiBold" />
                     <TextBlock Grid.Row="2"
-                               Text="{Binding Details.DeleteConfirmationMessage}"
+                               Text="{Binding DeleteConfirmationMessage}"
                                Foreground="#AFC0D6"
                                FontSize="{StaticResource Typography.FontSize.BodyLarge}"
                                TextWrapping="Wrap" />
@@ -158,7 +180,7 @@
                                 IsDefault="True"
                                 Click="CancelDeleteCoachPackButton_Click" />
                         <Button x:Name="ConfirmDeleteCoachPackButton"
-                                Content="{Binding Details.DeleteConfirmationActionLabel}"
+                                Content="{Binding DeleteConfirmationActionLabel}"
                                 Margin="10,0,0,0"
                                 Click="ConfirmDeleteCoachPackButton_Click">
                             <Button.Style>

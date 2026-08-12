@@ -44,7 +44,10 @@ internal sealed class MapControlPackCardFactory
                 ? "Coaching.Library.Origin.Imported"
                 : "Coaching.Library.Origin.Created"),
             GetContentLanguageLabel(pack.ContentLanguage),
-            _localization.Format("Coaching.Library.Patch", pack.Patch));
+            _localization.Format("Coaching.Library.Patch", pack.Patch),
+            _localization.Get(origin == CoachingPackOrigin.Imported
+                ? "Coaching.Details.Delete.Imported"
+                : "Coaching.Details.Delete.Own"));
     }
 
     private string GetRolesLabel(IReadOnlyList<MapControlRole> roles)
