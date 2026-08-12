@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\TempoCue.App\TempoCue.App.csproj" />
+    <ProjectReference Include="..\..\src\TempoCue.Coaching\TempoCue.Coaching.csproj" />
   </ItemGroup>
 
 </Project>

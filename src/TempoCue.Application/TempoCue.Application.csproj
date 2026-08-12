@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TempoCue.Coaching\TempoCue.Coaching.csproj" />
     <ProjectReference Include="..\TempoCue.Core\TempoCue.Core.csproj" />
   </ItemGroup>
 

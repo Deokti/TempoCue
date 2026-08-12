@@ -31,7 +31,7 @@ public sealed class MatchupEditorViewModel : ObservableObject
         Content = new MatchupContentViewModel(localization, itemCatalog);
         Verification = new MatchupVerificationViewModel(
             localization,
-            new TempoCue.Core.MatchupPhaseSelector());
+            new MatchupPhaseSelector());
         Save = new MatchupSaveViewModel(localization, saveCoachPack);
         MainInformation.PropertyChanged += MainInformation_PropertyChanged;
         ChampionsAndRole.PropertyChanged += ChampionsAndRole_PropertyChanged;

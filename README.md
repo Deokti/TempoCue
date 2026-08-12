@@ -8,7 +8,7 @@
 
 ## Что уже работает
 
-- отдельное ядро правил без зависимости от интерфейса;
+- отдельные модели игры и коучинга без зависимости от интерфейса;
 - загрузка и проверка Coach Pack из JSON;
 - единая модель состояния пользователя, союзников и противников;
 - разделение участников по командам и позициям;
@@ -53,10 +53,12 @@ dotnet run --project src/TempoCue.App
 ```text
 src/TempoCue.App        WPF Views, ViewModels и composition root
 src/TempoCue.Application сценарии приложения и порты внешних эффектов
-src/TempoCue.Core       состояние, Coach Packs и движок правил
+src/TempoCue.Coaching   Coach Packs, валидаторы и детерминированные правила советов
+src/TempoCue.Core       состояние матча и нормализованные игровые факты
 src/TempoCue.Overlay    WPF-окно оверлея и нейтральный контракт уведомления
 src/TempoCue.Riot       Live Client Data, Data Dragon, внешние DTO и преобразование JSON
 tests/TempoCue.Core.Tests
+tests/TempoCue.Coaching.Tests
 tests/TempoCue.Application.Tests
 tests/TempoCue.Riot.Tests
 tests/TempoCue.Overlay.Tests

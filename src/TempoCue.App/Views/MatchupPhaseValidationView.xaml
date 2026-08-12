@@ -1,7 +1,7 @@
 <UserControl x:Class="TempoCue.App.Views.MatchupPhaseValidationView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:core="clr-namespace:TempoCue.Core;assembly=TempoCue.Core"
+             xmlns:core="clr-namespace:TempoCue.Coaching;assembly=TempoCue.Coaching"
              xmlns:localization="clr-namespace:TempoCue.App.Localization"
              xmlns:viewModels="clr-namespace:TempoCue.App.ViewModels"
              Background="Transparent"

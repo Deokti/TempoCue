@@ -444,10 +444,10 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         PowerState = advice.PowerState;
         PowerStateLabel = advice.PowerState switch
         {
-            TempoCue.Core.PowerState.Dangerous => _localization.Get("Power.Dangerous"),
-            TempoCue.Core.PowerState.Cautious => _localization.Get("Power.Cautious"),
-            TempoCue.Core.PowerState.Playable => _localization.Get("Power.Playable"),
-            TempoCue.Core.PowerState.Favorable => _localization.Get("Power.Favorable"),
+            TempoCue.Coaching.PowerState.Dangerous => _localization.Get("Power.Dangerous"),
+            TempoCue.Coaching.PowerState.Cautious => _localization.Get("Power.Cautious"),
+            TempoCue.Coaching.PowerState.Playable => _localization.Get("Power.Playable"),
+            TempoCue.Coaching.PowerState.Favorable => _localization.Get("Power.Favorable"),
             _ => throw new ArgumentOutOfRangeException(nameof(advice.PowerState))
         };
     }

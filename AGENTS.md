@@ -9,7 +9,8 @@ TempoCue — локальный Windows-ассистент для League of Lege
 ## Технологии и структура
 
 - Используется C# с nullable reference types и implicit usings, SDK закреплён в `global.json`.
-- `src/TempoCue.Core` — доменная модель, Coach Packs, проверка их данных и детерминированный движок правил.
+- `src/TempoCue.Core` — состояние матча, участники, позиции и нормализованные игровые факты.
+- `src/TempoCue.Coaching` — Coach Packs, проверка авторского содержимого и детерминированные правила советов.
 - `src/TempoCue.Riot` — HTTP-доступ к Riot Live Client Data API, DTO и преобразование внешнего JSON в модели Core.
 - `src/TempoCue.App` — WPF-интерфейс, локализация, настройки и сборка компонентов приложения.
 - `tests/*` — тестовые проекты xUnit, соответствующие производственным проектам.
@@ -19,10 +20,11 @@ TempoCue — локальный Windows-ассистент для League of Lege
 ## Архитектурные границы
 
 - `docs/architecture.md` — канонический документ архитектуры. Перед новой функцией определи владельца поведения, поток данных и допустимые зависимости по этому документу.
-- Текущее направление зависимостей: `TempoCue.Application -> TempoCue.Core`, `TempoCue.Riot -> TempoCue.Application/TempoCue.Core`, `TempoCue.App -> TempoCue.Application/TempoCue.Riot/TempoCue.Core`. Граф объектов активного матча создаётся в `App.OnStartup`; остальные функции переходят к этой схеме постепенно по `docs/architecture.md`.
-- `TempoCue.Core` не должен зависеть от WPF, `TempoCue.App`, Riot DTO, HTTP или деталей отображения. Доменная логика должна работать без запущенной игры и интерфейса.
+- Текущее направление зависимостей: `TempoCue.Coaching -> TempoCue.Core`, `TempoCue.Application -> TempoCue.Coaching/TempoCue.Core`, `TempoCue.Riot -> TempoCue.Application/TempoCue.Core`, `TempoCue.App -> TempoCue.Application/TempoCue.Coaching/TempoCue.Riot/TempoCue.Core`. Граф объектов активного матча создаётся в `App.OnStartup`; остальные функции переходят к этой схеме постепенно по `docs/architecture.md`.
+- `TempoCue.Core` не должен зависеть от Coaching, WPF, `TempoCue.App`, Riot DTO, HTTP или деталей отображения. Модель игры должна работать без запущенной игры и интерфейса.
+- `TempoCue.Coaching` зависит только от Core и не должен знать WPF, Riot DTO, HTTP, файловые пути или детали отображения.
 - `TempoCue.Riot` не должен зависеть от WPF или `TempoCue.App`. Изолируй формат Riot API в DTO и преобразователях; не распространяй внешние DTO в Core и UI.
-- В `TempoCue.App` оставляй представление и координацию, специфичную для UI. Новые правила выбора советов, определения матчапа и интерпретации состояния размещай в Core, межсистемные сценарии — в целевом Application, а разбор Riot JSON — в Riot.
+- В `TempoCue.App` оставляй представление и координацию, специфичную для UI. Новые правила выбора и планирования советов размещай в Coaching, определение игровых фактов — в Core, межсистемные сценарии — в целевом Application, а разбор Riot JSON — в Riot.
 - Не добавляй новый слой, фреймворк, глобальный singleton или абстракцию только «на будущее». Вводи их при наличии конкретной границы, нескольких реализаций или проверяемой пользы.
 - Не выполняй масштабную миграцию существующего WPF-кода, например на MVVM-фреймворк, в рамках несвязанной задачи. При росте окна извлекай самостоятельную логику небольшими проверяемыми шагами.
 - Новые самостоятельные экраны создавай отдельными View/ViewModel, не расширяй ими `MainWindow.xaml`. Новый сценарий, координирующий Core и внешний эффект, выноси в целевой слой `TempoCue.Application` согласно плану постепенного перехода.

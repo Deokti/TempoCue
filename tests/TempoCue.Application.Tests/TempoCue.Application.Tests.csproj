@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\TempoCue.Application\TempoCue.Application.csproj" />
+    <ProjectReference Include="..\..\src\TempoCue.Coaching\TempoCue.Coaching.csproj" />
   </ItemGroup>
 
 </Project>
