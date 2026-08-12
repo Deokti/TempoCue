@@ -6,12 +6,12 @@ using TempoCue.Application;
 namespace TempoCue.App.Persistence;
 
 /// <summary>Владеет локальной JSON-схемой состояния Coach Pack, не зная пути к файлу.</summary>
-internal static class LocalCoachPackStateSerializer
+internal static class LocalCoachingPackStateSerializer
 {
     private const int CurrentSchemaVersion = 2;
     private static readonly JsonSerializerOptions SerializerOptions = CreateOptions();
 
-    public static async Task<StoredCoachPackState> ReadAsync(
+    public static async Task<StoredCoachingPackState> ReadAsync(
         Stream stream,
         CancellationToken cancellationToken = default)
     {
@@ -33,7 +33,7 @@ internal static class LocalCoachPackStateSerializer
             throw new InvalidDataException("Local Coach Pack state is invalid.");
         }
 
-        return new StoredCoachPackState(metadata.PackId, metadata.State, origin.Value);
+        return new StoredCoachingPackState(metadata.PackId, metadata.State, origin.Value);
     }
 
     public static Task WriteAsync(
@@ -77,7 +77,7 @@ internal static class LocalCoachPackStateSerializer
         DateTimeOffset SavedAtUtc);
 }
 
-internal sealed record StoredCoachPackState(
+internal sealed record StoredCoachingPackState(
     string PackId,
     LocalCoachPackState State,
     LocalCoachPackOrigin Origin);
