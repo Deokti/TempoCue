@@ -63,6 +63,46 @@ public sealed class CoachingLibraryViewTests
     });
 
     [Fact]
+    public void Library_ShowsSavedMapControlPackAndPersistsToggle() => WpfTestHost.Run(() =>
+    {
+        using var context = new MainWindowTestContext();
+        var pack = TestMapControlPackFactory.Create() with
+        {
+            Name = "Контроль раннего дракона",
+            Author = string.Empty
+        };
+        context.MapControlPackStore.SaveAsync(pack, LocalCoachPackState.Enabled)
+            .GetAwaiter()
+            .GetResult();
+        var libraryPage = OpenLibrary(context);
+        var coachingTabs = WpfTestHost.Find<TabControl>(
+            libraryPage,
+            "CoachingSectionsTabControl");
+
+        coachingTabs.SelectedIndex = 1;
+        WpfTestHost.Pump(DispatcherPriority.ApplicationIdle);
+
+        var card = Assert.Single(context.Coaching.Library.MapControlCards);
+        Assert.Equal(pack.Id, card.Pack.Id);
+        Assert.Equal("Контроль раннего дракона", card.Title);
+        Assert.Contains("все роли · вы", card.Details);
+        Assert.Contains("1 совет", card.AdviceCount);
+        Assert.False(WpfTestHost.Find<Border>(libraryPage, "MapControlEmptyState").IsVisible);
+        var toggle = Assert.Single(
+            WpfTestHost.FindVisualDescendants<ToggleButton>(libraryPage),
+            candidate => candidate.Name == "MapControlPackEnabledToggle");
+        Assert.True(toggle.IsChecked);
+        SaveVisualSnapshotIfRequested(context.Window, "coaching-library-map-control.png");
+
+        WpfTestHost.Click(toggle);
+        WpfTestHost.Pump(DispatcherPriority.ApplicationIdle);
+
+        card = Assert.Single(context.Coaching.Library.MapControlCards);
+        Assert.True(card.IsDisabled);
+        Assert.False(card.IsEnabled);
+    });
+
+    [Fact]
     public void Library_TogglePersistsDisabledMatchupState() => WpfTestHost.Run(() =>
     {
         using var context = new MainWindowTestContext();

@@ -257,6 +257,11 @@
   <data name="Coaching.Tab.MapControl" xml:space="preserve"><value>Контроль игры</value></data>
   <data name="Coaching.Tab.MyPacks" xml:space="preserve"><value>Мои наборы</value></data>
   <data name="Coaching.Library.Search" xml:space="preserve"><value>Поиск по чемпиону, набору или автору</value></data>
+  <data name="Coaching.MapControl.Library.Search" xml:space="preserve"><value>Поиск по названию или ситуации</value></data>
+  <data name="Coaching.MapControl.Library.Card.Details" xml:space="preserve"><value>{0} · {1}</value></data>
+  <data name="Coaching.MapControl.Library.Author.You" xml:space="preserve"><value>вы</value></data>
+  <data name="Coaching.MapControl.Library.Role.Selected" xml:space="preserve"><value>только {0}</value></data>
+  <data name="Coaching.MapControl.Library.OpenUnavailable" xml:space="preserve"><value>Просмотр набора появится в следующей итерации.</value></data>
   <data name="Coaching.Library.Matchup" xml:space="preserve"><value>{0} против {1}</value></data>
   <data name="Coaching.Library.Card.Details" xml:space="preserve"><value>{0} · {1}</value></data>
   <data name="Coaching.Library.State.Enabled" xml:space="preserve"><value>Включён</value></data>

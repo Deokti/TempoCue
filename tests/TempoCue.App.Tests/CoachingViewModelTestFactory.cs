@@ -24,7 +24,9 @@ internal static class CoachingViewModelTestFactory
             championCatalog,
             new LoadCoachPackLibraryUseCase(resolvedStore),
             new SetCoachPackStateUseCase(resolvedStore),
-            new DeleteCoachPackUseCase(resolvedStore));
+            new DeleteCoachPackUseCase(resolvedStore),
+            new LoadMapControlPackLibraryUseCase(resolvedMapControlStore),
+            new SetMapControlPackStateUseCase(resolvedMapControlStore));
         var itemCatalog = TestItemCatalog.Ready();
         var editor = new MatchupEditorViewModel(
             resolvedLocalization,

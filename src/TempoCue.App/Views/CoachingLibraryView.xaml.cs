@@ -62,6 +62,26 @@ public partial class CoachingLibraryView : UserControl
         toggle.IsEnabled = true;
     }
 
+    private async void MapControlPackEnabledToggle_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not ToggleButton toggle
+            || toggle.DataContext is not MapControlPackCardViewModel card)
+        {
+            return;
+        }
+
+        toggle.IsEnabled = false;
+        var wasSaved = await ViewModel.SetMapControlPackEnabledAsync(
+            card,
+            toggle.IsChecked == true);
+        if (!wasSaved)
+        {
+            toggle.IsChecked = card.IsEnabled;
+        }
+
+        toggle.IsEnabled = true;
+    }
+
     private void PackActionsMenu_ExportRequested(object? sender, EventArgs e)
     {
         if (sender is CoachPackActionsMenu { DataContext: CoachingPackCardViewModel card })

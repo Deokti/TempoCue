@@ -34,13 +34,16 @@ public sealed class CoachingLibraryViewModelTests
     private static CoachingLibraryViewModel CreateViewModel(ICoachPackStore store)
     {
         var localization = LocalizationService.Instance;
+        var mapControlStore = new TestMapControlPackStore();
         return new CoachingLibraryViewModel(
             [],
             localization,
             TestChampionCatalog.Ready(),
             new LoadCoachPackLibraryUseCase(store),
             new SetCoachPackStateUseCase(store),
-            new DeleteCoachPackUseCase(store));
+            new DeleteCoachPackUseCase(store),
+            new LoadMapControlPackLibraryUseCase(mapControlStore),
+            new SetMapControlPackStateUseCase(mapControlStore));
     }
 
     private static CoachPack CreatePack(string id) =>

@@ -61,6 +61,8 @@ public partial class App : System.Windows.Application
             "MapControlPacks");
         var mapControlPackStore = new LocalMapControlPackStore(mapControlPackDirectory);
         var saveMapControlPack = new SaveMapControlPackUseCase(mapControlPackStore);
+        var loadMapControlPackLibrary = new LoadMapControlPackLibraryUseCase(mapControlPackStore);
+        var setMapControlPackState = new SetMapControlPackStateUseCase(mapControlPackStore);
         var loadCoachPackLibrary = new LoadCoachPackLibraryUseCase(coachPackStore);
         var setCoachPackState = new SetCoachPackStateUseCase(coachPackStore);
         var deleteCoachPack = new DeleteCoachPackUseCase(coachPackStore);
@@ -129,7 +131,9 @@ public partial class App : System.Windows.Application
             _championCatalog,
             loadCoachPackLibrary,
             setCoachPackState,
-            deleteCoachPack);
+            deleteCoachPack,
+            loadMapControlPackLibrary,
+            setMapControlPackState);
         coachingLibraryViewModel.LibraryChanged += (_, _) =>
         {
             activeCoachPackSelector.Invalidate();
