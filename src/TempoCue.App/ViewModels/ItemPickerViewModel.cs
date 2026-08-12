@@ -313,6 +313,7 @@ public sealed class ItemPickerViewModel : ObservableObject
         SelectedSortOption = SortOptions.First(static option => option.Mode == ItemSortMode.Name);
         PreviewedItem = null;
         Target = target;
+        NotifyFilteredItemsChanged();
     }
 
     public void SelectCategory(ItemCategoryOptionViewModel option)
@@ -368,6 +369,7 @@ public sealed class ItemPickerViewModel : ObservableObject
 
         NotifySelectionChanged();
         Target = ItemPickerTarget.None;
+        NotifyFilteredItemsChanged();
     }
 
     public void UpdateLanguage(string languageCode)
@@ -412,7 +414,9 @@ public sealed class ItemPickerViewModel : ObservableObject
 
     private void NotifyFilteredItemsChanged()
     {
-        _filteredItems = BuildFilteredItems();
+        // Закрытая модалка не должна удерживать сотни WPF-контейнеров и декодированных
+        // изображений. Сам каталог остаётся загруженным и мгновенно восстанавливается при открытии.
+        _filteredItems = IsOpen ? BuildFilteredItems() : [];
         OnPropertyChanged(nameof(FilteredItems));
         OnPropertyChanged(nameof(HasResults));
         OnPropertyChanged(nameof(ResultCountText));

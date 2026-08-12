@@ -177,6 +177,7 @@ public sealed class MatchupChampionsAndRoleViewModel : ObservableObject
     {
         PickerSearch = string.Empty;
         PickerTarget = ChampionPickerTarget.None;
+        RefreshFilteredPickerChampions();
     }
 
     public void SelectPickerChampion(ChampionOptionViewModel champion)
@@ -303,6 +304,7 @@ public sealed class MatchupChampionsAndRoleViewModel : ObservableObject
 
         PickerSearch = string.Empty;
         PickerTarget = target;
+        RefreshFilteredPickerChampions();
     }
 
     private ChampionOptionViewModel? FindChampion(string? championId) =>
@@ -338,7 +340,11 @@ public sealed class MatchupChampionsAndRoleViewModel : ObservableObject
 
     private void RefreshFilteredPickerChampions()
     {
-        _filteredPickerChampions = FilterAllChampions(PickerSearch);
+        // Полный каталог хранится отдельно, а закрытая модалка освобождает привязанный список,
+        // чтобы WPF мог собрать карточки и изображения чемпионов.
+        _filteredPickerChampions = IsPickerOpen
+            ? FilterAllChampions(PickerSearch)
+            : [];
         OnPropertyChanged(nameof(FilteredPickerChampions));
         OnPropertyChanged(nameof(HasPickerResults));
         OnPropertyChanged(nameof(PickerResultCountText));

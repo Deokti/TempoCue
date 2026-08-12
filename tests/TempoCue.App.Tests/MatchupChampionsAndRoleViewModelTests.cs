@@ -91,9 +91,11 @@ public sealed class MatchupChampionsAndRoleViewModelTests
         viewModel.SelectPickerChampion(sett);
 
         Assert.False(viewModel.IsPickerOpen);
+        Assert.Empty(viewModel.FilteredPickerChampions);
         Assert.Equal("Sett", viewModel.SelectedPlayerChampion?.Id);
 
         viewModel.OpenOpponentPicker();
+        Assert.Equal(viewModel.Champions.Count, viewModel.FilteredPickerChampions.Count);
         var urgot = viewModel.FilteredPickerChampions.Single(champion => champion.Id == "Urgot");
         viewModel.SelectPickerChampion(urgot);
 

@@ -44,6 +44,12 @@ public sealed class ItemPickerViewModelTests
                 content.ItemPicker.PreviewedItemStats,
                 stat => stat.Name == "Броня" && stat.Value == "+25");
             Assert.Contains("ID 3047", content.ItemPicker.PreviewedItemTechnicalText);
+
+            content.ItemPicker.Close();
+            Assert.Empty(content.ItemPicker.FilteredItems);
+
+            content.OpenRecommendedItemPicker();
+            Assert.Equal(2, content.ItemPicker.FilteredItems.Count);
         }
         finally
         {
