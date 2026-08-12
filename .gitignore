@@ -5,6 +5,7 @@ obj/
 .vscode/
 .dotnet-cli/
 .codex-temp/
+artifacts/
 TestResults/
 *.user
 *.suo
