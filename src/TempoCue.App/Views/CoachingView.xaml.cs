@@ -179,8 +179,16 @@ public partial class CoachingView : UserControl
     private void PackTypeSelectionPage_MatchupSelected(object? sender, EventArgs e) =>
         ViewModel.OpenMatchupEditor();
 
+    private async void PackTypeSelectionPage_GameControlSelected(
+        object? sender,
+        EventArgs e) =>
+        await ViewModel.OpenNewMapControlEditorAsync();
+
     private void MatchupEditorPage_BackRequested(object? sender, EventArgs e) =>
         ViewModel.CloseMatchupEditor();
+
+    private void MapControlEditorPage_BackRequested(object? sender, EventArgs e) =>
+        ViewModel.CloseMapControlEditor();
 
     private async void MatchupEditorPage_SaveCompleted(object? sender, EventArgs e)
     {

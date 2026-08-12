@@ -18,7 +18,8 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
         CoachingPackDetailsViewModel details,
         CoachPackImportDialogViewModel import,
         PackTypeSelectionViewModel packTypeSelection,
-        MatchupEditorViewModel matchupEditor)
+        MatchupEditorViewModel matchupEditor,
+        MapControlEditorViewModel mapControlEditor)
     {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         Library = library ?? throw new ArgumentNullException(nameof(library));
@@ -27,6 +28,8 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
         PackTypeSelection = packTypeSelection
             ?? throw new ArgumentNullException(nameof(packTypeSelection));
         MatchupEditor = matchupEditor ?? throw new ArgumentNullException(nameof(matchupEditor));
+        MapControlEditor = mapControlEditor
+            ?? throw new ArgumentNullException(nameof(mapControlEditor));
         _localization.PropertyChanged += Localization_PropertyChanged;
     }
 
@@ -39,6 +42,8 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
     public PackTypeSelectionViewModel PackTypeSelection { get; }
 
     public MatchupEditorViewModel MatchupEditor { get; }
+
+    public MapControlEditorViewModel MapControlEditor { get; }
 
     public CoachingScreen CurrentScreen
     {
@@ -151,6 +156,13 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
         CurrentScreen = CoachingScreen.MatchupEditor;
     }
 
+    public async Task OpenNewMapControlEditorAsync(
+        CancellationToken cancellationToken = default)
+    {
+        CurrentScreen = CoachingScreen.MapControlEditor;
+        await MapControlEditor.BeginNewAsync(cancellationToken);
+    }
+
     public async Task OpenSelectedPackEditorAsync(
         CancellationToken cancellationToken = default)
     {
@@ -168,6 +180,9 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
         CurrentScreen = MatchupEditor.ReturnsToPackDetails
             ? CoachingScreen.PackDetails
             : CoachingScreen.PackTypeSelection;
+
+    public void CloseMapControlEditor() =>
+        CurrentScreen = CoachingScreen.PackTypeSelection;
 
     public void OpenLibrary()
     {
@@ -192,6 +207,7 @@ public sealed class CoachingViewModel : ObservableObject, IDisposable
     private void Localization_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         MatchupEditor.UpdateLanguage(_localization.CurrentLanguageCode);
+        MapControlEditor.UpdateLanguage();
         if (Details.Pack is { } pack
             && Library.FindCard(pack.Id) is { } refreshedCard)
         {

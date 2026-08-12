@@ -143,6 +143,9 @@ public partial class App : System.Windows.Application
             _championCatalog,
             _itemCatalog,
             saveCoachPack);
+        var mapControlEditorViewModel = new MapControlEditorViewModel(
+            LocalizationService.Instance,
+            _gamePatchCatalog);
         _coachingViewModel = new CoachingViewModel(
             LocalizationService.Instance,
             coachingLibraryViewModel,
@@ -151,7 +154,8 @@ public partial class App : System.Windows.Application
                 LocalizationService.Instance,
                 importCoachPack),
             new PackTypeSelectionViewModel(),
-            matchupEditorViewModel);
+            matchupEditorViewModel,
+            mapControlEditorViewModel);
 
         // Окно получает полностью собранный граф зависимостей и только связывает ViewModel с View.
         MainWindow = new MainWindow(

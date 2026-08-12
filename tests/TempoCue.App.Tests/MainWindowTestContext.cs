@@ -75,6 +75,14 @@ internal sealed class MainWindowTestContext : IDisposable
     public MatchupEditorView MatchupEditorPage =>
         WpfTestHost.Find<MatchupEditorView>(CoachingPage, "MatchupEditorPage");
 
+    public MapControlEditorView MapControlEditorPage =>
+        WpfTestHost.Find<MapControlEditorView>(CoachingPage, "MapControlEditorPage");
+
+    public MapControlMainInformationView MapControlMainInformationPage =>
+        WpfTestHost.Find<MapControlMainInformationView>(
+            MapControlEditorPage,
+            "MapControlMainInformationPage");
+
     public MatchupMainInformationView MainInformationPage =>
         WpfTestHost.Find<MatchupMainInformationView>(
             MatchupEditorPage,

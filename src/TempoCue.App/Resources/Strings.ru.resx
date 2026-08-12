@@ -315,6 +315,28 @@
   <data name="Coaching.NewPack.GameControl.Description" xml:space="preserve"><value>Создайте напоминания о карте, гангах, объектах, пропавших противниках и других игровых событиях.</value></data>
   <data name="Coaching.NewPack.GameControl.PromptItems" xml:space="preserve"><value>роль и режим · игровую ситуацию из шаблонов · условия по времени и карте · способ показа</value></data>
   <data name="Coaching.NewPack.GameControl.Unavailable" xml:space="preserve"><value>Недоступно в этой итерации</value></data>
+  <data name="Coaching.NewPack.GameControl.Start" xml:space="preserve"><value>Начать · шаг 1 из 5</value></data>
+  <data name="Coaching.MapControlEditor.Title" xml:space="preserve"><value>Контроль нейтральных объектов</value></data>
+  <data name="Coaching.MapControlEditor.TypeBadge" xml:space="preserve"><value>Контроль карты</value></data>
+  <data name="Coaching.MapControlEditor.StepSummary.Main" xml:space="preserve"><value>Шаг 1 из 5 · Основная информация</value></data>
+  <data name="Coaching.MapControlEditor.StepSummary.Scope" xml:space="preserve"><value>Шаг 2 из 5 · Область применения</value></data>
+  <data name="Coaching.MapControlEditor.StepSummary.Content" xml:space="preserve"><value>Шаг 3 из 5 · Содержание</value></data>
+  <data name="Coaching.MapControlEditor.StepSummary.Verification" xml:space="preserve"><value>Шаг 4 из 5 · Проверка</value></data>
+  <data name="Coaching.MapControlEditor.StepSummary.Save" xml:space="preserve"><value>Шаг 5 из 5 · Сохранение</value></data>
+  <data name="Coaching.MapControlEditor.Step.Main" xml:space="preserve"><value>Основная информация</value></data>
+  <data name="Coaching.MapControlEditor.Step.Scope" xml:space="preserve"><value>Область применения</value></data>
+  <data name="Coaching.MapControlEditor.Step.Content" xml:space="preserve"><value>Содержание</value></data>
+  <data name="Coaching.MapControlEditor.Step.Verification" xml:space="preserve"><value>Проверка</value></data>
+  <data name="Coaching.MapControlEditor.Step.Save" xml:space="preserve"><value>Сохранение</value></data>
+  <data name="Coaching.MapControlEditor.Main.Description" xml:space="preserve"><value>Название и описание видны в библиотеке коучинга и в журнале советов во время матча.</value></data>
+  <data name="Coaching.MapControlEditor.Main.PackName" xml:space="preserve"><value>Название набора</value></data>
+  <data name="Coaching.MapControlEditor.Main.ShortDescription" xml:space="preserve"><value>Краткое описание</value></data>
+  <data name="Coaching.MapControlEditor.Main.ContentLanguage" xml:space="preserve"><value>Язык содержимого</value></data>
+  <data name="Coaching.MapControlEditor.Main.LanguageHint" xml:space="preserve"><value>Интерфейс TempoCue переключается между языками, но текст набора остаётся таким, каким вы его написали.</value></data>
+  <data name="Coaching.MapControlEditor.Main.Map" xml:space="preserve"><value>Карта</value></data>
+  <data name="Coaching.MapControlEditor.Main.SummonersRift" xml:space="preserve"><value>Ущелье призывателей</value></data>
+  <data name="Coaching.MapControlEditor.Main.FirstVersion" xml:space="preserve"><value>Первая версия</value></data>
+  <data name="Coaching.MapControlEditor.FutureStep" xml:space="preserve"><value>Поля этого шага появятся в следующей проверяемой итерации.</value></data>
   <data name="Coaching.NewPack.Soon" xml:space="preserve"><value>Скоро</value></data>
   <data name="Coaching.MatchupEditor.Back" xml:space="preserve"><value>Назад</value></data>
   <data name="Coaching.MatchupEditor.Close" xml:space="preserve"><value>Закрыть редактор</value></data>

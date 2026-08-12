@@ -6,5 +6,6 @@ public enum CoachingScreen
     Library,
     PackDetails,
     PackTypeSelection,
-    MatchupEditor
+    MatchupEditor,
+    MapControlEditor
 }

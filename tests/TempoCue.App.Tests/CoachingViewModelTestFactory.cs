@@ -44,6 +44,9 @@ internal static class CoachingViewModelTestFactory
             details,
             import,
             new PackTypeSelectionViewModel(),
-            editor);
+            editor,
+            new MapControlEditorViewModel(
+                resolvedLocalization,
+                TestGamePatchCatalog.Ready()));
     }
 }

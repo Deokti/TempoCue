@@ -1,0 +1,154 @@
+<UserControl x:Class="TempoCue.App.Views.MapControlEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:localization="clr-namespace:TempoCue.App.Localization"
+             xmlns:views="clr-namespace:TempoCue.App.Views"
+             Background="#080D14"
+             FontFamily="Segoe UI">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Styles/ShellControls.xaml" />
+                <ResourceDictionary Source="../Styles/FormControls.xaml" />
+                <ResourceDictionary Source="../Styles/EditorWizardControls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <!-- Каркас повторяет редактор матчапа, но управляет отдельной моделью Map Control Pack. -->
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="16" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="16" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="20" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock x:Name="MapControlEditorTitleTextBlock"
+                               Text="{Binding MainInformation.DisplayTitle}"
+                               Foreground="#F4F7FB"
+                               FontSize="{StaticResource Typography.FontSize.PageTitle}"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center" />
+                    <Border Background="#1B2A42"
+                            CornerRadius="10"
+                            Padding="9,4"
+                            Margin="12,0,0,0"
+                            VerticalAlignment="Center">
+                        <TextBlock Text="{localization:Loc Coaching.MapControlEditor.TypeBadge}"
+                                   Foreground="#A8B8CC"
+                                   FontSize="{StaticResource Typography.FontSize.Caption}"
+                                   FontWeight="SemiBold" />
+                    </Border>
+                </StackPanel>
+                <TextBlock x:Name="MapControlEditorStepSummaryTextBlock"
+                           Text="{Binding StepSummary}"
+                           Foreground="#8EA2BC"
+                           FontSize="{StaticResource Typography.FontSize.Body}"
+                           Margin="0,5,0,0" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="2"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center">
+                <Button x:Name="MapControlEditorBackButton"
+                        Content="{localization:Loc Coaching.MatchupEditor.Back}"
+                        Style="{StaticResource SecondaryButton}"
+                        Click="MapControlEditorBackButton_Click" />
+                <Button x:Name="MapControlEditorNextButton"
+                        Content="{localization:Loc Coaching.MatchupEditor.Next}"
+                        Style="{StaticResource PrimaryButton}"
+                        Margin="10,0,0,0"
+                        IsEnabled="{Binding CanMoveNext}"
+                        Click="MapControlEditorNextButton_Click" />
+            </StackPanel>
+        </Grid>
+
+        <!-- Только уже пройденные и следующий валидный шаг доступны для прямого перехода. -->
+        <Border x:Name="MapControlEditorStepsPanel"
+                Grid.Row="2"
+                Background="#101827"
+                BorderBrush="#263750"
+                BorderThickness="1"
+                CornerRadius="12"
+                Padding="12,10,8,8">
+            <ListBox x:Name="MapControlEditorStepsListBox"
+                     Style="{StaticResource EditorStepsListBox}"
+                     ItemContainerStyle="{StaticResource EditorStepItem}"
+                     SelectedIndex="{Binding CurrentStepIndex, Mode=OneWay}"
+                     PreviewMouseLeftButtonDown="MapControlEditorStepsListBox_PreviewMouseLeftButtonDown"
+                     SelectionChanged="MapControlEditorStepsListBox_SelectionChanged">
+                <ListBox.Resources>
+                    <Style TargetType="ListBoxItem" BasedOn="{StaticResource EditorStepItem}" />
+                    <Style TargetType="ScrollBar" BasedOn="{StaticResource ShellHorizontalScrollBar}" />
+                </ListBox.Resources>
+                <ListBoxItem Tag="1" Content="{localization:Loc Coaching.MapControlEditor.Step.Main}" IsEnabled="{Binding CanNavigateToStep1}" />
+                <ListBoxItem Tag="2" Content="{localization:Loc Coaching.MapControlEditor.Step.Scope}" IsEnabled="{Binding CanNavigateToStep2}" />
+                <ListBoxItem Tag="3" Content="{localization:Loc Coaching.MapControlEditor.Step.Content}" IsEnabled="{Binding CanNavigateToStep3}" />
+                <ListBoxItem Tag="4" Content="{localization:Loc Coaching.MapControlEditor.Step.Verification}" IsEnabled="{Binding CanNavigateToStep4}" />
+                <ListBoxItem Tag="5" Content="{localization:Loc Coaching.MapControlEditor.Step.Save}" IsEnabled="{Binding CanNavigateToStep5}" />
+            </ListBox>
+        </Border>
+
+        <ScrollViewer x:Name="MapControlEditorContentScrollViewer"
+                      Grid.Row="4"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <ScrollViewer.Resources>
+                <Style TargetType="ScrollBar" BasedOn="{StaticResource ShellScrollBar}" />
+            </ScrollViewer.Resources>
+            <Grid Margin="0,0,8,24">
+                <views:MapControlMainInformationView x:Name="MapControlMainInformationPage"
+                                                     DataContext="{Binding MainInformation}">
+                    <views:MapControlMainInformationView.Style>
+                        <Style TargetType="views:MapControlMainInformationView">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding DataContext.CurrentStep, RelativeSource={RelativeSource AncestorType=views:MapControlEditorView}}"
+                                             Value="1">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </views:MapControlMainInformationView.Style>
+                </views:MapControlMainInformationView>
+
+                <!-- Следующий шаг присутствует в маршруте, но будет реализован отдельной итерацией. -->
+                <Border x:Name="MapControlFutureStepCard"
+                        Padding="20">
+                    <Border.Style>
+                        <Style TargetType="Border" BasedOn="{StaticResource ShellCard}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentStep}" Value="2">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <StackPanel>
+                        <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Step.Scope}"
+                                   Foreground="#F4F7FB"
+                                   FontSize="{StaticResource Typography.FontSize.SectionTitle}"
+                                   FontWeight="SemiBold" />
+                        <TextBlock Text="{localization:Loc Coaching.MapControlEditor.FutureStep}"
+                                   Foreground="#91A4BD"
+                                   FontSize="{StaticResource Typography.FontSize.BodyLarge}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,8,0,0" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

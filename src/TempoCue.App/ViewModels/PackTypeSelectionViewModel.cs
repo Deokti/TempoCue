@@ -5,5 +5,5 @@ public sealed class PackTypeSelectionViewModel
 {
     public bool IsMatchupAvailable => true;
 
-    public bool IsGameControlAvailable => false;
+    public bool IsGameControlAvailable => true;
 }

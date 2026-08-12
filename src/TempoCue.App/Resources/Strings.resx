@@ -307,6 +307,28 @@
   <data name="Coaching.NewPack.GameControl.Description" xml:space="preserve"><value>Create reminders about the map, ganks, objectives, missing opponents and other game events.</value></data>
   <data name="Coaching.NewPack.GameControl.PromptItems" xml:space="preserve"><value>role and mode · a situation template · time and map conditions · display method</value></data>
   <data name="Coaching.NewPack.GameControl.Unavailable" xml:space="preserve"><value>Unavailable in this iteration</value></data>
+  <data name="Coaching.NewPack.GameControl.Start" xml:space="preserve"><value>Start · step 1 of 5</value></data>
+  <data name="Coaching.MapControlEditor.Title" xml:space="preserve"><value>Neutral objective control</value></data>
+  <data name="Coaching.MapControlEditor.TypeBadge" xml:space="preserve"><value>Map control</value></data>
+  <data name="Coaching.MapControlEditor.StepSummary.Main" xml:space="preserve"><value>Step 1 of 5 · Main information</value></data>
+  <data name="Coaching.MapControlEditor.StepSummary.Scope" xml:space="preserve"><value>Step 2 of 5 · Scope</value></data>
+  <data name="Coaching.MapControlEditor.StepSummary.Content" xml:space="preserve"><value>Step 3 of 5 · Content</value></data>
+  <data name="Coaching.MapControlEditor.StepSummary.Verification" xml:space="preserve"><value>Step 4 of 5 · Verification</value></data>
+  <data name="Coaching.MapControlEditor.StepSummary.Save" xml:space="preserve"><value>Step 5 of 5 · Save</value></data>
+  <data name="Coaching.MapControlEditor.Step.Main" xml:space="preserve"><value>Main information</value></data>
+  <data name="Coaching.MapControlEditor.Step.Scope" xml:space="preserve"><value>Scope</value></data>
+  <data name="Coaching.MapControlEditor.Step.Content" xml:space="preserve"><value>Content</value></data>
+  <data name="Coaching.MapControlEditor.Step.Verification" xml:space="preserve"><value>Verification</value></data>
+  <data name="Coaching.MapControlEditor.Step.Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Coaching.MapControlEditor.Main.Description" xml:space="preserve"><value>The name and description are shown in the coaching library and in the in-match advice log.</value></data>
+  <data name="Coaching.MapControlEditor.Main.PackName" xml:space="preserve"><value>Pack name</value></data>
+  <data name="Coaching.MapControlEditor.Main.ShortDescription" xml:space="preserve"><value>Short description</value></data>
+  <data name="Coaching.MapControlEditor.Main.ContentLanguage" xml:space="preserve"><value>Content language</value></data>
+  <data name="Coaching.MapControlEditor.Main.LanguageHint" xml:space="preserve"><value>The TempoCue interface can switch languages, while the pack text stays exactly as written.</value></data>
+  <data name="Coaching.MapControlEditor.Main.Map" xml:space="preserve"><value>Map</value></data>
+  <data name="Coaching.MapControlEditor.Main.SummonersRift" xml:space="preserve"><value>Summoner's Rift</value></data>
+  <data name="Coaching.MapControlEditor.Main.FirstVersion" xml:space="preserve"><value>First version</value></data>
+  <data name="Coaching.MapControlEditor.FutureStep" xml:space="preserve"><value>The fields for this step will be added in the next verified iteration.</value></data>
   <data name="Coaching.NewPack.Soon" xml:space="preserve"><value>Soon</value></data>
   <data name="Coaching.MatchupEditor.Back" xml:space="preserve"><value>Back</value></data>
   <data name="Coaching.MatchupEditor.Close" xml:space="preserve"><value>Close editor</value></data>
