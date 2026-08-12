@@ -27,7 +27,7 @@ public static class CoachPackValidator
             throw new InvalidDataException("Coach Pack must contain at least one rule.");
         }
 
-        EnsureUniqueIds(pack.Rules.Select(static rule => rule.Id), "rule");
+        CoachPackValidation.EnsureUniqueIds(pack.Rules.Select(static rule => rule.Id), "rule");
         foreach (var rule in pack.Rules)
         {
             ValidateRule(rule);
@@ -71,9 +71,11 @@ public static class CoachPackValidator
             throw new InvalidDataException("Fork author requires the source Coach Pack id.");
         }
 
-        ValidateSource(pack.Source);
-        EnsureUniqueIds(pack.PersistentTips.Select(static tip => tip.Id), "persistent tip");
-        EnsureUniqueIds(pack.ItemBlocks.Select(static block => block.Id), "item block");
+        CoachPackValidation.ValidateSource(pack.Source);
+        CoachPackValidation.EnsureUniqueIds(
+            pack.PersistentTips.Select(static tip => tip.Id),
+            "persistent tip");
+        CoachPackValidation.EnsureUniqueIds(pack.ItemBlocks.Select(static block => block.Id), "item block");
 
         var ruleIds = pack.Rules.Select(static rule => rule.Id).ToHashSet(StringComparer.OrdinalIgnoreCase);
         foreach (var tip in pack.PersistentTips)
@@ -136,38 +138,6 @@ public static class CoachPackValidator
             || string.IsNullOrWhiteSpace(rule.Source))
         {
             throw new InvalidDataException($"Rule '{rule.Id}' requires title, message and source.");
-        }
-    }
-
-    private static void ValidateSource(CoachPackSource source)
-    {
-        if (source.Kind == CoachPackSourceKind.PersonalExperience)
-        {
-            if (source.Permission != CoachPackSourcePermission.NotRequired)
-            {
-                throw new InvalidDataException("Personal experience does not require external permission.");
-            }
-
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(source.Title)
-            || string.IsNullOrWhiteSpace(source.Author)
-            || !Uri.TryCreate(source.Url, UriKind.Absolute, out var uri)
-            || uri.Scheme is not ("http" or "https"))
-        {
-            throw new InvalidDataException("External source requires title, author and HTTP(S) URL.");
-        }
-    }
-
-    private static void EnsureUniqueIds(IEnumerable<string> ids, string entityName)
-    {
-        var duplicate = ids
-            .GroupBy(static id => id, StringComparer.OrdinalIgnoreCase)
-            .FirstOrDefault(static group => string.IsNullOrWhiteSpace(group.Key) || group.Count() > 1);
-        if (duplicate is not null)
-        {
-            throw new InvalidDataException($"Invalid or duplicate {entityName} id: {duplicate.Key}.");
         }
     }
 

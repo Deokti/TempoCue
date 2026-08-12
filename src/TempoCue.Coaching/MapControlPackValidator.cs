@@ -1,0 +1,82 @@
+namespace TempoCue.Coaching;
+
+/// <summary>Проверяет переносимый набор контроля карты на границе системы.</summary>
+public static class MapControlPackValidator
+{
+    public const int CurrentSchemaVersion = 1;
+
+    public static void Validate(MapControlPack pack)
+    {
+        ArgumentNullException.ThrowIfNull(pack);
+
+        if (pack.SchemaVersion != CurrentSchemaVersion)
+        {
+            throw new InvalidDataException(
+                $"Unsupported Map Control Pack schema: {pack.SchemaVersion}.");
+        }
+
+        if (!string.Equals(
+                pack.PackType,
+                MapControlPack.SupportedPackType,
+                StringComparison.Ordinal))
+        {
+            throw new InvalidDataException($"Unsupported Coach Pack type: {pack.PackType}.");
+        }
+
+        if (string.IsNullOrWhiteSpace(pack.Id)
+            || string.IsNullOrWhiteSpace(pack.Name)
+            || string.IsNullOrWhiteSpace(pack.Patch))
+        {
+            throw new InvalidDataException("Map Control Pack id, name and patch are required.");
+        }
+
+        if (string.IsNullOrWhiteSpace(pack.Description)
+            || string.IsNullOrWhiteSpace(pack.Author)
+            || string.IsNullOrWhiteSpace(pack.ContentLanguage)
+            || pack.VerifiedOn is null
+            || pack.Source is null)
+        {
+            throw new InvalidDataException("Map Control Pack metadata is incomplete.");
+        }
+
+        if (string.Equals(pack.Id, pack.ForkedFromPackId, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidDataException("A Map Control Pack copy must have its own id.");
+        }
+
+        if (pack.ForkedFromAuthor is not null && string.IsNullOrWhiteSpace(pack.ForkedFromPackId))
+        {
+            throw new InvalidDataException("Fork author requires the source Map Control Pack id.");
+        }
+
+        if (pack.Rules.Count == 0)
+        {
+            throw new InvalidDataException("Map Control Pack must contain at least one rule.");
+        }
+
+        if (!MapObjectiveTimingCatalog.TryGetForPatch(pack.Patch, out var timingSet)
+            || timingSet is null)
+        {
+            throw new InvalidDataException(
+                $"Map objective timings are unavailable for patch '{pack.Patch}'.");
+        }
+
+        CoachPackValidation.ValidateSource(pack.Source);
+        CoachPackValidation.EnsureUniqueIds(
+            pack.Rules.Select(static rule => rule.Id),
+            "map reminder rule");
+
+        var timings = timingSet.Objectives.ToDictionary(static timing => timing.Objective);
+        foreach (var rule in pack.Rules)
+        {
+            if (!Enum.IsDefined(rule.Objective)
+                || !timings.TryGetValue(rule.Objective, out var timing))
+            {
+                throw new InvalidDataException(
+                    $"Rule '{rule.Id}' references an unsupported map objective.");
+            }
+
+            MapObjectiveReminderRuleValidator.Validate(rule, timing);
+        }
+    }
+}
