@@ -37,7 +37,7 @@ internal static class ActiveMatchOverlayTestData
                 }
             ]
         };
-        var snapshot = new MatchSnapshot(match, [], "{}", DateTimeOffset.UtcNow);
+        var snapshot = new MatchSnapshot(match, [], DateTimeOffset.UtcNow);
         return new ActiveMatchUpdate(
             MatchSnapshotReadStatus.Success,
             snapshot,

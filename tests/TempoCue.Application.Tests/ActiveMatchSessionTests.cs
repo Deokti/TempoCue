@@ -8,7 +8,7 @@ public sealed class ActiveMatchSessionTests
     public async Task RefreshAsync_ReturnsAdviceForSuccessfulSnapshot()
     {
         var match = CreateMatch(level: 9);
-        var snapshot = new MatchSnapshot(match, [], "{}", DateTimeOffset.UtcNow);
+        var snapshot = new MatchSnapshot(match, [], DateTimeOffset.UtcNow);
         var source = new StubSnapshotSource(MatchSnapshotReadResult.Success(snapshot));
         var coach = new MatchupCoach(
         [

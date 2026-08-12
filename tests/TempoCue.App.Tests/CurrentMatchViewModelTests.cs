@@ -25,7 +25,6 @@ public sealed class CurrentMatchViewModelTests
                 ]
             },
             [],
-            "{}",
             DateTimeOffset.UtcNow);
         using var monitor = CreateMonitor(TestMatchSnapshotSource.FromSnapshot(snapshot));
         await monitor.RefreshAsync();
@@ -95,7 +94,6 @@ public sealed class CurrentMatchViewModelTests
                     VictimParticipantId = "sett-player"
                 }
             ],
-            "{}",
             DateTimeOffset.UtcNow);
         var viewModel = context.CreateViewModel(
             snapshot,
@@ -166,7 +164,7 @@ public sealed class CurrentMatchViewModelTests
             ]
         };
         var viewModel = context.CreateViewModel(
-            new MatchSnapshot(match, [], "{}", DateTimeOffset.UtcNow));
+            new MatchSnapshot(match, [], DateTimeOffset.UtcNow));
 
         await viewModel.RefreshAsync();
 
@@ -199,7 +197,7 @@ public sealed class CurrentMatchViewModelTests
             ]
         };
         var viewModel = context.CreateViewModel(
-            new MatchSnapshot(match, [], "{}", DateTimeOffset.UtcNow));
+            new MatchSnapshot(match, [], DateTimeOffset.UtcNow));
 
         await viewModel.RefreshAsync();
 
@@ -229,7 +227,7 @@ public sealed class CurrentMatchViewModelTests
         };
         var viewModel = context.CreateViewModel(
             MatchSnapshotReadResult.Success(
-                new MatchSnapshot(match, [], "{}", DateTimeOffset.UtcNow)),
+                new MatchSnapshot(match, [], DateTimeOffset.UtcNow)),
             new TestMatchAdviceSelector(),
             TestChampionCatalog.Ready());
 
@@ -277,7 +275,7 @@ public sealed class CurrentMatchViewModelTests
         };
         var selection = ActiveCoachPackSelection.Conflict(["Первый", "Второй"]);
         var viewModel = context.CreateViewModel(
-            new MatchSnapshot(match, [], "{}", DateTimeOffset.UtcNow),
+            new MatchSnapshot(match, [], DateTimeOffset.UtcNow),
             new TestMatchAdviceSelector(selection));
 
         await viewModel.RefreshAsync();

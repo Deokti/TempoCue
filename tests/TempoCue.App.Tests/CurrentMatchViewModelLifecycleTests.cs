@@ -37,7 +37,6 @@ public sealed class CurrentMatchViewModelLifecycleTests
                 ]
             },
             [],
-            "{}",
             DateTimeOffset.UtcNow)));
         await refresh;
 
