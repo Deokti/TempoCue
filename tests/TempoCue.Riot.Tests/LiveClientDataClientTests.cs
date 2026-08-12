@@ -244,6 +244,7 @@ public sealed class LiveClientDataClientTests
 
         Assert.Equal(MatchSnapshotReadStatus.GameLoading, result.Status);
         Assert.Null(result.Snapshot);
+        Assert.Single(handler.RequestedUris);
     }
 
     [Fact]
@@ -259,6 +260,7 @@ public sealed class LiveClientDataClientTests
 
         Assert.Equal(MatchSnapshotReadStatus.NoActiveMatch, result.Status);
         Assert.Null(result.Snapshot);
+        Assert.Empty(handler.RequestedUris);
     }
 
     private sealed class StubHttpMessageHandler(
