@@ -22,6 +22,7 @@ public sealed class MapControlEditorViewModel : ObservableObject
             localization);
         Scope = new MapControlScopeViewModel(localization);
         Content = new MapControlContentViewModel(localization);
+        Verification = new MapControlVerificationViewModel(localization);
         MainInformation.PropertyChanged += MainInformation_PropertyChanged;
         Scope.PropertyChanged += Scope_PropertyChanged;
         Content.PropertyChanged += Content_PropertyChanged;
@@ -34,6 +35,8 @@ public sealed class MapControlEditorViewModel : ObservableObject
 
     public MapControlContentViewModel Content { get; }
 
+    public MapControlVerificationViewModel Verification { get; }
+
     public int CurrentStep
     {
         get => _currentStep;
@@ -45,6 +48,10 @@ public sealed class MapControlEditorViewModel : ObservableObject
                 if (value == 3)
                 {
                     Content.SetPatch(MainInformation.GamePatch);
+                }
+                else if (value == 4)
+                {
+                    RefreshVerification();
                 }
 
                 OnPropertyChanged(nameof(CurrentStepIndex));
@@ -129,6 +136,7 @@ public sealed class MapControlEditorViewModel : ObservableObject
         MainInformation.UpdateLanguage();
         Scope.UpdateLanguage();
         Content.UpdateLanguage();
+        Verification.UpdateLanguage();
         OnPropertyChanged(nameof(StepSummary));
     }
 
@@ -184,6 +192,9 @@ public sealed class MapControlEditorViewModel : ObservableObject
         OnPropertyChanged(nameof(CanMoveNext));
         NotifyStepAvailabilityChanged();
     }
+
+    private void RefreshVerification() =>
+        Verification.Update(MainInformation, Scope, Content);
 
     private void NotifyStepAvailabilityChanged()
     {

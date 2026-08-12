@@ -51,9 +51,12 @@ public static class MapControlPackValidator
 
         ValidateApplicability(pack.Applicability);
 
-        if (pack.Rules.Count == 0)
+        if (pack.Rules.Count == 0
+            && pack.TimedReminders.Count == 0
+            && pack.PersistentTips.Count == 0)
         {
-            throw new InvalidDataException("Map Control Pack must contain at least one rule.");
+            throw new InvalidDataException(
+                "Map Control Pack must contain at least one objective rule, timed reminder or persistent tip.");
         }
 
         if (!MapObjectiveTimingCatalog.TryGetForPatch(pack.Patch, out var timingSet)

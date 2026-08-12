@@ -154,6 +154,21 @@
                         </Style>
                     </views:MapControlContentView.Style>
                 </views:MapControlContentView>
+
+                <views:MapControlVerificationView x:Name="MapControlVerificationPage"
+                                                  DataContext="{Binding Verification}">
+                    <views:MapControlVerificationView.Style>
+                        <Style TargetType="views:MapControlVerificationView">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding DataContext.CurrentStep, RelativeSource={RelativeSource AncestorType=views:MapControlEditorView}}"
+                                             Value="4">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </views:MapControlVerificationView.Style>
+                </views:MapControlVerificationView>
             </Grid>
         </ScrollViewer>
     </Grid>

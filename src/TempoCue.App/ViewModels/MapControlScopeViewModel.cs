@@ -61,24 +61,25 @@ public sealed class MapControlScopeViewModel : ObservableObject
     {
         get
         {
-            var roles = AllRolesSelected
-                ? _localization.Get("Coaching.MapControlEditor.Scope.Summary.AllRoles")
-                : string.Join(", ", RoleOptions
-                    .Where(static option => option.IsSelected)
-                    .Select(static option => option.DisplayName));
-            var side = _localization.Get(SelectedTeamSide switch
-            {
-                MapControlTeamSide.Blue => "Coaching.MapControlEditor.Scope.Summary.BlueSide",
-                MapControlTeamSide.Red => "Coaching.MapControlEditor.Scope.Summary.RedSide",
-                _ => "Coaching.MapControlEditor.Scope.Summary.AnySide"
-            });
-
             return _localization.Format(
                 "Coaching.MapControlEditor.Scope.Summary",
-                roles,
-                side);
+                RolesSummary,
+                TeamSideSummary);
         }
     }
+
+    public string RolesSummary => AllRolesSelected
+        ? _localization.Get("Coaching.MapControlEditor.Scope.Summary.AllRoles")
+        : string.Join(", ", RoleOptions
+            .Where(static option => option.IsSelected)
+            .Select(static option => option.DisplayName));
+
+    public string TeamSideSummary => _localization.Get(SelectedTeamSide switch
+    {
+        MapControlTeamSide.Blue => "Coaching.MapControlEditor.Scope.Summary.BlueSide",
+        MapControlTeamSide.Red => "Coaching.MapControlEditor.Scope.Summary.RedSide",
+        _ => "Coaching.MapControlEditor.Scope.Summary.AnySide"
+    });
 
     public void SelectAllRoles()
     {
@@ -98,7 +99,12 @@ public sealed class MapControlScopeViewModel : ObservableObject
         NotifySelectionChanged();
     }
 
-    public void UpdateLanguage() => OnPropertyChanged(nameof(SummaryText));
+    public void UpdateLanguage()
+    {
+        OnPropertyChanged(nameof(RolesSummary));
+        OnPropertyChanged(nameof(TeamSideSummary));
+        OnPropertyChanged(nameof(SummaryText));
+    }
 
     private void RoleOption_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -130,6 +136,7 @@ public sealed class MapControlScopeViewModel : ObservableObject
         OnPropertyChanged(nameof(AllRolesSelected));
         OnPropertyChanged(nameof(IsComplete));
         OnPropertyChanged(nameof(SelectedRoles));
+        OnPropertyChanged(nameof(RolesSummary));
         OnPropertyChanged(nameof(SummaryText));
     }
 }

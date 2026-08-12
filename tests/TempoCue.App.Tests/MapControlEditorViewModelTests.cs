@@ -74,6 +74,91 @@ public sealed class MapControlEditorViewModelTests
         Assert.True(editor.NavigateToStep(2));
     }
 
+    [Fact]
+    public async Task CompletedContent_OpensVerificationWithTimelineAndSummary()
+    {
+        var editor = CreateEditor();
+        await editor.BeginNewAsync();
+        CompleteMainInformation(editor);
+        Assert.True(editor.MoveNext());
+        Assert.True(editor.MoveNext());
+        AddTimedReminder(editor.Content, "Ранний обзор", "03:15");
+
+        Assert.True(editor.MoveNext());
+
+        Assert.Equal(4, editor.CurrentStep);
+        Assert.True(editor.Verification.CanContinue);
+        Assert.Equal(0, editor.Verification.ErrorCount);
+        Assert.Equal(0, editor.Verification.WarningCount);
+        Assert.Equal(1, editor.Verification.TimedReminderCount);
+        Assert.Single(editor.Verification.TimelineMarkers);
+        Assert.Contains(
+            editor.Verification.TimelineMarkers,
+            marker => marker.IsUserReminder && marker.Title == "Ранний обзор");
+    }
+
+    [Fact]
+    public async Task ObjectiveRule_AddsOnlyItsSystemEventToTimeline()
+    {
+        var editor = CreateEditor();
+        await editor.BeginNewAsync();
+        CompleteMainInformation(editor);
+        editor.Content.SetPatch(editor.MainInformation.GamePatch);
+        editor.Content.BeginAddRule(TempoCue.Core.MapObjectiveKind.ElementalDragon);
+        editor.Content.Editor.Message = "Подготовьте обзор у реки.";
+        editor.Content.Editor.WhyNow = "Дракон скоро появится.";
+        Assert.True(editor.Content.SaveEditor());
+
+        editor.Verification.Update(editor.MainInformation, editor.Scope, editor.Content);
+
+        var systemMarker = Assert.Single(
+            editor.Verification.TimelineMarkers,
+            marker => !marker.IsUserReminder);
+        Assert.Equal("05:00", systemMarker.TimeLabel);
+        Assert.DoesNotContain(
+            editor.Verification.TimelineMarkers,
+            marker => marker.TimeLabel is "08:00" or "15:00" or "20:00");
+    }
+
+    [Fact]
+    public async Task FuturePatch_ShowsWarningWithoutBlockingVerification()
+    {
+        var editor = CreateEditor();
+        await editor.BeginNewAsync();
+        editor.MainInformation.PatchSelection.SelectPatch("26.16");
+        CompleteMainInformation(editor);
+        editor.Content.SetPatch(editor.MainInformation.GamePatch);
+        AddTimedReminder(editor.Content, "Подготовка", "10:00");
+
+        editor.Verification.Update(editor.MainInformation, editor.Scope, editor.Content);
+
+        Assert.True(editor.Verification.CanContinue);
+        Assert.Equal(0, editor.Verification.ErrorCount);
+        Assert.Equal(1, editor.Verification.WarningCount);
+        Assert.Contains("16.15", editor.Verification.Issues.Single().Message);
+    }
+
+    private static void CompleteMainInformation(MapControlEditorViewModel editor)
+    {
+        editor.MainInformation.PackName = "Контроль объектов";
+        editor.MainInformation.ShortDescription =
+            "Напоминания о подготовке и появлении нейтральных объектов.";
+    }
+
+    private static void AddTimedReminder(
+        MapControlContentViewModel content,
+        string title,
+        string gameTime)
+    {
+        content.TimedReminders.BeginAdd();
+        var form = content.TimedReminders.Editor;
+        form.GameTimeInput = gameTime;
+        form.Title = title;
+        form.Message = "Проверьте обзор вокруг цели.";
+        form.WhyNow = "Скоро начнётся важное игровое событие.";
+        Assert.True(content.TimedReminders.SaveEditor());
+    }
+
     private static MapControlEditorViewModel CreateEditor() => new(
         LocalizationService.Instance,
         TestGamePatchCatalog.Ready());

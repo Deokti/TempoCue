@@ -13,6 +13,48 @@ public sealed class MapControlPackValidatorTests
     }
 
     [Fact]
+    public void Validate_AcceptsPackWithOnlyTimedReminder()
+    {
+        var original = MapControlPackTestData.Create();
+        var pack = original with
+        {
+            Rules = [],
+            PersistentTips = []
+        };
+
+        MapControlPackValidator.Validate(pack);
+    }
+
+    [Fact]
+    public void Validate_AcceptsPackWithOnlyPersistentTip()
+    {
+        var original = MapControlPackTestData.Create();
+        var pack = original with
+        {
+            Rules = [],
+            TimedReminders = []
+        };
+
+        MapControlPackValidator.Validate(pack);
+    }
+
+    [Fact]
+    public void Validate_RejectsPackWithoutContent()
+    {
+        var pack = MapControlPackTestData.Create() with
+        {
+            Rules = [],
+            TimedReminders = [],
+            PersistentTips = []
+        };
+
+        var exception = Assert.Throws<InvalidDataException>(
+            () => MapControlPackValidator.Validate(pack));
+
+        Assert.Contains("at least one", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public void Validate_RejectsUnsupportedPackType()
     {
         var pack = MapControlPackTestData.Create() with { PackType = "matchup" };

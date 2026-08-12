@@ -901,4 +901,27 @@
   <data name="Coaching.MapControlEditor.Content.Persistent.Scope.BeforeFirstObjective" xml:space="preserve"><value>Before the first objective</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.Scope.WhileObjectiveAvailable" xml:space="preserve"><value>While any objective is available</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.Scope.Hint" xml:space="preserve"><value>“Any objective” means Dragon, Void Grubs, Rift Herald, or Baron has spawned and has not been taken yet.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Result" xml:space="preserve"><value>Verification result</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Errors" xml:space="preserve"><value>{0} errors</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Warnings" xml:space="preserve"><value>{0} warnings</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Status.Success" xml:space="preserve"><value>No errors found</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Status.Success.Description" xml:space="preserve"><value>The pack is internally consistent and can proceed to saving.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Status.Attention" xml:space="preserve"><value>The pack needs attention</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Status.Attention.Description" xml:space="preserve"><value>Review the notes below before saving the pack.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Issue.TimingsUnavailable" xml:space="preserve"><value>TempoCue has no objective timing data for the selected patch.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Issue.PreviousPatch" xml:space="preserve"><value>Patch {0} uses the latest timings verified through patch {1}. The rules remain active but need review.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Issue.EmptyContent" xml:space="preserve"><value>Add at least one objective rule, timed reminder, or persistent tip.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Issue.OpenEditor" xml:space="preserve"><value>Finish editing or remove the unfinished content card before verification.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Issue.DuplicateTimes" xml:space="preserve"><value>Several timed reminders will appear simultaneously at: {0}.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Timeline" xml:space="preserve"><value>Timeline</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Timeline.Description" xml:space="preserve"><value>Circles are system events only for objectives configured in this pack. Squares are your timed reminders.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Legend.System" xml:space="preserve"><value>System event</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Legend.User" xml:space="preserve"><value>Your reminder</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary" xml:space="preserve"><value>Pack summary</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Rules" xml:space="preserve"><value>Objective rules</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Timed" xml:space="preserve"><value>Timed reminders</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Persistent" xml:space="preserve"><value>Persistent tips</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Patch" xml:space="preserve"><value>Catalog patch</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Scope" xml:space="preserve"><value>Scope</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Side" xml:space="preserve"><value>Team side</value></data>
 </root>

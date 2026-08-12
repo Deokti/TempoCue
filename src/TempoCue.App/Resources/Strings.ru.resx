@@ -911,4 +911,27 @@
   <data name="Coaching.MapControlEditor.Content.Persistent.Scope.BeforeFirstObjective" xml:space="preserve"><value>До первого объекта</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.Scope.WhileObjectiveAvailable" xml:space="preserve"><value>Пока доступен любой объект</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.Scope.Hint" xml:space="preserve"><value>«Любой объект» — Дракон, Личинки Бездны, Герольд или Барон уже появились и ещё не были взяты.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Result" xml:space="preserve"><value>Результат проверки</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Errors" xml:space="preserve"><value>Ошибок: {0}</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Warnings" xml:space="preserve"><value>Предупреждений: {0}</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Status.Success" xml:space="preserve"><value>Ошибок не найдено</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Status.Success.Description" xml:space="preserve"><value>Настройки набора согласованы. Можно переходить к сохранению.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Status.Attention" xml:space="preserve"><value>Набор требует внимания</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Status.Attention.Description" xml:space="preserve"><value>Перед сохранением проверьте замечания ниже.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Issue.TimingsUnavailable" xml:space="preserve"><value>В TempoCue нет расписания объектов для выбранного патча.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Issue.PreviousPatch" xml:space="preserve"><value>Для патча {0} используются последние тайминги, проверенные на патче {1}. Правила остаются активными, но требуют проверки.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Issue.EmptyContent" xml:space="preserve"><value>Добавьте хотя бы одно правило объекта, напоминание по времени или постоянную подсказку.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Issue.OpenEditor" xml:space="preserve"><value>Завершите редактирование или удалите незаполненную карточку перед проверкой.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Issue.DuplicateTimes" xml:space="preserve"><value>Несколько напоминаний появятся одновременно: {0}.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Timeline" xml:space="preserve"><value>Временная шкала</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Timeline.Description" xml:space="preserve"><value>Кружки — системные события только для настроенных в наборе объектов. Квадраты — ваши напоминания по времени.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Legend.System" xml:space="preserve"><value>Системное событие</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Legend.User" xml:space="preserve"><value>Ваше напоминание</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary" xml:space="preserve"><value>Сводка набора</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Rules" xml:space="preserve"><value>Правила объектов</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Timed" xml:space="preserve"><value>Напоминания по времени</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Persistent" xml:space="preserve"><value>Постоянные подсказки</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Patch" xml:space="preserve"><value>Патч каталога</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Scope" xml:space="preserve"><value>Область</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Side" xml:space="preserve"><value>Сторона команды</value></data>
 </root>

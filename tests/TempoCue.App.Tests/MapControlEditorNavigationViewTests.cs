@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Threading;
+using TempoCue.App.ViewModels;
 using TempoCue.App.Views;
 using static TempoCue.App.Tests.CoachingViewTestContext;
 
@@ -141,6 +142,37 @@ public sealed class MapControlEditorNavigationViewTests
             "map-control-editor-step3-navigation.png");
     });
 
+    [Fact]
+    public void CompletedContent_OpensVerificationStep() => WpfTestHost.Run(() =>
+    {
+        using var context = new MainWindowTestContext();
+        OpenMapControlEditor(context);
+        FillMainInformation(context, "Контроль объектов");
+        var next = WpfTestHost.Find<Button>(
+            context.MapControlEditorPage,
+            "MapControlEditorNextButton");
+        WpfTestHost.Click(next, DispatcherPriority.ApplicationIdle);
+        WpfTestHost.Click(next, DispatcherPriority.ApplicationIdle);
+        AddTimedReminder(context.Coaching.MapControlEditor.Content);
+        WpfTestHost.Pump();
+
+        WpfTestHost.Click(next, DispatcherPriority.ApplicationIdle);
+
+        var verification = WpfTestHost.Find<MapControlVerificationView>(
+            context.MapControlEditorPage,
+            "MapControlVerificationPage");
+        var steps = WpfTestHost.Find<ListBox>(
+            context.MapControlEditorPage,
+            "MapControlEditorStepsListBox");
+        Assert.Equal(4, context.Coaching.MapControlEditor.CurrentStep);
+        Assert.Equal(3, steps.SelectedIndex);
+        Assert.Equal(Visibility.Visible, verification.Visibility);
+        Assert.Single(context.Coaching.MapControlEditor.Verification.TimelineMarkers);
+        SaveVisualSnapshotIfRequested(
+            context.Window,
+            "map-control-editor-step4-verification.png");
+    });
+
     private static (PackTypeSelectionView Page, Button GameControlButton) OpenMapControlEditor(
         MainWindowTestContext context)
     {
@@ -165,5 +197,16 @@ public sealed class MapControlEditorNavigationViewTests
         form.ShortDescription =
             "Напоминания о подготовке и появлении нейтральных объектов.";
         WpfTestHost.Pump();
+    }
+
+    private static void AddTimedReminder(MapControlContentViewModel content)
+    {
+        content.TimedReminders.BeginAdd();
+        var form = content.TimedReminders.Editor;
+        form.GameTimeInput = "03:15";
+        form.Title = "Ранний обзор";
+        form.Message = "Проверьте обзор вокруг цели.";
+        form.WhyNow = "Скоро начнётся важное игровое событие.";
+        Assert.True(content.TimedReminders.SaveEditor());
     }
 }
