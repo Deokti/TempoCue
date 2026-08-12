@@ -1,6 +1,7 @@
 <UserControl x:Class="TempoCue.App.Views.CurrentMatchView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:TempoCue.App.Controls"
              xmlns:application="clr-namespace:TempoCue.Application;assembly=TempoCue.Application"
              xmlns:core="clr-namespace:TempoCue.Coaching;assembly=TempoCue.Coaching"
              xmlns:localization="clr-namespace:TempoCue.App.Localization"
@@ -249,7 +250,9 @@
         </Border>
 
         <!-- Прокручиваемое содержимое матча: участники, совет и игровые факты. -->
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
+        <ScrollViewer Grid.Row="1"
+                      controls:ScrollViewerWheelRouting.IsEnabled="True"
+                      VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
             <StackPanel Margin="24,22,24,24">
                 <!-- Краткая сводка активного игрока, соперника на линии и состояния правила. -->

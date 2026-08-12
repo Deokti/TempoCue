@@ -18,6 +18,7 @@
 
     <!-- Настройки интерфейса и безопасная проверка будущего игрового оверлея. -->
     <ScrollViewer x:Name="SettingsScrollViewer"
+                  controls:ScrollViewerWheelRouting.IsEnabled="True"
                   VerticalScrollBarVisibility="Auto"
                   HorizontalScrollBarVisibility="Disabled">
         <ScrollViewer.Resources>
