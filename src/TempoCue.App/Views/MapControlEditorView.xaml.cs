@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -73,7 +74,9 @@ public partial class MapControlEditorView : UserControl
             ResetContentScroll();
         }
 
-        MapControlEditorStepsListBox.SelectedIndex = ViewModel.CurrentStepIndex;
+        MapControlEditorStepsListBox.SetCurrentValue(
+            Selector.SelectedIndexProperty,
+            ViewModel.CurrentStepIndex);
     }
 
     private static ListBoxItem? FindStepItem(DependencyObject? element)

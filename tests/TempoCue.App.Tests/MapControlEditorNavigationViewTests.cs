@@ -1,5 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Threading;
 using TempoCue.App.Views;
 using static TempoCue.App.Tests.CoachingViewTestContext;
@@ -11,18 +13,39 @@ namespace TempoCue.App.Tests;
 public sealed class MapControlEditorNavigationViewTests
 {
     [Fact]
+    public void DirectStepNavigation_KeepsSelectedStepBoundToViewModel() => WpfTestHost.Run(() =>
+    {
+        using var context = new MainWindowTestContext();
+        OpenMapControlEditor(context);
+        FillMainInformation(context, "Контроль объектов");
+        var steps = WpfTestHost.Find<ListBox>(
+            context.MapControlEditorPage,
+            "MapControlEditorStepsListBox");
+        var stepItems = steps.Items.Cast<ListBoxItem>().ToArray();
+
+        WpfTestHost.Click(stepItems[1], DispatcherPriority.ApplicationIdle);
+
+        Assert.Equal(2, context.Coaching.MapControlEditor.CurrentStep);
+        Assert.True(BindingOperations.IsDataBound(
+            steps,
+            Selector.SelectedIndexProperty));
+
+        WpfTestHost.Click(
+            WpfTestHost.Find<Button>(context.MapControlEditorPage, "MapControlEditorBackButton"),
+            DispatcherPriority.ApplicationIdle);
+        Assert.Equal(0, steps.SelectedIndex);
+
+        WpfTestHost.Click(
+            WpfTestHost.Find<Button>(context.MapControlEditorPage, "MapControlEditorNextButton"),
+            DispatcherPriority.ApplicationIdle);
+        Assert.Equal(1, steps.SelectedIndex);
+    });
+
+    [Fact]
     public void ReopenAfterLeavingThirdStep_ResetsVisibleAndSelectedStep() => WpfTestHost.Run(() =>
     {
         using var context = new MainWindowTestContext();
-        var libraryPage = OpenLibrary(context);
-        WpfTestHost.Click(WpfTestHost.Find<Button>(libraryPage, "CreatePackButton"));
-        var packTypePage = WpfTestHost.Find<PackTypeSelectionView>(
-            context.CoachingPage,
-            "PackTypeSelectionPage");
-        var gameControlButton = WpfTestHost.Find<Button>(
-            packTypePage,
-            "GameControlPackTypeButton");
-        WpfTestHost.Click(gameControlButton, DispatcherPriority.ApplicationIdle);
+        var (packTypePage, gameControlButton) = OpenMapControlEditor(context);
 
         FillMainInformation(context, "Первый набор");
         var next = WpfTestHost.Find<Button>(
@@ -56,17 +79,8 @@ public sealed class MapControlEditorNavigationViewTests
     public void PackTypeSelection_OpensMapControlEditor() => WpfTestHost.Run(() =>
     {
         using var context = new MainWindowTestContext();
-        var libraryPage = OpenLibrary(context);
-        WpfTestHost.Click(WpfTestHost.Find<Button>(libraryPage, "CreatePackButton"));
-        var packTypePage = WpfTestHost.Find<PackTypeSelectionView>(
-            context.CoachingPage,
-            "PackTypeSelectionPage");
-
-        var gameControlButton = WpfTestHost.Find<Button>(
-            packTypePage,
-            "GameControlPackTypeButton");
+        var (packTypePage, gameControlButton) = OpenMapControlEditor(context);
         Assert.True(gameControlButton.IsEnabled);
-        WpfTestHost.Click(gameControlButton, DispatcherPriority.ApplicationIdle);
 
         Assert.Equal(Visibility.Collapsed, packTypePage.Visibility);
         Assert.Equal(Visibility.Visible, context.MapControlEditorPage.Visibility);
@@ -108,11 +122,39 @@ public sealed class MapControlEditorNavigationViewTests
         Assert.Equal(Visibility.Collapsed, WpfTestHost.Find<MapControlMainInformationView>(
             context.MapControlEditorPage,
             "MapControlMainInformationPage").Visibility);
+        Assert.Equal(2, context.Coaching.MapControlEditor.CurrentStep);
+        Assert.Equal(1, steps.SelectedIndex);
         Assert.True(stepItems[2].IsEnabled);
         SaveVisualSnapshotIfRequested(
             context.Window,
             "map-control-editor-step2.png");
+
+        WpfTestHost.Click(
+            WpfTestHost.Find<Button>(context.MapControlEditorPage, "MapControlEditorNextButton"),
+            DispatcherPriority.ApplicationIdle);
+
+        Assert.Equal(3, context.Coaching.MapControlEditor.CurrentStep);
+        Assert.Equal(2, steps.SelectedIndex);
+        Assert.True(stepItems[2].IsSelected);
+        SaveVisualSnapshotIfRequested(
+            context.Window,
+            "map-control-editor-step3-navigation.png");
     });
+
+    private static (PackTypeSelectionView Page, Button GameControlButton) OpenMapControlEditor(
+        MainWindowTestContext context)
+    {
+        var libraryPage = OpenLibrary(context);
+        WpfTestHost.Click(WpfTestHost.Find<Button>(libraryPage, "CreatePackButton"));
+        var packTypePage = WpfTestHost.Find<PackTypeSelectionView>(
+            context.CoachingPage,
+            "PackTypeSelectionPage");
+        var gameControlButton = WpfTestHost.Find<Button>(
+            packTypePage,
+            "GameControlPackTypeButton");
+        WpfTestHost.Click(gameControlButton, DispatcherPriority.ApplicationIdle);
+        return (packTypePage, gameControlButton);
+    }
 
     private static void FillMainInformation(
         MainWindowTestContext context,
