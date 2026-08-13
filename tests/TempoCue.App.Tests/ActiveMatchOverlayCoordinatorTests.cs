@@ -42,6 +42,7 @@ public sealed class ActiveMatchOverlayCoordinatorTests
                 Assert.Equal("Содержимое совета", first.Source);
                 Assert.Equal("Уровень 1", first.Badge);
                 Assert.Equal(OverlayNotificationTone.Danger, first.Tone);
+                Assert.Equal(OverlayNotificationPurpose.Operational, first.Purpose);
             },
             second =>
             {
@@ -126,6 +127,7 @@ public sealed class ActiveMatchOverlayCoordinatorTests
                 Assert.Equal("Совет текущей фазы", phaseTip.Phrase);
                 Assert.Equal("Уровень 2", phaseTip.Badge);
                 Assert.Equal(OverlayNotificationTone.Coach, phaseTip.Tone);
+                Assert.Equal(OverlayNotificationPurpose.Learning, phaseTip.Purpose);
             },
             generalTip =>
                 Assert.Equal("matchup:test.urgot-vs-sett:tip:general-tip:level:3", generalTip.Key));
@@ -353,6 +355,7 @@ public sealed class ActiveMatchOverlayCoordinatorTests
                 Assert.Equal("Проверьте реку", reminder.Phrase);
                 Assert.Equal("К 03:15", reminder.Badge);
                 Assert.Equal(OverlayNotificationTone.Caution, reminder.Tone);
+                Assert.Equal(OverlayNotificationPurpose.Operational, reminder.Purpose);
             });
     }
 
@@ -397,6 +400,7 @@ public sealed class ActiveMatchOverlayCoordinatorTests
         Assert.Equal("Сохраняйте обзор", tip.Phrase);
         Assert.Equal("Уровень 5", tip.Badge);
         Assert.Equal(OverlayNotificationTone.Coach, tip.Tone);
+        Assert.Equal(OverlayNotificationPurpose.Learning, tip.Purpose);
     }
 
     [Fact]

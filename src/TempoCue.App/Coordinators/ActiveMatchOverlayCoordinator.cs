@@ -262,7 +262,8 @@ public sealed class ActiveMatchOverlayCoordinator : IDisposable
             _localization.Get("Overlay.Matchup.Dismiss"),
             OverlayNotificationTone.Coach,
             pack.Name,
-            _localization.Format("Current.Phase.Level", playerLevel));
+            _localization.Format("Current.Phase.Level", playerLevel),
+            OverlayNotificationPurpose.Learning);
 
     private OverlayNotification CreateMapControlNotification(
         MapControlScheduledAdvice advice) => new(
@@ -289,7 +290,8 @@ public sealed class ActiveMatchOverlayCoordinator : IDisposable
             _localization.Get("Overlay.MapControl.Dismiss"),
             OverlayNotificationTone.Coach,
             advice.PackName,
-            _localization.Format("Current.Phase.Level", playerLevel));
+            _localization.Format("Current.Phase.Level", playerLevel),
+            OverlayNotificationPurpose.Learning);
 
     private EligiblePersistentTip? SelectPersistentTip(
         IReadOnlyCollection<EligiblePersistentTip> eligibleTips,

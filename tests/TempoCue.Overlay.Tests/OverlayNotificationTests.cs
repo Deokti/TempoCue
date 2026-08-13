@@ -13,7 +13,8 @@ public sealed class OverlayNotificationTests
             "  Закрыть оверлей  ",
             OverlayNotificationTone.Coach,
             "  уровни 1–8  ",
-            "  новое  ");
+            "  новое  ",
+            OverlayNotificationPurpose.Learning);
 
         Assert.Equal("matchup.rule.1", notification.Key);
         Assert.Equal("Совет", notification.Status);
@@ -21,8 +22,22 @@ public sealed class OverlayNotificationTests
         Assert.Equal("Набор советов · Urgot против Sett", notification.Source);
         Assert.Equal("Закрыть оверлей", notification.DismissLabel);
         Assert.Equal(OverlayNotificationTone.Coach, notification.Tone);
+        Assert.Equal(OverlayNotificationPurpose.Learning, notification.Purpose);
         Assert.Equal("уровни 1–8", notification.Context);
         Assert.Equal("новое", notification.Badge);
+    }
+
+    [Fact]
+    public void Constructor_DefaultsPurposeToOperational()
+    {
+        var notification = new OverlayNotification(
+            "objective.dragon",
+            "Событие",
+            "Дракон появится через минуту",
+            "Контроль карты",
+            "Закрыть");
+
+        Assert.Equal(OverlayNotificationPurpose.Operational, notification.Purpose);
     }
 
     [Theory]
