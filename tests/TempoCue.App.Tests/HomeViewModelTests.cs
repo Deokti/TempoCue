@@ -48,6 +48,7 @@ public sealed class HomeViewModelTests
             using var currentMatch = new CurrentMatchViewModel(
                 monitor,
                 TestChampionCatalog.Ready(),
+                TestLeagueClientRegionSource.EuropeWest(),
                 localization);
             using var home = new HomeViewModel(currentMatch, localization);
 

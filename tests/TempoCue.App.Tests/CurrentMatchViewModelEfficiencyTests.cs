@@ -88,6 +88,7 @@ public sealed class CurrentMatchViewModelEfficiencyTests
         using var viewModel = new CurrentMatchViewModel(
             monitor,
             TestChampionCatalog.Ready(),
+            TestLeagueClientRegionSource.EuropeWest(),
             LocalizationService.Instance);
 
         await viewModel.RefreshAsync();

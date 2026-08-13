@@ -31,6 +31,7 @@ internal sealed class MainWindowTestContext : IDisposable
         CurrentMatch = new CurrentMatchViewModel(
             _activeMatchMonitor,
             TestChampionCatalog.Ready(),
+            TestLeagueClientRegionSource.EuropeWest(),
             Localization);
         Home = new HomeViewModel(CurrentMatch, Localization);
         Settings = new SettingsViewModel(

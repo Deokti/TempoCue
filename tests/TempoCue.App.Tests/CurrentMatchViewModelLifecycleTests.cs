@@ -20,6 +20,7 @@ public sealed class CurrentMatchViewModelLifecycleTests
         var viewModel = new CurrentMatchViewModel(
             monitor,
             TestChampionCatalog.Ready(),
+            TestLeagueClientRegionSource.EuropeWest(),
             LocalizationService.Instance);
         var completedUpdates = 0;
         viewModel.StateUpdated += (_, _) => completedUpdates++;

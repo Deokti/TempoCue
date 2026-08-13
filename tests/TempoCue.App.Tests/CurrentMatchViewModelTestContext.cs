@@ -31,7 +31,8 @@ internal sealed class CurrentMatchViewModelTestContext : IDisposable
     public CurrentMatchViewModel CreateViewModel(
         MatchSnapshotReadResult result,
         IMatchAdviceSelector adviceSelector,
-        IChampionCatalog? championCatalog = null)
+        IChampionCatalog? championCatalog = null,
+        ILeagueClientRegionSource? leagueClientRegionSource = null)
     {
         var monitor = CurrentMatchViewModelTestData.CreateMonitor(
             TestMatchSnapshotSource.FromResult(result),
@@ -39,6 +40,7 @@ internal sealed class CurrentMatchViewModelTestContext : IDisposable
         var viewModel = new CurrentMatchViewModel(
             monitor,
             championCatalog ?? TestChampionCatalog.Ready(),
+            leagueClientRegionSource ?? TestLeagueClientRegionSource.EuropeWest(),
             Localization);
         _monitors.Add(monitor);
         _viewModels.Add(viewModel);

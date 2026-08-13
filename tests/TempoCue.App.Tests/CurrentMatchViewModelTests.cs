@@ -32,6 +32,7 @@ public sealed class CurrentMatchViewModelTests
         using var viewModel = new TempoCue.App.ViewModels.CurrentMatchViewModel(
             monitor,
             TestChampionCatalog.Ready(),
+            TestLeagueClientRegionSource.EuropeWest(),
             TempoCue.App.Localization.LocalizationService.Instance);
 
         Assert.Equal(MatchSnapshotReadStatus.Success, viewModel.Status);
@@ -244,6 +245,47 @@ public sealed class CurrentMatchViewModelTests
         Assert.Equal(
             viewModel.OpponentChampionImageUri,
             Assert.Single(viewModel.Enemies).ChampionImageUri);
+    }
+
+    [Fact]
+    public async Task LoadPlayerProfileRegionAsync_AddsRiotIdAndProfileLinkToRoster()
+    {
+        using var context = new CurrentMatchViewModelTestContext();
+        var match = new MatchState
+        {
+            GameTimeSeconds = 120,
+            ActivePlayerId = "urgot-player",
+            Players =
+            [
+                new PlayerState
+                {
+                    ParticipantId = "urgot-player",
+                    RiotId = RiotId.Create("Summoner A", "EUW"),
+                    ChampionName = "Urgot",
+                    Team = TeamSide.Order,
+                    Position = PlayerPosition.Top,
+                    Level = 1
+                }
+            ]
+        };
+        var viewModel = context.CreateViewModel(
+            MatchSnapshotReadResult.Success(
+                new MatchSnapshot(match, [], DateTimeOffset.UtcNow)),
+            new TestMatchAdviceSelector(),
+            leagueClientRegionSource: TestLeagueClientRegionSource.EuropeWest());
+
+        await viewModel.RefreshAsync();
+        var participantWithoutRegion = Assert.Single(viewModel.Allies);
+        Assert.Equal("Summoner A#EUW", participantWithoutRegion.RiotId);
+        Assert.Null(participantWithoutRegion.ProfileUri);
+
+        await viewModel.LoadPlayerProfileRegionAsync();
+
+        var participant = Assert.Single(viewModel.Allies);
+        Assert.Equal(
+            "https://www.leagueofgraphs.com/summoner/euw/Summoner+A-EUW",
+            participant.ProfileUri?.AbsoluteUri);
+        Assert.Contains("Summoner A#EUW", participant.ProfileLinkToolTip);
     }
 
     [Fact]

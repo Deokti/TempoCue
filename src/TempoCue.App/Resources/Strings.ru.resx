@@ -194,6 +194,10 @@
   <data name="Current.CreepScore.Approximate" xml:space="preserve"><value>≈{0} CS</value></data>
   <data name="Current.Participant.You" xml:space="preserve"><value>вы · {0}</value></data>
   <data name="Current.Participant.State" xml:space="preserve"><value>{0} · {1}</value></data>
+  <data name="Current.Participant.ProfileLink" xml:space="preserve"><value>LoG ↗</value></data>
+  <data name="Current.Participant.ProfileLinkHint" xml:space="preserve"><value>Открыть профиль {0} на LeagueOfGraphs</value></data>
+  <data name="Current.Participant.ProfileOpenError.Title" xml:space="preserve"><value>Не удалось открыть профиль</value></data>
+  <data name="Current.Participant.ProfileOpenError.Message" xml:space="preserve"><value>Windows не смогла открыть ссылку LeagueOfGraphs в браузере.</value></data>
   <data name="Current.Events.Empty" xml:space="preserve"><value>Смерти и взятые драконы появятся здесь по ходу матча.</value></data>
   <data name="Current.Event.Kill" xml:space="preserve"><value>{0} убил {1}</value></data>
   <data name="Current.Event.Death" xml:space="preserve"><value>{0} погиб</value></data>

@@ -36,6 +36,8 @@ internal sealed record LiveClientPlayerDto
 
     public string? RiotIdGameName { get; init; }
 
+    public string? RiotIdTagLine { get; init; }
+
     public string? SummonerName { get; init; }
 
     public required string ChampionName { get; init; }

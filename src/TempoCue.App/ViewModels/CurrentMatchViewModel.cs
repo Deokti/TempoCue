@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using TempoCue.App.Localization;
+using TempoCue.App.Profiles;
 using TempoCue.Application;
 using TempoCue.Core;
 
@@ -16,14 +17,19 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
 
     private readonly IActiveMatchMonitor _monitor;
     private readonly IChampionCatalog _championCatalog;
+    private readonly ILeagueClientRegionSource _leagueClientRegionSource;
     private readonly LocalizationService _localization;
 
     private ActiveMatchUpdate? _lastUpdate;
     private IReadOnlyDictionary<string, Uri> _championImages =
         new Dictionary<string, Uri>(StringComparer.OrdinalIgnoreCase);
     private CancellationTokenSource? _championCatalogLoadCancellation;
+    private CancellationTokenSource? _profileRegionLoadCancellation;
     private int _championCatalogLoadVersion;
+    private int _profileRegionLoadVersion;
     private bool _isChampionCatalogLoaded;
+    private bool _isProfileRegionLoaded;
+    private string? _leagueClientRegion;
     private MatchSnapshotReadStatus _status = MatchSnapshotReadStatus.NoActiveMatch;
     private string _connectionTitle = string.Empty;
     private string _connectionDetails = string.Empty;
@@ -52,10 +58,13 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
     public CurrentMatchViewModel(
         IActiveMatchMonitor monitor,
         IChampionCatalog championCatalog,
+        ILeagueClientRegionSource leagueClientRegionSource,
         LocalizationService localization)
     {
         _monitor = monitor ?? throw new ArgumentNullException(nameof(monitor));
         _championCatalog = championCatalog ?? throw new ArgumentNullException(nameof(championCatalog));
+        _leagueClientRegionSource = leagueClientRegionSource
+            ?? throw new ArgumentNullException(nameof(leagueClientRegionSource));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _monitor.Updated += Monitor_Updated;
         _localization.PropertyChanged += Localization_PropertyChanged;
@@ -273,6 +282,54 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         }
     }
 
+    /// <summary>
+    /// Один раз читает регион локального клиента. Если регион неизвестен, Riot ID всё равно
+    /// показывается, но ссылка не строится по догадке.
+    /// </summary>
+    public async Task LoadPlayerProfileRegionAsync(
+        CancellationToken cancellationToken = default)
+    {
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
+        if (_isProfileRegionLoaded)
+        {
+            return;
+        }
+
+        var version = Interlocked.Increment(ref _profileRegionLoadVersion);
+        var requestCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        var previousCancellation = Interlocked.Exchange(
+            ref _profileRegionLoadCancellation,
+            requestCancellation);
+        TryCancel(previousCancellation);
+
+        try
+        {
+            var region = await _leagueClientRegionSource
+                .ReadRegionAsync(requestCancellation.Token);
+            if (_isDisposed || version != Volatile.Read(ref _profileRegionLoadVersion))
+            {
+                return;
+            }
+
+            _leagueClientRegion = region;
+            _isProfileRegionLoaded = true;
+            RerenderLastUpdate();
+        }
+        catch (OperationCanceledException) when (
+            !cancellationToken.IsCancellationRequested
+            && requestCancellation.IsCancellationRequested)
+        {
+        }
+        finally
+        {
+            Interlocked.CompareExchange(
+                ref _profileRegionLoadCancellation,
+                null,
+                requestCancellation);
+            requestCancellation.Dispose();
+        }
+    }
+
     public void Dispose()
     {
         if (_isDisposed)
@@ -282,7 +339,9 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
 
         _isDisposed = true;
         Interlocked.Increment(ref _championCatalogLoadVersion);
+        Interlocked.Increment(ref _profileRegionLoadVersion);
         TryCancel(Interlocked.Exchange(ref _championCatalogLoadCancellation, null));
+        TryCancel(Interlocked.Exchange(ref _profileRegionLoadCancellation, null));
         _monitor.Updated -= Monitor_Updated;
         _localization.PropertyChanged -= Localization_PropertyChanged;
     }
@@ -529,12 +588,22 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
                 "Current.Participant.State",
                 state,
                 FormatCreepScore(player.CreepScore));
+        var riotId = player.RiotId?.DisplayName ?? string.Empty;
+        var profileUri = LeagueOfGraphsProfileUriBuilder.Build(
+            player.RiotId,
+            _leagueClientRegion);
+        var profileLinkToolTip = profileUri is null
+            ? string.Empty
+            : _localization.Format("Current.Participant.ProfileLinkHint", riotId);
 
         return new ParticipantViewModel(
             GetPositionCode(player.Position),
             GetInitials(player.ChampionName),
             FindChampionImage(player.ChampionName),
             player.ChampionName,
+            riotId,
+            profileUri,
+            profileLinkToolTip,
             details,
             $"{player.Kills}/{player.Deaths}/{player.Assists}",
             player.Level,

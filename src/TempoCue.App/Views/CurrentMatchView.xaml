@@ -463,6 +463,41 @@
                                                         <StackPanel Grid.Column="2" Margin="9,0,0,0">
                                                             <TextBlock Text="{Binding ChampionName}" Foreground="#F4F7FB"
                                                                        FontSize="12" FontWeight="SemiBold" />
+                                                            <StackPanel Orientation="Horizontal" Margin="0,1,0,0">
+                                                                <TextBlock Text="{Binding RiotId}"
+                                                                           ToolTip="{Binding RiotId}"
+                                                                           Foreground="#8EA3BD" FontSize="9"
+                                                                           MaxWidth="145" TextTrimming="CharacterEllipsis">
+                                                                    <TextBlock.Style>
+                                                                        <Style TargetType="TextBlock">
+                                                                            <Setter Property="Visibility" Value="Visible" />
+                                                                            <Style.Triggers>
+                                                                                <DataTrigger Binding="{Binding HasRiotId}" Value="False">
+                                                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                                                </DataTrigger>
+                                                                            </Style.Triggers>
+                                                                        </Style>
+                                                                    </TextBlock.Style>
+                                                                </TextBlock>
+                                                                <TextBlock Margin="7,0,0,0" FontSize="9">
+                                                                    <TextBlock.Style>
+                                                                        <Style TargetType="TextBlock">
+                                                                            <Setter Property="Visibility" Value="Visible" />
+                                                                            <Style.Triggers>
+                                                                                <DataTrigger Binding="{Binding HasProfileUri}" Value="False">
+                                                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                                                </DataTrigger>
+                                                                            </Style.Triggers>
+                                                                        </Style>
+                                                                    </TextBlock.Style>
+                                                                    <Hyperlink NavigateUri="{Binding ProfileUri}"
+                                                                               Foreground="#50B7ED"
+                                                                               ToolTip="{Binding ProfileLinkToolTip}"
+                                                                               RequestNavigate="ProfileLink_RequestNavigate">
+                                                                        <Run Text="{localization:Loc Current.Participant.ProfileLink}" />
+                                                                    </Hyperlink>
+                                                                </TextBlock>
+                                                            </StackPanel>
                                                             <TextBlock Text="{Binding Details}" Foreground="#6F849F"
                                                                        FontSize="10" Margin="0,2,0,0" />
                                                         </StackPanel>
@@ -510,6 +545,41 @@
                                                         <StackPanel Grid.Column="2" Margin="9,0,0,0">
                                                             <TextBlock Text="{Binding ChampionName}" Foreground="#F4F7FB"
                                                                        FontSize="12" FontWeight="SemiBold" />
+                                                            <StackPanel Orientation="Horizontal" Margin="0,1,0,0">
+                                                                <TextBlock Text="{Binding RiotId}"
+                                                                           ToolTip="{Binding RiotId}"
+                                                                           Foreground="#8EA3BD" FontSize="9"
+                                                                           MaxWidth="145" TextTrimming="CharacterEllipsis">
+                                                                    <TextBlock.Style>
+                                                                        <Style TargetType="TextBlock">
+                                                                            <Setter Property="Visibility" Value="Visible" />
+                                                                            <Style.Triggers>
+                                                                                <DataTrigger Binding="{Binding HasRiotId}" Value="False">
+                                                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                                                </DataTrigger>
+                                                                            </Style.Triggers>
+                                                                        </Style>
+                                                                    </TextBlock.Style>
+                                                                </TextBlock>
+                                                                <TextBlock Margin="7,0,0,0" FontSize="9">
+                                                                    <TextBlock.Style>
+                                                                        <Style TargetType="TextBlock">
+                                                                            <Setter Property="Visibility" Value="Visible" />
+                                                                            <Style.Triggers>
+                                                                                <DataTrigger Binding="{Binding HasProfileUri}" Value="False">
+                                                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                                                </DataTrigger>
+                                                                            </Style.Triggers>
+                                                                        </Style>
+                                                                    </TextBlock.Style>
+                                                                    <Hyperlink NavigateUri="{Binding ProfileUri}"
+                                                                               Foreground="#50B7ED"
+                                                                               ToolTip="{Binding ProfileLinkToolTip}"
+                                                                               RequestNavigate="ProfileLink_RequestNavigate">
+                                                                        <Run Text="{localization:Loc Current.Participant.ProfileLink}" />
+                                                                    </Hyperlink>
+                                                                </TextBlock>
+                                                            </StackPanel>
                                                             <TextBlock Text="{Binding Details}" Foreground="#6F849F"
                                                                        FontSize="10" Margin="0,2,0,0" />
                                                         </StackPanel>

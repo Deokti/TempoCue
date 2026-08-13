@@ -1,4 +1,9 @@
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Navigation;
+using TempoCue.App.Localization;
 
 namespace TempoCue.App.Views;
 
@@ -8,5 +13,39 @@ public partial class CurrentMatchView : UserControl
     public CurrentMatchView()
     {
         InitializeComponent();
+    }
+
+    private void ProfileLink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+    {
+        e.Handled = true;
+        if (!string.Equals(e.Uri.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase)
+            || !string.Equals(
+                e.Uri.Host,
+                "www.leagueofgraphs.com",
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        try
+        {
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri)
+            {
+                UseShellExecute = true
+            });
+        }
+        catch (Exception exception) when (exception is Win32Exception
+            or InvalidOperationException)
+        {
+            Trace.TraceWarning(
+                "Не удалось открыть профиль LeagueOfGraphs: {0}",
+                exception.GetType().Name);
+            MessageBox.Show(
+                Window.GetWindow(this),
+                LocalizationService.Instance.Get("Current.Participant.ProfileOpenError.Message"),
+                LocalizationService.Instance.Get("Current.Participant.ProfileOpenError.Title"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+        }
     }
 }
