@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "packType": "mapControl",
+  "id": "tempocue.map-control.objective-setup.ru",
+  "name": "Подготовка к объектам заранее",
+  "patch": "16.16",
+  "description": "Один универсальный принцип подготовки дракона, Герольда или Барона до того, как объект станет срочным.",
+  "author": "TempoCue",
+  "contentLanguage": "ru_RU",
+  "verifiedOn": "2026-08-13",
+  "source": {
+    "kind": "communityGuide",
+    "title": "Mid & Late Game Course: Objective Control and Setup",
+    "url": "https://kirei.gg/courses-archive/mid-and-late-game-course/",
+    "author": "Coach Kirei",
+    "permission": "notConfirmed"
+  },
+  "applicability": {
+    "roles": ["top", "jungle", "mid", "adc", "support"],
+    "teamSide": "any"
+  },
+  "rules": [],
+  "timedReminders": [],
+  "persistentTips": [
+    {
+      "id": "prepare-objective-before-it-is-urgent",
+      "title": "Подготовь объект заранее",
+      "message": "Примерно за 90 секунд реши, будете ли вы бороться за объект: потрать золото, протолкни нужные волны и только затем занимай обзор. Поздний выход из базы уже не исправит потерянную подготовку.",
+      "scope": {
+        "kind": "wholeMatch"
+      }
+    }
+  ]
+}

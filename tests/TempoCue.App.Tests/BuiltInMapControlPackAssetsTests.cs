@@ -6,7 +6,7 @@ namespace TempoCue.App.Tests;
 public sealed class BuiltInMapControlPackAssetsTests
 {
     [Fact]
-    public void Assets_ContainFiveIndependentValidBuiltInPacks()
+    public void Assets_ContainIndependentValidBuiltInPacks()
     {
         var directory = Path.Combine(
             AppContext.BaseDirectory,
@@ -22,8 +22,8 @@ public sealed class BuiltInMapControlPackAssetsTests
             })
             .ToArray();
 
-        Assert.Equal(5, packs.Length);
-        Assert.Equal(5, packs.Select(static pack => pack.Id).Distinct(
+        Assert.Equal(8, packs.Length);
+        Assert.Equal(8, packs.Select(static pack => pack.Id).Distinct(
             StringComparer.OrdinalIgnoreCase).Count());
         Assert.All(packs, static pack =>
         {
@@ -42,11 +42,26 @@ public sealed class BuiltInMapControlPackAssetsTests
             pack.Id.EndsWith("baron-nashor.ru", StringComparison.Ordinal));
         var earlyGank = Assert.Single(packs, static pack =>
             pack.Id.EndsWith("early-gank.ru", StringComparison.Ordinal));
+        var riverScuttler = Assert.Single(packs, static pack =>
+            pack.Id.EndsWith("river-scuttler.ru", StringComparison.Ordinal));
+        var objectiveSetup = Assert.Single(packs, static pack =>
+            pack.Id.EndsWith("objective-setup.ru", StringComparison.Ordinal));
+        var crossMapTrade = Assert.Single(packs, static pack =>
+            pack.Id.EndsWith("cross-map-trade.ru", StringComparison.Ordinal));
 
         Assert.Equal(MapObjectiveReminderRecurrence.EveryCycle, Assert.Single(dragons.Rules).Recurrence);
         Assert.Equal(MapObjectiveReminderRecurrence.OncePerMatch, Assert.Single(voidGrubs.Rules).Recurrence);
         Assert.Equal(MapObjectiveReminderRecurrence.OncePerMatch, Assert.Single(riftHerald.Rules).Recurrence);
         Assert.Equal(MapObjectiveReminderRecurrence.EveryCycle, Assert.Single(baron.Rules).Recurrence);
         Assert.Equal(TimeSpan.FromMinutes(1.5), Assert.Single(earlyGank.TimedReminders).GameTime);
+        Assert.Equal(
+            TimeSpan.FromMinutes(2.5),
+            Assert.Single(riverScuttler.TimedReminders).GameTime);
+        Assert.Equal(
+            MapControlPersistentTipScopeKind.WholeMatch,
+            Assert.Single(objectiveSetup.PersistentTips).Scope.Kind);
+        Assert.Equal(
+            MapControlPersistentTipScopeKind.WholeMatch,
+            Assert.Single(crossMapTrade.PersistentTips).Scope.Kind);
     }
 }
