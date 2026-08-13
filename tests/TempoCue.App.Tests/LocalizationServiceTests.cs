@@ -137,6 +137,10 @@ public sealed class LocalizationServiceTests
             Assert.Equal("Game control", localization.Get("Coaching.Tab.MapControl"));
             Assert.Equal("Interface language", localization.Get("Settings.Language.Label"));
             Assert.Equal("Available now", localization.Get("Home.Available.Title"));
+            Assert.Equal("Riot fact", localization.Get("Current.Rosters.RiotFact.Label"));
+            Assert.Equal(
+                "Rosters, levels, K/D/A, and approximate CS come from Live Client Data. Riot ID is shown when the client provides it.",
+                localization.Get("Current.Rosters.RiotFact.Description"));
             Assert.Equal("v0.4.0", AppVersion.Display);
             Assert.Equal("1 player", localization.Plural("Count.Player", 1));
             Assert.Equal("10 players", localization.Plural("Count.Player", 10));
@@ -150,6 +154,10 @@ public sealed class LocalizationServiceTests
             Assert.Equal("Контроль игры", localization.Get("Coaching.Tab.MapControl"));
             Assert.Equal("Язык интерфейса", localization.Get("Settings.Language.Label"));
             Assert.Equal("Что работает сейчас", localization.Get("Home.Available.Title"));
+            Assert.Equal("Факт Riot", localization.Get("Current.Rosters.RiotFact.Label"));
+            Assert.Equal(
+                "Составы, уровни, K/D/A и приблизительный CS приходят из Live Client Data. Riot ID отображается, когда клиент его сообщает.",
+                localization.Get("Current.Rosters.RiotFact.Description"));
             Assert.Equal("1 игрок", localization.Plural("Count.Player", 1));
             Assert.Equal("2 игрока", localization.Plural("Count.Player", 2));
             Assert.Equal("10 игроков", localization.Plural("Count.Player", 10));

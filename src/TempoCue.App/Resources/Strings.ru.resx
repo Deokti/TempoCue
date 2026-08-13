@@ -189,6 +189,8 @@
   <data name="Current.Team.Allies" xml:space="preserve"><value>Ваша команда</value></data>
   <data name="Current.Team.Enemies" xml:space="preserve"><value>Противники</value></data>
   <data name="Current.Rosters.Empty" xml:space="preserve"><value>Составы появятся после подключения к матчу.</value></data>
+  <data name="Current.Rosters.RiotFact.Label" xml:space="preserve"><value>Факт Riot</value></data>
+  <data name="Current.Rosters.RiotFact.Description" xml:space="preserve"><value>Составы, уровни, K/D/A и приблизительный CS приходят из Live Client Data. Riot ID отображается, когда клиент его сообщает.</value></data>
   <data name="Current.Participant.Alive" xml:space="preserve"><value>жив</value></data>
   <data name="Current.Participant.Dead" xml:space="preserve"><value>возрождение через {0} с</value></data>
   <data name="Current.CreepScore.Approximate" xml:space="preserve"><value>≈{0} CS</value></data>

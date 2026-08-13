@@ -181,6 +181,8 @@
   <data name="Current.Team.Allies" xml:space="preserve"><value>Your team</value></data>
   <data name="Current.Team.Enemies" xml:space="preserve"><value>Opponents</value></data>
   <data name="Current.Rosters.Empty" xml:space="preserve"><value>Rosters will appear after connecting to a match.</value></data>
+  <data name="Current.Rosters.RiotFact.Label" xml:space="preserve"><value>Riot fact</value></data>
+  <data name="Current.Rosters.RiotFact.Description" xml:space="preserve"><value>Rosters, levels, K/D/A, and approximate CS come from Live Client Data. Riot ID is shown when the client provides it.</value></data>
   <data name="Current.Participant.Alive" xml:space="preserve"><value>alive</value></data>
   <data name="Current.Participant.Dead" xml:space="preserve"><value>respawns in {0}s</value></data>
   <data name="Current.CreepScore.Approximate" xml:space="preserve"><value>≈{0} CS</value></data>
