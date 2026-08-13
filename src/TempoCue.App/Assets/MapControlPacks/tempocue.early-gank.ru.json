@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "packType": "mapControl",
+  "id": "tempocue.map-control.early-gank.ru",
+  "name": "Ранний ганк: первая осторожность",
+  "patch": "16.16",
+  "description": "Одно раннее напоминание о возможном выходе лесника на линию без смешивания с правилами нейтральных объектов.",
+  "author": "TempoCue",
+  "contentLanguage": "ru_RU",
+  "verifiedOn": "2026-08-13",
+  "source": {
+    "kind": "communityGuide",
+    "title": "Jungle Tracking: How to Track the Enemy Jungler",
+    "url": "https://metafy.gg/%40roguelol/guides",
+    "author": "Coach Rogue",
+    "permission": "notConfirmed"
+  },
+  "applicability": {
+    "roles": ["top", "jungle", "mid", "adc", "support"],
+    "teamSide": "any"
+  },
+  "rules": [],
+  "timedReminders": [
+    {
+      "id": "first-gank-window",
+      "gameTime": "00:01:30",
+      "priority": "caution",
+      "title": "Ранний ганк уже возможен",
+      "message": "После одного лагеря лесник уже может выйти на линию. Не отдавай здоровье и заклинания призывателя без необходимости.",
+      "whyNow": "Самые быстрые маршруты достигают линии примерно к 1:20–1:45, а обычный ранний выход часто совпадает с третьей волной.",
+      "nextGoal": "Поставь ранний вард до третьей волны и держись ближе к стороне линии, которую можешь контролировать."
+    }
+  ],
+  "persistentTips": []
+}

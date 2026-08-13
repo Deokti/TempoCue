@@ -48,6 +48,7 @@ public partial class App : System.Windows.Application
         // Каталог может быть пустым: встроенные наборы поставляются только после
         // отдельной проверки их содержания и актуальности.
         var builtInPacks = LoadBuiltInCoachPacks();
+        var builtInMapControlPacks = LoadBuiltInMapControlPacks();
 
         var coachPackDirectory = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -72,12 +73,13 @@ public partial class App : System.Windows.Application
             builtInPacks.Select(static pack => pack.Id));
         var importMapControlPack = new ImportMapControlPackUseCase(
             mapControlPackStore,
-            []);
+            builtInMapControlPacks.Select(static pack => pack.Id));
         var activeCoachPackSelector = new SelectActiveCoachPackUseCase(
             builtInPacks,
             loadCoachPackLibrary);
         var activeMapControlPackSelector = new SelectActiveMapControlPacksUseCase(
-            loadMapControlPackLibrary);
+            loadMapControlPackLibrary,
+            builtInMapControlPacks);
 
         // Каталоги Data Dragon используют общий локальный кэш патчей и чемпионов.
         var dataDragonCacheDirectory = Path.Combine(
@@ -141,7 +143,8 @@ public partial class App : System.Windows.Application
             deleteCoachPack,
             loadMapControlPackLibrary,
             setMapControlPackState,
-            deleteMapControlPack);
+            deleteMapControlPack,
+            builtInMapControlPacks);
         coachingLibraryViewModel.LibraryChanged += (_, _) =>
         {
             activeCoachPackSelector.Invalidate();
@@ -236,6 +239,28 @@ public partial class App : System.Windows.Application
         {
             using var stream = File.OpenRead(path);
             packs.Add(CoachPackLoader.Load(stream));
+        }
+
+        return packs;
+    }
+
+    private static IReadOnlyList<MapControlPack> LoadBuiltInMapControlPacks()
+    {
+        var directory = Path.Combine(
+            AppContext.BaseDirectory,
+            "Assets",
+            "MapControlPacks");
+        if (!Directory.Exists(directory))
+        {
+            return [];
+        }
+
+        var packs = new List<MapControlPack>();
+        foreach (var path in Directory.EnumerateFiles(directory, "*.json")
+                     .OrderBy(static path => path, StringComparer.OrdinalIgnoreCase))
+        {
+            using var stream = File.OpenRead(path);
+            packs.Add(MapControlPackLoader.Load(stream));
         }
 
         return packs;

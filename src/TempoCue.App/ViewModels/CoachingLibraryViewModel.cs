@@ -11,6 +11,8 @@ namespace TempoCue.App.ViewModels;
 public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
 {
     private readonly IReadOnlyList<CoachPack> _builtInPacks;
+    private readonly IReadOnlyList<MapControlPack> _builtInMapControlPacks;
+    private readonly HashSet<string> _builtInMapControlPackIds;
     private readonly LocalizationService _localization;
     private readonly IChampionCatalog _championCatalog;
     private readonly LoadCoachPackLibraryUseCase _loadCoachPackLibrary;
@@ -54,10 +56,15 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
         DeleteCoachPackUseCase deleteCoachPack,
         LoadMapControlPackLibraryUseCase loadMapControlPackLibrary,
         SetMapControlPackStateUseCase setMapControlPackState,
-        DeleteMapControlPackUseCase deleteMapControlPack)
+        DeleteMapControlPackUseCase deleteMapControlPack,
+        IReadOnlyList<MapControlPack>? builtInMapControlPacks = null)
     {
         ArgumentNullException.ThrowIfNull(builtInPacks);
         _builtInPacks = builtInPacks.ToArray();
+        _builtInMapControlPacks = (builtInMapControlPacks ?? []).ToArray();
+        _builtInMapControlPackIds = _builtInMapControlPacks
+            .Select(static pack => pack.Id)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _championCatalog = championCatalog ?? throw new ArgumentNullException(nameof(championCatalog));
         _loadCoachPackLibrary = loadCoachPackLibrary
@@ -388,13 +395,21 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
                 _champions)))
             .ToArray();
         _allCards = cards;
-        _allMapControlCards = _mapControlEntries
-            .Select(entry => _mapControlCardFactory.Create(
+        _allMapControlCards = _builtInMapControlPacks
+            .Select(pack => _mapControlCardFactory.Create(
+                pack,
+                CoachingPackOrigin.BuiltIn,
+                _mapControlPackStates.GetValueOrDefault(
+                    pack.Id,
+                    LocalCoachPackState.Enabled)))
+            .Concat(_mapControlEntries
+                .Where(entry => !_builtInMapControlPackIds.Contains(entry.Pack.Id))
+                .Select(entry => _mapControlCardFactory.Create(
                 entry.Pack,
                 entry.Origin == LocalCoachPackOrigin.CreatedByUser
                     ? CoachingPackOrigin.CreatedByUser
                     : CoachingPackOrigin.Imported,
-                _mapControlPackStates.GetValueOrDefault(entry.Pack.Id, entry.State)))
+                _mapControlPackStates.GetValueOrDefault(entry.Pack.Id, entry.State))))
             .ToArray();
         OnPropertyChanged(nameof(TotalPackCount));
         OnPropertyChanged(nameof(EnabledPackCount));

@@ -10,6 +10,8 @@ namespace TempoCue.Application;
 public sealed class SelectActiveMapControlPacksUseCase : IMapControlPlanSelector
 {
     private readonly LoadMapControlPackLibraryUseCase _loadLibrary;
+    private readonly IReadOnlyList<MapControlPack> _builtInPacks;
+    private readonly HashSet<string> _builtInPackIds;
     private readonly SemaphoreSlim _cacheLock = new(1, 1);
     private readonly object _planCacheLock = new();
 
@@ -18,9 +20,23 @@ public sealed class SelectActiveMapControlPacksUseCase : IMapControlPlanSelector
     private long _cacheVersion;
     private long _loadedVersion = -1;
 
-    public SelectActiveMapControlPacksUseCase(LoadMapControlPackLibraryUseCase loadLibrary)
+    public SelectActiveMapControlPacksUseCase(
+        LoadMapControlPackLibraryUseCase loadLibrary,
+        IReadOnlyList<MapControlPack>? builtInPacks = null)
     {
         _loadLibrary = loadLibrary ?? throw new ArgumentNullException(nameof(loadLibrary));
+        _builtInPacks = (builtInPacks ?? []).ToArray();
+        _builtInPackIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var pack in _builtInPacks)
+        {
+            MapControlPackValidator.Validate(pack);
+            if (!_builtInPackIds.Add(pack.Id))
+            {
+                throw new InvalidDataException(
+                    $"Duplicate built-in Map Control Pack id: {pack.Id}.");
+            }
+        }
     }
 
     public async ValueTask<ActiveMapControlPlan> SelectAsync(
@@ -137,12 +153,20 @@ public sealed class SelectActiveMapControlPacksUseCase : IMapControlPlanSelector
             try
             {
                 var snapshot = await _loadLibrary.ExecuteAsync(cancellationToken);
+                var enabledBuiltInPacks = _builtInPacks
+                    .Where(pack => snapshot.PackStates.GetValueOrDefault(
+                        pack.Id,
+                        LocalCoachPackState.Enabled) == LocalCoachPackState.Enabled)
+                    .Select(static pack => new PlannedPack(
+                        pack,
+                        new MapControlPackPlanner(pack)));
                 result = new LibraryLoadResult(
-                    snapshot.Entries
-                        .Where(static entry => entry.State == LocalCoachPackState.Enabled)
+                    enabledBuiltInPacks.Concat(snapshot.Entries
+                        .Where(entry => entry.State == LocalCoachPackState.Enabled
+                                        && !_builtInPackIds.Contains(entry.Pack.Id))
                         .Select(static entry => new PlannedPack(
                             entry.Pack,
-                            new MapControlPackPlanner(entry.Pack)))
+                            new MapControlPackPlanner(entry.Pack))))
                         .ToArray(),
                     requestedVersion);
             }

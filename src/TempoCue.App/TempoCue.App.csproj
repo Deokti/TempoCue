@@ -12,6 +12,9 @@
     <Content Include="Assets\CoachPacks\*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\MapControlPacks\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Resource Include="Assets\Brand\AppIcon.ico" />
   </ItemGroup>
 

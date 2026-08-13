@@ -148,6 +148,33 @@ public sealed class SelectActiveMapControlPacksUseCaseTests
     }
 
     [Fact]
+    public async Task SelectAsync_UsesBuiltInPackByDefaultAndRespectsSavedDisabledState()
+    {
+        var store = new TestMapControlPackStore();
+        var builtInPack = CreateTimedPack(
+            "built-in",
+            MapControlRole.Top,
+            MapControlTeamSide.Any);
+        store.Add(
+            builtInPack with { Name = "conflicting local pack" },
+            LocalCoachPackState.Enabled,
+            LocalCoachPackOrigin.Imported);
+        var useCase = new SelectActiveMapControlPacksUseCase(
+            new LoadMapControlPackLibraryUseCase(store),
+            [builtInPack]);
+
+        var initial = await useCase.SelectAsync(CreateSnapshot());
+        await store.SetStateAsync(builtInPack.Id, LocalCoachPackState.Disabled);
+        useCase.Invalidate();
+        var disabled = await useCase.SelectAsync(CreateSnapshot());
+
+        Assert.Equal([builtInPack.Name], initial.ActivePackNames);
+        Assert.Single(initial.ScheduledAdvice);
+        Assert.Empty(disabled.ActivePackNames);
+        Assert.Empty(disabled.ScheduledAdvice);
+    }
+
+    [Fact]
     public async Task SelectAsync_ReusesPlanUntilRelevantObjectiveEventsChange()
     {
         var store = new TestMapControlPackStore();

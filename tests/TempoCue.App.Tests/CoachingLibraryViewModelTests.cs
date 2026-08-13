@@ -9,6 +9,30 @@ namespace TempoCue.App.Tests;
 public sealed class CoachingLibraryViewModelTests
 {
     [Fact]
+    public async Task RefreshAsync_ShowsBuiltInMapControlPackAsProtectedAndEnabledByDefault()
+    {
+        var coachPackStore = new TestCoachPackStore();
+        var mapControlStore = new TestMapControlPackStore();
+        var builtInPack = TestMapControlPackFactory.Create("built-in-map-control") with
+        {
+            Name = "Built-in map control"
+        };
+        using var viewModel = CreateViewModel(
+            coachPackStore,
+            mapControlStore,
+            [builtInPack]);
+
+        await viewModel.RefreshAsync();
+
+        var card = Assert.Single(viewModel.MapControlCards);
+        Assert.Equal(CoachingPackOrigin.BuiltIn, card.Origin);
+        Assert.True(card.IsEnabled);
+        Assert.False(card.CanEdit);
+        Assert.False(card.CanDelete);
+        Assert.True(card.CanCreateCopy);
+    }
+
+    [Fact]
     public async Task RefreshAsync_SerializesConcurrentLoadsAndKeepsNewestSnapshot()
     {
         var store = new ControlledCoachPackStore();
@@ -31,10 +55,13 @@ public sealed class CoachingLibraryViewModelTests
         Assert.NotNull(viewModel.FindCard(secondPack.Id));
     }
 
-    private static CoachingLibraryViewModel CreateViewModel(ICoachPackStore store)
+    private static CoachingLibraryViewModel CreateViewModel(
+        ICoachPackStore store,
+        TestMapControlPackStore? mapControlStore = null,
+        IReadOnlyList<MapControlPack>? builtInMapControlPacks = null)
     {
         var localization = LocalizationService.Instance;
-        var mapControlStore = new TestMapControlPackStore();
+        mapControlStore ??= new TestMapControlPackStore();
         return new CoachingLibraryViewModel(
             [],
             localization,
@@ -44,7 +71,8 @@ public sealed class CoachingLibraryViewModelTests
             new DeleteCoachPackUseCase(store),
             new LoadMapControlPackLibraryUseCase(mapControlStore),
             new SetMapControlPackStateUseCase(mapControlStore),
-            new DeleteMapControlPackUseCase(mapControlStore));
+            new DeleteMapControlPackUseCase(mapControlStore),
+            builtInMapControlPacks);
     }
 
     private static CoachPack CreatePack(string id) =>
