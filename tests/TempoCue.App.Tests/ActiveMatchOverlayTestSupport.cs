@@ -8,10 +8,11 @@ namespace TempoCue.App.Tests;
 internal static class ActiveMatchOverlayTestData
 {
     public static ActiveMatchUpdate CreateSuccessUpdate(
-        CoachPack pack,
-        CoachAdvice advice,
+        CoachPack? pack,
+        CoachAdvice? advice,
         double gameTimeSeconds,
-        int level)
+        int level,
+        ActiveMapControlPlan? mapControlPlan = null)
     {
         var match = new MatchState
         {
@@ -41,7 +42,10 @@ internal static class ActiveMatchOverlayTestData
         return new ActiveMatchUpdate(
             MatchSnapshotReadStatus.Success,
             snapshot,
-            ActiveCoachPackSelection.Selected(pack, advice));
+            pack is not null && advice is not null
+                ? ActiveCoachPackSelection.Selected(pack, advice)
+                : ActiveCoachPackSelection.NotFound(),
+            mapControlPlan);
     }
 
     public static CoachAdvice CreateAdvice(

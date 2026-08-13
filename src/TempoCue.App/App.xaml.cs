@@ -76,6 +76,8 @@ public partial class App : System.Windows.Application
         var activeCoachPackSelector = new SelectActiveCoachPackUseCase(
             builtInPacks,
             loadCoachPackLibrary);
+        var activeMapControlPackSelector = new SelectActiveMapControlPacksUseCase(
+            loadMapControlPackLibrary);
 
         // Каталоги Data Dragon используют общий локальный кэш патчей и чемпионов.
         var dataDragonCacheDirectory = Path.Combine(
@@ -99,7 +101,8 @@ public partial class App : System.Windows.Application
         var activeMatchSession = new ActiveMatchSession(
             _liveClientDataClient,
             activeCoachPackSelector,
-            TimeSpan.FromSeconds(1));
+            TimeSpan.FromSeconds(1),
+            activeMapControlPackSelector);
         _activeMatchMonitor = new ActiveMatchMonitor(activeMatchSession);
         var currentMatchViewModel = new CurrentMatchViewModel(
             _activeMatchMonitor,
@@ -142,6 +145,7 @@ public partial class App : System.Windows.Application
         coachingLibraryViewModel.LibraryChanged += (_, _) =>
         {
             activeCoachPackSelector.Invalidate();
+            activeMapControlPackSelector.Invalidate();
             homeViewModel.SetCoachPackCount(coachingLibraryViewModel.TotalPackCount);
         };
         var buildLeagueItemSetExport = new BuildLeagueItemSetExportUseCase(

@@ -80,6 +80,8 @@ internal static class LiveClientDataMapper
         {
             "ChampionKill" => MatchEventKind.ChampionKill,
             "DragonKill" => MatchEventKind.DragonKill,
+            "HeraldKill" => MatchEventKind.RiftHeraldKill,
+            "BaronKill" => MatchEventKind.BaronNashorKill,
             _ => (MatchEventKind?)null
         };
 

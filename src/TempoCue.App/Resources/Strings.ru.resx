@@ -827,6 +827,10 @@
   <data name="Settings.Overlay.Preview.Close" xml:space="preserve"><value>Закрыть оверлей</value></data>
   <data name="Overlay.Matchup.Dismiss" xml:space="preserve"><value>Скрыть совет</value></data>
   <data name="Overlay.Matchup.PersistentTip.Status" xml:space="preserve"><value>Подсказка по матчапу</value></data>
+  <data name="Overlay.MapControl.Status" xml:space="preserve"><value>Контроль карты</value></data>
+  <data name="Overlay.MapControl.Dismiss" xml:space="preserve"><value>Скрыть напоминание</value></data>
+  <data name="Overlay.MapControl.TargetTime" xml:space="preserve"><value>К {0}</value></data>
+  <data name="Overlay.MapControl.GenericTitle" xml:space="preserve"><value>Напоминание по карте</value></data>
   <data name="Coaching.MapControlEditor.Content.Tab.Objects" xml:space="preserve"><value>Объекты · {0}</value></data>
   <data name="Coaching.MapControlEditor.Content.Tab.Timed" xml:space="preserve"><value>Напоминания по времени · {0}</value></data>
   <data name="Coaching.MapControlEditor.Content.Tab.Persistent" xml:space="preserve"><value>Постоянные подсказки · {0}</value></data>

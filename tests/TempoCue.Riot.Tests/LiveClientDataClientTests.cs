@@ -87,6 +87,18 @@ public sealed class LiveClientDataClientTests
                     "EventTime": 620,
                     "DragonType": "Earth",
                     "KillerName": "UrgotPlayer"
+                  },
+                  {
+                    "EventID": 9,
+                    "EventName": "HeraldKill",
+                    "EventTime": 630,
+                    "KillerName": "UrgotPlayer"
+                  },
+                  {
+                    "EventID": 10,
+                    "EventName": "BaronKill",
+                    "EventTime": 640,
+                    "KillerName": "UrgotPlayer"
                   }
                 ]
               }
@@ -125,13 +137,17 @@ public sealed class LiveClientDataClientTests
         Assert.True(sett.IsDead);
         Assert.Equal(12.5, sett.RespawnTimerSeconds);
 
-        Assert.Equal(2, snapshot.Events.Count);
-        var dragon = snapshot.Events[0];
+        Assert.Equal(4, snapshot.Events.Count);
+        var baron = snapshot.Events[0];
+        Assert.Equal(MatchEventKind.BaronNashorKill, baron.Kind);
+        var herald = snapshot.Events[1];
+        Assert.Equal(MatchEventKind.RiftHeraldKill, herald.Kind);
+        var dragon = snapshot.Events[2];
         Assert.Equal(MatchEventKind.DragonKill, dragon.Kind);
         Assert.Equal(DragonType.Earth, dragon.DragonType);
         Assert.Equal("UrgotPlayer#TEST", dragon.KillerParticipantId);
 
-        var championKill = snapshot.Events[1];
+        var championKill = snapshot.Events[3];
         Assert.Equal(MatchEventKind.ChampionKill, championKill.Kind);
         Assert.Equal("UrgotPlayer#TEST", championKill.KillerParticipantId);
         Assert.Equal("SettPlayer#TEST", championKill.VictimParticipantId);

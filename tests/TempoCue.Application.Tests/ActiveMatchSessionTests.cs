@@ -38,6 +38,25 @@ public sealed class ActiveMatchSessionTests
     }
 
     [Fact]
+    public async Task RefreshAsync_ReturnsMapControlPlanForSuccessfulSnapshot()
+    {
+        var snapshot = new MatchSnapshot(
+            CreateMatch(level: 9),
+            [],
+            DateTimeOffset.UtcNow);
+        var expectedPlan = new ActiveMapControlPlan([], ["Контроль реки"]);
+        var session = new ActiveMatchSession(
+            new StubSnapshotSource(MatchSnapshotReadResult.Success(snapshot)),
+            new FixedAdviceSelector(new MatchupCoach([])),
+            TimeSpan.FromSeconds(1),
+            new FixedMapControlPlanSelector(expectedPlan));
+
+        var update = await session.RefreshAsync();
+
+        Assert.Same(expectedPlan, update.MapControlPlan);
+    }
+
+    [Fact]
     public async Task RefreshAsync_PreservesExpectedNoMatchState()
     {
         var source = new StubSnapshotSource(MatchSnapshotReadResult.NoActiveMatch());
@@ -114,5 +133,14 @@ public sealed class ActiveMatchSessionTests
                     Patch = "test"
                 },
                 coach.GetBestAdvice(match)));
+    }
+
+    private sealed class FixedMapControlPlanSelector(ActiveMapControlPlan plan)
+        : IMapControlPlanSelector
+    {
+        public ValueTask<ActiveMapControlPlan> SelectAsync(
+            MatchSnapshot snapshot,
+            CancellationToken cancellationToken = default) =>
+            ValueTask.FromResult(plan);
     }
 }

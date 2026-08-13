@@ -817,6 +817,10 @@
   <data name="Settings.Overlay.Preview.Close" xml:space="preserve"><value>Close overlay</value></data>
   <data name="Overlay.Matchup.Dismiss" xml:space="preserve"><value>Hide advice</value></data>
   <data name="Overlay.Matchup.PersistentTip.Status" xml:space="preserve"><value>Matchup tip</value></data>
+  <data name="Overlay.MapControl.Status" xml:space="preserve"><value>Map control</value></data>
+  <data name="Overlay.MapControl.Dismiss" xml:space="preserve"><value>Hide reminder</value></data>
+  <data name="Overlay.MapControl.TargetTime" xml:space="preserve"><value>By {0}</value></data>
+  <data name="Overlay.MapControl.GenericTitle" xml:space="preserve"><value>Map reminder</value></data>
   <data name="Coaching.MapControlEditor.Content.Tab.Objects" xml:space="preserve"><value>Objectives · {0}</value></data>
   <data name="Coaching.MapControlEditor.Content.Tab.Timed" xml:space="preserve"><value>Timed reminders · {0}</value></data>
   <data name="Coaching.MapControlEditor.Content.Tab.Persistent" xml:space="preserve"><value>Persistent tips · {0}</value></data>

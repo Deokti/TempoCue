@@ -326,6 +326,129 @@ public sealed class ActiveMatchOverlayCoordinatorTests
     }
 
     [Fact]
+    public void Updated_ShowsMapReminderWhenGameTimeCrossesTrigger()
+    {
+        LocalizationService.Instance.SetLanguage("ru-RU");
+        var monitor = new TestActiveMatchMonitor();
+        using var presenter = new RecordingOverlayPresenter();
+        using var coordinator = new ActiveMatchOverlayCoordinator(
+            monitor,
+            presenter,
+            LocalizationService.Instance);
+        var pack = TestCoachPackFactory.CreateMatchup();
+        var advice = CreateAdvice("early", PowerState.Playable, "Фаза");
+        var mapPlan = CreateMapControlPlan(triggerSeconds: 195);
+
+        monitor.Publish(CreateSuccessUpdate(pack, advice, 194, 4, mapPlan));
+        monitor.Publish(CreateSuccessUpdate(pack, advice, 195, 4, mapPlan));
+        monitor.Publish(CreateSuccessUpdate(pack, advice, 196, 4, mapPlan));
+
+        Assert.Collection(
+            presenter.Notifications,
+            phase => Assert.StartsWith("matchup:", phase.Key, StringComparison.Ordinal),
+            reminder =>
+            {
+                Assert.Equal("map-control:map-pack:timed:river", reminder.Key);
+                Assert.Equal("КОНТРОЛЬ КАРТЫ", reminder.DisplayStatus);
+                Assert.Equal("Проверьте реку", reminder.Phrase);
+                Assert.Equal("К 03:15", reminder.Badge);
+                Assert.Equal(OverlayNotificationTone.Caution, reminder.Tone);
+            });
+    }
+
+    [Fact]
+    public void Updated_ShowsMapReminderWithoutSelectedMatchupPack()
+    {
+        var monitor = new TestActiveMatchMonitor();
+        using var presenter = new RecordingOverlayPresenter();
+        using var coordinator = new ActiveMatchOverlayCoordinator(
+            monitor,
+            presenter,
+            LocalizationService.Instance);
+        var mapPlan = CreateMapControlPlan(triggerSeconds: 195);
+
+        monitor.Publish(CreateSuccessUpdate(null, null, 194, 4, mapPlan));
+        monitor.Publish(CreateSuccessUpdate(null, null, 195, 4, mapPlan));
+
+        var reminder = Assert.Single(presenter.Notifications);
+        Assert.StartsWith("map-control:", reminder.Key, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Updated_DoesNotReplayOldMapReminderWhenApplicationStartsMidMatch()
+    {
+        var monitor = new TestActiveMatchMonitor();
+        using var presenter = new RecordingOverlayPresenter();
+        using var coordinator = new ActiveMatchOverlayCoordinator(
+            monitor,
+            presenter,
+            LocalizationService.Instance);
+        var pack = TestCoachPackFactory.CreateMatchup();
+
+        monitor.Publish(CreateSuccessUpdate(
+            pack,
+            CreateAdvice("early", PowerState.Playable, "Фаза"),
+            600,
+            9,
+            CreateMapControlPlan(triggerSeconds: 195)));
+
+        Assert.Single(presenter.Notifications);
+        Assert.DoesNotContain(
+            presenter.Notifications,
+            notification => notification.Key.StartsWith("map-control:", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Updated_ShowsRecentMapEventAddedAfterItsTimestamp()
+    {
+        var monitor = new TestActiveMatchMonitor();
+        using var presenter = new RecordingOverlayPresenter();
+        using var coordinator = new ActiveMatchOverlayCoordinator(
+            monitor,
+            presenter,
+            LocalizationService.Instance);
+        var pack = TestCoachPackFactory.CreateMatchup();
+        var advice = CreateAdvice("early", PowerState.Playable, "Фаза");
+
+        monitor.Publish(CreateSuccessUpdate(pack, advice, 195.5, 4));
+        monitor.Publish(CreateSuccessUpdate(
+            pack,
+            advice,
+            196,
+            4,
+            CreateMapControlPlan(triggerSeconds: 195)));
+
+        Assert.Contains(
+            presenter.Notifications,
+            notification => notification.Key.StartsWith("map-control:", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Updated_AllowsMapReminderAgainAfterMatchReset()
+    {
+        var monitor = new TestActiveMatchMonitor();
+        using var presenter = new RecordingOverlayPresenter();
+        using var coordinator = new ActiveMatchOverlayCoordinator(
+            monitor,
+            presenter,
+            LocalizationService.Instance);
+        var pack = TestCoachPackFactory.CreateMatchup();
+        var advice = CreateAdvice("early", PowerState.Playable, "Фаза");
+        var mapPlan = CreateMapControlPlan(triggerSeconds: 10);
+
+        monitor.Publish(CreateSuccessUpdate(pack, advice, 9, 1, mapPlan));
+        monitor.Publish(CreateSuccessUpdate(pack, advice, 10, 1, mapPlan));
+        monitor.Publish(new ActiveMatchUpdate(MatchSnapshotReadStatus.NoActiveMatch, null, null));
+        monitor.Publish(CreateSuccessUpdate(pack, advice, 9, 1, mapPlan));
+        monitor.Publish(CreateSuccessUpdate(pack, advice, 10, 1, mapPlan));
+
+        Assert.Equal(
+            2,
+            presenter.Notifications.Count(notification =>
+                notification.Key.StartsWith("map-control:", StringComparison.Ordinal)));
+    }
+
+    [Fact]
     public void Dispose_UnsubscribesFromMatchUpdates()
     {
         var monitor = new TestActiveMatchMonitor();
@@ -344,5 +467,22 @@ public sealed class ActiveMatchOverlayCoordinatorTests
 
         Assert.Empty(presenter.Notifications);
     }
+
+    private static ActiveMapControlPlan CreateMapControlPlan(double triggerSeconds) => new(
+        [
+            new MapControlScheduledAdvice(
+                "map-pack:timed:river",
+                "map-pack",
+                "Контроль реки",
+                MapControlScheduledAdviceKind.TimedReminder,
+                MapObjectiveReminderPriority.Caution,
+                "Проверьте реку",
+                "Поставьте обзор до выхода на объект.",
+                "Скоро появится объект.",
+                "Занять реку.",
+                TimeSpan.FromSeconds(triggerSeconds),
+                TimeSpan.FromSeconds(triggerSeconds))
+        ],
+        ["Контроль реки"]);
 
 }

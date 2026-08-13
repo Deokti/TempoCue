@@ -1,18 +1,20 @@
 using TempoCue.App.Localization;
 using TempoCue.App.Settings;
 using TempoCue.Application;
+using TempoCue.Coaching;
 using TempoCue.Core;
 using TempoCue.Overlay;
 
 namespace TempoCue.App.Coordinators;
 
 /// <summary>
-/// Передаёт в игровой оверлей уже выбранный движком совет при смене фазы матчапа.
+/// Передаёт в игровой оверлей готовые советы матчапа и запланированные напоминания карты.
 /// Координатор не вычисляет правила повторно и не зависит от Riot DTO.
 /// </summary>
 public sealed class ActiveMatchOverlayCoordinator : IDisposable
 {
     private const double MatchRestartToleranceSeconds = 5;
+    private const double InitialMapReminderCatchUpSeconds = 2;
     private const int PersistentTipRepeatLevelGap = 3;
 
     private readonly IActiveMatchMonitor _monitor;
@@ -22,6 +24,7 @@ public sealed class ActiveMatchOverlayCoordinator : IDisposable
     private readonly object _stateLock = new();
     private readonly Dictionary<string, int> _persistentTipLevels =
         new(StringComparer.Ordinal);
+    private readonly HashSet<string> _shownMapAdvice = new(StringComparer.Ordinal);
 
     private AdviceIdentity? _lastAdvice;
     private double? _lastGameTimeSeconds;
@@ -90,67 +93,102 @@ public sealed class ActiveMatchOverlayCoordinator : IDisposable
             }
 
             var gameTimeSeconds = snapshot.Match.GameTimeSeconds;
-            if (_lastGameTimeSeconds is { } previousGameTime
-                && gameTimeSeconds + MatchRestartToleranceSeconds < previousGameTime)
+            var previousGameTime = _lastGameTimeSeconds;
+            if (previousGameTime is { } previousTime
+                && gameTimeSeconds + MatchRestartToleranceSeconds < previousTime)
             {
-                ResetSelectionState();
+                ResetMatchState();
+                previousGameTime = null;
             }
 
             _lastGameTimeSeconds = gameTimeSeconds;
+            ApplyMatchupSelection(update.CoachPackSelection, snapshot);
+            ApplyMapControlPlan(
+                update.MapControlPlan,
+                previousGameTime,
+                gameTimeSeconds);
+        }
+    }
 
-            var selection = update.CoachPackSelection;
-            if (selection?.State is not ActiveCoachPackSelectionState.Selected
-                || selection.Pack is not { } pack
-                || selection.Advice is not { } advice)
-            {
-                ResetSelectionState();
-                return;
-            }
+    private void ApplyMatchupSelection(
+        ActiveCoachPackSelection? selection,
+        MatchSnapshot snapshot)
+    {
+        if (selection?.State is not ActiveCoachPackSelectionState.Selected
+            || selection.Pack is not { } pack
+            || selection.Advice is not { } advice)
+        {
+            ResetMatchupSelectionState();
+            return;
+        }
 
-            var activePlayer = snapshot.Match.GetActivePlayer();
-            if (activePlayer is null)
-            {
-                ResetSelectionState();
-                return;
-            }
+        var activePlayer = snapshot.Match.GetActivePlayer();
+        if (activePlayer is null)
+        {
+            ResetMatchupSelectionState();
+            return;
+        }
 
-            var packChanged = !string.Equals(
-                _activePackId,
-                pack.Id,
-                StringComparison.Ordinal);
-            if (packChanged)
-            {
-                _persistentTipLevels.Clear();
-            }
+        var packChanged = !string.Equals(
+            _activePackId,
+            pack.Id,
+            StringComparison.Ordinal);
+        if (packChanged)
+        {
+            _persistentTipLevels.Clear();
+        }
 
-            var identity = new AdviceIdentity(pack.Id, advice.RuleId);
-            var phaseChanged = _lastAdvice != identity;
-            var levelIncreased = _lastPlayerLevel is { } previousLevel
-                && activePlayer.Level > previousLevel;
+        var identity = new AdviceIdentity(pack.Id, advice.RuleId);
+        var phaseChanged = _lastAdvice != identity;
+        var levelIncreased = _lastPlayerLevel is { } previousLevel
+            && activePlayer.Level > previousLevel;
 
-            _activePackId = pack.Id;
-            _lastAdvice = identity;
-            _lastPlayerLevel = activePlayer.Level;
+        _activePackId = pack.Id;
+        _lastAdvice = identity;
+        _lastPlayerLevel = activePlayer.Level;
 
-            if (phaseChanged)
-            {
-                Show(CreatePhaseNotification(pack, advice, activePlayer.Level));
-                return;
-            }
+        if (phaseChanged)
+        {
+            Show(CreatePhaseNotification(pack, advice, activePlayer.Level));
+            return;
+        }
 
-            if (!levelIncreased)
-            {
-                return;
-            }
+        if (!levelIncreased)
+        {
+            return;
+        }
 
-            var persistentTip = SelectPersistentTip(
-                pack,
-                advice.RuleId,
-                activePlayer.Level);
-            if (persistentTip is not null)
-            {
-                Show(CreatePersistentTipNotification(pack, persistentTip, activePlayer.Level));
-            }
+        var persistentTip = SelectPersistentTip(
+            pack,
+            advice.RuleId,
+            activePlayer.Level);
+        if (persistentTip is not null)
+        {
+            Show(CreatePersistentTipNotification(pack, persistentTip, activePlayer.Level));
+        }
+    }
+
+    private void ApplyMapControlPlan(
+        ActiveMapControlPlan? plan,
+        double? previousGameTimeSeconds,
+        double gameTimeSeconds)
+    {
+        if (plan is null || plan.ScheduledAdvice.Count == 0)
+        {
+            return;
+        }
+
+        var catchUpBound = Math.Max(0, gameTimeSeconds - InitialMapReminderCatchUpSeconds);
+        var lowerBound = previousGameTimeSeconds is { } previousTime
+            ? Math.Min(previousTime, catchUpBound)
+            : catchUpBound;
+        foreach (var advice in plan.ScheduledAdvice.Where(advice =>
+                     advice.TriggerTime.TotalSeconds > lowerBound
+                     && advice.TriggerTime.TotalSeconds <= gameTimeSeconds
+                     && !_shownMapAdvice.Contains(advice.Id)))
+        {
+            _shownMapAdvice.Add(advice.Id);
+            Show(CreateMapControlNotification(advice));
         }
     }
 
@@ -187,6 +225,21 @@ public sealed class ActiveMatchOverlayCoordinator : IDisposable
             OverlayNotificationTone.Coach,
             pack.Name,
             _localization.Format("Current.Phase.Level", playerLevel));
+
+    private OverlayNotification CreateMapControlNotification(
+        MapControlScheduledAdvice advice) => new(
+            $"map-control:{advice.Id}",
+            _localization.Get("Overlay.MapControl.Status"),
+            string.IsNullOrWhiteSpace(advice.Title)
+                ? GetObjectiveName(advice.Objective)
+                : advice.Title,
+            advice.Message,
+            _localization.Get("Overlay.MapControl.Dismiss"),
+            GetTone(advice.Priority),
+            advice.PackName,
+            _localization.Format(
+                "Overlay.MapControl.TargetTime",
+                FormatTime(advice.TargetTime)));
 
     private CoachPersistentTipDefinition? SelectPersistentTip(
         CoachPack pack,
@@ -241,11 +294,12 @@ public sealed class ActiveMatchOverlayCoordinator : IDisposable
 
     private void ResetMatchState()
     {
-        ResetSelectionState();
+        ResetMatchupSelectionState();
+        _shownMapAdvice.Clear();
         _lastGameTimeSeconds = null;
     }
 
-    private void ResetSelectionState()
+    private void ResetMatchupSelectionState()
     {
         _lastAdvice = null;
         _activePackId = null;
@@ -269,6 +323,31 @@ public sealed class ActiveMatchOverlayCoordinator : IDisposable
         PowerState.Playable or PowerState.Favorable => OverlayNotificationTone.Coach,
         _ => throw new ArgumentOutOfRangeException(nameof(powerState), powerState, null)
     };
+
+    private static OverlayNotificationTone GetTone(
+        MapObjectiveReminderPriority priority) => priority switch
+    {
+        MapObjectiveReminderPriority.Important => OverlayNotificationTone.Danger,
+        MapObjectiveReminderPriority.Caution => OverlayNotificationTone.Caution,
+        MapObjectiveReminderPriority.Information => OverlayNotificationTone.Information,
+        _ => throw new ArgumentOutOfRangeException(nameof(priority), priority, null)
+    };
+
+    private string GetObjectiveName(MapObjectiveKind? objective) => objective switch
+    {
+        MapObjectiveKind.ElementalDragon => _localization.Get(
+            "Coaching.MapControlEditor.Content.Objective.Dragon"),
+        MapObjectiveKind.VoidGrubs => _localization.Get(
+            "Coaching.MapControlEditor.Content.Objective.Grubs"),
+        MapObjectiveKind.RiftHerald => _localization.Get(
+            "Coaching.MapControlEditor.Content.Objective.Herald"),
+        MapObjectiveKind.BaronNashor => _localization.Get(
+            "Coaching.MapControlEditor.Content.Objective.Baron"),
+        _ => _localization.Get("Overlay.MapControl.GenericTitle")
+    };
+
+    private static string FormatTime(TimeSpan value) =>
+        $"{(int)value.TotalMinutes:00}:{value.Seconds:00}";
 
     private sealed record AdviceIdentity(string PackId, string RuleId);
 
