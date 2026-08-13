@@ -790,7 +790,7 @@
   <data name="Settings.Overlay.Duration.Warning" xml:space="preserve"><value>Danger alerts always remain visible for at least 6 seconds so they cannot be missed.</value></data>
   <data name="Settings.Overlay.Duration.SecondsSuffix" xml:space="preserve"><value>sec</value></data>
   <data name="Settings.Overlay.Persistent.Label" xml:space="preserve"><value>Whole-match advice</value></data>
-  <data name="Settings.Overlay.Persistent.Summary" xml:space="preserve"><value>Matchup mechanics that are not tied to a specific moment</value></data>
+  <data name="Settings.Overlay.Persistent.Summary" xml:space="preserve"><value>Matchup and map-control tips that are not tied to an exact moment</value></data>
   <data name="Settings.Overlay.Persistent.Once" xml:space="preserve"><value>Once per match</value></data>
   <data name="Settings.Overlay.Persistent.Recommended" xml:space="preserve"><value>recommended</value></data>
   <data name="Settings.Overlay.Persistent.Once.Hint" xml:space="preserve"><value>Tips are introduced gradually and do not start repeating after the list ends.</value></data>
@@ -798,7 +798,7 @@
   <data name="Settings.Overlay.Persistent.Level.Hint" xml:space="preserve"><value>The next tip appears on level up. The same tip does not repeat until at least three levels later.</value></data>
   <data name="Settings.Overlay.Persistent.Disabled" xml:space="preserve"><value>Do not show automatically</value></data>
   <data name="Settings.Overlay.Persistent.Disabled.Hint" xml:space="preserve"><value>Whole-match tips remain available in the Coach Pack details.</value></data>
-  <data name="Settings.Overlay.Persistent.ScopeHint" xml:space="preserve"><value>Phase changes and danger alerts are always shown separately and do not depend on this setting.</value></data>
+  <data name="Settings.Overlay.Persistent.ScopeHint" xml:space="preserve"><value>Phase changes, objective rules, and timed reminders are shown separately and do not depend on this setting.</value></data>
   <data name="Settings.Overlay.Reset.Button" xml:space="preserve"><value>Default values</value></data>
   <data name="Settings.Overlay.Save.Button" xml:space="preserve"><value>Save settings</value></data>
   <data name="Settings.Overlay.Unsaved" xml:space="preserve"><value>There are unsaved changes</value></data>
@@ -818,6 +818,7 @@
   <data name="Overlay.Matchup.Dismiss" xml:space="preserve"><value>Hide advice</value></data>
   <data name="Overlay.Matchup.PersistentTip.Status" xml:space="preserve"><value>Matchup tip</value></data>
   <data name="Overlay.MapControl.Status" xml:space="preserve"><value>Map control</value></data>
+  <data name="Overlay.MapControl.PersistentTip.Status" xml:space="preserve"><value>Map tip</value></data>
   <data name="Overlay.MapControl.Dismiss" xml:space="preserve"><value>Hide reminder</value></data>
   <data name="Overlay.MapControl.TargetTime" xml:space="preserve"><value>By {0}</value></data>
   <data name="Overlay.MapControl.GenericTitle" xml:space="preserve"><value>Map reminder</value></data>
@@ -900,7 +901,7 @@
   <data name="Coaching.MapControlEditor.Content.Timed.Future.Description" xml:space="preserve"><value>The first version does not analyze the mini-map image, so these conditions cannot be selected yet.</value></data>
   <data name="Coaching.MapControlEditor.Content.Timed.Future.Items" xml:space="preserve"><value>Enemy jungler spotted · Opponent missing from lane · Enemy ward placed · Team grouped at an objective</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.ListTitle" xml:space="preserve"><value>Persistent tips</value></data>
-  <data name="Coaching.MapControlEditor.Content.Persistent.Description" xml:space="preserve"><value>The player opens these tips in the pack details. They do not pop up during the match and do not replace active advice.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Description" xml:space="preserve"><value>Tips remain available in pack details and the overlay shows one on an eligible level-up. Urgent objective and timed reminders take priority.</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.Add" xml:space="preserve"><value>+ Add tip</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.Empty" xml:space="preserve"><value>No persistent tips yet. Add the first one when the pack needs reference advice.</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.Editor.AddTitle" xml:space="preserve"><value>Persistent tip</value></data>

@@ -176,6 +176,47 @@ public sealed class SelectActiveMapControlPacksUseCaseTests
         Assert.NotSame(first, afterEvent);
     }
 
+    [Fact]
+    public async Task SelectAsync_IncludesOnlyCurrentlyApplicablePersistentAdvice()
+    {
+        var store = new TestMapControlPackStore();
+        var pack = CreateTimedPack("persistent", MapControlRole.Top, MapControlTeamSide.Any) with
+        {
+            PersistentTips =
+            [
+                new MapControlPersistentTip
+                {
+                    Id = "whole",
+                    Title = "Весь матч",
+                    Message = "Следите за рекой.",
+                    Scope = new MapControlPersistentTipScope(
+                        MapControlPersistentTipScopeKind.WholeMatch)
+                },
+                new MapControlPersistentTip
+                {
+                    Id = "dragon",
+                    Title = "Дракон доступен",
+                    Message = "Займите нижнюю реку.",
+                    Scope = new MapControlPersistentTipScope(
+                        MapControlPersistentTipScopeKind.SpecificObjective,
+                        MapObjectiveKind.ElementalDragon)
+                }
+            ]
+        };
+        store.Add(pack, LocalCoachPackState.Enabled, LocalCoachPackOrigin.CreatedByUser);
+        var useCase = new SelectActiveMapControlPacksUseCase(
+            new LoadMapControlPackLibraryUseCase(store));
+
+        var beforeDragon = await useCase.SelectAsync(CreateSnapshot(gameTimeSeconds: 180));
+        var afterDragon = await useCase.SelectAsync(CreateSnapshot(gameTimeSeconds: 300));
+
+        Assert.Single(beforeDragon.AvailablePersistentAdvice);
+        Assert.Equal(2, afterDragon.AvailablePersistentAdvice.Count);
+        Assert.Contains(
+            afterDragon.AvailablePersistentAdvice,
+            advice => advice.Id.EndsWith(":dragon", StringComparison.Ordinal));
+    }
+
     private static MapControlPack CreateTimedPack(
         string id,
         MapControlRole role,
@@ -205,10 +246,11 @@ public sealed class SelectActiveMapControlPacksUseCaseTests
 
     private static MatchSnapshot CreateSnapshot(
         IReadOnlyList<MatchEvent>? events = null,
-        PlayerPosition position = PlayerPosition.Top) => new(
+        PlayerPosition position = PlayerPosition.Top,
+        double gameTimeSeconds = 180) => new(
         new MatchState
         {
-            GameTimeSeconds = 180,
+            GameTimeSeconds = gameTimeSeconds,
             ActivePlayerId = "player",
             Players =
             [

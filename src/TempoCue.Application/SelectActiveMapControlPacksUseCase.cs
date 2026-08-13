@@ -41,16 +41,6 @@ public sealed class SelectActiveMapControlPacksUseCase : IMapControlPlanSelector
         }
 
         var killEvents = ToObjectiveKillEvents(snapshot.Events);
-        if (TryGetCachedPlan(
-                libraryLoad.Version,
-                activePlayer.Position,
-                activePlayer.Team,
-                killEvents,
-                out var cachedPlan))
-        {
-            return cachedPlan;
-        }
-
         var activePacks = libraryLoad.Packs
             .Where(pack => AppliesTo(pack.Pack.Applicability, activePlayer))
             .OrderBy(pack => pack.Pack.Name, StringComparer.OrdinalIgnoreCase)
@@ -64,6 +54,28 @@ public sealed class SelectActiveMapControlPacksUseCase : IMapControlPlanSelector
                 activePlayer.Team,
                 killEvents,
                 ActiveMapControlPlan.Empty);
+        }
+
+        var gameTime = TimeSpan.FromSeconds(Math.Max(0, snapshot.Match.GameTimeSeconds));
+        var persistentAdvice = activePacks
+            .SelectMany(pack => pack.Planner.BuildPersistentAdvice(gameTime, killEvents))
+            .GroupBy(static item => new PersistentAdviceDeduplicationKey(
+                item.Title.Trim(),
+                item.Message.Trim()))
+            .Select(static group => group.First())
+            .ToArray();
+        var persistentAdviceIds = persistentAdvice
+            .Select(static item => item.Id)
+            .ToArray();
+        if (TryGetCachedPlan(
+                libraryLoad.Version,
+                activePlayer.Position,
+                activePlayer.Team,
+                killEvents,
+                persistentAdviceIds,
+                out var cachedPlan))
+        {
+            return cachedPlan;
         }
 
         var advice = activePacks
@@ -88,7 +100,8 @@ public sealed class SelectActiveMapControlPacksUseCase : IMapControlPlanSelector
             killEvents,
             new ActiveMapControlPlan(
                 advice,
-                activePacks.Select(static pack => pack.Pack.Name).ToArray()));
+                activePacks.Select(static pack => pack.Pack.Name).ToArray(),
+                persistentAdvice));
     }
 
     /// <summary>Помечает кеш устаревшим после изменения библиотеки.</summary>
@@ -213,6 +226,7 @@ public sealed class SelectActiveMapControlPacksUseCase : IMapControlPlanSelector
         PlayerPosition position,
         TeamSide team,
         IReadOnlyList<MapObjectiveKillEvent> killEvents,
+        IReadOnlyList<string> persistentAdviceIds,
         out ActiveMapControlPlan plan)
     {
         lock (_planCacheLock)
@@ -221,7 +235,8 @@ public sealed class SelectActiveMapControlPacksUseCase : IMapControlPlanSelector
                 && cached.LibraryVersion == libraryVersion
                 && cached.Position == position
                 && cached.Team == team
-                && cached.KillEvents.SequenceEqual(killEvents))
+                && cached.KillEvents.SequenceEqual(killEvents)
+                && cached.PersistentAdviceIds.SequenceEqual(persistentAdviceIds))
             {
                 plan = cached.Plan;
                 return true;
@@ -246,6 +261,7 @@ public sealed class SelectActiveMapControlPacksUseCase : IMapControlPlanSelector
                 position,
                 team,
                 killEvents.ToArray(),
+                plan.AvailablePersistentAdvice.Select(static item => item.Id).ToArray(),
                 plan);
         }
 
@@ -263,12 +279,17 @@ public sealed class SelectActiveMapControlPacksUseCase : IMapControlPlanSelector
         PlayerPosition Position,
         TeamSide Team,
         IReadOnlyList<MapObjectiveKillEvent> KillEvents,
+        IReadOnlyList<string> PersistentAdviceIds,
         ActiveMapControlPlan Plan);
 
     private sealed record AdviceDeduplicationKey(
         MapControlScheduledAdviceKind Kind,
         MapObjectiveKind? Objective,
         TimeSpan TriggerTime,
+        string Title,
+        string Message);
+
+    private sealed record PersistentAdviceDeduplicationKey(
         string Title,
         string Message);
 }

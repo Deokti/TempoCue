@@ -375,6 +375,112 @@ public sealed class ActiveMatchOverlayCoordinatorTests
     }
 
     [Fact]
+    public void Updated_ShowsMapPersistentTipOnLevelUpWithoutSelectedMatchupPack()
+    {
+        LocalizationService.Instance.SetLanguage("ru-RU");
+        var monitor = new TestActiveMatchMonitor();
+        using var presenter = new RecordingOverlayPresenter();
+        using var coordinator = new ActiveMatchOverlayCoordinator(
+            monitor,
+            presenter,
+            LocalizationService.Instance);
+        var mapPlan = CreateMapPersistentPlan();
+
+        monitor.Publish(CreateSuccessUpdate(null, null, 180, 4, mapPlan));
+        monitor.Publish(CreateSuccessUpdate(null, null, 210, 5, mapPlan));
+
+        var tip = Assert.Single(presenter.Notifications);
+        Assert.Equal(
+            "map-control:map-pack:persistent:river:level:5",
+            tip.Key);
+        Assert.Equal("ПОДСКАЗКА ПО КАРТЕ", tip.DisplayStatus);
+        Assert.Equal("Сохраняйте обзор", tip.Phrase);
+        Assert.Equal("Уровень 5", tip.Badge);
+        Assert.Equal(OverlayNotificationTone.Coach, tip.Tone);
+    }
+
+    [Fact]
+    public void Updated_DefersMapPersistentTipWhenScheduledReminderIsDue()
+    {
+        var monitor = new TestActiveMatchMonitor();
+        using var presenter = new RecordingOverlayPresenter();
+        using var coordinator = new ActiveMatchOverlayCoordinator(
+            monitor,
+            presenter,
+            LocalizationService.Instance);
+        var mapPlan = CreateMapControlPlan(
+            triggerSeconds: 195,
+            persistentAdvice: CreateMapPersistentPlan().AvailablePersistentAdvice);
+
+        monitor.Publish(CreateSuccessUpdate(null, null, 194, 4, mapPlan));
+        monitor.Publish(CreateSuccessUpdate(null, null, 195, 5, mapPlan));
+        monitor.Publish(CreateSuccessUpdate(null, null, 240, 6, mapPlan));
+
+        Assert.Collection(
+            presenter.Notifications,
+            reminder => Assert.Contains(":timed:", reminder.Key, StringComparison.Ordinal),
+            tip => Assert.Contains(":persistent:", tip.Key, StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Updated_RotatesMapTipBetweenPhaseSpecificAndGeneralMatchupTips()
+    {
+        var monitor = new TestActiveMatchMonitor();
+        using var presenter = new RecordingOverlayPresenter();
+        using var coordinator = new ActiveMatchOverlayCoordinator(
+            monitor,
+            presenter,
+            LocalizationService.Instance);
+        var pack = TestCoachPackFactory.CreateMatchup(
+            persistentTips:
+            [
+                CreatePersistentTip("phase-tip", "Совет фазы", "early"),
+                CreatePersistentTip("general-tip", "Общий совет")
+            ]);
+        var advice = CreateAdvice("early", PowerState.Playable, "Фаза");
+        var mapPlan = CreateMapPersistentPlan();
+
+        for (var level = 1; level <= 4; level++)
+        {
+            monitor.Publish(CreateSuccessUpdate(
+                pack,
+                advice,
+                level * 30,
+                level,
+                mapPlan));
+        }
+
+        Assert.Collection(
+            presenter.Notifications,
+            phase => Assert.EndsWith(":early", phase.Key, StringComparison.Ordinal),
+            phaseTip => Assert.Contains(":phase-tip:", phaseTip.Key, StringComparison.Ordinal),
+            mapTip => Assert.StartsWith("map-control:", mapTip.Key, StringComparison.Ordinal),
+            generalTip => Assert.Contains(":general-tip:", generalTip.Key, StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Updated_DoesNotShowMapPersistentTipWhenDisabled()
+    {
+        var monitor = new TestActiveMatchMonitor();
+        using var presenter = new RecordingOverlayPresenter();
+        var settings = new OverlaySettingsState(new OverlayUserSettings
+        {
+            PersistentAdviceFrequency = PersistentAdviceFrequency.Disabled
+        });
+        using var coordinator = new ActiveMatchOverlayCoordinator(
+            monitor,
+            presenter,
+            LocalizationService.Instance,
+            settings);
+        var mapPlan = CreateMapPersistentPlan();
+
+        monitor.Publish(CreateSuccessUpdate(null, null, 180, 4, mapPlan));
+        monitor.Publish(CreateSuccessUpdate(null, null, 210, 5, mapPlan));
+
+        Assert.Empty(presenter.Notifications);
+    }
+
+    [Fact]
     public void Updated_DoesNotReplayOldMapReminderWhenApplicationStartsMidMatch()
     {
         var monitor = new TestActiveMatchMonitor();
@@ -468,7 +574,9 @@ public sealed class ActiveMatchOverlayCoordinatorTests
         Assert.Empty(presenter.Notifications);
     }
 
-    private static ActiveMapControlPlan CreateMapControlPlan(double triggerSeconds) => new(
+    private static ActiveMapControlPlan CreateMapControlPlan(
+        double triggerSeconds,
+        IReadOnlyList<MapControlPersistentAdvice>? persistentAdvice = null) => new(
         [
             new MapControlScheduledAdvice(
                 "map-pack:timed:river",
@@ -483,6 +591,19 @@ public sealed class ActiveMatchOverlayCoordinatorTests
                 TimeSpan.FromSeconds(triggerSeconds),
                 TimeSpan.FromSeconds(triggerSeconds))
         ],
-        ["Контроль реки"]);
+        ["Контроль реки"],
+        persistentAdvice);
+
+    private static ActiveMapControlPlan CreateMapPersistentPlan() => new(
+        [],
+        ["Контроль реки"],
+        [
+            new MapControlPersistentAdvice(
+                "map-pack:persistent:river",
+                "map-pack",
+                "Контроль реки",
+                "Сохраняйте обзор",
+                "Не входите в реку без информации о соперниках.")
+        ]);
 
 }

@@ -59,6 +59,69 @@ public sealed class MapControlPackPlanner
             .ToArray();
     }
 
+    /// <summary>
+    /// Возвращает постоянные подсказки, область которых применима в текущий момент матча.
+    /// Порядок автора сохраняется, чтобы ротация оставалась детерминированной.
+    /// </summary>
+    public IReadOnlyList<MapControlPersistentAdvice> BuildPersistentAdvice(
+        TimeSpan gameTime,
+        IReadOnlyCollection<MapObjectiveKillEvent> killEvents)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(gameTime, TimeSpan.Zero);
+        ArgumentNullException.ThrowIfNull(killEvents);
+
+        var firstObjectiveTime = _timings.Values.Min(static timing => timing.InitialSpawnTime);
+        return _pack.PersistentTips
+            .Where(tip => IsApplicable(tip.Scope, gameTime, firstObjectiveTime, killEvents))
+            .Select(tip => new MapControlPersistentAdvice(
+                $"{_pack.Id}:persistent:{tip.Id}",
+                _pack.Id,
+                _pack.Name,
+                tip.Title,
+                tip.Message))
+            .ToArray();
+    }
+
+    private bool IsApplicable(
+        MapControlPersistentTipScope scope,
+        TimeSpan gameTime,
+        TimeSpan firstObjectiveTime,
+        IReadOnlyCollection<MapObjectiveKillEvent> killEvents) => scope.Kind switch
+        {
+            MapControlPersistentTipScopeKind.WholeMatch => true,
+            MapControlPersistentTipScopeKind.BeforeFirstObjective => gameTime < firstObjectiveTime,
+            MapControlPersistentTipScopeKind.WhileAnyObjectiveAvailable =>
+                _timings.Keys.Any(objective => IsObjectiveAvailable(objective, gameTime, killEvents)),
+            MapControlPersistentTipScopeKind.SpecificObjective when scope.Objective is { } objective =>
+                IsObjectiveAvailable(objective, gameTime, killEvents),
+            _ => false
+        };
+
+    private bool IsObjectiveAvailable(
+        MapObjectiveKind objective,
+        TimeSpan gameTime,
+        IReadOnlyCollection<MapObjectiveKillEvent> killEvents)
+    {
+        var timing = _timings[objective];
+        if (gameTime < timing.InitialSpawnTime)
+        {
+            return false;
+        }
+
+        var latestKill = killEvents
+            .Where(item => item.Objective == objective && item.GameTime <= gameTime)
+            .OrderByDescending(static item => item.GameTime)
+            .ThenByDescending(static item => item.EventId)
+            .FirstOrDefault();
+        if (latestKill is null)
+        {
+            return true;
+        }
+
+        return timing.RespawnDelay is { } respawnDelay
+               && gameTime >= latestKill.GameTime + respawnDelay;
+    }
+
     private static MapControlScheduledAdvice FromOccurrence(
         MapControlPack pack,
         MapObjectiveReminderRule rule,

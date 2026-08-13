@@ -800,7 +800,7 @@
   <data name="Settings.Overlay.Duration.Warning" xml:space="preserve"><value>Опасные уведомления всегда остаются на экране не менее 6 секунд, чтобы их нельзя было пропустить.</value></data>
   <data name="Settings.Overlay.Duration.SecondsSuffix" xml:space="preserve"><value>с</value></data>
   <data name="Settings.Overlay.Persistent.Label" xml:space="preserve"><value>Постоянные советы на весь матч</value></data>
-  <data name="Settings.Overlay.Persistent.Summary" xml:space="preserve"><value>Механические подсказки матчапа, не привязанные к моменту</value></data>
+  <data name="Settings.Overlay.Persistent.Summary" xml:space="preserve"><value>Подсказки матчапа и контроля карты, не привязанные к точному моменту</value></data>
   <data name="Settings.Overlay.Persistent.Once" xml:space="preserve"><value>Один раз за матч</value></data>
   <data name="Settings.Overlay.Persistent.Recommended" xml:space="preserve"><value>рекомендуется</value></data>
   <data name="Settings.Overlay.Persistent.Once.Hint" xml:space="preserve"><value>Советы появляются постепенно и не повторяются после окончания списка.</value></data>
@@ -808,7 +808,7 @@
   <data name="Settings.Overlay.Persistent.Level.Hint" xml:space="preserve"><value>Следующий совет появляется при повышении уровня. Один и тот же совет повторяется не раньше чем через три уровня.</value></data>
   <data name="Settings.Overlay.Persistent.Disabled" xml:space="preserve"><value>Не показывать автоматически</value></data>
   <data name="Settings.Overlay.Persistent.Disabled.Hint" xml:space="preserve"><value>Постоянные советы останутся доступны в подробностях Coach Pack.</value></data>
-  <data name="Settings.Overlay.Persistent.ScopeHint" xml:space="preserve"><value>Смена фаз и опасные события всегда показываются отдельно и не зависят от этой настройки.</value></data>
+  <data name="Settings.Overlay.Persistent.ScopeHint" xml:space="preserve"><value>Смена фаз, объектные правила и напоминания по времени показываются отдельно и не зависят от этой настройки.</value></data>
   <data name="Settings.Overlay.Reset.Button" xml:space="preserve"><value>Значения по умолчанию</value></data>
   <data name="Settings.Overlay.Save.Button" xml:space="preserve"><value>Сохранить настройки</value></data>
   <data name="Settings.Overlay.Unsaved" xml:space="preserve"><value>Есть несохранённые изменения</value></data>
@@ -828,6 +828,7 @@
   <data name="Overlay.Matchup.Dismiss" xml:space="preserve"><value>Скрыть совет</value></data>
   <data name="Overlay.Matchup.PersistentTip.Status" xml:space="preserve"><value>Подсказка по матчапу</value></data>
   <data name="Overlay.MapControl.Status" xml:space="preserve"><value>Контроль карты</value></data>
+  <data name="Overlay.MapControl.PersistentTip.Status" xml:space="preserve"><value>Подсказка по карте</value></data>
   <data name="Overlay.MapControl.Dismiss" xml:space="preserve"><value>Скрыть напоминание</value></data>
   <data name="Overlay.MapControl.TargetTime" xml:space="preserve"><value>К {0}</value></data>
   <data name="Overlay.MapControl.GenericTitle" xml:space="preserve"><value>Напоминание по карте</value></data>
@@ -910,7 +911,7 @@
   <data name="Coaching.MapControlEditor.Content.Timed.Future.Description" xml:space="preserve"><value>Первая версия не анализирует изображение мини-карты, поэтому такие условия пока нельзя выбрать.</value></data>
   <data name="Coaching.MapControlEditor.Content.Timed.Future.Items" xml:space="preserve"><value>Вражеский лесник замечен · Противник пропал с линии · Поставлен вражеский вард · Команда собралась у объекта</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.ListTitle" xml:space="preserve"><value>Постоянные подсказки</value></data>
-  <data name="Coaching.MapControlEditor.Content.Persistent.Description" xml:space="preserve"><value>Игрок открывает эти подсказки в деталях набора. Они не всплывают во время матча и не заменяют активный совет.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Description" xml:space="preserve"><value>Подсказки доступны в деталях набора и по одной показываются оверлеем при подходящем повышении уровня. Срочные напоминания объектов и времени имеют приоритет.</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.Add" xml:space="preserve"><value>+ Добавить подсказку</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.Empty" xml:space="preserve"><value>Постоянных подсказок пока нет. Добавьте первую, если набору нужна справочная рекомендация.</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.Editor.AddTitle" xml:space="preserve"><value>Постоянная подсказка</value></data>

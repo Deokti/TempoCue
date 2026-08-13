@@ -28,7 +28,6 @@ public sealed class ActiveMatchOverlayCoordinator : IDisposable
 
     private AdviceIdentity? _lastAdvice;
     private double? _lastGameTimeSeconds;
-    private string? _activePackId;
     private int? _lastPlayerLevel;
     private bool _isDisposed;
 
@@ -102,82 +101,80 @@ public sealed class ActiveMatchOverlayCoordinator : IDisposable
             }
 
             _lastGameTimeSeconds = gameTimeSeconds;
-            ApplyMatchupSelection(update.CoachPackSelection, snapshot);
-            ApplyMapControlPlan(
+            var activePlayer = snapshot.Match.GetActivePlayer();
+            var levelIncreased = activePlayer is not null
+                && _lastPlayerLevel is { } previousLevel
+                && activePlayer.Level > previousLevel;
+            if (activePlayer is not null)
+            {
+                _lastPlayerLevel = activePlayer.Level;
+            }
+
+            var matchupResult = ApplyMatchupSelection(update.CoachPackSelection, activePlayer);
+            var mapReminderShown = ApplyMapControlPlan(
                 update.MapControlPlan,
                 previousGameTime,
                 gameTimeSeconds);
+            if (activePlayer is not null
+                && levelIncreased
+                && !matchupResult.NotificationShown
+                && !mapReminderShown)
+            {
+                ApplyPersistentAdvice(
+                    matchupResult.Context,
+                    update.MapControlPlan,
+                    activePlayer.Level);
+            }
         }
     }
 
-    private void ApplyMatchupSelection(
+    private MatchupUpdateResult ApplyMatchupSelection(
         ActiveCoachPackSelection? selection,
-        MatchSnapshot snapshot)
+        PlayerState? activePlayer)
     {
         if (selection?.State is not ActiveCoachPackSelectionState.Selected
             || selection.Pack is not { } pack
             || selection.Advice is not { } advice)
         {
             ResetMatchupSelectionState();
-            return;
+            return MatchupUpdateResult.Empty;
         }
 
-        var activePlayer = snapshot.Match.GetActivePlayer();
         if (activePlayer is null)
         {
             ResetMatchupSelectionState();
-            return;
-        }
-
-        var packChanged = !string.Equals(
-            _activePackId,
-            pack.Id,
-            StringComparison.Ordinal);
-        if (packChanged)
-        {
-            _persistentTipLevels.Clear();
+            return MatchupUpdateResult.Empty;
         }
 
         var identity = new AdviceIdentity(pack.Id, advice.RuleId);
         var phaseChanged = _lastAdvice != identity;
-        var levelIncreased = _lastPlayerLevel is { } previousLevel
-            && activePlayer.Level > previousLevel;
 
-        _activePackId = pack.Id;
         _lastAdvice = identity;
-        _lastPlayerLevel = activePlayer.Level;
 
         if (phaseChanged)
         {
             Show(CreatePhaseNotification(pack, advice, activePlayer.Level));
-            return;
+            return new MatchupUpdateResult(
+                new MatchupPersistentContext(pack, advice.RuleId),
+                true);
         }
 
-        if (!levelIncreased)
-        {
-            return;
-        }
-
-        var persistentTip = SelectPersistentTip(
-            pack,
-            advice.RuleId,
-            activePlayer.Level);
-        if (persistentTip is not null)
-        {
-            Show(CreatePersistentTipNotification(pack, persistentTip, activePlayer.Level));
-        }
+        return new MatchupUpdateResult(
+            new MatchupPersistentContext(pack, advice.RuleId),
+            false);
     }
 
-    private void ApplyMapControlPlan(
+    private bool ApplyMapControlPlan(
         ActiveMapControlPlan? plan,
         double? previousGameTimeSeconds,
         double gameTimeSeconds)
     {
         if (plan is null || plan.ScheduledAdvice.Count == 0)
         {
-            return;
+            return false;
         }
 
+        var shown = false;
         var catchUpBound = Math.Max(0, gameTimeSeconds - InitialMapReminderCatchUpSeconds);
         var lowerBound = previousGameTimeSeconds is { } previousTime
             ? Math.Min(previousTime, catchUpBound)
@@ -189,6 +186,47 @@ public sealed class ActiveMatchOverlayCoordinator : IDisposable
         {
             _shownMapAdvice.Add(advice.Id);
             Show(CreateMapControlNotification(advice));
+            shown = true;
+        }
+
+        return shown;
+    }
+
+    private void ApplyPersistentAdvice(
+        MatchupPersistentContext? matchup,
+        ActiveMapControlPlan? mapControlPlan,
+        int playerLevel)
+    {
+        var candidates = new List<EligiblePersistentTip>();
+        if (matchup is not null)
+        {
+            candidates.AddRange(matchup.Pack.PersistentTips
+                .Where(tip => tip.ApplicableRuleId is null
+                    || string.Equals(
+                        tip.ApplicableRuleId,
+                        matchup.ActiveRuleId,
+                        StringComparison.Ordinal))
+                .Select((tip, index) => new EligiblePersistentTip(
+                    $"matchup:{matchup.Pack.Id}:persistent:{tip.Id}",
+                    tip.ApplicableRuleId is not null ? 0 : 2,
+                    index,
+                    () => CreatePersistentTipNotification(matchup.Pack, tip, playerLevel))));
+        }
+
+        if (mapControlPlan is not null)
+        {
+            candidates.AddRange(mapControlPlan.AvailablePersistentAdvice
+                .Select((tip, index) => new EligiblePersistentTip(
+                    $"map-control:{tip.Id}",
+                    1,
+                    index,
+                    () => CreateMapPersistentTipNotification(tip, playerLevel))));
+        }
+
+        var selected = SelectPersistentTip(candidates, playerLevel);
+        if (selected is not null)
+        {
+            Show(selected.CreateNotification());
         }
     }
 
@@ -241,45 +279,42 @@ public sealed class ActiveMatchOverlayCoordinator : IDisposable
                 "Overlay.MapControl.TargetTime",
                 FormatTime(advice.TargetTime)));
 
-    private CoachPersistentTipDefinition? SelectPersistentTip(
-        CoachPack pack,
-        string activeRuleId,
+    private OverlayNotification CreateMapPersistentTipNotification(
+        MapControlPersistentAdvice advice,
+        int playerLevel) => new(
+            $"map-control:{advice.Id}:level:{playerLevel}",
+            _localization.Get("Overlay.MapControl.PersistentTip.Status"),
+            advice.Title,
+            advice.Message,
+            _localization.Get("Overlay.MapControl.Dismiss"),
+            OverlayNotificationTone.Coach,
+            advice.PackName,
+            _localization.Format("Current.Phase.Level", playerLevel));
+
+    private EligiblePersistentTip? SelectPersistentTip(
+        IReadOnlyCollection<EligiblePersistentTip> eligibleTips,
         int playerLevel)
     {
         var frequency = _overlaySettings.Current.PersistentAdviceFrequency;
-        if (frequency is PersistentAdviceFrequency.Disabled)
+        if (frequency is PersistentAdviceFrequency.Disabled || eligibleTips.Count == 0)
         {
             return null;
         }
 
-        var eligibleTips = pack.PersistentTips
-            .Where(tip => tip.ApplicableRuleId is null
-                || string.Equals(
-                    tip.ApplicableRuleId,
-                    activeRuleId,
-                    StringComparison.Ordinal))
-            .Select((tip, index) => new EligiblePersistentTip(
-                tip,
-                index,
-                tip.ApplicableRuleId is not null))
-            .OrderByDescending(candidate => candidate.IsPhaseSpecific)
+        var orderedTips = eligibleTips
+            .OrderBy(candidate => candidate.ScopeRank)
             .ThenBy(candidate => candidate.SourceIndex)
             .ToArray();
-        if (eligibleTips.Length == 0)
-        {
-            return null;
-        }
-
-        var selected = eligibleTips.FirstOrDefault(candidate =>
-            !_persistentTipLevels.ContainsKey(candidate.Tip.Id));
+        var selected = orderedTips.FirstOrDefault(candidate =>
+            !_persistentTipLevels.ContainsKey(candidate.Id));
         if (frequency is PersistentAdviceFrequency.EveryLevel)
         {
-            selected ??= eligibleTips
+            selected ??= orderedTips
                 .Where(candidate =>
-                    playerLevel - _persistentTipLevels[candidate.Tip.Id]
+                    playerLevel - _persistentTipLevels[candidate.Id]
                     >= PersistentTipRepeatLevelGap)
-                .OrderBy(candidate => _persistentTipLevels[candidate.Tip.Id])
-                .ThenByDescending(candidate => candidate.IsPhaseSpecific)
+                .OrderBy(candidate => _persistentTipLevels[candidate.Id])
+                .ThenBy(candidate => candidate.ScopeRank)
                 .ThenBy(candidate => candidate.SourceIndex)
                 .FirstOrDefault();
         }
@@ -288,23 +323,22 @@ public sealed class ActiveMatchOverlayCoordinator : IDisposable
             return null;
         }
 
-        _persistentTipLevels[selected.Tip.Id] = playerLevel;
-        return selected.Tip;
+        _persistentTipLevels[selected.Id] = playerLevel;
+        return selected;
     }
 
     private void ResetMatchState()
     {
         ResetMatchupSelectionState();
         _shownMapAdvice.Clear();
+        _persistentTipLevels.Clear();
         _lastGameTimeSeconds = null;
+        _lastPlayerLevel = null;
     }
 
     private void ResetMatchupSelectionState()
     {
         _lastAdvice = null;
-        _activePackId = null;
-        _lastPlayerLevel = null;
-        _persistentTipLevels.Clear();
     }
 
     private static string GetPowerStateResourceKey(PowerState powerState) => powerState switch
@@ -351,8 +385,20 @@ public sealed class ActiveMatchOverlayCoordinator : IDisposable
 
     private sealed record AdviceIdentity(string PackId, string RuleId);
 
+    private sealed record MatchupPersistentContext(
+        CoachPack Pack,
+        string ActiveRuleId);
+
+    private sealed record MatchupUpdateResult(
+        MatchupPersistentContext? Context,
+        bool NotificationShown)
+    {
+        public static MatchupUpdateResult Empty { get; } = new(null, false);
+    }
+
     private sealed record EligiblePersistentTip(
-        CoachPersistentTipDefinition Tip,
+        string Id,
+        int ScopeRank,
         int SourceIndex,
-        bool IsPhaseSpecific);
+        Func<OverlayNotification> CreateNotification);
 }
