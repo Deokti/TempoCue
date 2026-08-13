@@ -4,5 +4,7 @@ namespace TempoCue.Core;
 public enum MatchEventKind
 {
     ChampionKill,
-    DragonKill
+    DragonKill,
+    RiftHeraldKill,
+    BaronNashorKill
 }

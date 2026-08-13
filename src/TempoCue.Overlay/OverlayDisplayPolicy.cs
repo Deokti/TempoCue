@@ -20,7 +20,7 @@ public sealed class OverlayDisplayPolicy
 
     public TimeSpan DuplicateSuppressionInterval { get; init; } = TimeSpan.FromSeconds(20);
 
-    public TimeSpan LowPriorityCadence { get; init; } = TimeSpan.FromSeconds(8);
+    public TimeSpan LearningCadence { get; init; } = TimeSpan.FromSeconds(8);
 
     public TimeSpan PendingLifetime { get; init; } = TimeSpan.FromSeconds(20);
 
@@ -82,9 +82,33 @@ public sealed class OverlayDisplayPolicy
         _ => throw new ArgumentOutOfRangeException(nameof(tone), tone, null)
     };
 
+    public int GetPriority(OverlayNotification notification)
+    {
+        ArgumentNullException.ThrowIfNull(notification);
+        if (notification.Tone is OverlayNotificationTone.Paused)
+        {
+            return 100;
+        }
+
+        var purposePriority = notification.Purpose switch
+        {
+            OverlayNotificationPurpose.Operational => 10,
+            OverlayNotificationPurpose.Learning => 0,
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(notification),
+                notification.Purpose,
+                null)
+        };
+        return purposePriority + GetPriority(notification.Tone);
+    }
+
     public bool IsWarning(OverlayNotificationTone tone) =>
         tone is OverlayNotificationTone.Danger or OverlayNotificationTone.Caution;
 
-    public bool BypassesCadence(OverlayNotificationTone tone) => IsWarning(tone) ||
-        tone is OverlayNotificationTone.Paused;
+    public bool BypassesLearningCadence(OverlayNotification notification)
+    {
+        ArgumentNullException.ThrowIfNull(notification);
+        return notification.Purpose is OverlayNotificationPurpose.Operational
+            || notification.Tone is OverlayNotificationTone.Paused;
+    }
 }

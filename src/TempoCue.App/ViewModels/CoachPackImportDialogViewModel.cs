@@ -3,6 +3,7 @@ using System.IO;
 using System.Text.Json;
 using TempoCue.App.Localization;
 using TempoCue.Application;
+using TempoCue.Coaching;
 using TempoCue.Core;
 
 namespace TempoCue.App.ViewModels;
@@ -11,8 +12,8 @@ namespace TempoCue.App.ViewModels;
 public sealed class CoachPackImportDialogViewModel : ObservableObject, IDisposable
 {
     private readonly LocalizationService _localization;
-    private readonly ImportCoachPackUseCase _importCoachPack;
-    private CoachPackImportPreview? _preview;
+    private readonly ImportPortableCoachPackUseCase _importCoachPack;
+    private PortableCoachPackImportPreview? _preview;
     private CoachPackImportDialogStatus _status;
     private bool _isOpen;
     private bool _isBusy;
@@ -20,7 +21,7 @@ public sealed class CoachPackImportDialogViewModel : ObservableObject, IDisposab
 
     public CoachPackImportDialogViewModel(
         LocalizationService localization,
-        ImportCoachPackUseCase importCoachPack)
+        ImportPortableCoachPackUseCase importCoachPack)
     {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _importCoachPack = importCoachPack ?? throw new ArgumentNullException(nameof(importCoachPack));
@@ -45,15 +46,20 @@ public sealed class CoachPackImportDialogViewModel : ObservableObject, IDisposab
         }
     }
 
-    public CoachPack? Pack => _preview?.Pack;
+    public CoachPack? Pack => _preview?.MatchupPack;
 
-    public bool HasPreview => Pack is not null;
+    public MapControlPack? MapControlPack => _preview?.MapControlPack;
 
-    public string PackName => Pack?.Name ?? string.Empty;
+    public bool HasPreview => Pack is not null || MapControlPack is not null;
 
-    public string Description => string.IsNullOrWhiteSpace(Pack?.Description)
+    public bool IsMapControlPreview => MapControlPack is not null;
+
+    public string PackName => Pack?.Name ?? MapControlPack?.Name ?? string.Empty;
+
+    public string Description => string.IsNullOrWhiteSpace(
+        Pack?.Description ?? MapControlPack?.Description)
         ? _localization.Get("Coaching.Import.Preview.Description.Empty")
-        : Pack.Description;
+        : Pack?.Description ?? MapControlPack?.Description ?? string.Empty;
 
     public string MatchupLabel => Pack is null
         ? string.Empty
@@ -66,15 +72,17 @@ public sealed class CoachPackImportDialogViewModel : ObservableObject, IDisposab
         ? _localization.Get("Coaching.Library.Role.Any")
         : Pack.LaneRole.ToUpperInvariant();
 
-    public string AuthorLabel => string.IsNullOrWhiteSpace(Pack?.Author)
+    public string AuthorLabel => string.IsNullOrWhiteSpace(
+        Pack?.Author ?? MapControlPack?.Author)
         ? _localization.Get("Coaching.Library.Author.TempoCue")
-        : Pack.Author;
+        : Pack?.Author ?? MapControlPack?.Author ?? string.Empty;
 
-    public string LanguageLabel => string.IsNullOrWhiteSpace(Pack?.ContentLanguage)
+    public string LanguageLabel => string.IsNullOrWhiteSpace(
+        Pack?.ContentLanguage ?? MapControlPack?.ContentLanguage)
         ? _localization.Get("Coaching.Library.Language.Unknown")
-        : Pack.ContentLanguage;
+        : Pack?.ContentLanguage ?? MapControlPack?.ContentLanguage ?? string.Empty;
 
-    public string PatchLabel => Pack?.Patch ?? string.Empty;
+    public string PatchLabel => Pack?.Patch ?? MapControlPack?.Patch ?? string.Empty;
 
     public string AdviceCountLabel => Pack is null
         ? string.Empty
@@ -85,6 +93,27 @@ public sealed class CoachPackImportDialogViewModel : ObservableObject, IDisposab
     public string ItemBlockCountLabel => Pack is null
         ? string.Empty
         : _localization.Plural("Count.ItemBlock", Pack.ItemBlocks.Count);
+
+    public string PreviewContextLabel => MapControlPack is null
+        ? _localization.Format(
+            "Coaching.Import.Preview.Matchup.Context",
+            MatchupLabel,
+            RoleLabel)
+        : _localization.Format(
+            "Coaching.Import.Preview.MapControl.Context",
+            GetMapControlRolesLabel(MapControlPack.Applicability.Roles),
+            GetMapControlTeamSideLabel(MapControlPack.Applicability.TeamSide));
+
+    public string PreviewContentsLabel => MapControlPack is null
+        ? _localization.Format(
+            "Coaching.Import.Preview.Matchup.Contents",
+            AdviceCountLabel,
+            ItemBlockCountLabel)
+        : _localization.Format(
+            "Coaching.MapControl.Details.Overview.ContentValue",
+            MapControlPack.Rules.Count,
+            MapControlPack.TimedReminders.Count,
+            MapControlPack.PersistentTips.Count);
 
     public bool CanConfirm => _preview?.CanImport == true && !IsBusy;
 
@@ -178,7 +207,8 @@ public sealed class CoachPackImportDialogViewModel : ObservableObject, IDisposab
 
     public async Task<bool> ConfirmAsync(CancellationToken cancellationToken = default)
     {
-        if (_preview is null || !CanConfirm)
+        var preview = _preview;
+        if (preview is null || !CanConfirm)
         {
             return false;
         }
@@ -186,13 +216,12 @@ public sealed class CoachPackImportDialogViewModel : ObservableObject, IDisposab
         IsBusy = true;
         try
         {
-            var result = await _importCoachPack.ExecuteAsync(_preview, cancellationToken);
+            var result = await _importCoachPack.ExecuteAsync(preview, cancellationToken);
             _preview = result.Preview;
             if (!result.Succeeded)
             {
                 SetStatus(GetPreviewStatus(_preview));
             }
-
             NotifyPreviewChanged();
             return result.Succeeded;
         }
@@ -254,7 +283,9 @@ public sealed class CoachPackImportDialogViewModel : ObservableObject, IDisposab
     private void NotifyPreviewChanged()
     {
         OnPropertyChanged(nameof(Pack));
+        OnPropertyChanged(nameof(MapControlPack));
         OnPropertyChanged(nameof(HasPreview));
+        OnPropertyChanged(nameof(IsMapControlPreview));
         OnPropertyChanged(nameof(PackName));
         OnPropertyChanged(nameof(Description));
         OnPropertyChanged(nameof(MatchupLabel));
@@ -264,6 +295,8 @@ public sealed class CoachPackImportDialogViewModel : ObservableObject, IDisposab
         OnPropertyChanged(nameof(PatchLabel));
         OnPropertyChanged(nameof(AdviceCountLabel));
         OnPropertyChanged(nameof(ItemBlockCountLabel));
+        OnPropertyChanged(nameof(PreviewContextLabel));
+        OnPropertyChanged(nameof(PreviewContentsLabel));
         OnPropertyChanged(nameof(CanConfirm));
         OnPropertyChanged(nameof(HasImportAction));
         OnPropertyChanged(nameof(ConfirmActionLabel));
@@ -277,15 +310,39 @@ public sealed class CoachPackImportDialogViewModel : ObservableObject, IDisposab
         OnPropertyChanged(nameof(StatusMessage));
     }
 
-    private static CoachPackImportDialogStatus GetPreviewStatus(CoachPackImportPreview preview) =>
-        preview.Conflict switch
+    private static CoachPackImportDialogStatus GetPreviewStatus(
+        PortableCoachPackImportPreview preview) => preview.Conflict switch
         {
-            CoachPackImportConflict.None => CoachPackImportDialogStatus.Ready,
-            CoachPackImportConflict.ImportedPack => CoachPackImportDialogStatus.Replacement,
-            CoachPackImportConflict.CreatedPack => CoachPackImportDialogStatus.CreatedConflict,
-            CoachPackImportConflict.BuiltInPack => CoachPackImportDialogStatus.BuiltInConflict,
+            PortableCoachPackImportConflict.None => CoachPackImportDialogStatus.Ready,
+            PortableCoachPackImportConflict.ImportedPack =>
+                CoachPackImportDialogStatus.Replacement,
+            PortableCoachPackImportConflict.CreatedPack =>
+                CoachPackImportDialogStatus.CreatedConflict,
+            PortableCoachPackImportConflict.BuiltInPack =>
+                CoachPackImportDialogStatus.BuiltInConflict,
             _ => throw new ArgumentOutOfRangeException(nameof(preview))
         };
+
+    private string GetMapControlRolesLabel(IReadOnlyList<MapControlRole> roles)
+    {
+        if (roles.Count == MapControlRoleValues.All.Count
+            && MapControlRoleValues.All.All(roles.Contains))
+        {
+            return _localization.Get("Coaching.MapControlEditor.Scope.Summary.AllRoles");
+        }
+
+        return _localization.Format(
+            "Coaching.MapControl.Library.Role.Selected",
+            string.Join(", ", roles.Select(static role => role.ToString().ToUpperInvariant())));
+    }
+
+    private string GetMapControlTeamSideLabel(MapControlTeamSide teamSide) =>
+        _localization.Get(teamSide switch
+        {
+            MapControlTeamSide.Blue => "Coaching.MapControlEditor.Scope.Summary.BlueSide",
+            MapControlTeamSide.Red => "Coaching.MapControlEditor.Scope.Summary.RedSide",
+            _ => "Coaching.MapControlEditor.Scope.Summary.AnySide"
+        });
 
     private static string EmptyToFallback(string value, string? fallback) =>
         string.IsNullOrWhiteSpace(value)

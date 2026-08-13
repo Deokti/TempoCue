@@ -11,6 +11,7 @@ public sealed class ActiveMatchSession
 {
     private readonly IMatchSnapshotSource _snapshotSource;
     private readonly IMatchAdviceSelector _adviceSelector;
+    private readonly IMapControlPlanSelector? _mapControlPlanSelector;
     private readonly TimeSpan _pollingInterval;
     private readonly SemaphoreSlim _readLock = new(1, 1);
     private int _isWatching;
@@ -18,7 +19,8 @@ public sealed class ActiveMatchSession
     public ActiveMatchSession(
         IMatchSnapshotSource snapshotSource,
         IMatchAdviceSelector adviceSelector,
-        TimeSpan pollingInterval)
+        TimeSpan pollingInterval,
+        IMapControlPlanSelector? mapControlPlanSelector = null)
     {
         ArgumentNullException.ThrowIfNull(snapshotSource);
         ArgumentNullException.ThrowIfNull(adviceSelector);
@@ -31,6 +33,7 @@ public sealed class ActiveMatchSession
 
         _snapshotSource = snapshotSource;
         _adviceSelector = adviceSelector;
+        _mapControlPlanSelector = mapControlPlanSelector;
         _pollingInterval = pollingInterval;
     }
 
@@ -68,8 +71,17 @@ public sealed class ActiveMatchSession
                 : await _adviceSelector.SelectAsync(
                     result.Snapshot.Match,
                     cancellationToken);
+            var mapControlPlan = result.Snapshot is null || _mapControlPlanSelector is null
+                ? null
+                : await _mapControlPlanSelector.SelectAsync(
+                    result.Snapshot,
+                    cancellationToken);
 
-            return new ActiveMatchUpdate(result.Status, result.Snapshot, selection);
+            return new ActiveMatchUpdate(
+                result.Status,
+                result.Snapshot,
+                selection,
+                mapControlPlan);
         }
         finally
         {

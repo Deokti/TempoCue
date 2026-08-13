@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "packType": "mapControl",
+  "id": "tempocue.map-control.river-scuttler.ru",
+  "name": "Речной Скарабей: первое появление",
+  "patch": "16.16",
+  "description": "Отдельное раннее напоминание о первом появлении Речных Скарабеев без попытки предсказывать их последующие возрождения.",
+  "author": "TempoCue",
+  "contentLanguage": "ru_RU",
+  "verifiedOn": "2026-08-13",
+  "source": {
+    "kind": "article",
+    "title": "League of Legends Patch 26.1 Notes",
+    "url": "https://www.leagueoflegends.com/en-us/news/game-updates/patch-26-1-notes/",
+    "author": "Riot Games",
+    "permission": "notConfirmed"
+  },
+  "applicability": {
+    "roles": ["top", "jungle", "mid", "adc", "support"],
+    "teamSide": "any"
+  },
+  "rules": [],
+  "timedReminders": [
+    {
+      "id": "first-river-scuttler-spawn",
+      "gameTime": "00:02:30",
+      "priority": "information",
+      "title": "Скарабеи скоро появятся",
+      "message": "Первые Речные Скарабеи появляются в 2:55. Посмотри, может ли твоя ближайшая линия первой помочь в реке, и не начинай спорный бой без преимущества.",
+      "whyNow": "Осталось достаточно времени, чтобы закончить текущее действие и оценить приоритет ближайших линий.",
+      "nextGoal": "Реши заранее: безопасно забрать Скарабея, помочь союзному леснику или уступить реку без лишней смерти."
+    }
+  ],
+  "persistentTips": []
+}

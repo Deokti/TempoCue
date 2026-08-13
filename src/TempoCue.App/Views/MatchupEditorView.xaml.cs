@@ -1,8 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Threading;
 using TempoCue.App.ViewModels;
 using TempoCue.Application;
 
@@ -28,7 +26,7 @@ public partial class MatchupEditorView : UserControl
     {
         if (ViewModel.MovePrevious())
         {
-            ResetContentScroll();
+            EditorWizardNavigation.ResetScroll(MatchupEditorContentScrollViewer);
         }
         else
         {
@@ -40,7 +38,7 @@ public partial class MatchupEditorView : UserControl
     {
         if (ViewModel.MoveNext())
         {
-            ResetContentScroll();
+            EditorWizardNavigation.ResetScroll(MatchupEditorContentScrollViewer);
         }
     }
 
@@ -56,9 +54,7 @@ public partial class MatchupEditorView : UserControl
         object sender,
         MouseButtonEventArgs e)
     {
-        if (sender is not ListBox
-            || FindStepItem(e.OriginalSource as DependencyObject) is not { IsEnabled: true } stepItem
-            || !int.TryParse(stepItem.Tag?.ToString(), out var selectedStep))
+        if (!EditorWizardNavigation.TryGetStep(e, out var selectedStep))
         {
             return;
         }
@@ -69,29 +65,11 @@ public partial class MatchupEditorView : UserControl
 
     private void NavigateToStep(int selectedStep)
     {
-        if (selectedStep < 1
-            || selectedStep > ViewModel.TotalSteps
-            || selectedStep == ViewModel.CurrentStep)
-        {
-            return;
-        }
-
-        if (ViewModel.NavigateToStep(selectedStep))
-        {
-            ResetContentScroll();
-        }
-
-        MatchupEditorStepsListBox.SelectedIndex = ViewModel.CurrentStepIndex;
-    }
-
-    private static ListBoxItem? FindStepItem(DependencyObject? element)
-    {
-        while (element is not null and not ListBoxItem)
-        {
-            element = VisualTreeHelper.GetParent(element);
-        }
-
-        return element as ListBoxItem;
+        EditorWizardNavigation.Navigate(
+            ViewModel,
+            MatchupEditorStepsListBox,
+            MatchupEditorContentScrollViewer,
+            selectedStep);
     }
 
     private async void SaveDraftButton_Click(object sender, RoutedEventArgs e) =>
@@ -111,9 +89,4 @@ public partial class MatchupEditorView : UserControl
         }
     }
 
-    // Каждый новый шаг начинается с верхней границы содержимого независимо от позиции предыдущего.
-    private void ResetContentScroll() =>
-        Dispatcher.BeginInvoke(
-            DispatcherPriority.Loaded,
-            new Action(MatchupEditorContentScrollViewer.ScrollToTop));
 }

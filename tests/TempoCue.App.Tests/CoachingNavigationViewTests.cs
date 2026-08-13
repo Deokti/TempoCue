@@ -29,7 +29,7 @@ public sealed class CoachingNavigationViewTests
             packTypePage,
             "MatchupPackTypeButton");
         Assert.True(matchupPackTypeButton.IsEnabled);
-        Assert.False(WpfTestHost.Find<Button>(
+        Assert.True(WpfTestHost.Find<Button>(
             packTypePage,
             "GameControlPackTypeButton").IsEnabled);
 

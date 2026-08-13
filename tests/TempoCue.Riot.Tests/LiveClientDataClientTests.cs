@@ -12,7 +12,7 @@ namespace TempoCue.Riot.Tests;
 public sealed class LiveClientDataClientTests
 {
     [Fact]
-    public async Task GetSnapshotAsync_MapsActiveMatchAndPreservesJson()
+    public async Task GetSnapshotAsync_MapsActiveMatchFromResponseStream()
     {
         const string json = """
             {
@@ -87,6 +87,18 @@ public sealed class LiveClientDataClientTests
                     "EventTime": 620,
                     "DragonType": "Earth",
                     "KillerName": "UrgotPlayer"
+                  },
+                  {
+                    "EventID": 9,
+                    "EventName": "HeraldKill",
+                    "EventTime": 630,
+                    "KillerName": "UrgotPlayer"
+                  },
+                  {
+                    "EventID": 10,
+                    "EventName": "BaronKill",
+                    "EventTime": 640,
+                    "KillerName": "UrgotPlayer"
                   }
                 ]
               }
@@ -125,19 +137,21 @@ public sealed class LiveClientDataClientTests
         Assert.True(sett.IsDead);
         Assert.Equal(12.5, sett.RespawnTimerSeconds);
 
-        Assert.Equal(2, snapshot.Events.Count);
-        var dragon = snapshot.Events[0];
+        Assert.Equal(4, snapshot.Events.Count);
+        var baron = snapshot.Events[0];
+        Assert.Equal(MatchEventKind.BaronNashorKill, baron.Kind);
+        var herald = snapshot.Events[1];
+        Assert.Equal(MatchEventKind.RiftHeraldKill, herald.Kind);
+        var dragon = snapshot.Events[2];
         Assert.Equal(MatchEventKind.DragonKill, dragon.Kind);
         Assert.Equal(DragonType.Earth, dragon.DragonType);
         Assert.Equal("UrgotPlayer#TEST", dragon.KillerParticipantId);
 
-        var championKill = snapshot.Events[1];
+        var championKill = snapshot.Events[3];
         Assert.Equal(MatchEventKind.ChampionKill, championKill.Kind);
         Assert.Equal("UrgotPlayer#TEST", championKill.KillerParticipantId);
         Assert.Equal("SettPlayer#TEST", championKill.VictimParticipantId);
         Assert.Equal(["AllySupport#TEST"], championKill.AssisterParticipantIds);
-
-        Assert.Equal(json, snapshot.RawJson);
 
         // Проверяем всю цепочку: JSON Riot → MatchState → определение Sett на TOP → совет.
         var coach = new MatchupCoach(
@@ -232,6 +246,41 @@ public sealed class LiveClientDataClientTests
     }
 
     [Fact]
+    public async Task GetSnapshotAsync_DeserializesWithoutBufferingWholeResponse()
+    {
+        const string json = """
+            {
+              "activePlayer": {
+                "riotId": "StreamPlayer#TEST",
+                "summonerName": "StreamPlayer"
+              },
+              "allPlayers": [
+                {
+                  "riotId": "StreamPlayer#TEST",
+                  "summonerName": "StreamPlayer",
+                  "championName": "Urgot",
+                  "team": "ORDER",
+                  "position": "TOP",
+                  "level": 1,
+                  "scores": { "kills": 0, "deaths": 0, "assists": 0, "creepScore": 0 }
+                }
+              ],
+              "gameData": { "gameTime": 1 }
+            }
+            """;
+        var handler = new StubHttpMessageHandler(
+            json,
+            contentFactory: () => new StreamOnlyHttpContent(json));
+        using var httpClient = new HttpClient(handler);
+        using var client = new LiveClientDataClient(httpClient);
+
+        var snapshot = await client.GetSnapshotAsync();
+
+        Assert.Equal("StreamPlayer#TEST", snapshot.Match.ActivePlayerId);
+        Assert.Single(snapshot.Match.Players);
+    }
+
+    [Fact]
     public async Task ReadAsync_ReturnsGameLoadingWhenProcessIsRunning()
     {
         var handler = new StubHttpMessageHandler(
@@ -265,7 +314,8 @@ public sealed class LiveClientDataClientTests
 
     private sealed class StubHttpMessageHandler(
         string responseJson,
-        HttpStatusCode allGameStatusCode = HttpStatusCode.OK) : HttpMessageHandler
+        HttpStatusCode allGameStatusCode = HttpStatusCode.OK,
+        Func<HttpContent>? contentFactory = null) : HttpMessageHandler
     {
         public ConcurrentBag<Uri> RequestedUris { get; } = [];
 
@@ -284,10 +334,31 @@ public sealed class LiveClientDataClientTests
 
             var response = new HttpResponseMessage(HttpStatusCode.OK)
             {
-                Content = new StringContent(responseJson, Encoding.UTF8, "application/json")
+                Content = contentFactory?.Invoke()
+                    ?? new StringContent(responseJson, Encoding.UTF8, "application/json")
             };
 
             return Task.FromResult(response);
+        }
+    }
+
+    private sealed class StreamOnlyHttpContent(string json) : HttpContent
+    {
+        private readonly byte[] _payload = Encoding.UTF8.GetBytes(json);
+
+        protected override Task SerializeToStreamAsync(
+            Stream stream,
+            TransportContext? context) =>
+            throw new InvalidOperationException(
+                "Полная буферизация тестового HTTP-ответа запрещена.");
+
+        protected override Task<Stream> CreateContentReadStreamAsync() =>
+            Task.FromResult<Stream>(new MemoryStream(_payload, writable: false));
+
+        protected override bool TryComputeLength(out long length)
+        {
+            length = _payload.Length;
+            return true;
         }
     }
 }

@@ -72,22 +72,30 @@ public sealed class LiveClientDataClient : IMatchSnapshotSource, IDisposable
     public async Task<MatchSnapshot> GetSnapshotAsync(CancellationToken cancellationToken = default)
     {
         using var response = await _httpClient
-            .GetAsync(AllGameDataEndpoint, cancellationToken)
+            .GetAsync(
+                AllGameDataEndpoint,
+                HttpCompletionOption.ResponseHeadersRead,
+                cancellationToken)
             .ConfigureAwait(false);
 
         response.EnsureSuccessStatusCode();
 
-        var rawJson = await response.Content
-            .ReadAsStringAsync(cancellationToken)
+        await using var contentStream = await response.Content
+            .ReadAsStreamAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        var data = JsonSerializer.Deserialize<LiveClientAllGameDataDto>(rawJson, ReadOptions)
+        var data = await JsonSerializer
+            .DeserializeAsync<LiveClientAllGameDataDto>(
+                contentStream,
+                ReadOptions,
+                cancellationToken)
+            .ConfigureAwait(false)
             ?? throw new InvalidDataException("Riot API вернул пустой JSON активного матча.");
 
         var match = LiveClientDataMapper.Map(data);
         var events = LiveClientDataMapper.MapEvents(data);
 
-        return new MatchSnapshot(match, events, rawJson, DateTimeOffset.UtcNow);
+        return new MatchSnapshot(match, events, DateTimeOffset.UtcNow);
     }
 
     /// <summary>

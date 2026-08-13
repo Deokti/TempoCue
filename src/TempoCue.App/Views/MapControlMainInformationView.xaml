@@ -1,0 +1,228 @@
+<UserControl x:Class="TempoCue.App.Views.MapControlMainInformationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:localization="clr-namespace:TempoCue.App.Localization"
+             Background="Transparent"
+             FontFamily="Segoe UI">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Styles/ShellControls.xaml" />
+                <ResourceDictionary Source="../Styles/FormControls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <!-- Первый шаг содержит только переносимые метаданные; автор и источник задаются при сохранении. -->
+    <Border x:Name="MapControlMainInformationCard"
+            Style="{StaticResource ShellCard}"
+            Padding="20">
+        <StackPanel>
+            <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Step.Main}"
+                       Foreground="#F4F7FB"
+                       FontSize="{StaticResource Typography.FontSize.SectionTitle}"
+                       FontWeight="SemiBold" />
+            <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Main.Description}"
+                       Foreground="#91A4BD"
+                       FontSize="{StaticResource Typography.FontSize.Body}"
+                       TextWrapping="Wrap"
+                       Margin="0,6,0,20" />
+
+            <!-- Название и описание будут показаны в библиотеке и журнале советов. -->
+            <StackPanel>
+                <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Main.PackName}"
+                           Style="{StaticResource FormFieldLabel}" />
+                <TextBox x:Name="MapControlPackNameTextBox"
+                         Text="{Binding PackName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FormTextBox}"
+                         MaxLength="60" />
+                <TextBlock x:Name="MapControlPackNameLengthFeedback"
+                           DataContext="{Binding PackNameLengthFeedback}"
+                           Text="{Binding Text}"
+                           Style="{StaticResource FormLengthFeedback}" />
+            </StackPanel>
+
+            <StackPanel Margin="0,16,0,0">
+                <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Main.ShortDescription}"
+                           Style="{StaticResource FormFieldLabel}" />
+                <TextBox x:Name="MapControlDescriptionTextBox"
+                         Text="{Binding ShortDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FormTextBox}"
+                         MaxLength="160" />
+                <TextBlock x:Name="MapControlDescriptionLengthFeedback"
+                           DataContext="{Binding ShortDescriptionLengthFeedback}"
+                           Text="{Binding Text}"
+                           Style="{StaticResource FormLengthFeedback}" />
+            </StackPanel>
+
+            <Grid Margin="0,16,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="16" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Язык относится к содержимому набора и не переводится вместе с интерфейсом. -->
+                <StackPanel>
+                    <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Main.ContentLanguage}"
+                               Style="{StaticResource FormFieldLabel}" />
+                    <ComboBox x:Name="MapControlContentLanguageComboBox"
+                              ItemsSource="{Binding ContentLanguages}"
+                              SelectedValuePath="Code"
+                              SelectedValue="{Binding ContentLanguageCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              Style="{StaticResource FormComboBox}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DisplayName}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Main.LanguageHint}"
+                               Foreground="#7F93AF"
+                               FontSize="{StaticResource Typography.FontSize.Caption}"
+                               TextWrapping="Wrap"
+                               Margin="0,8,0,0" />
+                </StackPanel>
+
+                <!-- Общий PatchSelection гарантирует одинаковую загрузку патчей во всех редакторах. -->
+                <StackPanel Grid.Column="2" DataContext="{Binding PatchSelection}">
+                    <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.GamePatch}"
+                               Style="{StaticResource FormFieldLabel}" />
+                    <Grid>
+                        <ComboBox x:Name="MapControlPatchComboBox"
+                                  ItemsSource="{Binding Options}"
+                                  SelectedItem="{Binding SelectedOption, Mode=TwoWay}"
+                                  IsEnabled="{Binding IsReady}"
+                                  Style="{StaticResource FormComboBox}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding DisplayName}">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="#DCEAF7" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsCurrent}" Value="True">
+                                                        <Setter Property="Foreground" Value="#6FC4EF" />
+                                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="12,0,0,0"
+                                    VerticalAlignment="Center"
+                                    IsHitTestVisible="False">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsLoading}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+                            <Ellipse Width="12"
+                                     Height="12"
+                                     Stroke="#6FC4EF"
+                                     StrokeThickness="2"
+                                     StrokeDashArray="1 3"
+                                     RenderTransformOrigin="0.5,0.5">
+                                <Ellipse.RenderTransform><RotateTransform /></Ellipse.RenderTransform>
+                                <Ellipse.Triggers>
+                                    <EventTrigger RoutedEvent="Loaded">
+                                        <BeginStoryboard>
+                                            <Storyboard RepeatBehavior="Forever">
+                                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                                                                 From="0" To="360" Duration="0:0:0.8" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Ellipse.Triggers>
+                            </Ellipse>
+                            <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.GamePatch.Loading}"
+                                       Foreground="#91A4BD"
+                                       FontSize="{StaticResource Typography.FontSize.Body}"
+                                       VerticalAlignment="Center"
+                                       Margin="8,0,0,0" />
+                        </StackPanel>
+                    </Grid>
+                    <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.GamePatch.UsingCache}"
+                               Foreground="#D9B44A"
+                               FontSize="{StaticResource Typography.FontSize.Caption}"
+                               TextWrapping="Wrap"
+                               Margin="0,6,0,0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsUsingCache}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" Margin="0,7,0,0">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HasError}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <TextBlock Text="{localization:Loc Coaching.MatchupEditor.Main.GamePatch.LoadError}"
+                                   Foreground="#FF7285"
+                                   FontSize="{StaticResource Typography.FontSize.Caption}"
+                                   VerticalAlignment="Center" />
+                        <Button x:Name="RetryMapControlPatchCatalogButton"
+                                Content="{localization:Loc Coaching.MatchupEditor.Main.GamePatch.Retry}"
+                                Foreground="#6FC4EF"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Padding="5,2"
+                                Margin="5,0,0,0"
+                                Cursor="Hand"
+                                Click="RetryMapControlPatchCatalogButton_Click" />
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+
+            <!-- В 0.4 поддерживается только Summoner's Rift; карта не является свободным вводом. -->
+            <Border Background="#0B1421"
+                    BorderBrush="#263750"
+                    BorderThickness="1"
+                    CornerRadius="10"
+                    Padding="14,11"
+                    Margin="0,18,0,0">
+                <Grid>
+                    <StackPanel>
+                        <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Main.Map}"
+                                   Foreground="#7F93AF"
+                                   FontSize="{StaticResource Typography.FontSize.Caption}" />
+                        <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Main.SummonersRift}"
+                                   Foreground="#DCE7F5"
+                                   FontSize="{StaticResource Typography.FontSize.BodyLarge}"
+                                   Margin="0,4,0,0" />
+                    </StackPanel>
+                    <Border Background="#1B2A42"
+                            CornerRadius="10"
+                            Padding="9,4"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center">
+                        <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Main.FirstVersion}"
+                                   Foreground="#91A4BD"
+                                   FontSize="{StaticResource Typography.FontSize.Caption}" />
+                    </Border>
+                </Grid>
+            </Border>
+        </StackPanel>
+    </Border>
+</UserControl>

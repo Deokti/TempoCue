@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TempoCue.Application\TempoCue.Application.csproj" />
+    <ProjectReference Include="..\TempoCue.Coaching\TempoCue.Coaching.csproj" />
     <ProjectReference Include="..\TempoCue.Core\TempoCue.Core.csproj" />
     <ProjectReference Include="..\TempoCue.Overlay\TempoCue.Overlay.csproj" />
     <ProjectReference Include="..\TempoCue.Riot\TempoCue.Riot.csproj" />
@@ -9,6 +10,9 @@
 
   <ItemGroup>
     <Content Include="Assets\CoachPacks\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\MapControlPacks\*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Resource Include="Assets\Brand\AppIcon.ico" />

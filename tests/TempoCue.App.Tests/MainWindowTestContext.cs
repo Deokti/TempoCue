@@ -39,10 +39,12 @@ internal sealed class MainWindowTestContext : IDisposable
             showOverlayPreview ?? (static () => { }),
             overlaySetupSession: overlaySetupSession);
         CoachPackStore = new TestCoachPackStore();
+        MapControlPackStore = new TestMapControlPackStore();
         Coaching = CoachingViewModelTestFactory.Create(
             TestCoachPackFactory.CreateMatchup(),
             Localization,
-            CoachPackStore);
+            CoachPackStore,
+            MapControlPackStore);
         Window = new MainWindow(CurrentMatch, Home, Settings, Coaching);
     }
 
@@ -55,6 +57,8 @@ internal sealed class MainWindowTestContext : IDisposable
     public SettingsViewModel Settings { get; }
 
     public TestCoachPackStore CoachPackStore { get; }
+
+    public TestMapControlPackStore MapControlPackStore { get; }
 
     public CoachingViewModel Coaching { get; }
 
@@ -69,11 +73,22 @@ internal sealed class MainWindowTestContext : IDisposable
     public CoachingPackDetailsView CoachingPackDetailsPage =>
         WpfTestHost.Find<CoachingPackDetailsView>(CoachingPage, "CoachingPackDetailsPage");
 
+    public MapControlPackDetailsView MapControlPackDetailsPage =>
+        WpfTestHost.Find<MapControlPackDetailsView>(CoachingPage, "MapControlPackDetailsPage");
+
     public CoachPackImportDialogView CoachPackImportDialog =>
         WpfTestHost.Find<CoachPackImportDialogView>(CoachingPage, "CoachPackImportDialog");
 
     public MatchupEditorView MatchupEditorPage =>
         WpfTestHost.Find<MatchupEditorView>(CoachingPage, "MatchupEditorPage");
+
+    public MapControlEditorView MapControlEditorPage =>
+        WpfTestHost.Find<MapControlEditorView>(CoachingPage, "MapControlEditorPage");
+
+    public MapControlMainInformationView MapControlMainInformationPage =>
+        WpfTestHost.Find<MapControlMainInformationView>(
+            MapControlEditorPage,
+            "MapControlMainInformationPage");
 
     public MatchupMainInformationView MainInformationPage =>
         WpfTestHost.Find<MatchupMainInformationView>(

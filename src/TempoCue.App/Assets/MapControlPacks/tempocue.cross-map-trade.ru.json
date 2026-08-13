@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "packType": "mapControl",
+  "id": "tempocue.map-control.cross-map-trade.ru",
+  "name": "Обмен противоположной стороны карты",
+  "patch": "16.16",
+  "description": "Отдельный принцип для ситуаций, когда команда не успевает безопасно бороться за нейтральный объект.",
+  "author": "TempoCue",
+  "contentLanguage": "ru_RU",
+  "verifiedOn": "2026-08-13",
+  "source": {
+    "kind": "communityGuide",
+    "title": "Mid & Late Game Course: Crossmapping and Objective Control",
+    "url": "https://kirei.gg/courses-archive/mid-and-late-game-course/",
+    "author": "Coach Kirei",
+    "permission": "notConfirmed"
+  },
+  "applicability": {
+    "roles": ["top", "jungle", "mid", "adc", "support"],
+    "teamSide": "any"
+  },
+  "rules": [],
+  "timedReminders": [],
+  "persistentTips": [
+    {
+      "id": "trade-instead-of-late-contest",
+      "title": "Не опаздывай на уже проигранный объект",
+      "message": "Если команда не может вовремя и безопасно бороться за объект, не отдавай вслед за ним ещё и смерти. Забери гарантированную волну, башню, лагерь или объект на противоположной стороне карты.",
+      "scope": {
+        "kind": "wholeMatch"
+      }
+    }
+  ]
+}

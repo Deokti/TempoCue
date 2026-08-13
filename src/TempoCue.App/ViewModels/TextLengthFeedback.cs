@@ -60,4 +60,38 @@ public sealed record TextLengthFeedback(string Text, bool HasError)
         var length = value.Trim().Length;
         return length >= minimumLength && length <= maximumLength;
     }
+
+    public static TextLengthFeedback CreateOptional(
+        string value,
+        int maximumLength,
+        LocalizationService localization)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+        ArgumentNullException.ThrowIfNull(localization);
+
+        var length = value.Trim().Length;
+        if (length == 0)
+        {
+            return new TextLengthFeedback(
+                localization.Format("Validation.Length.Optional", maximumLength),
+                HasError: false);
+        }
+
+        if (length > maximumLength)
+        {
+            return new TextLengthFeedback(
+                localization.Format("Validation.Length.TooLong", length, maximumLength),
+                HasError: true);
+        }
+
+        return new TextLengthFeedback(
+            localization.Format("Validation.Length.Valid", length, maximumLength),
+            HasError: false);
+    }
+
+    public static bool IsOptionalWithin(string value, int maximumLength)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+        return value.Trim().Length <= maximumLength;
+    }
 }

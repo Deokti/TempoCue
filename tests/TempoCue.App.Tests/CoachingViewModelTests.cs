@@ -9,7 +9,7 @@ namespace TempoCue.App.Tests;
 public sealed class CoachingViewModelTests
 {
     [Fact]
-    public async Task CoachingNavigation_OpensOnlyAvailablePackEditor()
+    public async Task CoachingNavigation_OpensMatchupEditor()
     {
         var localization = LocalizationService.Instance;
         using var viewModel = CoachingViewModelTestFactory.Create(
@@ -21,7 +21,7 @@ public sealed class CoachingViewModelTests
 
         Assert.Equal(CoachingScreen.Library, viewModel.CurrentScreen);
         Assert.True(viewModel.PackTypeSelection.IsMatchupAvailable);
-        Assert.False(viewModel.PackTypeSelection.IsGameControlAvailable);
+        Assert.True(viewModel.PackTypeSelection.IsGameControlAvailable);
 
         viewModel.OpenPackTypeSelection();
         Assert.Equal(CoachingScreen.PackTypeSelection, viewModel.CurrentScreen);

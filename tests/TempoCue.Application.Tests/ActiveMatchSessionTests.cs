@@ -8,7 +8,7 @@ public sealed class ActiveMatchSessionTests
     public async Task RefreshAsync_ReturnsAdviceForSuccessfulSnapshot()
     {
         var match = CreateMatch(level: 9);
-        var snapshot = new MatchSnapshot(match, [], "{}", DateTimeOffset.UtcNow);
+        var snapshot = new MatchSnapshot(match, [], DateTimeOffset.UtcNow);
         var source = new StubSnapshotSource(MatchSnapshotReadResult.Success(snapshot));
         var coach = new MatchupCoach(
         [
@@ -35,6 +35,25 @@ public sealed class ActiveMatchSessionTests
         Assert.Equal(MatchSnapshotReadStatus.Success, update.Status);
         Assert.Same(snapshot, update.Snapshot);
         Assert.Equal("level-nine", update.Advice?.RuleId);
+    }
+
+    [Fact]
+    public async Task RefreshAsync_ReturnsMapControlPlanForSuccessfulSnapshot()
+    {
+        var snapshot = new MatchSnapshot(
+            CreateMatch(level: 9),
+            [],
+            DateTimeOffset.UtcNow);
+        var expectedPlan = new ActiveMapControlPlan([], ["Контроль реки"]);
+        var session = new ActiveMatchSession(
+            new StubSnapshotSource(MatchSnapshotReadResult.Success(snapshot)),
+            new FixedAdviceSelector(new MatchupCoach([])),
+            TimeSpan.FromSeconds(1),
+            new FixedMapControlPlanSelector(expectedPlan));
+
+        var update = await session.RefreshAsync();
+
+        Assert.Same(expectedPlan, update.MapControlPlan);
     }
 
     [Fact]
@@ -114,5 +133,14 @@ public sealed class ActiveMatchSessionTests
                     Patch = "test"
                 },
                 coach.GetBestAdvice(match)));
+    }
+
+    private sealed class FixedMapControlPlanSelector(ActiveMapControlPlan plan)
+        : IMapControlPlanSelector
+    {
+        public ValueTask<ActiveMapControlPlan> SelectAsync(
+            MatchSnapshot snapshot,
+            CancellationToken cancellationToken = default) =>
+            ValueTask.FromResult(plan);
     }
 }

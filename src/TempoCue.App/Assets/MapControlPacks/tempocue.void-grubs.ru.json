@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "packType": "mapControl",
+  "id": "tempocue.map-control.void-grubs.ru",
+  "name": "Личинки Бездны: окно верхней стороны",
+  "patch": "16.16",
+  "description": "Напоминание о единственном появлении Личинок Бездны и безопасном выборе между захватом части объекта и отказом от плохой драки.",
+  "author": "TempoCue",
+  "contentLanguage": "ru_RU",
+  "verifiedOn": "2026-08-13",
+  "source": {
+    "kind": "article",
+    "title": "League of Legends Patch 26.1 Notes",
+    "url": "https://www.leagueoflegends.com/en-us/news/game-updates/patch-26-1-notes/",
+    "author": "Riot Games",
+    "permission": "notConfirmed"
+  },
+  "applicability": {
+    "roles": ["top", "jungle", "mid", "adc", "support"],
+    "teamSide": "any"
+  },
+  "rules": [
+    {
+      "id": "prepare-before-void-grubs",
+      "objective": "voidGrubs",
+      "trigger": "beforeInitialSpawn",
+      "leadTime": "00:01:30",
+      "recurrence": "oncePerMatch",
+      "priority": "caution",
+      "message": "Личинки появятся через полторы минуты. Заранее реши, есть ли у вашей команды окно на верхней стороне карты.",
+      "whyNow": "Личинки появляются один раз, поэтому поздний выход к реке обычно означает потерю позиции или плохой бой.",
+      "nextGoal": "Проверь приоритет верхней и средней линий. Если полного контроля нет, забрать одну личинку и выйти — допустимый результат.",
+      "isEnabled": true
+    }
+  ],
+  "timedReminders": [],
+  "persistentTips": []
+}

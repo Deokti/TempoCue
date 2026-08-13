@@ -42,7 +42,7 @@ public sealed class HomeViewModelTests
                     }
                 ]
             };
-            var snapshot = new MatchSnapshot(match, [], "{}", DateTimeOffset.UtcNow);
+            var snapshot = new MatchSnapshot(match, [], DateTimeOffset.UtcNow);
             using var monitor = CurrentMatchViewModelTestData.CreateMonitor(
                 TestMatchSnapshotSource.FromSnapshot(snapshot));
             using var currentMatch = new CurrentMatchViewModel(

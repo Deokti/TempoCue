@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Globalization;
 using TempoCue.App.Localization;
 using TempoCue.Application;
@@ -10,15 +11,11 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
 {
     private const int MaxPackNameLength = 80;
 
-    private readonly IGamePatchCatalog _gamePatchCatalog;
     private readonly LocalizationService _localization;
     private string _packName = string.Empty;
     private string _shortDescription = string.Empty;
     private string _author = string.Empty;
     private string _adviceLanguageCode;
-    private IReadOnlyList<GamePatchOptionViewModel> _gamePatches = [];
-    private GamePatchOptionViewModel? _selectedGamePatch;
-    private CatalogViewState _gamePatchCatalogState = CatalogViewState.NotLoaded;
     private DateTime _verifiedOn = DateTime.Today;
 
     public MatchupMainInformationViewModel(
@@ -27,11 +24,10 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
         LocalizationService localization)
     {
         ArgumentNullException.ThrowIfNull(gamePatchCatalog);
-        ArgumentNullException.ThrowIfNull(localization);
-
-        _gamePatchCatalog = gamePatchCatalog;
-        _localization = localization;
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _adviceLanguageCode = LocalizationService.NormalizeLanguageCode(defaultLanguageCode);
+        PatchSelection = new GamePatchSelectionViewModel(gamePatchCatalog, localization);
+        PatchSelection.PropertyChanged += PatchSelection_PropertyChanged;
     }
 
     public IReadOnlyList<AdviceLanguageOptionViewModel> AdviceLanguages { get; } =
@@ -39,6 +35,8 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
         new("ru-RU", "Русский"),
         new("en-US", "English")
     ];
+
+    public GamePatchSelectionViewModel PatchSelection { get; }
 
     public DateTime VerifiedOn
     {
@@ -110,22 +108,15 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
         }
     }
 
-    public IReadOnlyList<GamePatchOptionViewModel> GamePatches => _gamePatches;
+    public IReadOnlyList<GamePatchOptionViewModel> GamePatches => PatchSelection.Options;
 
     public GamePatchOptionViewModel? SelectedGamePatch
     {
-        get => _selectedGamePatch;
-        set
-        {
-            if (SetProperty(ref _selectedGamePatch, value))
-            {
-                OnPropertyChanged(nameof(GamePatch));
-                NotifyFormStateChanged();
-            }
-        }
+        get => PatchSelection.SelectedOption;
+        set => PatchSelection.SelectedOption = value;
     }
 
-    public string GamePatch => SelectedGamePatch?.Patch ?? string.Empty;
+    public string GamePatch => PatchSelection.Patch;
 
     public TextLengthFeedback PackNameLengthFeedback => TextLengthFeedback.Create(
         PackName,
@@ -145,78 +136,30 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
         40,
         _localization);
 
-    public CatalogViewState GamePatchCatalogState
-    {
-        get => _gamePatchCatalogState;
-        private set
-        {
-            if (SetProperty(ref _gamePatchCatalogState, value))
-            {
-                OnPropertyChanged(nameof(IsGamePatchCatalogReady));
-                OnPropertyChanged(nameof(IsGamePatchCatalogLoading));
-                OnPropertyChanged(nameof(HasGamePatchCatalogError));
-                OnPropertyChanged(nameof(IsUsingGamePatchCache));
-                OnPropertyChanged(nameof(IsComplete));
-            }
-        }
-    }
+    public CatalogViewState GamePatchCatalogState => PatchSelection.State;
 
-    public bool IsGamePatchCatalogReady =>
-        GamePatchCatalogState is CatalogViewState.Ready or CatalogViewState.Cached;
+    public bool IsGamePatchCatalogReady => PatchSelection.IsReady;
 
-    public bool IsGamePatchCatalogLoading =>
-        GamePatchCatalogState == CatalogViewState.Loading;
+    public bool IsGamePatchCatalogLoading => PatchSelection.IsLoading;
 
-    public bool HasGamePatchCatalogError =>
-        GamePatchCatalogState == CatalogViewState.Failed;
+    public bool HasGamePatchCatalogError => PatchSelection.HasError;
 
-    public bool IsUsingGamePatchCache =>
-        GamePatchCatalogState == CatalogViewState.Cached;
+    public bool IsUsingGamePatchCache => PatchSelection.IsUsingCache;
 
     public bool IsComplete =>
         TextLengthFeedback.IsWithin(PackName, 3, MaxPackNameLength)
         && TextLengthFeedback.IsWithin(ShortDescription, 10, 240)
         && TextLengthFeedback.IsWithin(Author, 2, 40)
-        && IsGamePatchCatalogReady
-        && SelectedGamePatch is not null
+        && PatchSelection.IsComplete
         && AdviceLanguages.Any(language => language.Code == AdviceLanguageCode);
 
-    public async Task EnsureGamePatchCatalogLoadedAsync(
-        CancellationToken cancellationToken = default)
-    {
-        if (IsGamePatchCatalogLoading || IsGamePatchCatalogReady)
-        {
-            return;
-        }
-
-        GamePatchCatalogState = CatalogViewState.Loading;
-        var previouslySelectedPatch = SelectedGamePatch?.Patch;
-        var result = await _gamePatchCatalog.LoadAsync(cancellationToken);
-        if (!result.IsAvailable)
-        {
-            _gamePatches = [];
-            SelectedGamePatch = null;
-            OnPropertyChanged(nameof(GamePatches));
-            GamePatchCatalogState = CatalogViewState.Failed;
-            return;
-        }
-
-        _gamePatches = CreatePatchOptions(result.Patches);
-        OnPropertyChanged(nameof(GamePatches));
-        SelectedGamePatch = FindPatch(previouslySelectedPatch)
-            ?? _gamePatches.FirstOrDefault(static patch => patch.IsCurrent)
-            ?? _gamePatches.FirstOrDefault();
-        GamePatchCatalogState = result.IsFromCache
-            ? CatalogViewState.Cached
-            : CatalogViewState.Ready;
-    }
+    public Task EnsureGamePatchCatalogLoadedAsync(
+        CancellationToken cancellationToken = default) =>
+        PatchSelection.EnsureLoadedAsync(cancellationToken);
 
     public Task RetryGamePatchCatalogLoadAsync(
-        CancellationToken cancellationToken = default)
-    {
-        GamePatchCatalogState = CatalogViewState.NotLoaded;
-        return EnsureGamePatchCatalogLoadedAsync(cancellationToken);
-    }
+        CancellationToken cancellationToken = default) =>
+        PatchSelection.RetryLoadAsync(cancellationToken);
 
     public void BeginNew()
     {
@@ -225,8 +168,7 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
         Author = string.Empty;
         AdviceLanguageCode = _localization.CurrentLanguageCode;
         VerifiedOn = DateTime.Today;
-        SelectedGamePatch = _gamePatches.FirstOrDefault(static patch => patch.IsCurrent)
-            ?? _gamePatches.FirstOrDefault();
+        PatchSelection.ResetToCurrent();
     }
 
     public void Load(CoachPack pack, bool createCopy)
@@ -246,7 +188,7 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
         VerifiedOn = createCopy
             ? DateTime.Today
             : pack.VerifiedOn?.ToDateTime(TimeOnly.MinValue) ?? DateTime.Today;
-        SelectGamePatch(pack.Patch);
+        PatchSelection.SelectPatch(pack.Patch);
     }
 
     public void UpdateLanguage()
@@ -256,18 +198,45 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
         OnPropertyChanged(nameof(PackNameLengthFeedback));
         OnPropertyChanged(nameof(ShortDescriptionLengthFeedback));
         OnPropertyChanged(nameof(AuthorLengthFeedback));
+        PatchSelection.UpdateLanguage();
+    }
 
-        if (_gamePatches.Count == 0)
+    private void PatchSelection_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        switch (e.PropertyName)
         {
-            return;
+            case nameof(GamePatchSelectionViewModel.Options):
+                OnPropertyChanged(nameof(GamePatches));
+                break;
+            case nameof(GamePatchSelectionViewModel.SelectedOption):
+                OnPropertyChanged(nameof(SelectedGamePatch));
+                break;
+            case nameof(GamePatchSelectionViewModel.Patch):
+                OnPropertyChanged(nameof(GamePatch));
+                break;
+            case nameof(GamePatchSelectionViewModel.State):
+                OnPropertyChanged(nameof(GamePatchCatalogState));
+                break;
+            case nameof(GamePatchSelectionViewModel.IsReady):
+                OnPropertyChanged(nameof(IsGamePatchCatalogReady));
+                break;
+            case nameof(GamePatchSelectionViewModel.IsLoading):
+                OnPropertyChanged(nameof(IsGamePatchCatalogLoading));
+                break;
+            case nameof(GamePatchSelectionViewModel.HasError):
+                OnPropertyChanged(nameof(HasGamePatchCatalogError));
+                break;
+            case nameof(GamePatchSelectionViewModel.IsUsingCache):
+                OnPropertyChanged(nameof(IsUsingGamePatchCache));
+                break;
         }
 
-        var selectedPatch = SelectedGamePatch?.Patch;
-        _gamePatches = _gamePatches
-            .Select(patch => CreatePatchOption(patch.Patch, patch.IsCurrent))
-            .ToArray();
-        OnPropertyChanged(nameof(GamePatches));
-        SelectedGamePatch = FindPatch(selectedPatch);
+        if (e.PropertyName is nameof(GamePatchSelectionViewModel.IsComplete)
+            or nameof(GamePatchSelectionViewModel.SelectedOption)
+            or nameof(GamePatchSelectionViewModel.State))
+        {
+            OnPropertyChanged(nameof(IsComplete));
+        }
     }
 
     private void NotifyFormStateChanged(string? feedbackPropertyName = null)
@@ -278,38 +247,4 @@ public sealed class MatchupMainInformationViewModel : ObservableObject
             OnPropertyChanged(feedbackPropertyName);
         }
     }
-
-    private IReadOnlyList<GamePatchOptionViewModel> CreatePatchOptions(
-        IReadOnlyList<GamePatchCatalogEntry> patches) =>
-        patches
-            .Select(patch => CreatePatchOption(patch.Patch, patch.IsCurrent))
-            .ToArray();
-
-    private GamePatchOptionViewModel CreatePatchOption(string patch, bool isCurrent) => new(
-        patch,
-        isCurrent
-            ? _localization.Format("Coaching.MatchupEditor.Main.GamePatch.Current", patch)
-            : patch,
-        isCurrent);
-
-    private GamePatchOptionViewModel? FindPatch(string? patch) =>
-        patch is null
-            ? null
-            : _gamePatches.FirstOrDefault(option =>
-                string.Equals(option.Patch, patch, StringComparison.OrdinalIgnoreCase));
-
-    private void SelectGamePatch(string patch)
-    {
-        var option = FindPatch(patch);
-        if (option is null)
-        {
-            option = CreatePatchOption(patch, false);
-            _gamePatches = [option, .. _gamePatches];
-            OnPropertyChanged(nameof(GamePatches));
-            GamePatchCatalogState = CatalogViewState.Cached;
-        }
-
-        SelectedGamePatch = option;
-    }
-
 }

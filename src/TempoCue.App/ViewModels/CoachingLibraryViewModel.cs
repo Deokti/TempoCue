@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.IO;
 using TempoCue.App.Localization;
 using TempoCue.Application;
+using TempoCue.Coaching;
 using TempoCue.Core;
 
 namespace TempoCue.App.ViewModels;
@@ -10,12 +11,18 @@ namespace TempoCue.App.ViewModels;
 public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
 {
     private readonly IReadOnlyList<CoachPack> _builtInPacks;
+    private readonly IReadOnlyList<MapControlPack> _builtInMapControlPacks;
+    private readonly HashSet<string> _builtInMapControlPackIds;
     private readonly LocalizationService _localization;
     private readonly IChampionCatalog _championCatalog;
     private readonly LoadCoachPackLibraryUseCase _loadCoachPackLibrary;
     private readonly SetCoachPackStateUseCase _setCoachPackState;
     private readonly DeleteCoachPackUseCase _deleteCoachPack;
+    private readonly LoadMapControlPackLibraryUseCase _loadMapControlPackLibrary;
+    private readonly SetMapControlPackStateUseCase _setMapControlPackState;
+    private readonly DeleteMapControlPackUseCase _deleteMapControlPack;
     private readonly CoachingPackCardFactory _cardFactory;
+    private readonly MapControlPackCardFactory _mapControlCardFactory;
     private readonly SemaphoreSlim _refreshLock = new(1, 1);
 
     private IReadOnlyList<LocalCoachPackEntry> _localEntries = [];
@@ -24,6 +31,11 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
     private IReadOnlyList<CoachingPackCardViewModel> _allCards = [];
     private IReadOnlyList<CoachingPackCardViewModel> _matchupCards = [];
     private IReadOnlyList<CoachingPackCardViewModel> _myPackCards = [];
+    private IReadOnlyList<LocalMapControlPackEntry> _mapControlEntries = [];
+    private IReadOnlyDictionary<string, LocalCoachPackState> _mapControlPackStates =
+        new Dictionary<string, LocalCoachPackState>(StringComparer.OrdinalIgnoreCase);
+    private IReadOnlyList<MapControlPackCardViewModel> _allMapControlCards = [];
+    private IReadOnlyList<MapControlPackCardViewModel> _mapControlCards = [];
     private string _librarySummary = string.Empty;
     private string _searchText = string.Empty;
     private string _libraryMessage = string.Empty;
@@ -41,10 +53,18 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
         IChampionCatalog championCatalog,
         LoadCoachPackLibraryUseCase loadCoachPackLibrary,
         SetCoachPackStateUseCase setCoachPackState,
-        DeleteCoachPackUseCase deleteCoachPack)
+        DeleteCoachPackUseCase deleteCoachPack,
+        LoadMapControlPackLibraryUseCase loadMapControlPackLibrary,
+        SetMapControlPackStateUseCase setMapControlPackState,
+        DeleteMapControlPackUseCase deleteMapControlPack,
+        IReadOnlyList<MapControlPack>? builtInMapControlPacks = null)
     {
         ArgumentNullException.ThrowIfNull(builtInPacks);
         _builtInPacks = builtInPacks.ToArray();
+        _builtInMapControlPacks = (builtInMapControlPacks ?? []).ToArray();
+        _builtInMapControlPackIds = _builtInMapControlPacks
+            .Select(static pack => pack.Id)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _championCatalog = championCatalog ?? throw new ArgumentNullException(nameof(championCatalog));
         _loadCoachPackLibrary = loadCoachPackLibrary
@@ -53,7 +73,14 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
             ?? throw new ArgumentNullException(nameof(setCoachPackState));
         _deleteCoachPack = deleteCoachPack
             ?? throw new ArgumentNullException(nameof(deleteCoachPack));
+        _loadMapControlPackLibrary = loadMapControlPackLibrary
+            ?? throw new ArgumentNullException(nameof(loadMapControlPackLibrary));
+        _setMapControlPackState = setMapControlPackState
+            ?? throw new ArgumentNullException(nameof(setMapControlPackState));
+        _deleteMapControlPack = deleteMapControlPack
+            ?? throw new ArgumentNullException(nameof(deleteMapControlPack));
         _cardFactory = new CoachingPackCardFactory(localization);
+        _mapControlCardFactory = new MapControlPackCardFactory(localization);
         _localization.PropertyChanged += Localization_PropertyChanged;
         RebuildCards();
     }
@@ -86,9 +113,24 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
 
     public bool HasMyPackCards => MyPackCards.Count > 0;
 
-    public int TotalPackCount => _allCards.Count;
+    public IReadOnlyList<MapControlPackCardViewModel> MapControlCards
+    {
+        get => _mapControlCards;
+        private set
+        {
+            if (SetProperty(ref _mapControlCards, value))
+            {
+                OnPropertyChanged(nameof(HasMapControlCards));
+            }
+        }
+    }
 
-    public int EnabledPackCount => _allCards.Count(static card => card.IsEnabled);
+    public bool HasMapControlCards => MapControlCards.Count > 0;
+
+    public int TotalPackCount => _allCards.Count + _allMapControlCards.Count;
+
+    public int EnabledPackCount => _allCards.Count(static card => card.IsEnabled)
+                                   + _allMapControlCards.Count(static card => card.IsEnabled);
 
     public string LibrarySummary
     {
@@ -162,12 +204,19 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
             IsLibraryMessageSuccess = false;
             LibraryMessage = string.Empty;
 
-            var snapshot = await _loadCoachPackLibrary.ExecuteAsync(cancellationToken);
+            var matchupLoad = _loadCoachPackLibrary.ExecuteAsync(cancellationToken);
+            var mapControlLoad = _loadMapControlPackLibrary.ExecuteAsync(cancellationToken);
+            await Task.WhenAll(matchupLoad, mapControlLoad);
+            var snapshot = await matchupLoad;
+            var mapControlSnapshot = await mapControlLoad;
             _localEntries = snapshot.Entries;
             _packStates = snapshot.PackStates;
+            _mapControlEntries = mapControlSnapshot.Entries;
+            _mapControlPackStates = mapControlSnapshot.PackStates;
             _isLibraryLoaded = true;
-            LibraryMessage = snapshot.InvalidFileCount > 0
-                ? _localization.Plural("Count.CoachPackInvalid", snapshot.InvalidFileCount)
+            var invalidFileCount = snapshot.InvalidFileCount + mapControlSnapshot.InvalidFileCount;
+            LibraryMessage = invalidFileCount > 0
+                ? _localization.Plural("Count.CoachPackInvalid", invalidFileCount)
                 : string.Empty;
             RebuildCards();
             LibraryChanged?.Invoke(this, EventArgs.Empty);
@@ -211,6 +260,39 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
         try
         {
             await _setCoachPackState.ExecuteAsync(
+                card.Pack.Id,
+                isEnabled ? LocalCoachPackState.Enabled : LocalCoachPackState.Disabled,
+                cancellationToken);
+            await RefreshAsync(cancellationToken);
+            return true;
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            return false;
+        }
+        catch (Exception exception) when (IsExpectedLibraryException(exception))
+        {
+            LibraryMessage = _localization.Get("Coaching.Library.StateChangeFailed");
+            return false;
+        }
+    }
+
+    public MapControlPackCardViewModel? FindMapControlCard(string packId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(packId);
+        return _allMapControlCards.FirstOrDefault(card => card.Pack.Id == packId);
+    }
+
+    public async Task<bool> SetMapControlPackEnabledAsync(
+        MapControlPackCardViewModel card,
+        bool isEnabled,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(card);
+        IsLibraryMessageSuccess = false;
+        try
+        {
+            await _setMapControlPackState.ExecuteAsync(
                 card.Pack.Id,
                 isEnabled ? LocalCoachPackState.Enabled : LocalCoachPackState.Disabled,
                 cancellationToken);
@@ -313,15 +395,32 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
                 _champions)))
             .ToArray();
         _allCards = cards;
+        _allMapControlCards = _builtInMapControlPacks
+            .Select(pack => _mapControlCardFactory.Create(
+                pack,
+                CoachingPackOrigin.BuiltIn,
+                _mapControlPackStates.GetValueOrDefault(
+                    pack.Id,
+                    LocalCoachPackState.Enabled)))
+            .Concat(_mapControlEntries
+                .Where(entry => !_builtInMapControlPackIds.Contains(entry.Pack.Id))
+                .Select(entry => _mapControlCardFactory.Create(
+                entry.Pack,
+                entry.Origin == LocalCoachPackOrigin.CreatedByUser
+                    ? CoachingPackOrigin.CreatedByUser
+                    : CoachingPackOrigin.Imported,
+                _mapControlPackStates.GetValueOrDefault(entry.Pack.Id, entry.State))))
+            .ToArray();
         OnPropertyChanged(nameof(TotalPackCount));
         OnPropertyChanged(nameof(EnabledPackCount));
         LibrarySummary = string.Join(
             " · ",
-            _localization.Plural("Count.CoachPack", cards.Length),
+            _localization.Plural("Count.CoachPack", TotalPackCount),
             _localization.Plural("Count.CoachPackEnabled", EnabledPackCount),
             _localization.Plural(
                 "Count.CoachPackCreated",
-                cards.Count(static card => card.IsCreatedByUser)));
+                cards.Count(static card => card.IsCreatedByUser)
+                + _allMapControlCards.Count(static card => card.IsCreatedByUser)));
         ApplySearch();
     }
 
@@ -331,9 +430,56 @@ public sealed class CoachingLibraryViewModel : ObservableObject, IDisposable
             .Where(MatchesSearch)
             .ToArray();
         MatchupCards = filteredCards;
+        MapControlCards = _allMapControlCards
+            .Where(MatchesMapControlSearch)
+            .ToArray();
         MyPackCards = filteredCards
             .Where(static card => card.IsCreatedByUser)
             .ToArray();
+    }
+
+    public async Task<bool> DeleteMapControlPackAsync(
+        MapControlPackCardViewModel card,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(card);
+        IsLibraryMessageSuccess = false;
+        if (!card.CanDelete)
+        {
+            return false;
+        }
+
+        try
+        {
+            if (!await _deleteMapControlPack.ExecuteAsync(card.Pack.Id, cancellationToken))
+            {
+                LibraryMessage = _localization.Get("Coaching.Library.DeleteFailed");
+                return false;
+            }
+
+            await RefreshAsync(cancellationToken);
+            IsLibraryMessageSuccess = true;
+            LibraryMessage = _localization.Format("Coaching.Library.Deleted", card.Title);
+            return true;
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            return false;
+        }
+        catch (Exception exception) when (IsExpectedLibraryException(exception))
+        {
+            LibraryMessage = _localization.Get("Coaching.Library.DeleteFailed");
+            return false;
+        }
+    }
+
+    private bool MatchesMapControlSearch(MapControlPackCardViewModel card)
+    {
+        var search = SearchText.Trim();
+        return search.Length == 0
+               || card.Title.Contains(search, StringComparison.CurrentCultureIgnoreCase)
+               || card.Details.Contains(search, StringComparison.CurrentCultureIgnoreCase)
+               || card.Pack.Description.Contains(search, StringComparison.CurrentCultureIgnoreCase);
     }
 
     private bool MatchesSearch(CoachingPackCardViewModel card)

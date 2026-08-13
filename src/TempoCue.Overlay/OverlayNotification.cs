@@ -11,7 +11,8 @@ public sealed record OverlayNotification
         string dismissLabel,
         OverlayNotificationTone tone = OverlayNotificationTone.Information,
         string? context = null,
-        string? badge = null)
+        string? badge = null,
+        OverlayNotificationPurpose purpose = OverlayNotificationPurpose.Operational)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
         ArgumentException.ThrowIfNullOrWhiteSpace(status);
@@ -25,6 +26,7 @@ public sealed record OverlayNotification
         Source = source.Trim();
         DismissLabel = dismissLabel.Trim();
         Tone = tone;
+        Purpose = purpose;
         Context = NormalizeOptional(context);
         Badge = NormalizeOptional(badge);
     }
@@ -43,6 +45,9 @@ public sealed record OverlayNotification
     public string DismissLabel { get; }
 
     public OverlayNotificationTone Tone { get; }
+
+    /// <summary>Роль сообщения при распределении ограниченного внимания и слотов оверлея.</summary>
+    public OverlayNotificationPurpose Purpose { get; }
 
     public string? Context { get; }
 

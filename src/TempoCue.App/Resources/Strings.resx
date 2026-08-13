@@ -10,6 +10,7 @@
   <data name="Header.CoachPackLoaded" xml:space="preserve"><value>COACH PACK LOADED</value></data>
   <data name="Language.Tooltip" xml:space="preserve"><value>Interface language</value></data>
   <data name="Validation.Length.Requirement" xml:space="preserve"><value>From {0} to {1} characters.</value></data>
+  <data name="Validation.Length.Optional" xml:space="preserve"><value>Optional, up to {0} characters.</value></data>
   <data name="Validation.Length.TooShort" xml:space="preserve"><value>{0} of at least {1} characters. Maximum: {2}.</value></data>
   <data name="Validation.Length.Valid" xml:space="preserve"><value>{0} of {1} characters.</value></data>
   <data name="Validation.Length.TooLong" xml:space="preserve"><value>{0} characters; maximum is {1}.</value></data>
@@ -223,6 +224,9 @@
   <data name="Coaching.Import.Preview.Language" xml:space="preserve"><value>Content language</value></data>
   <data name="Coaching.Import.Preview.Patch" xml:space="preserve"><value>Game patch</value></data>
   <data name="Coaching.Import.Preview.Contents" xml:space="preserve"><value>Contents</value></data>
+  <data name="Coaching.Import.Preview.Matchup.Context" xml:space="preserve"><value>{0} · {1}</value></data>
+  <data name="Coaching.Import.Preview.Matchup.Contents" xml:space="preserve"><value>{0} · {1}</value></data>
+  <data name="Coaching.Import.Preview.MapControl.Context" xml:space="preserve"><value>Map control · {0} · team side: {1}</value></data>
   <data name="Coaching.Import.Status.Loading.Title" xml:space="preserve"><value>Checking file</value></data>
   <data name="Coaching.Import.Status.Loading.Message" xml:space="preserve"><value>TempoCue is validating the schema and Coach Pack contents.</value></data>
   <data name="Coaching.Import.Status.Ready.Title" xml:space="preserve"><value>Ready to import</value></data>
@@ -248,6 +252,11 @@
   <data name="Coaching.Tab.MapControl" xml:space="preserve"><value>Game control</value></data>
   <data name="Coaching.Tab.MyPacks" xml:space="preserve"><value>My packs</value></data>
   <data name="Coaching.Library.Search" xml:space="preserve"><value>Search by champion, pack or author</value></data>
+  <data name="Coaching.MapControl.Library.Search" xml:space="preserve"><value>Search by name or situation</value></data>
+  <data name="Coaching.MapControl.Library.Card.Details" xml:space="preserve"><value>{0} · {1}</value></data>
+  <data name="Coaching.MapControl.Library.Author.You" xml:space="preserve"><value>you</value></data>
+  <data name="Coaching.MapControl.Library.Role.Selected" xml:space="preserve"><value>only {0}</value></data>
+  <data name="Coaching.MapControl.Library.OpenUnavailable" xml:space="preserve"><value>Pack details will be available in the next iteration.</value></data>
   <data name="Coaching.Library.Matchup" xml:space="preserve"><value>{0} vs {1}</value></data>
   <data name="Coaching.Library.Card.Details" xml:space="preserve"><value>{0} · {1}</value></data>
   <data name="Coaching.Library.State.Enabled" xml:space="preserve"><value>Enabled</value></data>
@@ -307,6 +316,45 @@
   <data name="Coaching.NewPack.GameControl.Description" xml:space="preserve"><value>Create reminders about the map, ganks, objectives, missing opponents and other game events.</value></data>
   <data name="Coaching.NewPack.GameControl.PromptItems" xml:space="preserve"><value>role and mode · a situation template · time and map conditions · display method</value></data>
   <data name="Coaching.NewPack.GameControl.Unavailable" xml:space="preserve"><value>Unavailable in this iteration</value></data>
+  <data name="Coaching.NewPack.GameControl.Start" xml:space="preserve"><value>Start · step 1 of 5</value></data>
+  <data name="Coaching.MapControlEditor.Title" xml:space="preserve"><value>Neutral objective control</value></data>
+  <data name="Coaching.MapControlEditor.TypeBadge" xml:space="preserve"><value>Map control</value></data>
+  <data name="Coaching.MapControlEditor.StepSummary.Main" xml:space="preserve"><value>Step 1 of 5 · Main information</value></data>
+  <data name="Coaching.MapControlEditor.StepSummary.Scope" xml:space="preserve"><value>Step 2 of 5 · Scope</value></data>
+  <data name="Coaching.MapControlEditor.StepSummary.Content" xml:space="preserve"><value>Step 3 of 5 · Content</value></data>
+  <data name="Coaching.MapControlEditor.StepSummary.Verification" xml:space="preserve"><value>Step 4 of 5 · Verification</value></data>
+  <data name="Coaching.MapControlEditor.StepSummary.Save" xml:space="preserve"><value>Step 5 of 5 · Save</value></data>
+  <data name="Coaching.MapControlEditor.Step.Main" xml:space="preserve"><value>Main information</value></data>
+  <data name="Coaching.MapControlEditor.Step.Scope" xml:space="preserve"><value>Scope</value></data>
+  <data name="Coaching.MapControlEditor.Step.Content" xml:space="preserve"><value>Content</value></data>
+  <data name="Coaching.MapControlEditor.Step.Verification" xml:space="preserve"><value>Verification</value></data>
+  <data name="Coaching.MapControlEditor.Step.Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Coaching.MapControlEditor.Main.Description" xml:space="preserve"><value>The name and description are shown in the coaching library and in the in-match advice log.</value></data>
+  <data name="Coaching.MapControlEditor.Main.PackName" xml:space="preserve"><value>Pack name</value></data>
+  <data name="Coaching.MapControlEditor.Main.ShortDescription" xml:space="preserve"><value>Short description</value></data>
+  <data name="Coaching.MapControlEditor.Main.ContentLanguage" xml:space="preserve"><value>Content language</value></data>
+  <data name="Coaching.MapControlEditor.Main.LanguageHint" xml:space="preserve"><value>The TempoCue interface can switch languages, while the pack text stays exactly as written.</value></data>
+  <data name="Coaching.MapControlEditor.Main.Map" xml:space="preserve"><value>Map</value></data>
+  <data name="Coaching.MapControlEditor.Main.SummonersRift" xml:space="preserve"><value>Summoner's Rift</value></data>
+  <data name="Coaching.MapControlEditor.Main.FirstVersion" xml:space="preserve"><value>First version</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Title" xml:space="preserve"><value>Scope</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Description" xml:space="preserve"><value>The pack will not activate when the player's role or team side does not match. The simulator verifies the same restrictions on step four.</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Roles" xml:space="preserve"><value>Roles</value></data>
+  <data name="Coaching.MapControlEditor.Scope.AllRoles" xml:space="preserve"><value>All roles</value></data>
+  <data name="Coaching.MapControlEditor.Scope.TeamSide" xml:space="preserve"><value>Team side</value></data>
+  <data name="Coaching.MapControlEditor.Scope.AnySide" xml:space="preserve"><value>Any</value></data>
+  <data name="Coaching.MapControlEditor.Scope.BlueSide" xml:space="preserve"><value>Blue</value></data>
+  <data name="Coaching.MapControlEditor.Scope.RedSide" xml:space="preserve"><value>Red</value></data>
+  <data name="Coaching.MapControlEditor.Scope.GameMode.Title" xml:space="preserve"><value>About game modes</value></data>
+  <data name="Coaching.MapControlEditor.Scope.GameMode.Description" xml:space="preserve"><value>Normal and ranked matches are not separated: the first version does not receive a sufficiently reliable signal for that distinction.</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Result.Title" xml:space="preserve"><value>Result</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Result.Hint" xml:space="preserve"><value>The summary updates immediately, so you can see exactly what will be saved in the pack.</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Summary" xml:space="preserve"><value>The pack applies on Summoner's Rift to {0} on {1}.</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Summary.AllRoles" xml:space="preserve"><value>all roles</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Summary.AnySide" xml:space="preserve"><value>both team sides</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Summary.BlueSide" xml:space="preserve"><value>the blue side</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Summary.RedSide" xml:space="preserve"><value>the red side</value></data>
+  <data name="Coaching.MapControlEditor.FutureStep" xml:space="preserve"><value>The fields for this step will be added in the next verified iteration.</value></data>
   <data name="Coaching.NewPack.Soon" xml:space="preserve"><value>Soon</value></data>
   <data name="Coaching.MatchupEditor.Back" xml:space="preserve"><value>Back</value></data>
   <data name="Coaching.MatchupEditor.Close" xml:space="preserve"><value>Close editor</value></data>
@@ -742,7 +790,7 @@
   <data name="Settings.Overlay.Duration.Warning" xml:space="preserve"><value>Danger alerts always remain visible for at least 6 seconds so they cannot be missed.</value></data>
   <data name="Settings.Overlay.Duration.SecondsSuffix" xml:space="preserve"><value>sec</value></data>
   <data name="Settings.Overlay.Persistent.Label" xml:space="preserve"><value>Whole-match advice</value></data>
-  <data name="Settings.Overlay.Persistent.Summary" xml:space="preserve"><value>Matchup mechanics that are not tied to a specific moment</value></data>
+  <data name="Settings.Overlay.Persistent.Summary" xml:space="preserve"><value>Matchup and map-control tips that are not tied to an exact moment</value></data>
   <data name="Settings.Overlay.Persistent.Once" xml:space="preserve"><value>Once per match</value></data>
   <data name="Settings.Overlay.Persistent.Recommended" xml:space="preserve"><value>recommended</value></data>
   <data name="Settings.Overlay.Persistent.Once.Hint" xml:space="preserve"><value>Tips are introduced gradually and do not start repeating after the list ends.</value></data>
@@ -750,7 +798,7 @@
   <data name="Settings.Overlay.Persistent.Level.Hint" xml:space="preserve"><value>The next tip appears on level up. The same tip does not repeat until at least three levels later.</value></data>
   <data name="Settings.Overlay.Persistent.Disabled" xml:space="preserve"><value>Do not show automatically</value></data>
   <data name="Settings.Overlay.Persistent.Disabled.Hint" xml:space="preserve"><value>Whole-match tips remain available in the Coach Pack details.</value></data>
-  <data name="Settings.Overlay.Persistent.ScopeHint" xml:space="preserve"><value>Phase changes and danger alerts are always shown separately and do not depend on this setting.</value></data>
+  <data name="Settings.Overlay.Persistent.ScopeHint" xml:space="preserve"><value>Phase changes, objective rules, and timed reminders are shown separately and do not depend on this setting.</value></data>
   <data name="Settings.Overlay.Reset.Button" xml:space="preserve"><value>Default values</value></data>
   <data name="Settings.Overlay.Save.Button" xml:space="preserve"><value>Save settings</value></data>
   <data name="Settings.Overlay.Unsaved" xml:space="preserve"><value>There are unsaved changes</value></data>
@@ -769,4 +817,164 @@
   <data name="Settings.Overlay.Preview.Close" xml:space="preserve"><value>Close overlay</value></data>
   <data name="Overlay.Matchup.Dismiss" xml:space="preserve"><value>Hide advice</value></data>
   <data name="Overlay.Matchup.PersistentTip.Status" xml:space="preserve"><value>Matchup tip</value></data>
+  <data name="Overlay.MapControl.Status" xml:space="preserve"><value>Map control</value></data>
+  <data name="Overlay.MapControl.PersistentTip.Status" xml:space="preserve"><value>Map tip</value></data>
+  <data name="Overlay.MapControl.Dismiss" xml:space="preserve"><value>Hide reminder</value></data>
+  <data name="Overlay.MapControl.TargetTime" xml:space="preserve"><value>By {0}</value></data>
+  <data name="Overlay.MapControl.GenericTitle" xml:space="preserve"><value>Map reminder</value></data>
+  <data name="Coaching.MapControlEditor.Content.Tab.Objects" xml:space="preserve"><value>Objectives · {0}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Tab.Timed" xml:space="preserve"><value>Timed reminders · {0}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Tab.Persistent" xml:space="preserve"><value>Persistent tips · {0}</value></data>
+  <data name="Coaching.MapControlEditor.Content.CatalogTitle" xml:space="preserve"><value>TempoCue knows the objective schedule</value></data>
+  <data name="Coaching.MapControlEditor.Content.CatalogUnavailable" xml:space="preserve"><value>Select a supported game patch on step one.</value></data>
+  <data name="Coaching.MapControlEditor.Content.CatalogCurrentPatch" xml:space="preserve"><value>Timings are verified for patch {0}. You only choose when and what TempoCue should remind you about.</value></data>
+  <data name="Coaching.MapControlEditor.Content.CatalogPreviousPatch" xml:space="preserve"><value>Patch {0} uses the latest verified timings from patch {1}. Rules remain active and are marked for review.</value></data>
+  <data name="Coaching.MapControlEditor.Content.RulesTitle" xml:space="preserve"><value>Objective rules</value></data>
+  <data name="Coaching.MapControlEditor.Content.RulesDescriptionCurrentPatch" xml:space="preserve"><value>TempoCue uses the verified objective timings for patch {1}. Set only the reminder moment and advice.</value></data>
+  <data name="Coaching.MapControlEditor.Content.RulesDescriptionPreviousPatch" xml:space="preserve"><value>Patch {0} uses the latest verified timings from patch {1}. Rules remain active and are marked for review.</value></data>
+  <data name="Coaching.MapControlEditor.Content.AddRule" xml:space="preserve"><value>+ Add objective rule</value></data>
+  <data name="Coaching.MapControlEditor.Content.EmptyRules" xml:space="preserve"><value>No objective rules yet. Add the first one to continue.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Coaching.MapControlEditor.Content.Duplicate" xml:space="preserve"><value>Duplicate</value></data>
+  <data name="Coaching.MapControlEditor.Content.Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Coaching.MapControlEditor.Content.DeleteRule" xml:space="preserve"><value>Delete rule</value></data>
+  <data name="Coaching.MapControlEditor.Content.Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Coaching.MapControlEditor.Content.Picker.Title" xml:space="preserve"><value>Choose an objective</value></data>
+  <data name="Coaching.MapControlEditor.Content.Picker.Description" xml:space="preserve"><value>The objective determines which patch timing TempoCue uses.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Picker.Notice" xml:space="preserve"><value>Only objectives supported by the timing catalog are available. Minimap-dependent conditions are not included in this release.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Objective.Dragon" xml:space="preserve"><value>Dragon</value></data>
+  <data name="Coaching.MapControlEditor.Content.Objective.Grubs" xml:space="preserve"><value>Void Grubs</value></data>
+  <data name="Coaching.MapControlEditor.Content.Objective.Herald" xml:space="preserve"><value>Rift Herald</value></data>
+  <data name="Coaching.MapControlEditor.Content.Objective.Baron" xml:space="preserve"><value>Baron Nashor</value></data>
+  <data name="Coaching.MapControlEditor.Content.Objective.Respawns" xml:space="preserve"><value>Initial spawn and respawn after a confirmed kill</value></data>
+  <data name="Coaching.MapControlEditor.Content.Objective.Once" xml:space="preserve"><value>One scheduled spawn in the current timing catalog</value></data>
+  <data name="Coaching.MapControlEditor.Content.Objective.TimingRespawns" xml:space="preserve"><value>First {0} · respawn {1}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Objective.TimingOnce" xml:space="preserve"><value>Spawn {0}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Priority.Information" xml:space="preserve"><value>Information</value></data>
+  <data name="Coaching.MapControlEditor.Content.Priority.Caution" xml:space="preserve"><value>Caution</value></data>
+  <data name="Coaching.MapControlEditor.Content.Priority.Important" xml:space="preserve"><value>Important</value></data>
+  <data name="Coaching.MapControlEditor.Content.Recurrence.Once" xml:space="preserve"><value>Once per match</value></data>
+  <data name="Coaching.MapControlEditor.Content.Recurrence.EveryCycle" xml:space="preserve"><value>Every available cycle</value></data>
+  <data name="Coaching.MapControlEditor.Content.Recurrence.Once.Description" xml:space="preserve"><value>The reminder is shown only for the first matching event.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Recurrence.EveryCycle.Initial.Description" xml:space="preserve"><value>Shown for the first spawn and repeated for every respawn after a confirmed kill.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Recurrence.EveryCycle.Respawn.Description" xml:space="preserve"><value>Repeated before every next spawn after a confirmed kill.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Recurrence.EveryCycle.AfterKill.Description" xml:space="preserve"><value>Repeated after every confirmed objective kill.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Recurrence.EveryCycle.Unavailable.Description" xml:space="preserve"><value>Unavailable: the selected objective has no respawn cycle.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Trigger.BeforeInitial" xml:space="preserve"><value>Before the first spawn</value></data>
+  <data name="Coaching.MapControlEditor.Content.Trigger.AtInitial" xml:space="preserve"><value>At the first spawn</value></data>
+  <data name="Coaching.MapControlEditor.Content.Trigger.BeforeRespawn" xml:space="preserve"><value>Before the next spawn after a kill</value></data>
+  <data name="Coaching.MapControlEditor.Content.Trigger.AfterKill" xml:space="preserve"><value>Immediately after a kill</value></data>
+  <data name="Coaching.MapControlEditor.Content.Trigger.BeforeInitial.Description" xml:space="preserve"><value>Calculated from the system time of the objective's first spawn.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Trigger.AtInitial.Description" xml:space="preserve"><value>Triggers exactly at the time TempoCue reads from the timing catalog.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Trigger.BeforeRespawn.Description" xml:space="preserve"><value>Requires a Live Client Data kill event. Available only for respawning objectives.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Trigger.AfterKill.Description" xml:space="preserve"><value>Triggers when either team kills the objective.</value></data>
+  <data name="Coaching.MapControlEditor.Content.TriggerSummary.Before" xml:space="preserve"><value>{0} sec. {1}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.Title" xml:space="preserve"><value>Objective rule: {0}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.Timing.Respawns" xml:space="preserve"><value>TempoCue timing: first spawn at {0}, respawn {1} after a confirmed kill.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.Timing.Once" xml:space="preserve"><value>TempoCue timing: scheduled spawn at {0}; this objective does not use a respawn cycle.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.Trigger" xml:space="preserve"><value>When to show the reminder</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.LeadTime" xml:space="preserve"><value>Lead time</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.Recurrence" xml:space="preserve"><value>Repeat</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.Priority" xml:space="preserve"><value>Priority</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.LiveSummaryTitle" xml:space="preserve"><value>How it will work</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.LiveSummary" xml:space="preserve"><value>{0}; {1}.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.Message" xml:space="preserve"><value>Main advice (the player sees it first)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.WhyNow" xml:space="preserve"><value>Why now (short explanation)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.NextGoal" xml:space="preserve"><value>What to prepare for the objective (optional)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Card.WhyNow" xml:space="preserve"><value>Why now</value></data>
+  <data name="Coaching.MapControlEditor.Content.Card.Preparation" xml:space="preserve"><value>What to prepare for the objective</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.Done" xml:space="preserve"><value>Done</value></data>
+  <data name="Coaching.MapControlEditor.Content.DuplicateName" xml:space="preserve"><value>{0} — copy</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.ListTitle" xml:space="preserve"><value>Game-time reminders</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Description" xml:space="preserve"><value>Bound to an exact match minute rather than a system event. Cards are sorted automatically by time.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Add" xml:space="preserve"><value>+ Add reminder</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Empty" xml:space="preserve"><value>No timed reminders yet. Add the first one when advice should appear at a specific match time.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Editor.Title" xml:space="preserve"><value>Timed reminder</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Editor.Progress" xml:space="preserve"><value>Reminder {0} of {1}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.GameTime" xml:space="preserve"><value>Game time</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.GameTime.Hint" xml:space="preserve"><value>Enter minutes (30) or MMSS (1330 = 13:30). 15-second step; once per match.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Name" xml:space="preserve"><value>Name (short label in the list)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Message" xml:space="preserve"><value>Main advice (the player sees it first)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.WhyNow" xml:space="preserve"><value>Why now (short explanation)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.NextGoal" xml:space="preserve"><value>What to prepare for the objective (optional)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Future.Title" xml:space="preserve"><value>Available after mini-map analysis</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Future.Description" xml:space="preserve"><value>The first version does not analyze the mini-map image, so these conditions cannot be selected yet.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Future.Items" xml:space="preserve"><value>Enemy jungler spotted · Opponent missing from lane · Enemy ward placed · Team grouped at an objective</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.ListTitle" xml:space="preserve"><value>Persistent tips</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Description" xml:space="preserve"><value>Tips remain available in pack details and the overlay shows one on an eligible level-up. Urgent objective and timed reminders take priority.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Add" xml:space="preserve"><value>+ Add tip</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Empty" xml:space="preserve"><value>No persistent tips yet. Add the first one when the pack needs reference advice.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Editor.AddTitle" xml:space="preserve"><value>Persistent tip</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Editor.EditTitle" xml:space="preserve"><value>Edit persistent tip</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Editor.Progress" xml:space="preserve"><value>Tip {0} of {1}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Title" xml:space="preserve"><value>Title</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Message" xml:space="preserve"><value>Text (one or two sentences)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Scope" xml:space="preserve"><value>Where it applies</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Scope.WholeMatch" xml:space="preserve"><value>Whole match</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Scope.BeforeFirstObjective" xml:space="preserve"><value>Before the first objective</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Scope.WhileObjectiveAvailable" xml:space="preserve"><value>While any objective is available</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Scope.Hint" xml:space="preserve"><value>“Any objective” means Dragon, Void Grubs, Rift Herald, or Baron has spawned and has not been taken yet.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Result" xml:space="preserve"><value>Verification result</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Errors" xml:space="preserve"><value>{0} errors</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Warnings" xml:space="preserve"><value>{0} warnings</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Status.Success" xml:space="preserve"><value>No errors found</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Status.Success.Description" xml:space="preserve"><value>The pack is internally consistent and can proceed to saving.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Status.Attention" xml:space="preserve"><value>The pack needs attention</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Status.Attention.Description" xml:space="preserve"><value>Review the notes below before saving the pack.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Issue.TimingsUnavailable" xml:space="preserve"><value>TempoCue has no objective timing data for the selected patch.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Issue.PreviousPatch" xml:space="preserve"><value>Patch {0} uses the latest timings verified through patch {1}. The rules remain active but need review.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Issue.EmptyContent" xml:space="preserve"><value>Add at least one objective rule, timed reminder, or persistent tip.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Issue.OpenEditor" xml:space="preserve"><value>Finish editing or remove the unfinished content card before verification.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Issue.DuplicateTimes" xml:space="preserve"><value>Several timed reminders will appear simultaneously at: {0}.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Timeline" xml:space="preserve"><value>Timeline</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Timeline.Description" xml:space="preserve"><value>Circles are system events only for objectives configured in this pack. Squares are your timed reminders.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Legend.System" xml:space="preserve"><value>System event</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Legend.User" xml:space="preserve"><value>Your reminder</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary" xml:space="preserve"><value>Pack summary</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Rules" xml:space="preserve"><value>Objective rules</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Timed" xml:space="preserve"><value>Timed reminders</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Persistent" xml:space="preserve"><value>Persistent tips</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Patch" xml:space="preserve"><value>Catalog patch</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Scope" xml:space="preserve"><value>Scope</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Side" xml:space="preserve"><value>Team side</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Title" xml:space="preserve"><value>Source</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Description" xml:space="preserve"><value>Personal experience is a valid source. For an article, video, or coaching material, provide its title and author.</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Personal" xml:space="preserve"><value>Personal experience</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Article" xml:space="preserve"><value>Article or guide</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Video" xml:space="preserve"><value>Video</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Training" xml:space="preserve"><value>Coaching material</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Name" xml:space="preserve"><value>Source title · required</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Author" xml:space="preserve"><value>Source author · required</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Link" xml:space="preserve"><value>Link · optional</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Validation" xml:space="preserve"><value>Provide a source title and author. If a link is provided, it must start with http:// or https://.</value></data>
+  <data name="Coaching.MapControlEditor.Save.Card.Title" xml:space="preserve"><value>Pack card</value></data>
+  <data name="Coaching.MapControlEditor.Save.Card.Name" xml:space="preserve"><value>Name</value></data>
+  <data name="Coaching.MapControlEditor.Save.Card.Type" xml:space="preserve"><value>Type</value></data>
+  <data name="Coaching.MapControlEditor.Save.Card.Scope" xml:space="preserve"><value>Scope</value></data>
+  <data name="Coaching.MapControlEditor.Save.Card.Patch" xml:space="preserve"><value>Patch</value></data>
+  <data name="Coaching.MapControlEditor.Save.Card.Language" xml:space="preserve"><value>Content language</value></data>
+  <data name="Coaching.MapControlEditor.Save.Action.Enable" xml:space="preserve"><value>Save and enable</value></data>
+  <data name="Coaching.MapControlEditor.Save.Action.Draft" xml:space="preserve"><value>Save draft</value></data>
+  <data name="Coaching.MapControlEditor.Save.Status.Saving" xml:space="preserve"><value>Saving Map Control Pack…</value></data>
+  <data name="Coaching.MapControlEditor.Save.Status.DraftSaved" xml:space="preserve"><value>Draft saved locally.</value></data>
+  <data name="Coaching.MapControlEditor.Save.Status.EnabledSaved" xml:space="preserve"><value>Map Control Pack saved and enabled.</value></data>
+  <data name="Coaching.MapControlEditor.Save.Status.Failed" xml:space="preserve"><value>Could not save the pack. Check access to TempoCue local application data.</value></data>
+  <data name="Coaching.MapControl.Details.Header" xml:space="preserve"><value>Map control · {0} · {1} · {2}</value></data>
+  <data name="Coaching.MapControl.Details.Export.Filter" xml:space="preserve"><value>TempoCue Map Control Pack (*.tempocue.json)|*.tempocue.json|JSON (*.json)|*.json</value></data>
+  <data name="Coaching.MapControl.Details.Tab.Overview" xml:space="preserve"><value>Overview</value></data>
+  <data name="Coaching.MapControl.Details.Tab.Objectives" xml:space="preserve"><value>Objectives</value></data>
+  <data name="Coaching.MapControl.Details.Tab.Timed" xml:space="preserve"><value>Timed reminders</value></data>
+  <data name="Coaching.MapControl.Details.Tab.Persistent" xml:space="preserve"><value>Persistent tips</value></data>
+  <data name="Coaching.MapControl.Details.Overview.Type" xml:space="preserve"><value>Map control</value></data>
+  <data name="Coaching.MapControl.Details.Overview.Roles" xml:space="preserve"><value>Roles</value></data>
+  <data name="Coaching.MapControl.Details.Overview.TeamSide" xml:space="preserve"><value>Team side</value></data>
+  <data name="Coaching.MapControl.Details.Overview.Content" xml:space="preserve"><value>Pack content</value></data>
+  <data name="Coaching.MapControl.Details.Overview.ContentValue" xml:space="preserve"><value>{0} objective rules · {1} timed reminders · {2} persistent tips</value></data>
+  <data name="Coaching.MapControl.Details.Objectives.Title" xml:space="preserve"><value>Objective rules</value></data>
+  <data name="Coaching.MapControl.Details.Objectives.Empty" xml:space="preserve"><value>This pack does not contain objective rules.</value></data>
+  <data name="Coaching.MapControl.Details.Timed.Title" xml:space="preserve"><value>Timed reminders</value></data>
+  <data name="Coaching.MapControl.Details.Timed.Empty" xml:space="preserve"><value>This pack does not contain timed reminders.</value></data>
+  <data name="Coaching.MapControl.Details.Persistent.Title" xml:space="preserve"><value>Persistent tips</value></data>
+  <data name="Coaching.MapControl.Details.Persistent.Empty" xml:space="preserve"><value>This pack does not contain persistent tips.</value></data>
+  <data name="Coaching.MapControl.Details.ReadOnly" xml:space="preserve"><value>Read-only. Open the pack editor to change its content.</value></data>
 </root>

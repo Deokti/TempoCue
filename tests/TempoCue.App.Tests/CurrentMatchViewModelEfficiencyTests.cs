@@ -35,7 +35,6 @@ public sealed class CurrentMatchViewModelEfficiencyTests
                     VictimParticipantId = "sett-player"
                 }
             ],
-            "{}",
             DateTimeOffset.UtcNow);
         var viewModel = context.CreateViewModel(snapshot);
         await viewModel.RefreshAsync();
@@ -82,9 +81,9 @@ public sealed class CurrentMatchViewModelEfficiencyTests
         };
         var source = TestMatchSnapshotSource.FromSequence(
             MatchSnapshotReadResult.Success(
-                new MatchSnapshot(firstMatch, [matchEvent], "{}", DateTimeOffset.UtcNow)),
+                new MatchSnapshot(firstMatch, [matchEvent], DateTimeOffset.UtcNow)),
             MatchSnapshotReadResult.Success(
-                new MatchSnapshot(secondMatch, [matchEvent], "{}", DateTimeOffset.UtcNow)));
+                new MatchSnapshot(secondMatch, [matchEvent], DateTimeOffset.UtcNow)));
         using var monitor = CreateMonitor(source);
         using var viewModel = new CurrentMatchViewModel(
             monitor,

@@ -48,6 +48,7 @@ public partial class App : System.Windows.Application
         // Каталог может быть пустым: встроенные наборы поставляются только после
         // отдельной проверки их содержания и актуальности.
         var builtInPacks = LoadBuiltInCoachPacks();
+        var builtInMapControlPacks = LoadBuiltInMapControlPacks();
 
         var coachPackDirectory = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -55,15 +56,30 @@ public partial class App : System.Windows.Application
             "CoachPacks");
         var coachPackStore = new LocalCoachPackStore(coachPackDirectory);
         var saveCoachPack = new SaveCoachPackUseCase(coachPackStore);
+        var mapControlPackDirectory = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "TempoCue",
+            "MapControlPacks");
+        var mapControlPackStore = new LocalMapControlPackStore(mapControlPackDirectory);
+        var saveMapControlPack = new SaveMapControlPackUseCase(mapControlPackStore);
+        var loadMapControlPackLibrary = new LoadMapControlPackLibraryUseCase(mapControlPackStore);
+        var setMapControlPackState = new SetMapControlPackStateUseCase(mapControlPackStore);
+        var deleteMapControlPack = new DeleteMapControlPackUseCase(mapControlPackStore);
         var loadCoachPackLibrary = new LoadCoachPackLibraryUseCase(coachPackStore);
         var setCoachPackState = new SetCoachPackStateUseCase(coachPackStore);
         var deleteCoachPack = new DeleteCoachPackUseCase(coachPackStore);
         var importCoachPack = new ImportCoachPackUseCase(
             coachPackStore,
             builtInPacks.Select(static pack => pack.Id));
+        var importMapControlPack = new ImportMapControlPackUseCase(
+            mapControlPackStore,
+            builtInMapControlPacks.Select(static pack => pack.Id));
         var activeCoachPackSelector = new SelectActiveCoachPackUseCase(
             builtInPacks,
             loadCoachPackLibrary);
+        var activeMapControlPackSelector = new SelectActiveMapControlPacksUseCase(
+            loadMapControlPackLibrary,
+            builtInMapControlPacks);
 
         // Каталоги Data Dragon используют общий локальный кэш патчей и чемпионов.
         var dataDragonCacheDirectory = Path.Combine(
@@ -87,7 +103,8 @@ public partial class App : System.Windows.Application
         var activeMatchSession = new ActiveMatchSession(
             _liveClientDataClient,
             activeCoachPackSelector,
-            TimeSpan.FromSeconds(1));
+            TimeSpan.FromSeconds(1),
+            activeMapControlPackSelector);
         _activeMatchMonitor = new ActiveMatchMonitor(activeMatchSession);
         var currentMatchViewModel = new CurrentMatchViewModel(
             _activeMatchMonitor,
@@ -123,10 +140,15 @@ public partial class App : System.Windows.Application
             _championCatalog,
             loadCoachPackLibrary,
             setCoachPackState,
-            deleteCoachPack);
+            deleteCoachPack,
+            loadMapControlPackLibrary,
+            setMapControlPackState,
+            deleteMapControlPack,
+            builtInMapControlPacks);
         coachingLibraryViewModel.LibraryChanged += (_, _) =>
         {
             activeCoachPackSelector.Invalidate();
+            activeMapControlPackSelector.Invalidate();
             homeViewModel.SetCoachPackCount(coachingLibraryViewModel.TotalPackCount);
         };
         var buildLeagueItemSetExport = new BuildLeagueItemSetExportUseCase(
@@ -137,21 +159,32 @@ public partial class App : System.Windows.Application
             _itemCatalog,
             buildLeagueItemSetExport,
             new ExportCoachPackUseCase());
+        var mapControlPackDetailsViewModel = new MapControlPackDetailsViewModel(
+            LocalizationService.Instance,
+            new ExportMapControlPackUseCase());
         var matchupEditorViewModel = new MatchupEditorViewModel(
             LocalizationService.Instance,
             _gamePatchCatalog,
             _championCatalog,
             _itemCatalog,
             saveCoachPack);
+        var mapControlEditorViewModel = new MapControlEditorViewModel(
+            LocalizationService.Instance,
+            _gamePatchCatalog,
+            saveMapControlPack);
         _coachingViewModel = new CoachingViewModel(
             LocalizationService.Instance,
             coachingLibraryViewModel,
             coachingPackDetailsViewModel,
+            mapControlPackDetailsViewModel,
             new CoachPackImportDialogViewModel(
                 LocalizationService.Instance,
-                importCoachPack),
+                new ImportPortableCoachPackUseCase(
+                    importCoachPack,
+                    importMapControlPack)),
             new PackTypeSelectionViewModel(),
-            matchupEditorViewModel);
+            matchupEditorViewModel,
+            mapControlEditorViewModel);
 
         // Окно получает полностью собранный граф зависимостей и только связывает ViewModel с View.
         MainWindow = new MainWindow(
@@ -206,6 +239,28 @@ public partial class App : System.Windows.Application
         {
             using var stream = File.OpenRead(path);
             packs.Add(CoachPackLoader.Load(stream));
+        }
+
+        return packs;
+    }
+
+    private static IReadOnlyList<MapControlPack> LoadBuiltInMapControlPacks()
+    {
+        var directory = Path.Combine(
+            AppContext.BaseDirectory,
+            "Assets",
+            "MapControlPacks");
+        if (!Directory.Exists(directory))
+        {
+            return [];
+        }
+
+        var packs = new List<MapControlPack>();
+        foreach (var path in Directory.EnumerateFiles(directory, "*.json")
+                     .OrderBy(static path => path, StringComparer.OrdinalIgnoreCase))
+        {
+            using var stream = File.OpenRead(path);
+            packs.Add(MapControlPackLoader.Load(stream));
         }
 
         return packs;

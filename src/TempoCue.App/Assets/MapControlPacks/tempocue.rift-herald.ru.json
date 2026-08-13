@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "packType": "mapControl",
+  "id": "tempocue.map-control.rift-herald.ru",
+  "name": "Герольд Бездны: подготовка и реализация",
+  "patch": "16.16",
+  "description": "Отдельное правило подготовки к Герольду Бездны и напоминание превратить его в урон по башне.",
+  "author": "TempoCue",
+  "contentLanguage": "ru_RU",
+  "verifiedOn": "2026-08-13",
+  "source": {
+    "kind": "article",
+    "title": "League of Legends Patch 26.1 Notes",
+    "url": "https://www.leagueoflegends.com/en-us/news/game-updates/patch-26-1-notes/",
+    "author": "Riot Games",
+    "permission": "notConfirmed"
+  },
+  "applicability": {
+    "roles": ["top", "jungle", "mid", "adc", "support"],
+    "teamSide": "any"
+  },
+  "rules": [
+    {
+      "id": "prepare-before-rift-herald",
+      "objective": "riftHerald",
+      "trigger": "beforeInitialSpawn",
+      "leadTime": "00:01:30",
+      "recurrence": "oncePerMatch",
+      "priority": "important",
+      "message": "До Герольда полторы минуты. Подготовь верхнюю реку и заранее выбери линию, на которой сможете реализовать объект.",
+      "whyNow": "Ценность Герольда появляется только после безопасного захвата и последующего давления на башню.",
+      "nextGoal": "Протолкни ближайшую волну, обнови покупку и не начинай объект без информации о соперниках.",
+      "isEnabled": true
+    }
+  ],
+  "timedReminders": [],
+  "persistentTips": [
+    {
+      "id": "herald-needs-wave",
+      "title": "Подготовь волну для Герольда",
+      "message": "Не выпускай Герольда в пустую линию. Сначала собери волну и выбери башню, к которой команда сможет безопасно подойти.",
+      "scope": {
+        "kind": "specificObjective",
+        "objective": "riftHerald"
+      }
+    }
+  ]
+}

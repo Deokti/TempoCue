@@ -1,6 +1,7 @@
 <UserControl x:Class="TempoCue.App.Views.PackTypeSelectionView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:TempoCue.App.Controls"
              xmlns:localization="clr-namespace:TempoCue.App.Localization"
              Background="#080D14"
              FontFamily="Segoe UI">
@@ -81,6 +82,7 @@
 
         <!-- Карточки типов прокручиваются при небольшой высоте окна. -->
         <ScrollViewer Grid.Row="1"
+                      controls:ScrollViewerWheelRouting.IsEnabled="True"
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
             <Grid Margin="0,26,0,24">
@@ -202,13 +204,13 @@
                         </Grid>
                     </Button>
 
-                    <!-- Контроль карты показан заранее, но заблокирован до отдельной реализации. -->
+                    <!-- Контроль карты открывает отдельный типизированный редактор. -->
                     <Button x:Name="GameControlPackTypeButton"
                             Grid.Column="2"
                             Style="{StaticResource PackTypeCardButton}"
                             MinHeight="330"
                             IsEnabled="{Binding IsGameControlAvailable}"
-                            ToolTip="{localization:Loc Coaching.NewPack.GameControl.Unavailable}">
+                            Click="GameControlPackTypeButton_Click">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
@@ -230,16 +232,6 @@
                                           Height="20"
                                           HorizontalAlignment="Center"
                                           VerticalAlignment="Center" />
-                                </Border>
-                                <Border Background="#26364E"
-                                        CornerRadius="10"
-                                        Padding="9,4"
-                                        HorizontalAlignment="Right"
-                                        VerticalAlignment="Top">
-                                    <TextBlock Text="{localization:Loc Coaching.NewPack.Soon}"
-                                               Foreground="#AAB8CA"
-                                               FontSize="{StaticResource Typography.FontSize.Caption}"
-                                               FontWeight="SemiBold" />
                                 </Border>
                             </Grid>
                             <StackPanel Grid.Row="1" Margin="0,20,0,0">
@@ -275,14 +267,12 @@
                                 </StackPanel>
                             </Border>
                             <Border Grid.Row="3"
-                                    Background="#17243A"
-                                    BorderBrush="#263750"
-                                    BorderThickness="1"
+                                    Background="#4FAAE8"
                                     CornerRadius="9"
                                     Padding="15,9"
                                     HorizontalAlignment="Left">
-                                <TextBlock Text="{localization:Loc Coaching.NewPack.GameControl.Unavailable}"
-                                           Foreground="#91A4BD"
+                                <TextBlock Text="{localization:Loc Coaching.NewPack.GameControl.Start}"
+                                           Foreground="#071019"
                                            FontSize="{StaticResource Typography.FontSize.Body}"
                                            FontWeight="SemiBold" />
                             </Border>

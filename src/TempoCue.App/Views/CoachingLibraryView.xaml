@@ -78,6 +78,13 @@
                 <Setter Property="Padding" Value="16" />
             </Style>
 
+            <Style x:Key="MapControlPackCard" TargetType="Border" BasedOn="{StaticResource ShellCard}">
+                <Setter Property="Width" Value="316" />
+                <Setter Property="MinHeight" Value="172" />
+                <Setter Property="Margin" Value="0,0,12,12" />
+                <Setter Property="Padding" Value="16" />
+            </Style>
+
             <Style x:Key="LibraryStateBadge" TargetType="Border">
                 <Setter Property="Background" Value="#19362F" />
                 <Setter Property="CornerRadius" Value="10" />
@@ -215,6 +222,78 @@
                                                         DeleteActionLabel="{Binding DeleteActionLabel}"
                                                         ExportRequested="PackActionsMenu_ExportRequested"
                                                         DeleteRequested="PackActionsMenu_DeleteRequested" />
+                        </Grid>
+                    </Grid>
+                </Border>
+            </DataTemplate>
+
+            <DataTemplate x:Key="MapControlPackCardTemplate">
+                <Border Style="{StaticResource MapControlPackCard}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <StackPanel>
+                            <TextBlock Text="{Binding Title}"
+                                       Foreground="#F4F7FB"
+                                       FontSize="{StaticResource Typography.FontSize.CardTitle}"
+                                       FontWeight="SemiBold"
+                                       TextTrimming="CharacterEllipsis" />
+                            <TextBlock Text="{Binding Details}"
+                                       Foreground="#91A4BD"
+                                       FontSize="{StaticResource Typography.FontSize.Body}"
+                                       TextTrimming="CharacterEllipsis"
+                                       Margin="0,5,0,0" />
+                            <TextBlock Text="{Binding AdviceCount}"
+                                       Foreground="#7F93AF"
+                                       FontSize="{StaticResource Typography.FontSize.Caption}"
+                                       Margin="0,5,0,0" />
+                        </StackPanel>
+
+                        <WrapPanel Grid.Row="1" Margin="0,13,0,10">
+                            <Border Style="{StaticResource LibraryStateBadge}" Margin="0,0,6,6">
+                                <TextBlock Text="{Binding StateLabel}" Style="{StaticResource LibraryStateText}" />
+                            </Border>
+                            <Border Background="#14253C" CornerRadius="9" Padding="8,4" Margin="0,0,6,6">
+                                <TextBlock Text="{Binding OriginLabel}" Foreground="#8CB6D6" FontSize="{StaticResource Typography.FontSize.Caption}" />
+                            </Border>
+                            <Border Background="#121E30" CornerRadius="9" Padding="8,4" Margin="0,0,6,6">
+                                <TextBlock Text="{Binding ContentLanguageLabel}" Foreground="#91A4BD" FontSize="{StaticResource Typography.FontSize.Caption}" />
+                            </Border>
+                            <Border Background="#121E30" CornerRadius="9" Padding="8,4" Margin="0,0,0,6">
+                                <TextBlock Text="{Binding PatchLabel}" Foreground="#91A4BD" FontSize="{StaticResource Typography.FontSize.Caption}" />
+                            </Border>
+                        </WrapPanel>
+
+                        <Grid Grid.Row="3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="OpenMapControlPackButton"
+                                    Content="{localization:Loc Coaching.Library.Open}"
+                                    Style="{StaticResource SecondaryButton}"
+                                    HorizontalAlignment="Left"
+                                    Click="OpenMapControlPackButton_Click" />
+                            <ToggleButton x:Name="MapControlPackEnabledToggle"
+                                          Grid.Column="1"
+                                          Style="{StaticResource TempoSwitch}"
+                                          IsChecked="{Binding IsEnabled, Mode=OneWay}"
+                                          ToolTip="{localization:Loc Coaching.Library.Toggle}"
+                                          AutomationProperties.Name="{localization:Loc Coaching.Library.Toggle}"
+                                          Click="MapControlPackEnabledToggle_Click" />
+                            <views:CoachPackActionsMenu Grid.Column="2"
+                                                       Margin="8,0,0,0"
+                                                       CanExport="True"
+                                                       CanDelete="{Binding CanDelete}"
+                                                       DeleteActionLabel="{Binding DeleteActionLabel}"
+                                                       ExportRequested="MapControlPackActionsMenu_ExportRequested"
+                                                       DeleteRequested="MapControlPackActionsMenu_DeleteRequested" />
                         </Grid>
                     </Grid>
                 </Border>
@@ -387,30 +466,97 @@
             </TabItem>
 
             <TabItem Header="{localization:Loc Coaching.Tab.MapControl}" Style="{StaticResource CoachingTab}">
-                <Border x:Name="MapControlEmptyState"
-                        Style="{StaticResource ShellCard}"
-                        Margin="0,12,0,0"
-                        Padding="32">
-                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="600">
-                        <Path Width="32" Height="32"
-                              Data="{StaticResource Icon.MapMinimap}"
-                              Style="{StaticResource TempoIcon}"
-                              Stroke="#50B7ED"
-                              HorizontalAlignment="Center" />
-                        <TextBlock Text="{localization:Loc Coaching.Empty.MapControl.Title}"
-                                   Foreground="#F4F7FB"
-                                   FontSize="{StaticResource Typography.FontSize.SectionTitle}"
-                                   FontWeight="SemiBold"
-                                   HorizontalAlignment="Center"
-                                   Margin="0,14,0,0" />
-                        <TextBlock Text="{localization:Loc Coaching.Empty.MapControl.Description}"
-                                   Foreground="#91A4BD"
-                                   FontSize="{StaticResource Typography.FontSize.BodyLarge}"
-                                   TextAlignment="Center"
-                                   TextWrapping="Wrap"
-                                   Margin="0,8,0,0" />
-                    </StackPanel>
-                </Border>
+                <Grid Margin="0,12,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="10" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Grid MaxWidth="680" HorizontalAlignment="Left">
+                        <TextBox x:Name="MapControlSearchTextBox"
+                                 MinWidth="360"
+                                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource FormTextBox}" />
+                        <TextBlock x:Name="MapControlSearchPlaceholder"
+                                   Text="{localization:Loc Coaching.MapControl.Library.Search}"
+                                   Foreground="#5F7592"
+                                   FontSize="{StaticResource Typography.FontSize.Body}"
+                                   Margin="10,0,0,0"
+                                   VerticalAlignment="Center"
+                                   IsHitTestVisible="False">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding SearchText}" Value="" />
+                                                <Condition Binding="{Binding IsKeyboardFocusWithin, ElementName=MapControlSearchTextBox}"
+                                                           Value="False" />
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </MultiDataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+
+                    <Grid Grid.Row="2">
+                        <ScrollViewer x:Name="MapControlLibraryScrollViewer"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled"
+                                      Padding="0,0,8,0">
+                            <ItemsControl x:Name="MapControlCardsItemsControl"
+                                          ItemsSource="{Binding MapControlCards}"
+                                          ItemTemplate="{StaticResource MapControlPackCardTemplate}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </ScrollViewer>
+
+                        <Border x:Name="MapControlEmptyState"
+                                Padding="32">
+                            <Border.Style>
+                                <Style TargetType="Border" BasedOn="{StaticResource ShellCard}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding HasMapControlCards}" Value="False" />
+                                                <Condition Binding="{Binding IsLibraryLoading}" Value="False" />
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </MultiDataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="600">
+                                <Path Width="32" Height="32"
+                                      Data="{StaticResource Icon.MapMinimap}"
+                                      Style="{StaticResource TempoIcon}"
+                                      Stroke="#50B7ED"
+                                      HorizontalAlignment="Center" />
+                                <TextBlock Text="{localization:Loc Coaching.Empty.MapControl.Title}"
+                                           Foreground="#F4F7FB"
+                                           FontSize="{StaticResource Typography.FontSize.SectionTitle}"
+                                           FontWeight="SemiBold"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,14,0,0" />
+                                <TextBlock Text="{localization:Loc Coaching.Empty.MapControl.Description}"
+                                           Foreground="#91A4BD"
+                                           FontSize="{StaticResource Typography.FontSize.BodyLarge}"
+                                           TextAlignment="Center"
+                                           TextWrapping="Wrap"
+                                           Margin="0,8,0,0" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Grid>
             </TabItem>
 
             <TabItem Header="{localization:Loc Coaching.Tab.MyPacks}" Style="{StaticResource CoachingTab}">

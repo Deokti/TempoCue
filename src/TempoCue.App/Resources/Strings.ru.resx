@@ -10,6 +10,7 @@
   <data name="Header.CoachPackLoaded" xml:space="preserve"><value>COACH PACK ЗАГРУЖЕН</value></data>
   <data name="Language.Tooltip" xml:space="preserve"><value>Язык интерфейса</value></data>
   <data name="Validation.Length.Requirement" xml:space="preserve"><value>От {0} до {1} символов.</value></data>
+  <data name="Validation.Length.Optional" xml:space="preserve"><value>Необязательно, до {0} символов.</value></data>
   <data name="Validation.Length.TooShort" xml:space="preserve"><value>{0} из минимум {1} символов. Максимум: {2}.</value></data>
   <data name="Validation.Length.Valid" xml:space="preserve"><value>{0} из {1} символов.</value></data>
   <data name="Validation.Length.TooLong" xml:space="preserve"><value>{0} символов; максимум — {1}.</value></data>
@@ -231,6 +232,9 @@
   <data name="Coaching.Import.Preview.Language" xml:space="preserve"><value>Язык содержимого</value></data>
   <data name="Coaching.Import.Preview.Patch" xml:space="preserve"><value>Игровой патч</value></data>
   <data name="Coaching.Import.Preview.Contents" xml:space="preserve"><value>Содержимое</value></data>
+  <data name="Coaching.Import.Preview.Matchup.Context" xml:space="preserve"><value>{0} · {1}</value></data>
+  <data name="Coaching.Import.Preview.Matchup.Contents" xml:space="preserve"><value>{0} · {1}</value></data>
+  <data name="Coaching.Import.Preview.MapControl.Context" xml:space="preserve"><value>Контроль карты · {0} · сторона: {1}</value></data>
   <data name="Coaching.Import.Status.Loading.Title" xml:space="preserve"><value>Проверяем файл</value></data>
   <data name="Coaching.Import.Status.Loading.Message" xml:space="preserve"><value>TempoCue проверяет версию схемы и содержимое Coach Pack.</value></data>
   <data name="Coaching.Import.Status.Ready.Title" xml:space="preserve"><value>Можно импортировать</value></data>
@@ -256,6 +260,11 @@
   <data name="Coaching.Tab.MapControl" xml:space="preserve"><value>Контроль игры</value></data>
   <data name="Coaching.Tab.MyPacks" xml:space="preserve"><value>Мои наборы</value></data>
   <data name="Coaching.Library.Search" xml:space="preserve"><value>Поиск по чемпиону, набору или автору</value></data>
+  <data name="Coaching.MapControl.Library.Search" xml:space="preserve"><value>Поиск по названию или ситуации</value></data>
+  <data name="Coaching.MapControl.Library.Card.Details" xml:space="preserve"><value>{0} · {1}</value></data>
+  <data name="Coaching.MapControl.Library.Author.You" xml:space="preserve"><value>вы</value></data>
+  <data name="Coaching.MapControl.Library.Role.Selected" xml:space="preserve"><value>только {0}</value></data>
+  <data name="Coaching.MapControl.Library.OpenUnavailable" xml:space="preserve"><value>Просмотр набора появится в следующей итерации.</value></data>
   <data name="Coaching.Library.Matchup" xml:space="preserve"><value>{0} против {1}</value></data>
   <data name="Coaching.Library.Card.Details" xml:space="preserve"><value>{0} · {1}</value></data>
   <data name="Coaching.Library.State.Enabled" xml:space="preserve"><value>Включён</value></data>
@@ -315,6 +324,45 @@
   <data name="Coaching.NewPack.GameControl.Description" xml:space="preserve"><value>Создайте напоминания о карте, гангах, объектах, пропавших противниках и других игровых событиях.</value></data>
   <data name="Coaching.NewPack.GameControl.PromptItems" xml:space="preserve"><value>роль и режим · игровую ситуацию из шаблонов · условия по времени и карте · способ показа</value></data>
   <data name="Coaching.NewPack.GameControl.Unavailable" xml:space="preserve"><value>Недоступно в этой итерации</value></data>
+  <data name="Coaching.NewPack.GameControl.Start" xml:space="preserve"><value>Начать · шаг 1 из 5</value></data>
+  <data name="Coaching.MapControlEditor.Title" xml:space="preserve"><value>Контроль нейтральных объектов</value></data>
+  <data name="Coaching.MapControlEditor.TypeBadge" xml:space="preserve"><value>Контроль карты</value></data>
+  <data name="Coaching.MapControlEditor.StepSummary.Main" xml:space="preserve"><value>Шаг 1 из 5 · Основная информация</value></data>
+  <data name="Coaching.MapControlEditor.StepSummary.Scope" xml:space="preserve"><value>Шаг 2 из 5 · Область применения</value></data>
+  <data name="Coaching.MapControlEditor.StepSummary.Content" xml:space="preserve"><value>Шаг 3 из 5 · Содержание</value></data>
+  <data name="Coaching.MapControlEditor.StepSummary.Verification" xml:space="preserve"><value>Шаг 4 из 5 · Проверка</value></data>
+  <data name="Coaching.MapControlEditor.StepSummary.Save" xml:space="preserve"><value>Шаг 5 из 5 · Сохранение</value></data>
+  <data name="Coaching.MapControlEditor.Step.Main" xml:space="preserve"><value>Основная информация</value></data>
+  <data name="Coaching.MapControlEditor.Step.Scope" xml:space="preserve"><value>Область применения</value></data>
+  <data name="Coaching.MapControlEditor.Step.Content" xml:space="preserve"><value>Содержание</value></data>
+  <data name="Coaching.MapControlEditor.Step.Verification" xml:space="preserve"><value>Проверка</value></data>
+  <data name="Coaching.MapControlEditor.Step.Save" xml:space="preserve"><value>Сохранение</value></data>
+  <data name="Coaching.MapControlEditor.Main.Description" xml:space="preserve"><value>Название и описание видны в библиотеке коучинга и в журнале советов во время матча.</value></data>
+  <data name="Coaching.MapControlEditor.Main.PackName" xml:space="preserve"><value>Название набора</value></data>
+  <data name="Coaching.MapControlEditor.Main.ShortDescription" xml:space="preserve"><value>Краткое описание</value></data>
+  <data name="Coaching.MapControlEditor.Main.ContentLanguage" xml:space="preserve"><value>Язык содержимого</value></data>
+  <data name="Coaching.MapControlEditor.Main.LanguageHint" xml:space="preserve"><value>Интерфейс TempoCue переключается между языками, но текст набора остаётся таким, каким вы его написали.</value></data>
+  <data name="Coaching.MapControlEditor.Main.Map" xml:space="preserve"><value>Карта</value></data>
+  <data name="Coaching.MapControlEditor.Main.SummonersRift" xml:space="preserve"><value>Ущелье призывателей</value></data>
+  <data name="Coaching.MapControlEditor.Main.FirstVersion" xml:space="preserve"><value>Первая версия</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Title" xml:space="preserve"><value>Область применения</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Description" xml:space="preserve"><value>Набор не сработает, если роль или сторона игрока не совпадают. Эти же ограничения проверяет симулятор на четвёртом шаге.</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Roles" xml:space="preserve"><value>Роли</value></data>
+  <data name="Coaching.MapControlEditor.Scope.AllRoles" xml:space="preserve"><value>Все роли</value></data>
+  <data name="Coaching.MapControlEditor.Scope.TeamSide" xml:space="preserve"><value>Сторона команды</value></data>
+  <data name="Coaching.MapControlEditor.Scope.AnySide" xml:space="preserve"><value>Любая</value></data>
+  <data name="Coaching.MapControlEditor.Scope.BlueSide" xml:space="preserve"><value>Синяя</value></data>
+  <data name="Coaching.MapControlEditor.Scope.RedSide" xml:space="preserve"><value>Красная</value></data>
+  <data name="Coaching.MapControlEditor.Scope.GameMode.Title" xml:space="preserve"><value>Про режим игры</value></data>
+  <data name="Coaching.MapControlEditor.Scope.GameMode.Description" xml:space="preserve"><value>Обычные и ранговые матчи не разделяются: первая версия не получает для этого достаточно надёжного сигнала.</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Result.Title" xml:space="preserve"><value>Что получится</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Result.Hint" xml:space="preserve"><value>Резюме обновляется сразу — так видно, что именно сохранится в наборе.</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Summary" xml:space="preserve"><value>Набор применяется на карте «Ущелье призывателей» для: {0}; сторона: {1}.</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Summary.AllRoles" xml:space="preserve"><value>все роли</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Summary.AnySide" xml:space="preserve"><value>любая</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Summary.BlueSide" xml:space="preserve"><value>синяя</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Summary.RedSide" xml:space="preserve"><value>красная</value></data>
+  <data name="Coaching.MapControlEditor.FutureStep" xml:space="preserve"><value>Поля этого шага появятся в следующей проверяемой итерации.</value></data>
   <data name="Coaching.NewPack.Soon" xml:space="preserve"><value>Скоро</value></data>
   <data name="Coaching.MatchupEditor.Back" xml:space="preserve"><value>Назад</value></data>
   <data name="Coaching.MatchupEditor.Close" xml:space="preserve"><value>Закрыть редактор</value></data>
@@ -752,7 +800,7 @@
   <data name="Settings.Overlay.Duration.Warning" xml:space="preserve"><value>Опасные уведомления всегда остаются на экране не менее 6 секунд, чтобы их нельзя было пропустить.</value></data>
   <data name="Settings.Overlay.Duration.SecondsSuffix" xml:space="preserve"><value>с</value></data>
   <data name="Settings.Overlay.Persistent.Label" xml:space="preserve"><value>Постоянные советы на весь матч</value></data>
-  <data name="Settings.Overlay.Persistent.Summary" xml:space="preserve"><value>Механические подсказки матчапа, не привязанные к моменту</value></data>
+  <data name="Settings.Overlay.Persistent.Summary" xml:space="preserve"><value>Подсказки матчапа и контроля карты, не привязанные к точному моменту</value></data>
   <data name="Settings.Overlay.Persistent.Once" xml:space="preserve"><value>Один раз за матч</value></data>
   <data name="Settings.Overlay.Persistent.Recommended" xml:space="preserve"><value>рекомендуется</value></data>
   <data name="Settings.Overlay.Persistent.Once.Hint" xml:space="preserve"><value>Советы появляются постепенно и не повторяются после окончания списка.</value></data>
@@ -760,7 +808,7 @@
   <data name="Settings.Overlay.Persistent.Level.Hint" xml:space="preserve"><value>Следующий совет появляется при повышении уровня. Один и тот же совет повторяется не раньше чем через три уровня.</value></data>
   <data name="Settings.Overlay.Persistent.Disabled" xml:space="preserve"><value>Не показывать автоматически</value></data>
   <data name="Settings.Overlay.Persistent.Disabled.Hint" xml:space="preserve"><value>Постоянные советы останутся доступны в подробностях Coach Pack.</value></data>
-  <data name="Settings.Overlay.Persistent.ScopeHint" xml:space="preserve"><value>Смена фаз и опасные события всегда показываются отдельно и не зависят от этой настройки.</value></data>
+  <data name="Settings.Overlay.Persistent.ScopeHint" xml:space="preserve"><value>Смена фаз, объектные правила и напоминания по времени показываются отдельно и не зависят от этой настройки.</value></data>
   <data name="Settings.Overlay.Reset.Button" xml:space="preserve"><value>Значения по умолчанию</value></data>
   <data name="Settings.Overlay.Save.Button" xml:space="preserve"><value>Сохранить настройки</value></data>
   <data name="Settings.Overlay.Unsaved" xml:space="preserve"><value>Есть несохранённые изменения</value></data>
@@ -779,4 +827,164 @@
   <data name="Settings.Overlay.Preview.Close" xml:space="preserve"><value>Закрыть оверлей</value></data>
   <data name="Overlay.Matchup.Dismiss" xml:space="preserve"><value>Скрыть совет</value></data>
   <data name="Overlay.Matchup.PersistentTip.Status" xml:space="preserve"><value>Подсказка по матчапу</value></data>
+  <data name="Overlay.MapControl.Status" xml:space="preserve"><value>Контроль карты</value></data>
+  <data name="Overlay.MapControl.PersistentTip.Status" xml:space="preserve"><value>Подсказка по карте</value></data>
+  <data name="Overlay.MapControl.Dismiss" xml:space="preserve"><value>Скрыть напоминание</value></data>
+  <data name="Overlay.MapControl.TargetTime" xml:space="preserve"><value>К {0}</value></data>
+  <data name="Overlay.MapControl.GenericTitle" xml:space="preserve"><value>Напоминание по карте</value></data>
+  <data name="Coaching.MapControlEditor.Content.Tab.Objects" xml:space="preserve"><value>Объекты · {0}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Tab.Timed" xml:space="preserve"><value>Напоминания по времени · {0}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Tab.Persistent" xml:space="preserve"><value>Постоянные подсказки · {0}</value></data>
+  <data name="Coaching.MapControlEditor.Content.CatalogTitle" xml:space="preserve"><value>TempoCue знает расписание объектов</value></data>
+  <data name="Coaching.MapControlEditor.Content.CatalogUnavailable" xml:space="preserve"><value>Выберите поддерживаемый игровой патч на первом шаге.</value></data>
+  <data name="Coaching.MapControlEditor.Content.CatalogCurrentPatch" xml:space="preserve"><value>Тайминги проверены для патча {0}. Вы выбираете только момент и текст напоминания.</value></data>
+  <data name="Coaching.MapControlEditor.Content.CatalogPreviousPatch" xml:space="preserve"><value>Для патча {0} используются последние проверенные тайминги патча {1}. Правила остаются активными и помечаются для проверки.</value></data>
+  <data name="Coaching.MapControlEditor.Content.RulesTitle" xml:space="preserve"><value>Правила по объектам</value></data>
+  <data name="Coaching.MapControlEditor.Content.RulesDescriptionCurrentPatch" xml:space="preserve"><value>TempoCue использует проверенные тайминги объектов для патча {1}. Укажите только момент напоминания и совет.</value></data>
+  <data name="Coaching.MapControlEditor.Content.RulesDescriptionPreviousPatch" xml:space="preserve"><value>Для патча {0} используются последние проверенные тайминги патча {1}. Правила остаются активными и помечаются для проверки.</value></data>
+  <data name="Coaching.MapControlEditor.Content.AddRule" xml:space="preserve"><value>+ Добавить правило объекта</value></data>
+  <data name="Coaching.MapControlEditor.Content.EmptyRules" xml:space="preserve"><value>Правил объектов пока нет. Добавьте первое, чтобы продолжить.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Edit" xml:space="preserve"><value>Редактировать</value></data>
+  <data name="Coaching.MapControlEditor.Content.Duplicate" xml:space="preserve"><value>Дублировать</value></data>
+  <data name="Coaching.MapControlEditor.Content.Delete" xml:space="preserve"><value>Удалить</value></data>
+  <data name="Coaching.MapControlEditor.Content.DeleteRule" xml:space="preserve"><value>Удалить правило</value></data>
+  <data name="Coaching.MapControlEditor.Content.Cancel" xml:space="preserve"><value>Отмена</value></data>
+  <data name="Coaching.MapControlEditor.Content.Picker.Title" xml:space="preserve"><value>Выберите объект</value></data>
+  <data name="Coaching.MapControlEditor.Content.Picker.Description" xml:space="preserve"><value>Объект определяет, какой тайминг патча использует TempoCue.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Picker.Notice" xml:space="preserve"><value>Доступны только объекты из каталога таймингов. Условия, зависящие от анализа миникарты, в этот релиз не входят.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Objective.Dragon" xml:space="preserve"><value>Дракон</value></data>
+  <data name="Coaching.MapControlEditor.Content.Objective.Grubs" xml:space="preserve"><value>Личинки Бездны</value></data>
+  <data name="Coaching.MapControlEditor.Content.Objective.Herald" xml:space="preserve"><value>Герольд</value></data>
+  <data name="Coaching.MapControlEditor.Content.Objective.Baron" xml:space="preserve"><value>Барон Нашор</value></data>
+  <data name="Coaching.MapControlEditor.Content.Objective.Respawns" xml:space="preserve"><value>Первое появление и возрождение после подтверждённого убийства</value></data>
+  <data name="Coaching.MapControlEditor.Content.Objective.Once" xml:space="preserve"><value>Одно запланированное появление в текущем каталоге</value></data>
+  <data name="Coaching.MapControlEditor.Content.Objective.TimingRespawns" xml:space="preserve"><value>Первый: {0} · возрождение: {1}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Objective.TimingOnce" xml:space="preserve"><value>Появление: {0}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Priority.Information" xml:space="preserve"><value>Информация</value></data>
+  <data name="Coaching.MapControlEditor.Content.Priority.Caution" xml:space="preserve"><value>Осторожно</value></data>
+  <data name="Coaching.MapControlEditor.Content.Priority.Important" xml:space="preserve"><value>Важно</value></data>
+  <data name="Coaching.MapControlEditor.Content.Recurrence.Once" xml:space="preserve"><value>Один раз за матч</value></data>
+  <data name="Coaching.MapControlEditor.Content.Recurrence.EveryCycle" xml:space="preserve"><value>Каждый доступный цикл</value></data>
+  <data name="Coaching.MapControlEditor.Content.Recurrence.Once.Description" xml:space="preserve"><value>Напоминание покажется только для первого подходящего события.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Recurrence.EveryCycle.Initial.Description" xml:space="preserve"><value>Покажется для первого появления и повторится для каждого возрождения после подтверждённого взятия.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Recurrence.EveryCycle.Respawn.Description" xml:space="preserve"><value>Повторится перед каждым следующим появлением после подтверждённого взятия.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Recurrence.EveryCycle.AfterKill.Description" xml:space="preserve"><value>Повторится после каждого подтверждённого взятия объекта.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Recurrence.EveryCycle.Unavailable.Description" xml:space="preserve"><value>Недоступно: у выбранного объекта нет цикла возрождения.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Trigger.BeforeInitial" xml:space="preserve"><value>До первого появления</value></data>
+  <data name="Coaching.MapControlEditor.Content.Trigger.AtInitial" xml:space="preserve"><value>В момент первого появления</value></data>
+  <data name="Coaching.MapControlEditor.Content.Trigger.BeforeRespawn" xml:space="preserve"><value>До следующего появления после взятия</value></data>
+  <data name="Coaching.MapControlEditor.Content.Trigger.AfterKill" xml:space="preserve"><value>Сразу после взятия</value></data>
+  <data name="Coaching.MapControlEditor.Content.Trigger.BeforeInitial.Description" xml:space="preserve"><value>Считается от системного времени первого появления объекта.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Trigger.AtInitial.Description" xml:space="preserve"><value>Срабатывает ровно в момент, который TempoCue берёт из каталога.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Trigger.BeforeRespawn.Description" xml:space="preserve"><value>Нужно событие взятия из Live Client Data. Доступно только для возрождающихся объектов.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Trigger.AfterKill.Description" xml:space="preserve"><value>Срабатывает по событию взятия объекта любой командой.</value></data>
+  <data name="Coaching.MapControlEditor.Content.TriggerSummary.Before" xml:space="preserve"><value>За {0} сек.: {1}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.Title" xml:space="preserve"><value>Правило объекта: {0}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.Timing.Respawns" xml:space="preserve"><value>Тайминг TempoCue: первое появление в {0}, возрождение через {1} после подтверждённого взятия.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.Timing.Once" xml:space="preserve"><value>Тайминг TempoCue: появление в {0}; у объекта нет цикла возрождения.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.Trigger" xml:space="preserve"><value>Когда показать напоминание</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.LeadTime" xml:space="preserve"><value>За сколько предупредить</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.Recurrence" xml:space="preserve"><value>Повторение</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.Priority" xml:space="preserve"><value>Приоритет</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.LiveSummaryTitle" xml:space="preserve"><value>Как это сработает</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.LiveSummary" xml:space="preserve"><value>{0}; {1}.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.Message" xml:space="preserve"><value>Главный совет (его игрок видит первым)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.WhyNow" xml:space="preserve"><value>Почему сейчас (короткое объяснение)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.NextGoal" xml:space="preserve"><value>Что подготовить к объекту (необязательно)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Card.WhyNow" xml:space="preserve"><value>Почему сейчас</value></data>
+  <data name="Coaching.MapControlEditor.Content.Card.Preparation" xml:space="preserve"><value>Что подготовить к объекту</value></data>
+  <data name="Coaching.MapControlEditor.Content.Editor.Done" xml:space="preserve"><value>Готово</value></data>
+  <data name="Coaching.MapControlEditor.Content.DuplicateName" xml:space="preserve"><value>{0} — копия</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.ListTitle" xml:space="preserve"><value>Напоминания по игровому времени</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Description" xml:space="preserve"><value>Привязаны к конкретной минуте матча, а не к системному событию. Карточки автоматически сортируются по времени.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Add" xml:space="preserve"><value>+ Добавить напоминание</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Empty" xml:space="preserve"><value>Напоминаний по времени пока нет. Добавьте первое, если совет должен появиться в конкретный момент матча.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Editor.Title" xml:space="preserve"><value>Напоминание по времени</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Editor.Progress" xml:space="preserve"><value>Напоминание {0} из {1}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.GameTime" xml:space="preserve"><value>Игровое время</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.GameTime.Hint" xml:space="preserve"><value>Введите минуты (30) или ММСС (1330 = 13:30). Шаг 15 секунд; один раз за матч.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Name" xml:space="preserve"><value>Название (короткое название в списке)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Message" xml:space="preserve"><value>Главный совет (его игрок видит первым)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.WhyNow" xml:space="preserve"><value>Почему сейчас (короткое объяснение)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.NextGoal" xml:space="preserve"><value>Что подготовить к объекту (необязательно)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Future.Title" xml:space="preserve"><value>Появится после анализа мини-карты</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Future.Description" xml:space="preserve"><value>Первая версия не анализирует изображение мини-карты, поэтому такие условия пока нельзя выбрать.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Future.Items" xml:space="preserve"><value>Вражеский лесник замечен · Противник пропал с линии · Поставлен вражеский вард · Команда собралась у объекта</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.ListTitle" xml:space="preserve"><value>Постоянные подсказки</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Description" xml:space="preserve"><value>Подсказки доступны в деталях набора и по одной показываются оверлеем при подходящем повышении уровня. Срочные напоминания объектов и времени имеют приоритет.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Add" xml:space="preserve"><value>+ Добавить подсказку</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Empty" xml:space="preserve"><value>Постоянных подсказок пока нет. Добавьте первую, если набору нужна справочная рекомендация.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Editor.AddTitle" xml:space="preserve"><value>Постоянная подсказка</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Editor.EditTitle" xml:space="preserve"><value>Редактирование подсказки</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Editor.Progress" xml:space="preserve"><value>Подсказка {0} из {1}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Title" xml:space="preserve"><value>Заголовок</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Message" xml:space="preserve"><value>Текст (одно-два предложения)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Scope" xml:space="preserve"><value>Где применима</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Scope.WholeMatch" xml:space="preserve"><value>Весь матч</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Scope.BeforeFirstObjective" xml:space="preserve"><value>До первого объекта</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Scope.WhileObjectiveAvailable" xml:space="preserve"><value>Пока доступен любой объект</value></data>
+  <data name="Coaching.MapControlEditor.Content.Persistent.Scope.Hint" xml:space="preserve"><value>«Любой объект» — Дракон, Личинки Бездны, Герольд или Барон уже появились и ещё не были взяты.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Result" xml:space="preserve"><value>Результат проверки</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Errors" xml:space="preserve"><value>Ошибок: {0}</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Warnings" xml:space="preserve"><value>Предупреждений: {0}</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Status.Success" xml:space="preserve"><value>Ошибок не найдено</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Status.Success.Description" xml:space="preserve"><value>Настройки набора согласованы. Можно переходить к сохранению.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Status.Attention" xml:space="preserve"><value>Набор требует внимания</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Status.Attention.Description" xml:space="preserve"><value>Перед сохранением проверьте замечания ниже.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Issue.TimingsUnavailable" xml:space="preserve"><value>В TempoCue нет расписания объектов для выбранного патча.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Issue.PreviousPatch" xml:space="preserve"><value>Для патча {0} используются последние тайминги, проверенные на патче {1}. Правила остаются активными, но требуют проверки.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Issue.EmptyContent" xml:space="preserve"><value>Добавьте хотя бы одно правило объекта, напоминание по времени или постоянную подсказку.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Issue.OpenEditor" xml:space="preserve"><value>Завершите редактирование или удалите незаполненную карточку перед проверкой.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Issue.DuplicateTimes" xml:space="preserve"><value>Несколько напоминаний появятся одновременно: {0}.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Timeline" xml:space="preserve"><value>Временная шкала</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Timeline.Description" xml:space="preserve"><value>Кружки — системные события только для настроенных в наборе объектов. Квадраты — ваши напоминания по времени.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Legend.System" xml:space="preserve"><value>Системное событие</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Legend.User" xml:space="preserve"><value>Ваше напоминание</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary" xml:space="preserve"><value>Сводка набора</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Rules" xml:space="preserve"><value>Правила объектов</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Timed" xml:space="preserve"><value>Напоминания по времени</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Persistent" xml:space="preserve"><value>Постоянные подсказки</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Patch" xml:space="preserve"><value>Патч каталога</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Scope" xml:space="preserve"><value>Область</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Side" xml:space="preserve"><value>Сторона команды</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Title" xml:space="preserve"><value>Источник</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Description" xml:space="preserve"><value>Личный опыт — полноценный источник. Для статьи, видео и тренерских материалов укажите название и автора.</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Personal" xml:space="preserve"><value>Личный опыт</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Article" xml:space="preserve"><value>Статья или гайд</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Video" xml:space="preserve"><value>Видео</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Training" xml:space="preserve"><value>Тренерские материалы</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Name" xml:space="preserve"><value>Название источника · обязательное поле</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Author" xml:space="preserve"><value>Автор источника · обязательное поле</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Link" xml:space="preserve"><value>Ссылка · необязательно</value></data>
+  <data name="Coaching.MapControlEditor.Save.Source.Validation" xml:space="preserve"><value>Укажите название и автора. Если добавляете ссылку, она должна начинаться с http:// или https://.</value></data>
+  <data name="Coaching.MapControlEditor.Save.Card.Title" xml:space="preserve"><value>Карточка набора</value></data>
+  <data name="Coaching.MapControlEditor.Save.Card.Name" xml:space="preserve"><value>Название</value></data>
+  <data name="Coaching.MapControlEditor.Save.Card.Type" xml:space="preserve"><value>Тип</value></data>
+  <data name="Coaching.MapControlEditor.Save.Card.Scope" xml:space="preserve"><value>Область</value></data>
+  <data name="Coaching.MapControlEditor.Save.Card.Patch" xml:space="preserve"><value>Патч</value></data>
+  <data name="Coaching.MapControlEditor.Save.Card.Language" xml:space="preserve"><value>Язык содержимого</value></data>
+  <data name="Coaching.MapControlEditor.Save.Action.Enable" xml:space="preserve"><value>Сохранить и включить</value></data>
+  <data name="Coaching.MapControlEditor.Save.Action.Draft" xml:space="preserve"><value>Сохранить черновик</value></data>
+  <data name="Coaching.MapControlEditor.Save.Status.Saving" xml:space="preserve"><value>Сохраняем набор контроля карты…</value></data>
+  <data name="Coaching.MapControlEditor.Save.Status.DraftSaved" xml:space="preserve"><value>Черновик сохранён локально.</value></data>
+  <data name="Coaching.MapControlEditor.Save.Status.EnabledSaved" xml:space="preserve"><value>Набор контроля карты сохранён и включён.</value></data>
+  <data name="Coaching.MapControlEditor.Save.Status.Failed" xml:space="preserve"><value>Не удалось сохранить набор. Проверьте доступ к локальным данным TempoCue.</value></data>
+  <data name="Coaching.MapControl.Details.Header" xml:space="preserve"><value>Контроль карты · {0} · {1} · {2}</value></data>
+  <data name="Coaching.MapControl.Details.Export.Filter" xml:space="preserve"><value>Набор контроля карты TempoCue (*.tempocue.json)|*.tempocue.json|JSON (*.json)|*.json</value></data>
+  <data name="Coaching.MapControl.Details.Tab.Overview" xml:space="preserve"><value>Обзор</value></data>
+  <data name="Coaching.MapControl.Details.Tab.Objectives" xml:space="preserve"><value>Объекты</value></data>
+  <data name="Coaching.MapControl.Details.Tab.Timed" xml:space="preserve"><value>По времени</value></data>
+  <data name="Coaching.MapControl.Details.Tab.Persistent" xml:space="preserve"><value>Постоянные</value></data>
+  <data name="Coaching.MapControl.Details.Overview.Type" xml:space="preserve"><value>Контроль карты</value></data>
+  <data name="Coaching.MapControl.Details.Overview.Roles" xml:space="preserve"><value>Роли</value></data>
+  <data name="Coaching.MapControl.Details.Overview.TeamSide" xml:space="preserve"><value>Сторона команды</value></data>
+  <data name="Coaching.MapControl.Details.Overview.Content" xml:space="preserve"><value>Содержание набора</value></data>
+  <data name="Coaching.MapControl.Details.Overview.ContentValue" xml:space="preserve"><value>Правила объектов: {0} · по времени: {1} · постоянные: {2}</value></data>
+  <data name="Coaching.MapControl.Details.Objectives.Title" xml:space="preserve"><value>Правила по объектам</value></data>
+  <data name="Coaching.MapControl.Details.Objectives.Empty" xml:space="preserve"><value>В наборе нет правил по объектам.</value></data>
+  <data name="Coaching.MapControl.Details.Timed.Title" xml:space="preserve"><value>Напоминания по времени</value></data>
+  <data name="Coaching.MapControl.Details.Timed.Empty" xml:space="preserve"><value>В наборе нет напоминаний по времени.</value></data>
+  <data name="Coaching.MapControl.Details.Persistent.Title" xml:space="preserve"><value>Постоянные подсказки</value></data>
+  <data name="Coaching.MapControl.Details.Persistent.Empty" xml:space="preserve"><value>В наборе нет постоянных подсказок.</value></data>
+  <data name="Coaching.MapControl.Details.ReadOnly" xml:space="preserve"><value>Только для чтения. Чтобы изменить содержимое, откройте редактор набора.</value></data>
 </root>

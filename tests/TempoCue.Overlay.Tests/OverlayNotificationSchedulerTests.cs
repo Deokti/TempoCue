@@ -149,11 +149,17 @@ public sealed class OverlayNotificationSchedulerTests
     }
 
     [Fact]
-    public void Advance_PromotesLowPriorityCardAfterCadenceWithoutVisibleCards()
+    public void Advance_PromotesLearningCardAfterCadenceWithoutVisibleCards()
     {
         var scheduler = new OverlayNotificationScheduler();
-        scheduler.Publish(Create("coach", OverlayNotificationTone.Coach), Start);
-        scheduler.Publish(Create("info", OverlayNotificationTone.Information), Start.AddSeconds(1));
+        scheduler.Publish(Create(
+            "coach",
+            OverlayNotificationTone.Coach,
+            purpose: OverlayNotificationPurpose.Learning), Start);
+        scheduler.Publish(Create(
+            "info",
+            OverlayNotificationTone.Information,
+            purpose: OverlayNotificationPurpose.Learning), Start.AddSeconds(1));
 
         var betweenCards = scheduler.Advance(Start.AddSeconds(7));
         Assert.Empty(betweenCards.Items);
@@ -164,14 +170,79 @@ public sealed class OverlayNotificationSchedulerTests
         Assert.False(promoted.HasPending);
     }
 
+    [Fact]
+    public void Publish_OperationalNotificationBypassesLearningCadence()
+    {
+        var scheduler = new OverlayNotificationScheduler();
+        scheduler.Publish(Create(
+            "learning",
+            OverlayNotificationTone.Coach,
+            purpose: OverlayNotificationPurpose.Learning), Start);
+
+        var snapshot = scheduler.Publish(
+            Create("objective", OverlayNotificationTone.Information),
+            Start.AddSeconds(1));
+
+        Assert.Equal(
+            ["objective", "learning"],
+            snapshot.Items.Select(item => item.Notification.Key));
+    }
+
+    [Fact]
+    public void Publish_LearningNotificationCannotDisplaceOperationalCards()
+    {
+        var scheduler = new OverlayNotificationScheduler();
+        scheduler.Publish(Create("no-data", OverlayNotificationTone.NoData), Start);
+        scheduler.Publish(Create("information", OverlayNotificationTone.Information), Start);
+
+        var snapshot = scheduler.Publish(
+            Create(
+                "learning-danger",
+                OverlayNotificationTone.Danger,
+                purpose: OverlayNotificationPurpose.Learning),
+            Start.AddSeconds(1));
+
+        Assert.Equal(
+            ["information", "no-data"],
+            snapshot.Items.Select(item => item.Notification.Key));
+        Assert.True(snapshot.HasPending);
+    }
+
+    [Fact]
+    public void Publish_OperationalNotificationDisplacesLearningCardRegardlessOfTone()
+    {
+        var scheduler = new OverlayNotificationScheduler(new OverlayDisplayPolicy
+        {
+            LearningCadence = TimeSpan.Zero
+        });
+        scheduler.Publish(Create(
+            "learning-danger",
+            OverlayNotificationTone.Danger,
+            purpose: OverlayNotificationPurpose.Learning), Start);
+        scheduler.Publish(Create(
+            "learning-caution",
+            OverlayNotificationTone.Caution,
+            purpose: OverlayNotificationPurpose.Learning), Start);
+
+        var snapshot = scheduler.Publish(
+            Create("operational-no-data", OverlayNotificationTone.NoData),
+            Start.AddSeconds(1));
+
+        Assert.Equal(
+            ["operational-no-data", "learning-danger"],
+            snapshot.Items.Select(item => item.Notification.Key));
+    }
+
     private static OverlayNotification Create(
         string key,
         OverlayNotificationTone tone,
-        string phrase = "Фраза") => new(
+        string phrase = "Фраза",
+        OverlayNotificationPurpose purpose = OverlayNotificationPurpose.Operational) => new(
         key,
         "Статус",
         phrase,
         "Источник",
         "Закрыть",
-        tone);
+        tone,
+        purpose: purpose);
 }

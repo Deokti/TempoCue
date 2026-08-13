@@ -23,6 +23,12 @@ public partial class CoachingLibraryView : UserControl
 
     public event EventHandler<CoachingPackEventArgs>? PackDeleteRequested;
 
+    public event EventHandler<MapControlPackEventArgs>? MapControlPackOpenRequested;
+
+    public event EventHandler<MapControlPackEventArgs>? MapControlPackExportRequested;
+
+    public event EventHandler<MapControlPackEventArgs>? MapControlPackDeleteRequested;
+
     private CoachingLibraryViewModel ViewModel => (CoachingLibraryViewModel)DataContext;
 
     private async void CoachingLibraryView_Loaded(object sender, RoutedEventArgs e) =>
@@ -60,6 +66,50 @@ public partial class CoachingLibraryView : UserControl
         }
 
         toggle.IsEnabled = true;
+    }
+
+    private async void MapControlPackEnabledToggle_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not ToggleButton toggle
+            || toggle.DataContext is not MapControlPackCardViewModel card)
+        {
+            return;
+        }
+
+        toggle.IsEnabled = false;
+        var wasSaved = await ViewModel.SetMapControlPackEnabledAsync(
+            card,
+            toggle.IsChecked == true);
+        if (!wasSaved)
+        {
+            toggle.IsChecked = card.IsEnabled;
+        }
+
+        toggle.IsEnabled = true;
+    }
+
+    private void OpenMapControlPackButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { DataContext: MapControlPackCardViewModel card })
+        {
+            MapControlPackOpenRequested?.Invoke(this, new MapControlPackEventArgs(card));
+        }
+    }
+
+    private void MapControlPackActionsMenu_ExportRequested(object? sender, EventArgs e)
+    {
+        if (sender is CoachPackActionsMenu { DataContext: MapControlPackCardViewModel card })
+        {
+            MapControlPackExportRequested?.Invoke(this, new MapControlPackEventArgs(card));
+        }
+    }
+
+    private void MapControlPackActionsMenu_DeleteRequested(object? sender, EventArgs e)
+    {
+        if (sender is CoachPackActionsMenu { DataContext: MapControlPackCardViewModel card })
+        {
+            MapControlPackDeleteRequested?.Invoke(this, new MapControlPackEventArgs(card));
+        }
     }
 
     private void PackActionsMenu_ExportRequested(object? sender, EventArgs e)

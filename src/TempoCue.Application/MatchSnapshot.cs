@@ -6,5 +6,4 @@ namespace TempoCue.Application;
 public sealed record MatchSnapshot(
     MatchState Match,
     IReadOnlyList<MatchEvent> Events,
-    string RawJson,
     DateTimeOffset ReceivedAtUtc);

@@ -63,6 +63,137 @@ public sealed class CoachingLibraryViewTests
     });
 
     [Fact]
+    public void Library_ShowsSavedMapControlPackAndPersistsToggle() => WpfTestHost.Run(() =>
+    {
+        using var context = new MainWindowTestContext();
+        var pack = TestMapControlPackFactory.Create() with
+        {
+            Name = "Контроль раннего дракона",
+            Author = string.Empty
+        };
+        context.MapControlPackStore.SaveAsync(pack, LocalCoachPackState.Enabled)
+            .GetAwaiter()
+            .GetResult();
+        var libraryPage = OpenLibrary(context);
+        var coachingTabs = WpfTestHost.Find<TabControl>(
+            libraryPage,
+            "CoachingSectionsTabControl");
+
+        coachingTabs.SelectedIndex = 1;
+        WpfTestHost.Pump(DispatcherPriority.ApplicationIdle);
+
+        var card = Assert.Single(context.Coaching.Library.MapControlCards);
+        Assert.Equal(pack.Id, card.Pack.Id);
+        Assert.Equal("Контроль раннего дракона", card.Title);
+        Assert.Contains("все роли · вы", card.Details);
+        Assert.Contains("1 совет", card.AdviceCount);
+        Assert.False(WpfTestHost.Find<Border>(libraryPage, "MapControlEmptyState").IsVisible);
+        var toggle = Assert.Single(
+            WpfTestHost.FindVisualDescendants<ToggleButton>(libraryPage),
+            candidate => candidate.Name == "MapControlPackEnabledToggle");
+        Assert.True(toggle.IsChecked);
+        SaveVisualSnapshotIfRequested(context.Window, "coaching-library-map-control.png");
+
+        WpfTestHost.Click(toggle);
+        WpfTestHost.Pump(DispatcherPriority.ApplicationIdle);
+
+        card = Assert.Single(context.Coaching.Library.MapControlCards);
+        Assert.True(card.IsDisabled);
+        Assert.False(card.IsEnabled);
+    });
+
+    [Fact]
+    public void Library_MapControlCardOpensDetailsAndOffersFileActions() => WpfTestHost.Run(() =>
+    {
+        using var context = new MainWindowTestContext();
+        var pack = TestMapControlPackFactory.Create("map-control.details-test");
+        context.MapControlPackStore.SaveAsync(pack, LocalCoachPackState.Enabled)
+            .GetAwaiter()
+            .GetResult();
+        var libraryPage = OpenLibrary(context);
+        context.Coaching.Library.RefreshAsync().GetAwaiter().GetResult();
+        WpfTestHost.Find<TabControl>(libraryPage, "CoachingSectionsTabControl").SelectedIndex = 1;
+        WpfTestHost.Pump(DispatcherPriority.ApplicationIdle);
+
+        var openButton = Assert.Single(
+            WpfTestHost.FindVisualDescendants<Button>(libraryPage),
+            button => button.DataContext is MapControlPackCardViewModel card
+                      && card.Pack.Id == pack.Id
+                      && Equals(button.Content, context.Localization.Get("Coaching.Library.Open")));
+        var actionsMenu = Assert.Single(
+            WpfTestHost.FindVisualDescendants<CoachPackActionsMenu>(libraryPage),
+            menu => menu.DataContext is MapControlPackCardViewModel card
+                    && card.Pack.Id == pack.Id);
+        Assert.True(actionsMenu.CanExport);
+        Assert.True(actionsMenu.CanDelete);
+
+        WpfTestHost.Click(openButton);
+        WpfTestHost.Pump(DispatcherPriority.ApplicationIdle);
+
+        Assert.Equal(CoachingScreen.MapControlPackDetails, context.Coaching.CurrentScreen);
+        Assert.Equal(pack.Id, context.Coaching.MapControlDetails.Pack?.Id);
+        Assert.Single(context.Coaching.MapControlDetails.Rules);
+        Assert.True(context.MapControlPackDetailsPage.IsVisible);
+        Assert.True(WpfTestHost.Find<Button>(
+            context.MapControlPackDetailsPage,
+            "MapControlPackEditActionButton").IsEnabled);
+        var detailsActionsMenu = WpfTestHost.Find<CoachPackActionsMenu>(
+            context.MapControlPackDetailsPage,
+            "MapControlPackActionsMenu");
+        Assert.True(detailsActionsMenu.CanExport);
+        Assert.True(detailsActionsMenu.CanDelete);
+        SaveVisualSnapshotIfRequested(
+            context.Window,
+            "map-control-pack-details.png");
+
+        WpfTestHost.Click(WpfTestHost.Find<Button>(
+            context.MapControlPackDetailsPage,
+            "ObjectivesTabButton"));
+        WpfTestHost.Pump(DispatcherPriority.ApplicationIdle);
+        Assert.Equal(MapControlPackDetailsTab.Objectives, context.Coaching.MapControlDetails.CurrentTab);
+        Assert.True(WpfTestHost.Find<StackPanel>(
+            context.MapControlPackDetailsPage,
+            "ObjectivesPanel").IsVisible);
+        SaveVisualSnapshotIfRequested(context.Window, "map-control-pack-objectives.png");
+
+        WpfTestHost.Click(WpfTestHost.Find<Button>(
+            context.MapControlPackDetailsPage,
+            "TimedTabButton"));
+        WpfTestHost.Pump(DispatcherPriority.ApplicationIdle);
+        Assert.Equal(MapControlPackDetailsTab.TimedReminders, context.Coaching.MapControlDetails.CurrentTab);
+        Assert.True(WpfTestHost.Find<StackPanel>(
+            context.MapControlPackDetailsPage,
+            "TimedPanel").IsVisible);
+        SaveVisualSnapshotIfRequested(context.Window, "map-control-pack-timed.png");
+
+        WpfTestHost.Click(WpfTestHost.Find<Button>(
+            context.MapControlPackDetailsPage,
+            "PersistentTabButton"));
+        WpfTestHost.Pump(DispatcherPriority.ApplicationIdle);
+        Assert.Equal(MapControlPackDetailsTab.PersistentTips, context.Coaching.MapControlDetails.CurrentTab);
+        Assert.True(WpfTestHost.Find<StackPanel>(
+            context.MapControlPackDetailsPage,
+            "PersistentPanel").IsVisible);
+        SaveVisualSnapshotIfRequested(context.Window, "map-control-pack-persistent.png");
+
+        WpfTestHost.Click(WpfTestHost.Find<Button>(
+            context.MapControlPackDetailsPage,
+            "MapControlPackEditActionButton"));
+        WpfTestHost.Pump(DispatcherPriority.ApplicationIdle);
+        Assert.Equal(CoachingScreen.MapControlEditor, context.Coaching.CurrentScreen);
+        Assert.Equal(MatchupEditorMode.Edit, context.Coaching.MapControlEditor.Mode);
+        var closeEditorButton = WpfTestHost.Find<Button>(
+            context.MapControlEditorPage,
+            "CloseMapControlEditorButton");
+        Assert.Equal(Visibility.Visible, closeEditorButton.Visibility);
+        SaveVisualSnapshotIfRequested(context.Window, "map-control-editor-close-action.png");
+
+        WpfTestHost.Click(closeEditorButton);
+        Assert.Equal(CoachingScreen.MapControlPackDetails, context.Coaching.CurrentScreen);
+        Assert.True(context.MapControlPackDetailsPage.IsVisible);
+    });
+
+    [Fact]
     public void Library_TogglePersistsDisabledMatchupState() => WpfTestHost.Run(() =>
     {
         using var context = new MainWindowTestContext();
