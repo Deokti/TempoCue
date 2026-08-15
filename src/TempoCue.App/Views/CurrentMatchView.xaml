@@ -92,6 +92,30 @@
             <Setter Property="Margin" Value="0,0,0,6" />
         </Style>
 
+        <Style x:Key="ChampionSelectParticipantRow"
+               TargetType="Border"
+               BasedOn="{StaticResource ParticipantRow}">
+            <Setter Property="Background" Value="#101B2D" />
+            <Setter Property="BorderBrush" Value="#263750" />
+            <Setter Property="Padding" Value="12,10" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsLocalPlayer}" Value="True">
+                    <Setter Property="Background" Value="#12243A" />
+                    <Setter Property="BorderBrush" Value="#3B91C2" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ChampionSelectRoleBadge" TargetType="Border">
+            <Setter Property="Background" Value="#162A43" />
+            <Setter Property="BorderBrush" Value="#29435F" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="8,4" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
         <Style x:Key="PowerBadge" TargetType="Border">
             <Setter Property="Background" Value="#243550" />
             <Setter Property="CornerRadius" Value="12" />
@@ -153,7 +177,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <!-- Экран обновляется из единого снимка Live Client Data через CurrentMatchViewModel. -->
+    <!-- Экран получает нормализованное состояние Riot через CurrentMatchViewModel. -->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="56" />
@@ -198,6 +222,9 @@
                                              Value="{x:Static application:MatchSnapshotReadStatus.Failed}">
                                     <Setter Property="Background" Value="#3A3020" />
                                 </DataTrigger>
+                                <DataTrigger Binding="{Binding HasChampionSelect}" Value="True">
+                                    <Setter Property="Background" Value="#17344A" />
+                                </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
@@ -227,6 +254,9 @@
                                         <DataTrigger Binding="{Binding Status}"
                                                      Value="{x:Static application:MatchSnapshotReadStatus.Failed}">
                                             <Setter Property="Fill" Value="#E8BB58" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding HasChampionSelect}" Value="True">
+                                            <Setter Property="Fill" Value="#50B7ED" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -270,11 +300,15 @@
                 HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Border.Style>
                 <Style TargetType="Border" BasedOn="{StaticResource CurrentCard}">
-                    <Setter Property="Visibility" Value="Visible" />
+                    <Setter Property="Visibility" Value="Collapsed" />
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding HasCurrentMatch}" Value="True">
-                            <Setter Property="Visibility" Value="Collapsed" />
-                        </DataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding HasCurrentMatch}" Value="False" />
+                                <Condition Binding="{Binding HasChampionSelect}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Visibility" Value="Visible" />
+                        </MultiDataTrigger>
                     </Style.Triggers>
                 </Style>
             </Border.Style>
@@ -313,6 +347,179 @@
                 </Button>
             </StackPanel>
         </Border>
+
+        <!-- Предматчевый состав использует отдельную модель с обязательным privacy gate. -->
+        <ScrollViewer x:Name="ChampionSelectContentScrollViewer"
+                      Grid.Row="1"
+                      controls:ScrollViewerWheelRouting.IsEnabled="True"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <ScrollViewer.Style>
+                <Style TargetType="ScrollViewer">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding HasChampionSelect}" Value="True">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ScrollViewer.Style>
+            <StackPanel Margin="24,22,24,24">
+                <Border Style="{StaticResource CurrentCard}" Padding="20,17">
+                    <StackPanel>
+                        <TextBlock Text="{localization:Loc Current.ChampionSelect.Title}"
+                                   Foreground="#F4F7FB" FontSize="22"
+                                   FontWeight="SemiBold" />
+                        <TextBlock Text="{localization:Loc Current.ChampionSelect.Description}"
+                                   Foreground="#91A5BD" FontSize="13" LineHeight="20"
+                                   TextWrapping="Wrap" Margin="0,7,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource CurrentCard}" Padding="18,16" Margin="0,10,0,0">
+                    <StackPanel>
+                        <TextBlock Text="{localization:Loc Current.ChampionSelect.Team}"
+                                   Foreground="#64D5A4" FontSize="13"
+                                   FontWeight="SemiBold" Margin="0,0,0,12" />
+                        <ItemsControl ItemsSource="{Binding ChampionSelectParticipants}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource ChampionSelectParticipantRow}"
+                                            AutomationProperties.Name="{Binding Identity}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="58" />
+                                                <ColumnDefinition Width="54" />
+                                                <ColumnDefinition Width="220" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border Style="{StaticResource ChampionSelectRoleBadge}">
+                                                <TextBlock Text="{Binding RoleCode}"
+                                                           Foreground="#8FB9D8" FontSize="10"
+                                                           FontWeight="Bold" />
+                                            </Border>
+                                            <Border Grid.Column="1" Width="46" Height="46"
+                                                    Background="#162A43" BorderBrush="#29435F"
+                                                    BorderThickness="1" CornerRadius="9">
+                                                <Grid>
+                                                    <TextBlock Text="{Binding ChampionInitials}"
+                                                               Foreground="#6FC4EF" FontSize="9"
+                                                               FontWeight="Bold"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsChampionPending}" Value="True">
+                                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                    <TextBlock Text="◇" Foreground="#58718D"
+                                                               FontSize="22" Margin="0,-3,0,0"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsChampionPending}" Value="True">
+                                                                        <Setter Property="Visibility" Value="Visible" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                    <Image Source="{Binding ChampionImageUri}"
+                                                           Stretch="UniformToFill"
+                                                           SnapsToDevicePixels="True" />
+                                                </Grid>
+                                            </Border>
+                                            <StackPanel Grid.Column="2" Margin="10,0,0,0"
+                                                        Orientation="Horizontal"
+                                                        VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding ChampionName}"
+                                                           Foreground="#F4F7FB" FontSize="13"
+                                                           FontWeight="SemiBold"
+                                                           VerticalAlignment="Center" />
+                                                <Border Background="#173B54" CornerRadius="9"
+                                                        Padding="7,3" Margin="8,0,0,0"
+                                                        VerticalAlignment="Center">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsLocalPlayer}" Value="True">
+                                                                    <Setter Property="Visibility" Value="Visible" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <TextBlock Text="{localization:Loc Current.ChampionSelect.You}"
+                                                               Foreground="#69C9F5" FontSize="9"
+                                                               FontWeight="Bold" />
+                                                </Border>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="3" Margin="12,0,0,0"
+                                                        VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Identity}" FontSize="13"
+                                                           FontWeight="SemiBold"
+                                                           ToolTip="{Binding IdentityStatus}">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Foreground" Value="#DCE7F2" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsAnonymous}" Value="True">
+                                                                    <Setter Property="Foreground" Value="#A6B5C7" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="4" FontSize="11"
+                                                       VerticalAlignment="Center" Margin="12,0,0,0">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding HasProfileUri}" Value="False">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                                <Hyperlink NavigateUri="{Binding ProfileUri}"
+                                                           Foreground="#50B7ED"
+                                                           ToolTip="{Binding ProfileLinkToolTip}"
+                                                           RequestNavigate="ProfileLink_RequestNavigate">
+                                                    <Run Text="{localization:Loc Current.Participant.ProfileLink}" />
+                                                </Hyperlink>
+                                            </TextBlock>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <Border Background="#0D1727" BorderBrush="#263750"
+                                BorderThickness="1" CornerRadius="9"
+                                Padding="11,7" Margin="0,6,0,0">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="ⓘ" Foreground="#6F9EBC"
+                                           FontSize="11" Margin="0,0,7,0" />
+                                <TextBlock Text="{localization:Loc Current.ChampionSelect.Privacy}"
+                                           Foreground="#8396AF" FontSize="10"
+                                           TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
 
         <!-- Прокручиваемое содержимое матча: участники, совет и игровые факты. -->
         <ScrollViewer x:Name="CurrentMatchContentScrollViewer"

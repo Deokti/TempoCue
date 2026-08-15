@@ -46,3 +46,13 @@ NNNN-short-title.md
 ```
 
 ADR не переписывается задним числом после изменения решения. Создай новый ADR и пометь прежний как заменённый.
+
+## Принятые решения
+
+- [0001. Модульная Clean Architecture](0001-modular-clean-architecture.md)
+- [0002. Локальное хранение Coach Pack](0002-local-coach-pack-storage.md)
+- [0003. Локальное владение Coach Pack](0003-local-coach-pack-ownership.md)
+- [0004. Граница модуля оверлея](0004-overlay-module-boundary.md)
+- [0005. Граница модуля коучинга](0005-coaching-module-boundary.md)
+- [0006. Локальное хранение Map Control Pack](0006-map-control-pack-storage.md)
+- [0007. Отдельный адаптер Champion Select и граница приватности](0007-champion-select-client-adapter.md)

@@ -7,7 +7,7 @@ namespace TempoCue.Riot.Tests;
 public sealed class DataDragonChampionCatalogTests
 {
     [Fact]
-    public async Task LoadAsync_LoadsLocalizedChampionsAndFallsBackToCache()
+    public async Task LoadAsync_LoadsLocalizedChampionsAndUsesFreshCacheWithoutNetwork()
     {
         var cacheDirectory = CreateTestCacheDirectory();
 
@@ -52,7 +52,7 @@ public sealed class DataDragonChampionCatalogTests
                 onlineResult.Champions[1].ImageUri.AbsoluteUri);
 
             using var offlineHttpClient = CreateHttpClient(_ =>
-                new HttpResponseMessage(HttpStatusCode.ServiceUnavailable));
+                throw new InvalidOperationException("Свежий кеш должен применяться до сети."));
             using var offlineDataDragonClient = new DataDragonClient(offlineHttpClient);
             var offlineCatalog = new DataDragonChampionCatalog(
                 offlineDataDragonClient,
@@ -63,6 +63,66 @@ public sealed class DataDragonChampionCatalogTests
             Assert.True(cachedResult.IsAvailable);
             Assert.Equal(ChampionCatalogSource.Cache, cachedResult.Source);
             Assert.Equal(onlineResult.Champions, cachedResult.Champions);
+        }
+        finally
+        {
+            Directory.Delete(cacheDirectory, recursive: true);
+        }
+    }
+
+    [Fact]
+    public async Task LoadAsync_RefreshesStaleCacheAndFallsBackWhenNetworkIsUnavailable()
+    {
+        var cacheDirectory = CreateTestCacheDirectory();
+
+        try
+        {
+            using var onlineHttpClient = CreateHttpClient(request =>
+            {
+                var json = request.RequestUri?.AbsolutePath switch
+                {
+                    "/api/versions.json" => "[\"26.15.1\"]",
+                    "/cdn/26.15.1/data/ru_RU/champion.json" => ChampionJson,
+                    _ => throw new InvalidOperationException()
+                };
+                return JsonResponse(json);
+            });
+            using var onlineDataDragonClient = new DataDragonClient(onlineHttpClient);
+            var onlineCatalog = new DataDragonChampionCatalog(
+                onlineDataDragonClient,
+                cacheDirectory);
+            await onlineCatalog.LoadAsync("ru-RU");
+
+            var cachePath = Path.Combine(cacheDirectory, "champions-ru_RU.json");
+            var cacheJson = await File.ReadAllTextAsync(cachePath);
+            using var cacheDocument = System.Text.Json.JsonDocument.Parse(cacheJson);
+            var savedAtValue = cacheDocument.RootElement
+                .GetProperty("savedAtUtc")
+                .GetString();
+            Assert.NotNull(savedAtValue);
+            var staleSavedAt = DateTimeOffset.UtcNow.Subtract(TimeSpan.FromDays(2));
+            var staleJson = cacheJson.Replace(
+                savedAtValue,
+                staleSavedAt.ToString("O"),
+                StringComparison.Ordinal);
+            await File.WriteAllTextAsync(cachePath, staleJson);
+
+            var networkRequests = 0;
+            using var offlineHttpClient = CreateHttpClient(_ =>
+            {
+                networkRequests++;
+                return new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
+            });
+            using var offlineDataDragonClient = new DataDragonClient(offlineHttpClient);
+            var offlineCatalog = new DataDragonChampionCatalog(
+                offlineDataDragonClient,
+                cacheDirectory);
+
+            var result = await offlineCatalog.LoadAsync("ru-RU");
+
+            Assert.True(result.IsAvailable);
+            Assert.Equal(ChampionCatalogSource.Cache, result.Source);
+            Assert.True(networkRequests > 0);
         }
         finally
         {

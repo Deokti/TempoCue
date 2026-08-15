@@ -73,6 +73,55 @@ public sealed class ActiveMatchSessionTests
     }
 
     [Fact]
+    public async Task RefreshAsync_ReturnsChampionSelectWhenActiveMatchIsAbsent()
+    {
+        var championSelect = new ChampionSelectState(
+            0,
+            [
+                ChampionSelectParticipant.Visible(
+                    0,
+                    6,
+                    PlayerPosition.Top,
+                    isLocalPlayer: true,
+                    RiotId.Create("Tempo Player", "TEST"))
+            ]);
+        var championSelectSource = new StubChampionSelectSource(
+            ChampionSelectReadResult.Success(championSelect));
+        var session = new ActiveMatchSession(
+            new StubSnapshotSource(MatchSnapshotReadResult.NoActiveMatch()),
+            new FixedAdviceSelector(new MatchupCoach([])),
+            TimeSpan.FromSeconds(1),
+            championSelectSource: championSelectSource);
+
+        var update = await session.RefreshAsync();
+
+        Assert.Equal(ChampionSelectReadStatus.Success, update.ChampionSelectStatus);
+        Assert.Same(championSelect, update.ChampionSelect);
+        Assert.Equal(1, championSelectSource.ReadCount);
+    }
+
+    [Fact]
+    public async Task RefreshAsync_DoesNotReadChampionSelectDuringActiveMatch()
+    {
+        var snapshot = new MatchSnapshot(
+            CreateMatch(level: 9),
+            [],
+            DateTimeOffset.UtcNow);
+        var championSelectSource = new StubChampionSelectSource(
+            ChampionSelectReadResult.NotInChampionSelect());
+        var session = new ActiveMatchSession(
+            new StubSnapshotSource(MatchSnapshotReadResult.Success(snapshot)),
+            new FixedAdviceSelector(new MatchupCoach([])),
+            TimeSpan.FromSeconds(1),
+            championSelectSource: championSelectSource);
+
+        var update = await session.RefreshAsync();
+
+        Assert.Equal(0, championSelectSource.ReadCount);
+        Assert.Null(update.ChampionSelect);
+    }
+
+    [Fact]
     public void Constructor_RejectsNonPositivePollingInterval()
     {
         var source = new StubSnapshotSource(MatchSnapshotReadResult.NoActiveMatch());
@@ -142,5 +191,18 @@ public sealed class ActiveMatchSessionTests
             MatchSnapshot snapshot,
             CancellationToken cancellationToken = default) =>
             ValueTask.FromResult(plan);
+    }
+
+    private sealed class StubChampionSelectSource(ChampionSelectReadResult result)
+        : IChampionSelectSource
+    {
+        public int ReadCount { get; private set; }
+
+        public Task<ChampionSelectReadResult> ReadAsync(
+            CancellationToken cancellationToken = default)
+        {
+            ReadCount++;
+            return Task.FromResult(result);
+        }
     }
 }

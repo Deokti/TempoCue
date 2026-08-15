@@ -19,7 +19,8 @@ internal sealed class MainWindowTestContext : IDisposable
 
     public MainWindowTestContext(
         Action? showOverlayPreview = null,
-        IOverlaySetupSession? overlaySetupSession = null)
+        IOverlaySetupSession? overlaySetupSession = null,
+        ChampionSelectReadResult? championSelectResult = null)
     {
         Localization = LocalizationService.Instance;
         _initialLanguage = Localization.CurrentLanguageCode;
@@ -27,7 +28,10 @@ internal sealed class MainWindowTestContext : IDisposable
 
         _activeMatchMonitor = CurrentMatchViewModelTestData.CreateMonitor(
             TestMatchSnapshotSource.FromResult(MatchSnapshotReadResult.NoActiveMatch()),
-            new TestMatchAdviceSelector());
+            new TestMatchAdviceSelector(),
+            championSelectSource: championSelectResult is null
+                ? null
+                : new TestChampionSelectSource(championSelectResult));
         CurrentMatch = new CurrentMatchViewModel(
             _activeMatchMonitor,
             TestChampionCatalog.Ready(),

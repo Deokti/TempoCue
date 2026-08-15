@@ -179,6 +179,20 @@
   <data name="Current.State.Error.Title" xml:space="preserve"><value>Не удалось подключиться к матчу</value></data>
   <data name="Current.State.Error.Message" xml:space="preserve"><value>TempoCue не получил данные от локального Riot API. Проверь, что игра запущена, и повтори попытку.</value></data>
   <data name="Current.State.Retry" xml:space="preserve"><value>Проверить снова</value></data>
+  <data name="Current.ChampionSelect.Status" xml:space="preserve"><value>ВЫБОР ЧЕМПИОНОВ</value></data>
+  <data name="Current.ChampionSelect.StatusDetails" xml:space="preserve"><value>League Client подключён · {0}</value></data>
+  <data name="Current.ChampionSelect.Title" xml:space="preserve"><value>Состав формируется</value></data>
+  <data name="Current.ChampionSelect.Description" xml:space="preserve"><value>TempoCue показывает только личности, которые League Client явно сообщает как видимые. Защищённые слоты остаются анонимными.</value></data>
+  <data name="Current.ChampionSelect.Team" xml:space="preserve"><value>Ваша команда</value></data>
+  <data name="Current.ChampionSelect.You" xml:space="preserve"><value>ВЫ</value></data>
+  <data name="Current.ChampionSelect.ChampionPending" xml:space="preserve"><value>Чемпион не выбран</value></data>
+  <data name="Current.ChampionSelect.ChampionUnknown" xml:space="preserve"><value>Чемпион #{0}</value></data>
+  <data name="Current.ChampionSelect.Identity.Anonymous" xml:space="preserve"><value>Анонимный игрок</value></data>
+  <data name="Current.ChampionSelect.Identity.Unavailable" xml:space="preserve"><value>Имя недоступно</value></data>
+  <data name="Current.ChampionSelect.Identity.Visible" xml:space="preserve"><value>Сообщено League Client</value></data>
+  <data name="Current.ChampionSelect.Identity.Protected" xml:space="preserve"><value>Личность защищена Riot</value></data>
+  <data name="Current.ChampionSelect.Identity.NotReported" xml:space="preserve"><value>Личность не сообщена</value></data>
+  <data name="Current.ChampionSelect.Privacy" xml:space="preserve"><value>TempoCue не восстанавливает скрытые Riot ID и не создаёт для них ссылки на профили.</value></data>
   <data name="Current.Header.Time" xml:space="preserve"><value>Время</value></data>
   <data name="Current.Player.Level" xml:space="preserve"><value>{0} · {1} уровень</value></data>
   <data name="Current.Player.Waiting" xml:space="preserve"><value>Ожидаем активного игрока</value></data>

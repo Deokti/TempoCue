@@ -341,6 +341,59 @@ public sealed class CurrentMatchViewModelTests
         Assert.Equal("03:00", viewModel.GameTime);
     }
 
+    [Fact]
+    public async Task RefreshAsync_ShowsChampionSelectWithoutExposingAnonymousIdentity()
+    {
+        using var context = new CurrentMatchViewModelTestContext();
+        var championSelect = new ChampionSelectState(
+            0,
+            [
+                ChampionSelectParticipant.Visible(
+                    0,
+                    6,
+                    PlayerPosition.Top,
+                    isLocalPlayer: true,
+                    RiotId.Create("Tempo Player", "TEST")),
+                ChampionSelectParticipant.Anonymous(
+                    1,
+                    266,
+                    PlayerPosition.Jungle,
+                    isLocalPlayer: false),
+                ChampionSelectParticipant.Unavailable(
+                    2,
+                    0,
+                    PlayerPosition.Middle,
+                    isLocalPlayer: false)
+            ]);
+        var viewModel = context.CreateViewModel(
+            MatchSnapshotReadResult.NoActiveMatch(),
+            ChampionSelectReadResult.Success(championSelect));
+
+        await viewModel.RefreshAsync();
+        await viewModel.LoadChampionImagesAsync();
+        await viewModel.LoadPlayerProfileRegionAsync();
+
+        Assert.True(viewModel.HasChampionSelect);
+        Assert.False(viewModel.HasCurrentMatch);
+        Assert.Equal("ВЫБОР ЧЕМПИОНОВ", viewModel.ConnectionTitle);
+        Assert.Equal(3, viewModel.ChampionSelectParticipants.Count);
+        var localPlayer = viewModel.ChampionSelectParticipants[0];
+        Assert.Equal("Urgot", localPlayer.ChampionName);
+        Assert.False(localPlayer.IsChampionPending);
+        Assert.Equal("Tempo Player#TEST", localPlayer.Identity);
+        Assert.Equal(
+            "https://www.leagueofgraphs.com/summoner/euw/Tempo+Player-TEST",
+            localPlayer.ProfileUri?.AbsoluteUri);
+        var anonymous = viewModel.ChampionSelectParticipants[1];
+        Assert.Equal("Aatrox", anonymous.ChampionName);
+        Assert.Equal("Анонимный игрок", anonymous.Identity);
+        Assert.True(anonymous.IsAnonymous);
+        Assert.Null(anonymous.ProfileUri);
+        var pending = viewModel.ChampionSelectParticipants[2];
+        Assert.Equal("Чемпион не выбран", pending.ChampionName);
+        Assert.True(pending.IsChampionPending);
+    }
+
     [Theory]
     [InlineData(MatchSnapshotReadStatus.NoActiveMatch, "Матч ещё не начался", false)]
     [InlineData(MatchSnapshotReadStatus.InvalidData, "Не удалось прочитать данные матча", true)]
