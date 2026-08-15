@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
 using TempoCue.App.Localization;
+using TempoCue.App.ViewModels;
 
 namespace TempoCue.App.Views;
 
@@ -13,6 +14,25 @@ public partial class CurrentMatchView : UserControl
     public CurrentMatchView()
     {
         InitializeComponent();
+    }
+
+    private async void RetryButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not CurrentMatchViewModel viewModel
+            || sender is not Button button)
+        {
+            return;
+        }
+
+        button.IsEnabled = false;
+        try
+        {
+            await viewModel.RefreshAsync();
+        }
+        finally
+        {
+            button.IsEnabled = true;
+        }
     }
 
     private void ProfileLink_RequestNavigate(object sender, RequestNavigateEventArgs e)

@@ -162,9 +162,23 @@
   <data name="Current.Status.Loading" xml:space="preserve"><value>ЗАГРУЗКА МАТЧА</value></data>
   <data name="Current.Status.LoadingDetails" xml:space="preserve"><value>League of Legends запущена · ожидаем готовность Live Client Data</value></data>
   <data name="Current.Status.Timeout" xml:space="preserve"><value>НЕТ ОТВЕТА</value></data>
+  <data name="Current.Status.TimeoutDetails" xml:space="preserve"><value>Live Client Data временно не отвечает · повторяем запросы</value></data>
   <data name="Current.Status.InvalidData" xml:space="preserve"><value>ОШИБКА ДАННЫХ</value></data>
+  <data name="Current.Status.InvalidDataDetails" xml:space="preserve"><value>Получен некорректный снимок матча · повторяем запросы</value></data>
   <data name="Current.Status.Error" xml:space="preserve"><value>ОШИБКА ПОДКЛЮЧЕНИЯ</value></data>
+  <data name="Current.Status.ErrorDetails" xml:space="preserve"><value>Не удалось обратиться к Live Client Data · повторяем запросы</value></data>
   <data name="Current.Status.WaitingDetails" xml:space="preserve"><value>Проверяем Live Client Data каждую секунду</value></data>
+  <data name="Current.State.Waiting.Title" xml:space="preserve"><value>Матч ещё не начался</value></data>
+  <data name="Current.State.Waiting.Message" xml:space="preserve"><value>Запусти тренировочную или обычную игру. TempoCue подключится автоматически после загрузки на карту.</value></data>
+  <data name="Current.State.Loading.Title" xml:space="preserve"><value>Матч загружается</value></data>
+  <data name="Current.State.Loading.Message" xml:space="preserve"><value>Клиент League of Legends уже запущен. Ждём, когда Live Client Data станет доступен.</value></data>
+  <data name="Current.State.Timeout.Title" xml:space="preserve"><value>Временно нет данных матча</value></data>
+  <data name="Current.State.Timeout.Message" xml:space="preserve"><value>Предыдущие значения скрыты как устаревшие. TempoCue продолжает подключаться автоматически.</value></data>
+  <data name="Current.State.InvalidData.Title" xml:space="preserve"><value>Не удалось прочитать данные матча</value></data>
+  <data name="Current.State.InvalidData.Message" xml:space="preserve"><value>Полученный снимок матча не прошёл проверку. Устаревшие значения скрыты, запросы продолжаются.</value></data>
+  <data name="Current.State.Error.Title" xml:space="preserve"><value>Не удалось подключиться к матчу</value></data>
+  <data name="Current.State.Error.Message" xml:space="preserve"><value>TempoCue не получил данные от локального Riot API. Проверь, что игра запущена, и повтори попытку.</value></data>
+  <data name="Current.State.Retry" xml:space="preserve"><value>Проверить снова</value></data>
   <data name="Current.Header.Time" xml:space="preserve"><value>Время</value></data>
   <data name="Current.Player.Level" xml:space="preserve"><value>{0} · {1} уровень</value></data>
   <data name="Current.Player.Waiting" xml:space="preserve"><value>Ожидаем активного игрока</value></data>

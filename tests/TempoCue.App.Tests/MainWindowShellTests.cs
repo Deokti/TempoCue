@@ -93,10 +93,24 @@ public sealed class MainWindowShellTests
         Assert.Equal(Visibility.Visible, currentMatchPage.Visibility);
         window.UpdateLayout();
         WpfTestHost.Pump(DispatcherPriority.Render);
-        var currentMatchScrollBar = Assert.Single(
-            WpfTestHost.FindVisualDescendants<ScrollBar>(currentMatchPage),
-            scrollBar => scrollBar.Orientation == Orientation.Vertical && scrollBar.IsVisible);
-        Assert.Equal(4d, currentMatchScrollBar.ActualWidth);
+        Assert.Equal(
+            Visibility.Visible,
+            WpfTestHost.Find<Border>(currentMatchPage, "CurrentMatchStatePanel").Visibility);
+        Assert.Equal(
+            Visibility.Collapsed,
+            WpfTestHost.Find<ScrollViewer>(
+                currentMatchPage,
+                "CurrentMatchContentScrollViewer").Visibility);
+        Assert.Equal(
+            Visibility.Collapsed,
+            WpfTestHost.Find<StackPanel>(
+                currentMatchPage,
+                "CurrentMatchGameTimePanel").Visibility);
+        Assert.Equal(
+            "Матч ещё не начался",
+            WpfTestHost.Find<TextBlock>(
+                currentMatchPage,
+                "CurrentMatchStateTitleTextBlock").Text);
         var currentMatchTabs = WpfTestHost.Find<TabControl>(
             currentMatchPage,
             "CurrentSectionsTabControl");

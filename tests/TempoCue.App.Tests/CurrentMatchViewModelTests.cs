@@ -299,6 +299,72 @@ public sealed class CurrentMatchViewModelTests
         Assert.Equal(MatchSnapshotReadStatus.GameLoading, viewModel.Status);
         Assert.Equal("ЗАГРУЗКА МАТЧА", viewModel.ConnectionTitle);
         Assert.Contains("ожидаем готовность", viewModel.ConnectionDetails);
+        Assert.False(viewModel.HasCurrentMatch);
+        Assert.Equal("Матч загружается", viewModel.StateTitle);
+        Assert.False(viewModel.CanRetry);
+    }
+
+    [Fact]
+    public async Task RefreshAsync_HidesStaleSnapshotAndRestoresContentAfterTemporaryFailure()
+    {
+        using var context = new CurrentMatchViewModelTestContext();
+        var firstSnapshot = CreateSnapshot("urgot-player", "Urgot", 120);
+        var restoredSnapshot = CreateSnapshot("darius-player", "Darius", 180);
+        var source = TestMatchSnapshotSource.FromSequence(
+            MatchSnapshotReadResult.Success(firstSnapshot),
+            MatchSnapshotReadResult.Timeout(),
+            MatchSnapshotReadResult.Success(restoredSnapshot));
+        using var monitor = CreateMonitor(source);
+        using var viewModel = new TempoCue.App.ViewModels.CurrentMatchViewModel(
+            monitor,
+            TestChampionCatalog.Ready(),
+            TestLeagueClientRegionSource.EuropeWest(),
+            context.Localization);
+
+        await viewModel.RefreshAsync();
+        Assert.True(viewModel.HasCurrentMatch);
+        Assert.Equal("Urgot", viewModel.ActiveChampion);
+
+        await viewModel.RefreshAsync();
+        Assert.False(viewModel.HasCurrentMatch);
+        Assert.True(viewModel.CanRetry);
+        Assert.Equal("Временно нет данных матча", viewModel.StateTitle);
+        Assert.Contains("устаревшие", viewModel.StateMessage);
+        Assert.Equal("—", viewModel.ActiveChampion);
+        Assert.Empty(viewModel.Allies);
+        Assert.Empty(viewModel.Enemies);
+
+        await viewModel.RefreshAsync();
+        Assert.True(viewModel.HasCurrentMatch);
+        Assert.False(viewModel.CanRetry);
+        Assert.Equal("Darius", viewModel.ActiveChampion);
+        Assert.Equal("03:00", viewModel.GameTime);
+    }
+
+    [Theory]
+    [InlineData(MatchSnapshotReadStatus.NoActiveMatch, "Матч ещё не начался", false)]
+    [InlineData(MatchSnapshotReadStatus.InvalidData, "Не удалось прочитать данные матча", true)]
+    [InlineData(MatchSnapshotReadStatus.Failed, "Не удалось подключиться к матчу", true)]
+    public async Task RefreshAsync_ProvidesDedicatedStatePresentation(
+        MatchSnapshotReadStatus status,
+        string expectedTitle,
+        bool expectedRetry)
+    {
+        using var context = new CurrentMatchViewModelTestContext();
+        var result = status switch
+        {
+            MatchSnapshotReadStatus.NoActiveMatch => MatchSnapshotReadResult.NoActiveMatch(),
+            MatchSnapshotReadStatus.InvalidData => MatchSnapshotReadResult.InvalidData(),
+            MatchSnapshotReadStatus.Failed => MatchSnapshotReadResult.Failed(),
+            _ => throw new ArgumentOutOfRangeException(nameof(status))
+        };
+        var viewModel = context.CreateViewModel(result);
+
+        await viewModel.RefreshAsync();
+
+        Assert.False(viewModel.HasCurrentMatch);
+        Assert.Equal(expectedTitle, viewModel.StateTitle);
+        Assert.Equal(expectedRetry, viewModel.CanRetry);
     }
 
     [Fact]
@@ -326,5 +392,25 @@ public sealed class CurrentMatchViewModelTests
         Assert.Contains("Первый, Второй", viewModel.AdviceMessage);
         Assert.Contains("не выбирает рекомендацию случайно", viewModel.AdviceReason);
     }
+
+    private static MatchSnapshot CreateSnapshot(
+        string activePlayerId,
+        string championName,
+        double gameTimeSeconds) => new(
+        new MatchState
+        {
+            GameTimeSeconds = gameTimeSeconds,
+            ActivePlayerId = activePlayerId,
+            Players =
+            [
+                CreatePlayer(
+                    activePlayerId,
+                    championName,
+                    TeamSide.Order,
+                    PlayerPosition.Top)
+            ]
+        },
+        [],
+        DateTimeOffset.UtcNow);
 
 }

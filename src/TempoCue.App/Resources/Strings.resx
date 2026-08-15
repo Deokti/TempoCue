@@ -154,9 +154,23 @@
   <data name="Current.Status.Loading" xml:space="preserve"><value>LOADING MATCH</value></data>
   <data name="Current.Status.LoadingDetails" xml:space="preserve"><value>League of Legends is running · waiting for Live Client Data</value></data>
   <data name="Current.Status.Timeout" xml:space="preserve"><value>NO RESPONSE</value></data>
+  <data name="Current.Status.TimeoutDetails" xml:space="preserve"><value>Live Client Data is temporarily unavailable · retrying</value></data>
   <data name="Current.Status.InvalidData" xml:space="preserve"><value>DATA ERROR</value></data>
+  <data name="Current.Status.InvalidDataDetails" xml:space="preserve"><value>Received an invalid match snapshot · retrying</value></data>
   <data name="Current.Status.Error" xml:space="preserve"><value>CONNECTION ERROR</value></data>
+  <data name="Current.Status.ErrorDetails" xml:space="preserve"><value>Could not reach Live Client Data · retrying</value></data>
   <data name="Current.Status.WaitingDetails" xml:space="preserve"><value>Checking Live Client Data every second</value></data>
+  <data name="Current.State.Waiting.Title" xml:space="preserve"><value>Match has not started</value></data>
+  <data name="Current.State.Waiting.Message" xml:space="preserve"><value>Start a practice or normal game. TempoCue will connect automatically after the map loads.</value></data>
+  <data name="Current.State.Loading.Title" xml:space="preserve"><value>Match is loading</value></data>
+  <data name="Current.State.Loading.Message" xml:space="preserve"><value>League of Legends is already running. Waiting for Live Client Data to become available.</value></data>
+  <data name="Current.State.Timeout.Title" xml:space="preserve"><value>Match data is temporarily unavailable</value></data>
+  <data name="Current.State.Timeout.Message" xml:space="preserve"><value>Previous values are hidden because they are stale. TempoCue will keep reconnecting automatically.</value></data>
+  <data name="Current.State.InvalidData.Title" xml:space="preserve"><value>Could not read match data</value></data>
+  <data name="Current.State.InvalidData.Message" xml:space="preserve"><value>The received match snapshot did not pass validation. Stale values are hidden while polling continues.</value></data>
+  <data name="Current.State.Error.Title" xml:space="preserve"><value>Could not connect to the match</value></data>
+  <data name="Current.State.Error.Message" xml:space="preserve"><value>TempoCue could not get data from the local Riot API. Make sure the game is running and try again.</value></data>
+  <data name="Current.State.Retry" xml:space="preserve"><value>Check again</value></data>
   <data name="Current.Header.Time" xml:space="preserve"><value>Time</value></data>
   <data name="Current.Player.Level" xml:space="preserve"><value>{0} · level {1}</value></data>
   <data name="Current.Player.Waiting" xml:space="preserve"><value>Waiting for the active player</value></data>

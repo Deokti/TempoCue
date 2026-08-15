@@ -33,7 +33,11 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
     private MatchSnapshotReadStatus _status = MatchSnapshotReadStatus.NoActiveMatch;
     private string _connectionTitle = string.Empty;
     private string _connectionDetails = string.Empty;
-    private string _gameTime = "00:00";
+    private string _stateTitle = string.Empty;
+    private string _stateMessage = string.Empty;
+    private bool _hasCurrentMatch;
+    private bool _canRetry;
+    private string _gameTime = "—";
     private string _activeChampion = "—";
     private string _activeChampionInitials = "—";
     private Uri? _activeChampionImageUri;
@@ -282,6 +286,30 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         }
     }
 
+    public string StateTitle
+    {
+        get => _stateTitle;
+        private set => SetProperty(ref _stateTitle, value);
+    }
+
+    public string StateMessage
+    {
+        get => _stateMessage;
+        private set => SetProperty(ref _stateMessage, value);
+    }
+
+    public bool HasCurrentMatch
+    {
+        get => _hasCurrentMatch;
+        private set => SetProperty(ref _hasCurrentMatch, value);
+    }
+
+    public bool CanRetry
+    {
+        get => _canRetry;
+        private set => SetProperty(ref _canRetry, value);
+    }
+
     /// <summary>
     /// Один раз читает регион локального клиента. Если регион неизвестен, Riot ID всё равно
     /// показывается, но ссылка не строится по догадке.
@@ -359,7 +387,7 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         _lastUpdate = update;
         Status = update.Status;
 
-        if (update.Snapshot is null)
+        if (update.Status != MatchSnapshotReadStatus.Success || update.Snapshot is null)
         {
             RenderWaiting();
         }
@@ -380,6 +408,10 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         var matchup = MatchupResolver.Resolve(match);
         var advice = selection?.Advice;
 
+        HasCurrentMatch = true;
+        CanRetry = false;
+        StateTitle = string.Empty;
+        StateMessage = string.Empty;
         ConnectionTitle = _localization.Get("Current.Status.Connected");
         ConnectionDetails = _localization.Format(
             "Current.Status.ConnectedDetails",
@@ -671,6 +703,10 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
 
     private void RenderWaiting()
     {
+        HasCurrentMatch = false;
+        CanRetry = Status is MatchSnapshotReadStatus.Timeout
+            or MatchSnapshotReadStatus.InvalidData
+            or MatchSnapshotReadStatus.Failed;
         ConnectionTitle = Status switch
         {
             MatchSnapshotReadStatus.GameLoading => _localization.Get("Current.Status.Loading"),
@@ -679,17 +715,28 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
             MatchSnapshotReadStatus.Failed => _localization.Get("Current.Status.Error"),
             _ => _localization.Get("Current.Status.Waiting")
         };
-        ConnectionDetails = Status == MatchSnapshotReadStatus.GameLoading
-            ? _localization.Get("Current.Status.LoadingDetails")
-            : _localization.Get("Current.Status.WaitingDetails");
-        GameTime = "00:00";
+        ConnectionDetails = Status switch
+        {
+            MatchSnapshotReadStatus.GameLoading =>
+                _localization.Get("Current.Status.LoadingDetails"),
+            MatchSnapshotReadStatus.Timeout =>
+                _localization.Get("Current.Status.TimeoutDetails"),
+            MatchSnapshotReadStatus.InvalidData =>
+                _localization.Get("Current.Status.InvalidDataDetails"),
+            MatchSnapshotReadStatus.Failed =>
+                _localization.Get("Current.Status.ErrorDetails"),
+            _ => _localization.Get("Current.Status.WaitingDetails")
+        };
+        StateTitle = _localization.Get(GetStateResourceKey("Title"));
+        StateMessage = _localization.Get(GetStateResourceKey("Message"));
+        GameTime = "—";
         ActiveChampion = "—";
         ActiveChampionInitials = "—";
         ActiveChampionImageUri = null;
         ActiveSummary = _localization.Get("Current.Player.Waiting");
         ActivePosition = "—";
-        ActiveKda = "0/0/0";
-        ActiveCreepScore = "0 CS";
+        ActiveKda = "—";
+        ActiveCreepScore = "—";
         OpponentChampion = "—";
         OpponentChampionInitials = "—";
         OpponentChampionImageUri = null;
@@ -708,6 +755,20 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(ParticipantCount));
     }
 
+    private string GetStateResourceKey(string suffix)
+    {
+        var state = Status switch
+        {
+            MatchSnapshotReadStatus.GameLoading => "Loading",
+            MatchSnapshotReadStatus.Timeout => "Timeout",
+            MatchSnapshotReadStatus.InvalidData => "InvalidData",
+            MatchSnapshotReadStatus.Failed => "Error",
+            _ => "Waiting"
+        };
+
+        return $"Current.State.{state}.{suffix}";
+    }
+
     private void Localization_PropertyChanged(
         object? sender,
         PropertyChangedEventArgs e)
@@ -717,7 +778,11 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
             return;
         }
 
-        if (_lastUpdate?.Snapshot is { } snapshot)
+        if (_lastUpdate is
+            {
+                Status: MatchSnapshotReadStatus.Success,
+                Snapshot: { } snapshot
+            })
         {
             RenderSnapshot(snapshot, _lastUpdate.CoachPackSelection);
         }
@@ -855,7 +920,11 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
 
     private void RerenderLastUpdate()
     {
-        if (_lastUpdate?.Snapshot is not { } snapshot)
+        if (_lastUpdate is not
+            {
+                Status: MatchSnapshotReadStatus.Success,
+                Snapshot: { } snapshot
+            })
         {
             return;
         }

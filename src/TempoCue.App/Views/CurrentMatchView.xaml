@@ -240,20 +240,96 @@
                 <TextBlock Grid.Column="1" Text="{Binding ConnectionDetails}"
                            Foreground="#8396AF" FontSize="12"
                            Margin="14,0,0,0" VerticalAlignment="Center" />
-                <TextBlock Grid.Column="2" Text="{localization:Loc Current.Header.Time}"
-                           Foreground="#8396AF" FontSize="12"
-                           VerticalAlignment="Center" Margin="0,0,9,0" />
-                <TextBlock Grid.Column="3" Text="{Binding GameTime}"
-                           Foreground="#F4F7FB" FontSize="22"
-                           FontWeight="Bold" VerticalAlignment="Center" />
+                <StackPanel x:Name="CurrentMatchGameTimePanel"
+                            Grid.Column="2" Grid.ColumnSpan="2"
+                            Orientation="Horizontal" VerticalAlignment="Center">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding HasCurrentMatch}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <TextBlock Text="{localization:Loc Current.Header.Time}"
+                               Foreground="#8396AF" FontSize="12"
+                               VerticalAlignment="Center" Margin="0,0,9,0" />
+                    <TextBlock Text="{Binding GameTime}"
+                               Foreground="#F4F7FB" FontSize="22"
+                               FontWeight="Bold" VerticalAlignment="Center" />
+                </StackPanel>
             </Grid>
         </Border>
 
+        <!-- В отсутствие актуального снимка старые игровые значения полностью скрываются. -->
+        <Border x:Name="CurrentMatchStatePanel"
+                Grid.Row="1"
+                Margin="24,22,24,24" Padding="32"
+                HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <Border.Style>
+                <Style TargetType="Border" BasedOn="{StaticResource CurrentCard}">
+                    <Setter Property="Visibility" Value="Visible" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding HasCurrentMatch}" Value="True">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
+                        MaxWidth="580">
+                <Border Width="58" Height="58" Background="#10253A"
+                        BorderBrush="#315372" BorderThickness="1"
+                        CornerRadius="29" HorizontalAlignment="Center">
+                    <TextBlock Text="◇" Foreground="#50B7ED" FontSize="29"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Margin="0,-4,0,0" />
+                </Border>
+                <TextBlock x:Name="CurrentMatchStateTitleTextBlock"
+                           Text="{Binding StateTitle}"
+                           Foreground="#F4F7FB" FontSize="24" FontWeight="SemiBold"
+                           TextAlignment="Center" TextWrapping="Wrap"
+                           Margin="0,20,0,0" />
+                <TextBlock Text="{Binding StateMessage}"
+                           Foreground="#91A5BD" FontSize="14" LineHeight="21"
+                           TextAlignment="Center" TextWrapping="Wrap"
+                           Margin="0,9,0,0" />
+                <Button x:Name="CurrentMatchRetryButton"
+                        Content="{localization:Loc Current.State.Retry}"
+                        HorizontalAlignment="Center" Margin="0,20,0,0"
+                        Click="RetryButton_Click">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CanRetry}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </StackPanel>
+        </Border>
+
         <!-- Прокручиваемое содержимое матча: участники, совет и игровые факты. -->
-        <ScrollViewer Grid.Row="1"
+        <ScrollViewer x:Name="CurrentMatchContentScrollViewer"
+                      Grid.Row="1"
                       controls:ScrollViewerWheelRouting.IsEnabled="True"
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
+            <ScrollViewer.Style>
+                <Style TargetType="ScrollViewer">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding HasCurrentMatch}" Value="True">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ScrollViewer.Style>
             <StackPanel Margin="24,22,24,24">
                 <!-- Краткая сводка активного игрока, соперника на линии и состояния правила. -->
                 <Border Style="{StaticResource CurrentCard}" Padding="16,12">
