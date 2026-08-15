@@ -5,6 +5,15 @@ obj/
 .vscode/
 .dotnet-cli/
 .codex-temp/
+.codex/
+
+# Graphify generates local graphs, reports, visualizations, manifests and caches.
+graphify-out/
+**/graphify-out/
+.graphify_version
+scripts/update-graphify-graphs.ps1
+u
+
 artifacts/
 TestResults/
 artifacts/
