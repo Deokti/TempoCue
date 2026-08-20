@@ -7,6 +7,8 @@ public interface IWindowCaptureSession
 {
     CaptureDiagnosticsSnapshot Snapshot { get; }
 
+    void EnableAutomaticLeagueWindowCapture(CancellationToken cancellationToken = default);
+
     Task<bool> PickAndStartAsync(
         nint ownerWindow,
         CancellationToken cancellationToken = default);

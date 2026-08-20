@@ -14,6 +14,11 @@ internal sealed class TestWindowCaptureSession : IWindowCaptureSession
 
     public nint LastOwnerWindow { get; private set; }
 
+    public void EnableAutomaticLeagueWindowCapture(
+        CancellationToken cancellationToken = default)
+    {
+    }
+
     public Task<bool> PickAndStartAsync(
         nint ownerWindow,
         CancellationToken cancellationToken = default)

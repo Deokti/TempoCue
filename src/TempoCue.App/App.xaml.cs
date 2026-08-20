@@ -33,6 +33,8 @@ public partial class App : System.Windows.Application
     private IOverlayPresenter? _overlayPresenter;
     private OverlaySetupSession? _overlaySetupSession;
     private ActiveMatchOverlayCoordinator? _activeMatchOverlayCoordinator;
+    private ActiveMatchVisionCoordinator? _activeMatchVisionCoordinator;
+    private ChampionPortraitReferenceLoader? _championPortraitReferenceLoader;
     private WindowsGraphicsCaptureSession? _windowCaptureSession;
     private readonly CancellationTokenSource _lifetimeCancellation = new();
     private int _overlayPreviewStep;
@@ -136,6 +138,13 @@ public partial class App : System.Windows.Application
             overlaySettings,
             LocalizationService.Instance);
         _windowCaptureSession = new WindowsGraphicsCaptureSession();
+        _championPortraitReferenceLoader = new ChampionPortraitReferenceLoader();
+        _activeMatchVisionCoordinator = new ActiveMatchVisionCoordinator(
+            _activeMatchMonitor,
+            _championCatalog,
+            _championPortraitReferenceLoader,
+            _windowCaptureSession,
+            LocalizationService.Instance);
         var captureDiagnostics = new CaptureDiagnosticsViewModel(
             _windowCaptureSession,
             new WindowsGraphicsCaptureSupport().IsSupported,
@@ -206,6 +215,8 @@ public partial class App : System.Windows.Application
             _settingsViewModel,
             _coachingViewModel);
         MainWindow.Show();
+        _windowCaptureSession.EnableAutomaticLeagueWindowCapture(
+            _lifetimeCancellation.Token);
         _activeMatchMonitor.Start();
         _ = InitializeScreenDataAsync(
             coachingLibraryViewModel,
@@ -328,6 +339,8 @@ public partial class App : System.Windows.Application
     protected override void OnExit(ExitEventArgs e)
     {
         _lifetimeCancellation.Cancel();
+        _activeMatchVisionCoordinator?.Dispose();
+        _championPortraitReferenceLoader?.Dispose();
         _activeMatchOverlayCoordinator?.Dispose();
         _overlaySetupSession?.Dispose();
         _overlayPresenter?.Dispose();

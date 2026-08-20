@@ -130,14 +130,21 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         {
             var candidates = _snapshot.MinimapPreview?.MarkerCandidates ??
                 Array.Empty<MinimapMarkerCandidate>();
+            var champions = _snapshot.MinimapPreview?.ChampionMarkerCandidates ??
+                Array.Empty<MinimapChampionMarkerCandidate>();
+            var preview = _snapshot.MinimapPreview;
             return string.Format(
                 CultureInfo.CurrentCulture,
                 _localization.Get("Settings.Capture.Minimap.Markers.Value"),
                 candidates.Count,
-                candidates.Count(candidate =>
+                champions.Count,
+                champions.Count(candidate =>
                     candidate.Affiliation == MinimapMarkerAffiliation.Ally),
-                candidates.Count(candidate =>
-                    candidate.Affiliation == MinimapMarkerAffiliation.Enemy));
+                champions.Count(candidate =>
+                    candidate.Affiliation == MinimapMarkerAffiliation.Enemy),
+                preview?.ChampionProposalCount ?? 0,
+                preview?.ChampionReferenceCount ?? 0,
+                preview?.MaximumIdentityConfidence ?? 0);
         }
     }
 
@@ -363,7 +370,7 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         image.Freeze();
         _renderedPreviewAt = preview.CapturedAt;
         _minimapPreviewImage = image;
-        _minimapMarkerOverlays = preview.MarkerCandidates
+        _minimapMarkerOverlays = preview.ChampionMarkerCandidates
             .Select(candidate => new MinimapMarkerOverlayViewModel(
                 candidate.X,
                 candidate.Y,

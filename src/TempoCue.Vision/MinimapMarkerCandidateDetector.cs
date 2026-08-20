@@ -13,7 +13,7 @@ internal static class MinimapMarkerCandidateDetector
     private const byte Enemy = 2;
     private const byte VisitedOffset = 2;
     private const int MinimumSide = 5;
-    private const int MaximumSide = 22;
+    private const int MaximumSide = 32;
     private const int MinimumColoredPixels = 12;
     private const double MinimumAspectRatio = 0.55;
     private const double MinimumDensity = 0.12;
@@ -185,7 +185,7 @@ internal static class MinimapMarkerCandidateDetector
             return null;
         }
 
-        var sizeScore = Math.Clamp(1 - (Math.Abs(maximumSide - 13) / 13d), 0, 1);
+        var sizeScore = Math.Clamp(1 - (Math.Abs(maximumSide - 18) / 18d), 0, 1);
         var densityScore = Math.Clamp(1 - (Math.Abs(density - 0.32) / 0.32), 0, 1);
         var confidence = (sizeScore * 0.4) + (aspectRatio * 0.35) + (densityScore * 0.25);
         if (confidence < MinimumConfidence)

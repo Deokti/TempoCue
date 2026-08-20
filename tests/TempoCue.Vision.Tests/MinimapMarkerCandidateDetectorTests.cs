@@ -6,11 +6,11 @@ public sealed class MinimapMarkerCandidateDetectorTests
     public void Detect_FindsCompactTeamContoursAndIgnoresDotsAndLines()
     {
         var image = new BgraTestImage(80, 80, 24, 35, 29);
-        DrawBorder(image, x: 10, y: 12, width: 12, height: 12, 240, 190, 35);
-        DrawBorder(image, x: 46, y: 41, width: 14, height: 14, 45, 55, 235);
+        image.DrawBorder(x: 10, y: 12, width: 12, height: 12, 240, 190, 35);
+        image.DrawBorder(x: 46, y: 41, width: 14, height: 14, 45, 55, 235);
 
-        DrawFilledRectangle(image, x: 4, y: 68, width: 3, height: 3, 35, 45, 235);
-        DrawFilledRectangle(image, x: 30, y: 5, width: 25, height: 1, 240, 190, 35);
+        image.DrawFilledRectangle(x: 4, y: 68, width: 3, height: 3, 35, 45, 235);
+        image.DrawFilledRectangle(x: 30, y: 5, width: 25, height: 1, 240, 190, 35);
 
         var candidates = MinimapMarkerCandidateDetector.Detect(
             image.Pixels,
@@ -40,47 +40,5 @@ public sealed class MinimapMarkerCandidateDetectorTests
                 stride: 16));
 
         Assert.Equal("pixels", exception.ParamName);
-    }
-
-    private static void DrawBorder(
-        BgraTestImage image,
-        int x,
-        int y,
-        int width,
-        int height,
-        byte blue,
-        byte green,
-        byte red)
-    {
-        for (var offsetX = 0; offsetX < width; offsetX++)
-        {
-            image.SetPixel(x + offsetX, y, blue, green, red);
-            image.SetPixel(x + offsetX, y + height - 1, blue, green, red);
-        }
-
-        for (var offsetY = 1; offsetY < height - 1; offsetY++)
-        {
-            image.SetPixel(x, y + offsetY, blue, green, red);
-            image.SetPixel(x + width - 1, y + offsetY, blue, green, red);
-        }
-    }
-
-    private static void DrawFilledRectangle(
-        BgraTestImage image,
-        int x,
-        int y,
-        int width,
-        int height,
-        byte blue,
-        byte green,
-        byte red)
-    {
-        for (var offsetY = 0; offsetY < height; offsetY++)
-        {
-            for (var offsetX = 0; offsetX < width; offsetX++)
-            {
-                image.SetPixel(x + offsetX, y + offsetY, blue, green, red);
-            }
-        }
     }
 }

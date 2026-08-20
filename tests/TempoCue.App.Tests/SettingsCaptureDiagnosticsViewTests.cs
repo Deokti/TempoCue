@@ -92,6 +92,16 @@ public sealed class SettingsCaptureDiagnosticsViewTests
                                 12,
                                 MinimapMarkerAffiliation.Ally,
                                 0.8)
+                        ],
+                        ChampionMarkerCandidates =
+                        [
+                            new MinimapChampionMarkerCandidate(
+                                20,
+                                30,
+                                12,
+                                12,
+                                MinimapMarkerAffiliation.Ally,
+                                0.65)
                         ]
                     }));
                 captureDiagnostics.Refresh();
@@ -110,7 +120,7 @@ public sealed class SettingsCaptureDiagnosticsViewTests
                     WpfTestHost.Find<Border>(view, "MinimapPreviewPanel").Visibility);
                 Assert.NotNull(WpfTestHost.Find<Image>(view, "MinimapPreviewImage").Source);
                 Assert.Equal(
-                    "Кандидатов: 1 · союзных: 1 · вражеских: 0",
+                    "Цветовых объектов: 1 · областей сравнения: 0 · подтверждено портретами: 1 (союзных: 1, вражеских: 0) · эталонов: 0 · лучший балл: 0 %",
                     WpfTestHost.Find<TextBlock>(view, "MinimapMarkerCandidatesTextBlock").Text);
                 Assert.Single(
                     WpfTestHost.Find<ItemsControl>(view, "MinimapMarkerCandidatesItemsControl").Items);

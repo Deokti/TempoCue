@@ -1013,7 +1013,7 @@
   <data name="Coaching.MapControl.Details.ReadOnly" xml:space="preserve"><value>Read-only. Open the pack editor to change its content.</value></data>
   <data name="Settings.Capture.Section" xml:space="preserve"><value>Map monitoring</value></data>
   <data name="Settings.Capture.Title" xml:space="preserve"><value>Game window capture</value></data>
-  <data name="Settings.Capture.Description" xml:space="preserve"><value>Select the League of Legends game window to verify stable frame capture before minimap recognition is enabled.</value></data>
+  <data name="Settings.Capture.Description" xml:space="preserve"><value>TempoCue automatically connects to the running League of Legends match window. Manual selection remains available as a fallback.</value></data>
   <data name="Settings.Capture.State.Hint" xml:space="preserve"><value>Metrics and the local minimap preview are refreshed up to four times per second.</value></data>
   <data name="Settings.Capture.State.Idle" xml:space="preserve"><value>Window not selected</value></data>
   <data name="Settings.Capture.State.Selecting" xml:space="preserve"><value>Waiting for window selection</value></data>
@@ -1041,11 +1041,11 @@
   <data name="Settings.Capture.Minimap.Detection.Value" xml:space="preserve"><value>{0} · confidence {1:P0}</value></data>
   <data name="Settings.Capture.Minimap.Corner.Left" xml:space="preserve"><value>bottom left</value></data>
   <data name="Settings.Capture.Minimap.Corner.Right" xml:space="preserve"><value>bottom right</value></data>
-  <data name="Settings.Capture.Minimap.Markers.Label" xml:space="preserve"><value>Preliminary marker detection</value></data>
-  <data name="Settings.Capture.Minimap.Markers.Value" xml:space="preserve"><value>Candidates: {0} · allied: {1} · enemy: {2}</value></data>
+  <data name="Settings.Capture.Minimap.Markers.Label" xml:space="preserve"><value>Participant portrait verification</value></data>
+  <data name="Settings.Capture.Minimap.Markers.Value" xml:space="preserve"><value>Color objects: {0} · comparison regions: {4} · portrait-confirmed: {1} (allied: {2}, enemy: {3}) · references: {5} · best score: {6:P0}</value></data>
   <data name="Settings.Capture.Minimap.Error.Label" xml:space="preserve"><value>Could not prepare the minimap preview</value></data>
   <data name="Settings.Capture.Value.NotAvailable" xml:space="preserve"><value>Not available</value></data>
   <data name="Settings.Capture.Unsupported.Description" xml:space="preserve"><value>Windows Graphics Capture requires Windows 10 version 2004 or later.</value></data>
   <data name="Settings.Capture.Error.Label" xml:space="preserve"><value>Technical details</value></data>
-  <data name="Settings.Capture.Privacy.Hint" xml:space="preserve"><value>Windows grants access only to the window you select. TempoCue does not read game memory and does not save captured frames during this diagnostic stage.</value></data>
+  <data name="Settings.Capture.Privacy.Hint" xml:space="preserve"><value>TempoCue captures only the verified League of Legends match window. It does not read game memory and does not save captured frames during this diagnostic stage.</value></data>
 </root>

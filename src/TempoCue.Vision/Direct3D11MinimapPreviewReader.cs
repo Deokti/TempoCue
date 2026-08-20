@@ -45,10 +45,12 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
         IDirect3DSurface surface,
         int frameWidth,
         int frameHeight,
-        DateTimeOffset capturedAt)
+        DateTimeOffset capturedAt,
+        IReadOnlyList<MinimapChampionReference> championReferences)
     {
         ObjectDisposedException.ThrowIf(_isDisposed, this);
         ArgumentNullException.ThrowIfNull(surface);
+        ArgumentNullException.ThrowIfNull(championReferences);
 
         var sourceTexture = GetTexture(surface);
         try
@@ -84,6 +86,18 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
                 MinimapFrameNormalizer.CanonicalSize,
                 MinimapFrameNormalizer.CanonicalSize,
                 checked(MinimapFrameNormalizer.CanonicalSize * BytesPerPixel));
+            var championProposals = MinimapChampionProposalGenerator.Create(
+                MinimapFrameNormalizer.CanonicalSize,
+                MinimapFrameNormalizer.CanonicalSize,
+                markerCandidates);
+            var championMarkerCandidates = MinimapChampionIdentityMatcher.Match(
+                normalizedPixels,
+                MinimapFrameNormalizer.CanonicalSize,
+                MinimapFrameNormalizer.CanonicalSize,
+                checked(MinimapFrameNormalizer.CanonicalSize * BytesPerPixel),
+                championProposals,
+                championReferences,
+                out var maximumIdentityConfidence);
 
             return new MinimapPreviewSnapshot(
                 region.X,
@@ -98,7 +112,11 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
                 _detectedCorner,
                 _detectionConfidence)
             {
-                MarkerCandidates = markerCandidates
+                MarkerCandidates = markerCandidates,
+                ChampionProposalCount = championProposals.Length,
+                ChampionMarkerCandidates = championMarkerCandidates,
+                ChampionReferenceCount = championReferences.Count,
+                MaximumIdentityConfidence = maximumIdentityConfidence
             };
         }
         finally

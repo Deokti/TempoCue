@@ -69,9 +69,9 @@ public sealed class CaptureDiagnosticsViewModelTests
                     viewModel.MinimapNormalizedSizeText);
                 Assert.Equal("справа внизу · уверенность 92 %", viewModel.MinimapDetectionText);
                 Assert.Equal(
-                    "Кандидатов: 2 · союзных: 1 · вражеских: 1",
+                    "Цветовых объектов: 2 · областей сравнения: 0 · подтверждено портретами: 1 (союзных: 0, вражеских: 1) · эталонов: 0 · лучший балл: 0 %",
                     viewModel.MinimapMarkerCandidatesText);
-                Assert.Equal(2, viewModel.MinimapMarkerOverlays.Count);
+                Assert.Single(viewModel.MinimapMarkerOverlays);
                 var previewImage = Assert.IsAssignableFrom<BitmapSource>(
                     viewModel.MinimapPreviewImage);
                 Assert.Equal(320, previewImage.PixelWidth);
@@ -144,6 +144,16 @@ public sealed class CaptureDiagnosticsViewModelTests
                     14,
                     MinimapMarkerAffiliation.Enemy,
                     0.75)
+            ],
+            ChampionMarkerCandidates =
+            [
+                new MinimapChampionMarkerCandidate(
+                    180,
+                    120,
+                    14,
+                    14,
+                    MinimapMarkerAffiliation.Enemy,
+                    0.68)
             ]
         };
 }

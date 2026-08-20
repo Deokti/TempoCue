@@ -5,7 +5,10 @@ using Windows.Graphics.DirectX.Direct3D11;
 namespace TempoCue.Vision;
 
 /// <summary>Владеет одной диагностической сессией Windows Graphics Capture.</summary>
-public sealed class WindowsGraphicsCaptureSession : IWindowCaptureSession, IAsyncDisposable
+public sealed class WindowsGraphicsCaptureSession :
+    IWindowCaptureSession,
+    IMinimapChampionReferenceSink,
+    IAsyncDisposable
 {
     private const int FrameBufferCount = 2;
     private const int DefaultSelectionFrameRateLimit = 30;
@@ -33,6 +36,9 @@ public sealed class WindowsGraphicsCaptureSession : IWindowCaptureSession, IAsyn
     private MinimapPreviewSnapshot? _minimapPreview;
     private string? _minimapPreviewErrorMessage;
     private string? _errorMessage;
+    private MinimapChampionReference[] _championReferences = [];
+    private CancellationTokenSource? _automaticCaptureCancellation;
+    private Task? _automaticCaptureTask;
     private int _generation;
     private int _disposeState;
 
@@ -59,6 +65,27 @@ public sealed class WindowsGraphicsCaptureSession : IWindowCaptureSession, IAsyn
                     _minimapPreviewErrorMessage,
                     _errorMessage);
             }
+        }
+    }
+
+    public void EnableAutomaticLeagueWindowCapture(
+        CancellationToken cancellationToken = default)
+    {
+        ObjectDisposedException.ThrowIf(Volatile.Read(ref _disposeState) != 0, this);
+        lock (_stateSync)
+        {
+            if (_automaticCaptureTask is { IsCompleted: false })
+            {
+                return;
+            }
+
+            _automaticCaptureCancellation?.Dispose();
+            _automaticCaptureCancellation = CancellationTokenSource.CreateLinkedTokenSource(
+                cancellationToken);
+            var automaticCaptureToken = _automaticCaptureCancellation.Token;
+            _automaticCaptureTask = Task.Run(
+                () => MonitorLeagueWindowAsync(automaticCaptureToken),
+                automaticCaptureToken);
         }
     }
 
@@ -105,6 +132,7 @@ public sealed class WindowsGraphicsCaptureSession : IWindowCaptureSession, IAsyn
     public async Task StopAsync(CancellationToken cancellationToken = default)
     {
         ObjectDisposedException.ThrowIf(Volatile.Read(ref _disposeState) != 0, this);
+        _ = CancelAutomaticCapture();
         await _lifecycleGate.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
@@ -125,6 +153,18 @@ public sealed class WindowsGraphicsCaptureSession : IWindowCaptureSession, IAsyn
             return;
         }
 
+        var automaticCaptureTask = CancelAutomaticCapture();
+        if (automaticCaptureTask is not null)
+        {
+            try
+            {
+                await automaticCaptureTask.ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+        }
+
         await _lifecycleGate.WaitAsync().ConfigureAwait(false);
         try
         {
@@ -135,6 +175,67 @@ public sealed class WindowsGraphicsCaptureSession : IWindowCaptureSession, IAsyn
         {
             _lifecycleGate.Release();
             _lifecycleGate.Dispose();
+            _automaticCaptureCancellation?.Dispose();
+        }
+    }
+
+    private async Task MonitorLeagueWindowAsync(CancellationToken cancellationToken)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+        do
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var state = Snapshot.State;
+            if (state is not CaptureSessionState.Capturing and
+                not CaptureSessionState.SelectingTarget)
+            {
+                await TryStartLeagueWindowAsync(cancellationToken).ConfigureAwait(false);
+            }
+        }
+        while (await timer.WaitForNextTickAsync(cancellationToken).ConfigureAwait(false));
+    }
+
+    private async Task<bool> TryStartLeagueWindowAsync(CancellationToken cancellationToken)
+    {
+        if (!GraphicsCaptureSession.IsSupported())
+        {
+            SetState(CaptureSessionState.Unsupported, null);
+            return false;
+        }
+
+        var windowHandle = LeagueWindowCaptureTarget.FindWindowHandle();
+        if (windowHandle == nint.Zero)
+        {
+            return false;
+        }
+
+        var generation = await BeginSelectionAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            var item = GraphicsCaptureItemFactory.CreateForWindow(windowHandle);
+            return await StartSelectedItemAsync(
+                generation,
+                item,
+                cancellationToken).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            await CompleteCancelledSelectionAsync(generation).ConfigureAwait(false);
+            throw;
+        }
+        catch (Exception exception)
+        {
+            await CompleteFailedSelectionAsync(generation, exception.Message).ConfigureAwait(false);
+            return false;
+        }
+    }
+
+    private Task? CancelAutomaticCapture()
+    {
+        lock (_stateSync)
+        {
+            _automaticCaptureCancellation?.Cancel();
+            return _automaticCaptureTask;
         }
     }
 
@@ -404,6 +505,14 @@ public sealed class WindowsGraphicsCaptureSession : IWindowCaptureSession, IAsyn
         }
     }
 
+    public void SetChampionReferences(IReadOnlyList<MinimapChampionReference> references)
+    {
+        ArgumentNullException.ThrowIfNull(references);
+        ObjectDisposedException.ThrowIf(Volatile.Read(ref _disposeState) != 0, this);
+
+        Volatile.Write(ref _championReferences, references.ToArray());
+    }
+
     private void TryUpdateMinimapPreview(
         IDirect3DSurface surface,
         int contentWidth,
@@ -416,7 +525,8 @@ public sealed class WindowsGraphicsCaptureSession : IWindowCaptureSession, IAsyn
                 surface,
                 contentWidth,
                 contentHeight,
-                DateTimeOffset.UtcNow);
+                DateTimeOffset.UtcNow,
+                Volatile.Read(ref _championReferences));
             lock (_stateSync)
             {
                 _minimapPreview = preview;
