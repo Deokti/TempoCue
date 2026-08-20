@@ -8,11 +8,13 @@ internal static class CurrentMatchViewModelTestData
     public static ActiveMatchMonitor CreateMonitor(
         IMatchSnapshotSource source,
         IMatchAdviceSelector? adviceSelector = null,
-        TimeSpan? pollingInterval = null) =>
+        TimeSpan? pollingInterval = null,
+        IChampionSelectSource? championSelectSource = null) =>
         new(new ActiveMatchSession(
             source,
             adviceSelector ?? new TestMatchAdviceSelector(),
-            pollingInterval ?? TimeSpan.FromSeconds(1)));
+            pollingInterval ?? TimeSpan.FromSeconds(1),
+            championSelectSource: championSelectSource));
 
     public static PlayerState CreatePlayer(
         string id,

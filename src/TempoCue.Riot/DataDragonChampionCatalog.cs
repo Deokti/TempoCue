@@ -11,6 +11,7 @@ namespace TempoCue.Riot;
 /// </summary>
 public sealed class DataDragonChampionCatalog : IChampionCatalog
 {
+    private static readonly TimeSpan FreshCacheLifetime = TimeSpan.FromHours(24);
     private static readonly JsonSerializerOptions CacheJsonOptions = new(JsonSerializerDefaults.Web);
 
     private readonly DataDragonClient _dataDragonClient;
@@ -66,6 +67,16 @@ public sealed class DataDragonChampionCatalog : IChampionCatalog
         string locale,
         CancellationToken cancellationToken)
     {
+        // Названия и портреты нужны уже в первые секунды Champion Select. Свежий
+        // локальный кеш быстрее сети и остаётся согласованным в пределах одного патча.
+        var freshCache = await LoadCacheAsync(
+            locale,
+            cancellationToken,
+            requireFresh: true).ConfigureAwait(false);
+        if (freshCache.IsAvailable)
+        {
+            return freshCache;
+        }
 
         try
         {
@@ -194,7 +205,8 @@ public sealed class DataDragonChampionCatalog : IChampionCatalog
 
     private async Task<ChampionCatalogLoadResult> LoadCacheAsync(
         string locale,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        bool requireFresh = false)
     {
         try
         {
@@ -209,7 +221,9 @@ public sealed class DataDragonChampionCatalog : IChampionCatalog
                 stream,
                 CacheJsonOptions,
                 cancellationToken);
-            if (cache?.Locale != locale || cache.Champions is null)
+            if (cache?.Locale != locale
+                || cache.Champions is null
+                || requireFresh && !IsFreshCache(cache.SavedAtUtc))
             {
                 return ChampionCatalogLoadResult.Unavailable();
             }
@@ -244,6 +258,12 @@ public sealed class DataDragonChampionCatalog : IChampionCatalog
 
     private string GetCachePath(string locale) =>
         Path.Combine(_cacheDirectory, $"champions-{locale}.json");
+
+    private static bool IsFreshCache(DateTimeOffset savedAtUtc)
+    {
+        var age = DateTimeOffset.UtcNow - savedAtUtc;
+        return age >= TimeSpan.FromMinutes(-5) && age <= FreshCacheLifetime;
+    }
 
     private static bool IsSummonersRiftChampion(string championId) =>
         !championId.StartsWith("Jade_", StringComparison.OrdinalIgnoreCase);

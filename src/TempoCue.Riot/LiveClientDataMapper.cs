@@ -53,10 +53,15 @@ internal static class LiveClientDataMapper
     {
         var participantId = GetParticipantId(source.RiotId, source.SummonerName)
             ?? $"participant-{index}";
+        var riotId = MapRiotId(
+            source.RiotId,
+            source.RiotIdGameName,
+            source.RiotIdTagLine);
 
         return new PlayerState
         {
             ParticipantId = participantId,
+            RiotId = riotId,
             ChampionName = GetCanonicalChampionName(source),
             Team = MapTeam(source.Team),
             Position = MapPosition(source.Position),
@@ -151,6 +156,32 @@ internal static class LiveClientDataMapper
         }
 
         return string.IsNullOrWhiteSpace(summonerName) ? null : summonerName;
+    }
+
+    private static RiotId? MapRiotId(
+        string? combinedRiotId,
+        string? gameName,
+        string? tagLine)
+    {
+        if (RiotId.TryCreate(gameName, tagLine, out var riotId))
+        {
+            return riotId;
+        }
+
+        if (string.IsNullOrWhiteSpace(combinedRiotId))
+        {
+            return null;
+        }
+
+        var separatorIndex = combinedRiotId.LastIndexOf('#');
+        return separatorIndex > 0
+            && separatorIndex < combinedRiotId.Length - 1
+            && RiotId.TryCreate(
+                combinedRiotId[..separatorIndex],
+                combinedRiotId[(separatorIndex + 1)..],
+                out riotId)
+                ? riotId
+                : null;
     }
 
     private static string GetCanonicalChampionName(LiveClientPlayerDto source)

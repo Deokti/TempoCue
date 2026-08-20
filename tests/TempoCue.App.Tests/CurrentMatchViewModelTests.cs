@@ -32,6 +32,7 @@ public sealed class CurrentMatchViewModelTests
         using var viewModel = new TempoCue.App.ViewModels.CurrentMatchViewModel(
             monitor,
             TestChampionCatalog.Ready(),
+            TestLeagueClientRegionSource.EuropeWest(),
             TempoCue.App.Localization.LocalizationService.Instance);
 
         Assert.Equal(MatchSnapshotReadStatus.Success, viewModel.Status);
@@ -247,6 +248,47 @@ public sealed class CurrentMatchViewModelTests
     }
 
     [Fact]
+    public async Task LoadPlayerProfileRegionAsync_AddsRiotIdAndProfileLinkToRoster()
+    {
+        using var context = new CurrentMatchViewModelTestContext();
+        var match = new MatchState
+        {
+            GameTimeSeconds = 120,
+            ActivePlayerId = "urgot-player",
+            Players =
+            [
+                new PlayerState
+                {
+                    ParticipantId = "urgot-player",
+                    RiotId = RiotId.Create("Summoner A", "EUW"),
+                    ChampionName = "Urgot",
+                    Team = TeamSide.Order,
+                    Position = PlayerPosition.Top,
+                    Level = 1
+                }
+            ]
+        };
+        var viewModel = context.CreateViewModel(
+            MatchSnapshotReadResult.Success(
+                new MatchSnapshot(match, [], DateTimeOffset.UtcNow)),
+            new TestMatchAdviceSelector(),
+            leagueClientRegionSource: TestLeagueClientRegionSource.EuropeWest());
+
+        await viewModel.RefreshAsync();
+        var participantWithoutRegion = Assert.Single(viewModel.Allies);
+        Assert.Equal("Summoner A#EUW", participantWithoutRegion.RiotId);
+        Assert.Null(participantWithoutRegion.ProfileUri);
+
+        await viewModel.LoadPlayerProfileRegionAsync();
+
+        var participant = Assert.Single(viewModel.Allies);
+        Assert.Equal(
+            "https://www.leagueofgraphs.com/summoner/euw/Summoner+A-EUW",
+            participant.ProfileUri?.AbsoluteUri);
+        Assert.Contains("Summoner A#EUW", participant.ProfileLinkToolTip);
+    }
+
+    [Fact]
     public async Task RefreshAsync_ShowsLoadingInsteadOfConnectionError()
     {
         using var context = new CurrentMatchViewModelTestContext();
@@ -257,6 +299,125 @@ public sealed class CurrentMatchViewModelTests
         Assert.Equal(MatchSnapshotReadStatus.GameLoading, viewModel.Status);
         Assert.Equal("ЗАГРУЗКА МАТЧА", viewModel.ConnectionTitle);
         Assert.Contains("ожидаем готовность", viewModel.ConnectionDetails);
+        Assert.False(viewModel.HasCurrentMatch);
+        Assert.Equal("Матч загружается", viewModel.StateTitle);
+        Assert.False(viewModel.CanRetry);
+    }
+
+    [Fact]
+    public async Task RefreshAsync_HidesStaleSnapshotAndRestoresContentAfterTemporaryFailure()
+    {
+        using var context = new CurrentMatchViewModelTestContext();
+        var firstSnapshot = CreateSnapshot("urgot-player", "Urgot", 120);
+        var restoredSnapshot = CreateSnapshot("darius-player", "Darius", 180);
+        var source = TestMatchSnapshotSource.FromSequence(
+            MatchSnapshotReadResult.Success(firstSnapshot),
+            MatchSnapshotReadResult.Timeout(),
+            MatchSnapshotReadResult.Success(restoredSnapshot));
+        using var monitor = CreateMonitor(source);
+        using var viewModel = new TempoCue.App.ViewModels.CurrentMatchViewModel(
+            monitor,
+            TestChampionCatalog.Ready(),
+            TestLeagueClientRegionSource.EuropeWest(),
+            context.Localization);
+
+        await viewModel.RefreshAsync();
+        Assert.True(viewModel.HasCurrentMatch);
+        Assert.Equal("Urgot", viewModel.ActiveChampion);
+
+        await viewModel.RefreshAsync();
+        Assert.False(viewModel.HasCurrentMatch);
+        Assert.True(viewModel.CanRetry);
+        Assert.Equal("Временно нет данных матча", viewModel.StateTitle);
+        Assert.Contains("устаревшие", viewModel.StateMessage);
+        Assert.Equal("—", viewModel.ActiveChampion);
+        Assert.Empty(viewModel.Allies);
+        Assert.Empty(viewModel.Enemies);
+
+        await viewModel.RefreshAsync();
+        Assert.True(viewModel.HasCurrentMatch);
+        Assert.False(viewModel.CanRetry);
+        Assert.Equal("Darius", viewModel.ActiveChampion);
+        Assert.Equal("03:00", viewModel.GameTime);
+    }
+
+    [Fact]
+    public async Task RefreshAsync_ShowsChampionSelectWithoutExposingAnonymousIdentity()
+    {
+        using var context = new CurrentMatchViewModelTestContext();
+        var championSelect = new ChampionSelectState(
+            0,
+            [
+                ChampionSelectParticipant.Visible(
+                    0,
+                    6,
+                    PlayerPosition.Top,
+                    isLocalPlayer: true,
+                    RiotId.Create("Tempo Player", "TEST")),
+                ChampionSelectParticipant.Anonymous(
+                    1,
+                    266,
+                    PlayerPosition.Jungle,
+                    isLocalPlayer: false),
+                ChampionSelectParticipant.Unavailable(
+                    2,
+                    0,
+                    PlayerPosition.Middle,
+                    isLocalPlayer: false)
+            ]);
+        var viewModel = context.CreateViewModel(
+            MatchSnapshotReadResult.NoActiveMatch(),
+            ChampionSelectReadResult.Success(championSelect));
+
+        await viewModel.RefreshAsync();
+        await viewModel.LoadChampionImagesAsync();
+        await viewModel.LoadPlayerProfileRegionAsync();
+
+        Assert.True(viewModel.HasChampionSelect);
+        Assert.False(viewModel.HasCurrentMatch);
+        Assert.Equal("ВЫБОР ЧЕМПИОНОВ", viewModel.ConnectionTitle);
+        Assert.Equal(3, viewModel.ChampionSelectParticipants.Count);
+        var localPlayer = viewModel.ChampionSelectParticipants[0];
+        Assert.Equal("Urgot", localPlayer.ChampionName);
+        Assert.False(localPlayer.IsChampionPending);
+        Assert.Equal("Tempo Player#TEST", localPlayer.Identity);
+        Assert.Equal(
+            "https://www.leagueofgraphs.com/summoner/euw/Tempo+Player-TEST",
+            localPlayer.ProfileUri?.AbsoluteUri);
+        var anonymous = viewModel.ChampionSelectParticipants[1];
+        Assert.Equal("Aatrox", anonymous.ChampionName);
+        Assert.Equal("Анонимный игрок", anonymous.Identity);
+        Assert.True(anonymous.IsAnonymous);
+        Assert.Null(anonymous.ProfileUri);
+        var pending = viewModel.ChampionSelectParticipants[2];
+        Assert.Equal("Чемпион не выбран", pending.ChampionName);
+        Assert.True(pending.IsChampionPending);
+    }
+
+    [Theory]
+    [InlineData(MatchSnapshotReadStatus.NoActiveMatch, "Матч ещё не начался", false)]
+    [InlineData(MatchSnapshotReadStatus.InvalidData, "Не удалось прочитать данные матча", true)]
+    [InlineData(MatchSnapshotReadStatus.Failed, "Не удалось подключиться к матчу", true)]
+    public async Task RefreshAsync_ProvidesDedicatedStatePresentation(
+        MatchSnapshotReadStatus status,
+        string expectedTitle,
+        bool expectedRetry)
+    {
+        using var context = new CurrentMatchViewModelTestContext();
+        var result = status switch
+        {
+            MatchSnapshotReadStatus.NoActiveMatch => MatchSnapshotReadResult.NoActiveMatch(),
+            MatchSnapshotReadStatus.InvalidData => MatchSnapshotReadResult.InvalidData(),
+            MatchSnapshotReadStatus.Failed => MatchSnapshotReadResult.Failed(),
+            _ => throw new ArgumentOutOfRangeException(nameof(status))
+        };
+        var viewModel = context.CreateViewModel(result);
+
+        await viewModel.RefreshAsync();
+
+        Assert.False(viewModel.HasCurrentMatch);
+        Assert.Equal(expectedTitle, viewModel.StateTitle);
+        Assert.Equal(expectedRetry, viewModel.CanRetry);
     }
 
     [Fact]
@@ -284,5 +445,25 @@ public sealed class CurrentMatchViewModelTests
         Assert.Contains("Первый, Второй", viewModel.AdviceMessage);
         Assert.Contains("не выбирает рекомендацию случайно", viewModel.AdviceReason);
     }
+
+    private static MatchSnapshot CreateSnapshot(
+        string activePlayerId,
+        string championName,
+        double gameTimeSeconds) => new(
+        new MatchState
+        {
+            GameTimeSeconds = gameTimeSeconds,
+            ActivePlayerId = activePlayerId,
+            Players =
+            [
+                CreatePlayer(
+                    activePlayerId,
+                    championName,
+                    TeamSide.Order,
+                    PlayerPosition.Top)
+            ]
+        },
+        [],
+        DateTimeOffset.UtcNow);
 
 }

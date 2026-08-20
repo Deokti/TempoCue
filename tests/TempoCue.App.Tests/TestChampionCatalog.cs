@@ -16,7 +16,12 @@ internal sealed class TestChampionCatalog(ChampionCatalogLoadResult result) : IC
                     "Sett",
                     875,
                     "Sett",
-                    new Uri("https://example.test/Sett.png"))
+                    new Uri("https://example.test/Sett.png")),
+                new ChampionCatalogEntry(
+                    "Aatrox",
+                    266,
+                    "Aatrox",
+                    new Uri("https://example.test/Aatrox.png"))
             ],
             ChampionCatalogSource.Network));
 

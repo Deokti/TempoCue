@@ -19,6 +19,7 @@ namespace TempoCue.App;
 public partial class App : System.Windows.Application
 {
     private LiveClientDataClient? _liveClientDataClient;
+    private LeagueClientChampionSelectClient? _championSelectClient;
     private DataDragonClient? _dataDragonClient;
     private DataDragonGamePatchCatalog? _gamePatchCatalog;
     private DataDragonChampionCatalog? _championCatalog;
@@ -100,15 +101,19 @@ public partial class App : System.Windows.Application
 
         // Инфраструктура матча создаётся здесь, чтобы View и ViewModel не конструировали HTTP-клиенты.
         _liveClientDataClient = new LiveClientDataClient();
+        _championSelectClient = new LeagueClientChampionSelectClient();
+        var leagueClientRegionSource = new LeagueClientRegionSource();
         var activeMatchSession = new ActiveMatchSession(
             _liveClientDataClient,
             activeCoachPackSelector,
             TimeSpan.FromSeconds(1),
-            activeMapControlPackSelector);
+            activeMapControlPackSelector,
+            _championSelectClient);
         _activeMatchMonitor = new ActiveMatchMonitor(activeMatchSession);
         var currentMatchViewModel = new CurrentMatchViewModel(
             _activeMatchMonitor,
             _championCatalog,
+            leagueClientRegionSource,
             LocalizationService.Instance);
         _currentMatchViewModel = currentMatchViewModel;
         var homeViewModel = new HomeViewModel(
@@ -209,7 +214,8 @@ public partial class App : System.Windows.Application
         {
             await Task.WhenAll(
                 coachingLibrary.EnsureLoadedAsync(cancellationToken),
-                currentMatch.LoadChampionImagesAsync(cancellationToken));
+                currentMatch.LoadChampionImagesAsync(cancellationToken),
+                currentMatch.LoadPlayerProfileRegionAsync(cancellationToken));
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -322,6 +328,7 @@ public partial class App : System.Windows.Application
         _homeViewModel?.Dispose();
         _currentMatchViewModel?.Dispose();
         _activeMatchMonitor?.Dispose();
+        _championSelectClient?.Dispose();
         _dataDragonClient?.Dispose();
         _liveClientDataClient?.Dispose();
         base.OnExit(e);

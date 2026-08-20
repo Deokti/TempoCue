@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using TempoCue.App.Localization;
+using TempoCue.App.Profiles;
 using TempoCue.Application;
 using TempoCue.Core;
 
@@ -16,18 +17,30 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
 
     private readonly IActiveMatchMonitor _monitor;
     private readonly IChampionCatalog _championCatalog;
+    private readonly ILeagueClientRegionSource _leagueClientRegionSource;
     private readonly LocalizationService _localization;
 
     private ActiveMatchUpdate? _lastUpdate;
     private IReadOnlyDictionary<string, Uri> _championImages =
         new Dictionary<string, Uri>(StringComparer.OrdinalIgnoreCase);
+    private IReadOnlyDictionary<int, ChampionCatalogEntry> _championsByNumericId =
+        new Dictionary<int, ChampionCatalogEntry>();
     private CancellationTokenSource? _championCatalogLoadCancellation;
+    private CancellationTokenSource? _profileRegionLoadCancellation;
     private int _championCatalogLoadVersion;
+    private int _profileRegionLoadVersion;
     private bool _isChampionCatalogLoaded;
+    private bool _isProfileRegionLoaded;
+    private string? _leagueClientRegion;
     private MatchSnapshotReadStatus _status = MatchSnapshotReadStatus.NoActiveMatch;
     private string _connectionTitle = string.Empty;
     private string _connectionDetails = string.Empty;
-    private string _gameTime = "00:00";
+    private string _stateTitle = string.Empty;
+    private string _stateMessage = string.Empty;
+    private bool _hasCurrentMatch;
+    private bool _hasChampionSelect;
+    private bool _canRetry;
+    private string _gameTime = "—";
     private string _activeChampion = "—";
     private string _activeChampionInitials = "—";
     private Uri? _activeChampionImageUri;
@@ -52,10 +65,13 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
     public CurrentMatchViewModel(
         IActiveMatchMonitor monitor,
         IChampionCatalog championCatalog,
+        ILeagueClientRegionSource leagueClientRegionSource,
         LocalizationService localization)
     {
         _monitor = monitor ?? throw new ArgumentNullException(nameof(monitor));
         _championCatalog = championCatalog ?? throw new ArgumentNullException(nameof(championCatalog));
+        _leagueClientRegionSource = leagueClientRegionSource
+            ?? throw new ArgumentNullException(nameof(leagueClientRegionSource));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _monitor.Updated += Monitor_Updated;
         _localization.PropertyChanged += Localization_PropertyChanged;
@@ -72,6 +88,11 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
     public ObservableCollection<ParticipantViewModel> Enemies { get; } = [];
 
     public ObservableCollection<MatchEventViewModel> Events { get; } = [];
+
+    public ObservableCollection<ChampionSelectParticipantViewModel> ChampionSelectParticipants
+    {
+        get;
+    } = [];
 
     /// <summary>
     /// Сообщает оболочке, что очередной снимок полностью применён.
@@ -255,6 +276,9 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
             }
 
             _championImages = BuildChampionImageLookup(result.Champions);
+            _championsByNumericId = result.Champions
+                .GroupBy(static champion => champion.NumericId)
+                .ToDictionary(static group => group.Key, static group => group.First());
             _isChampionCatalogLoaded = result.IsAvailable;
             RerenderLastUpdate();
         }
@@ -273,6 +297,84 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         }
     }
 
+    public string StateTitle
+    {
+        get => _stateTitle;
+        private set => SetProperty(ref _stateTitle, value);
+    }
+
+    public string StateMessage
+    {
+        get => _stateMessage;
+        private set => SetProperty(ref _stateMessage, value);
+    }
+
+    public bool HasCurrentMatch
+    {
+        get => _hasCurrentMatch;
+        private set => SetProperty(ref _hasCurrentMatch, value);
+    }
+
+    public bool HasChampionSelect
+    {
+        get => _hasChampionSelect;
+        private set => SetProperty(ref _hasChampionSelect, value);
+    }
+
+    public bool CanRetry
+    {
+        get => _canRetry;
+        private set => SetProperty(ref _canRetry, value);
+    }
+
+    /// <summary>
+    /// Один раз читает регион локального клиента. Если регион неизвестен, Riot ID всё равно
+    /// показывается, но ссылка не строится по догадке.
+    /// </summary>
+    public async Task LoadPlayerProfileRegionAsync(
+        CancellationToken cancellationToken = default)
+    {
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
+        if (_isProfileRegionLoaded)
+        {
+            return;
+        }
+
+        var version = Interlocked.Increment(ref _profileRegionLoadVersion);
+        var requestCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        var previousCancellation = Interlocked.Exchange(
+            ref _profileRegionLoadCancellation,
+            requestCancellation);
+        TryCancel(previousCancellation);
+
+        try
+        {
+            var region = await _leagueClientRegionSource
+                .ReadRegionAsync(requestCancellation.Token);
+            if (_isDisposed || version != Volatile.Read(ref _profileRegionLoadVersion))
+            {
+                return;
+            }
+
+            _leagueClientRegion = region;
+            _isProfileRegionLoaded = true;
+            RerenderLastUpdate();
+        }
+        catch (OperationCanceledException) when (
+            !cancellationToken.IsCancellationRequested
+            && requestCancellation.IsCancellationRequested)
+        {
+        }
+        finally
+        {
+            Interlocked.CompareExchange(
+                ref _profileRegionLoadCancellation,
+                null,
+                requestCancellation);
+            requestCancellation.Dispose();
+        }
+    }
+
     public void Dispose()
     {
         if (_isDisposed)
@@ -282,7 +384,9 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
 
         _isDisposed = true;
         Interlocked.Increment(ref _championCatalogLoadVersion);
+        Interlocked.Increment(ref _profileRegionLoadVersion);
         TryCancel(Interlocked.Exchange(ref _championCatalogLoadCancellation, null));
+        TryCancel(Interlocked.Exchange(ref _profileRegionLoadCancellation, null));
         _monitor.Updated -= Monitor_Updated;
         _localization.PropertyChanged -= Localization_PropertyChanged;
     }
@@ -300,13 +404,18 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         _lastUpdate = update;
         Status = update.Status;
 
-        if (update.Snapshot is null)
+        if (update.Status == MatchSnapshotReadStatus.Success && update.Snapshot is not null)
         {
-            RenderWaiting();
+            RenderSnapshot(update.Snapshot, update.CoachPackSelection);
+        }
+        else if (update.ChampionSelect is not null
+                 && update.ChampionSelectStatus == ChampionSelectReadStatus.Success)
+        {
+            RenderChampionSelect(update.ChampionSelect);
         }
         else
         {
-            RenderSnapshot(update.Snapshot, update.CoachPackSelection);
+            RenderWaiting();
         }
 
         StateUpdated?.Invoke(this, EventArgs.Empty);
@@ -321,6 +430,12 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         var matchup = MatchupResolver.Resolve(match);
         var advice = selection?.Advice;
 
+        HasCurrentMatch = true;
+        HasChampionSelect = false;
+        ClearIfNotEmpty(ChampionSelectParticipants);
+        CanRetry = false;
+        StateTitle = string.Empty;
+        StateMessage = string.Empty;
         ConnectionTitle = _localization.Get("Current.Status.Connected");
         ConnectionDetails = _localization.Format(
             "Current.Status.ConnectedDetails",
@@ -363,6 +478,91 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         RenderAdvice(selection, activePlayer);
         RenderParticipants(match);
         RenderEvents(match, snapshot.Events);
+    }
+
+    private void RenderChampionSelect(ChampionSelectState state)
+    {
+        HasCurrentMatch = false;
+        HasChampionSelect = true;
+        CanRetry = false;
+        ConnectionTitle = _localization.Get("Current.ChampionSelect.Status");
+        ConnectionDetails = _localization.Format(
+            "Current.ChampionSelect.StatusDetails",
+            _localization.Plural("Count.Player", state.Participants.Count));
+        StateTitle = string.Empty;
+        StateMessage = string.Empty;
+        GameTime = "—";
+
+        var participants = state.Participants
+            .OrderBy(static participant => GetPositionOrder(participant.Position))
+            .ThenBy(static participant => participant.CellId)
+            .Select(CreateChampionSelectParticipant)
+            .ToArray();
+        ReplaceItemsIfChanged(ChampionSelectParticipants, participants);
+
+        ResetActivePlayer();
+        OpponentChampion = "—";
+        OpponentChampionInitials = "—";
+        OpponentChampionImageUri = null;
+        AdviceTitle = string.Empty;
+        AdviceMessage = string.Empty;
+        AdviceReason = string.Empty;
+        AdviceSource = string.Empty;
+        PowerStateLabel = string.Empty;
+        PowerState = null;
+        ClearIfNotEmpty(Allies);
+        ClearIfNotEmpty(Enemies);
+        ClearIfNotEmpty(Events);
+        HasParticipants = false;
+        HasEvents = false;
+        OnPropertyChanged(nameof(ParticipantCount));
+    }
+
+    private ChampionSelectParticipantViewModel CreateChampionSelectParticipant(
+        ChampionSelectParticipant participant)
+    {
+        _championsByNumericId.TryGetValue(participant.ChampionId, out var champion);
+        var championName = champion?.DisplayName
+            ?? (participant.ChampionId == 0
+                ? _localization.Get("Current.ChampionSelect.ChampionPending")
+                : _localization.Format(
+                    "Current.ChampionSelect.ChampionUnknown",
+                    participant.ChampionId));
+        var riotId = participant.RiotId?.DisplayName;
+        var identity = participant.IdentityVisibility switch
+        {
+            ChampionSelectIdentityVisibility.Visible => riotId ?? string.Empty,
+            ChampionSelectIdentityVisibility.Anonymous =>
+                _localization.Get("Current.ChampionSelect.Identity.Anonymous"),
+            _ => _localization.Get("Current.ChampionSelect.Identity.Unavailable")
+        };
+        var identityStatus = participant.IdentityVisibility switch
+        {
+            ChampionSelectIdentityVisibility.Visible =>
+                _localization.Get("Current.ChampionSelect.Identity.Visible"),
+            ChampionSelectIdentityVisibility.Anonymous =>
+                _localization.Get("Current.ChampionSelect.Identity.Protected"),
+            _ => _localization.Get("Current.ChampionSelect.Identity.NotReported")
+        };
+        var profileUri = participant.IdentityVisibility == ChampionSelectIdentityVisibility.Visible
+            ? LeagueOfGraphsProfileUriBuilder.Build(participant.RiotId, _leagueClientRegion)
+            : null;
+        var profileLinkToolTip = profileUri is null || riotId is null
+            ? string.Empty
+            : _localization.Format("Current.Participant.ProfileLinkHint", riotId);
+
+        return new ChampionSelectParticipantViewModel(
+            GetPositionCode(participant.Position),
+            GetInitials(championName),
+            champion?.ImageUri,
+            championName,
+            identity,
+            identityStatus,
+            profileUri,
+            profileLinkToolTip,
+            participant.IsLocalPlayer,
+            participant.IdentityVisibility == ChampionSelectIdentityVisibility.Anonymous,
+            participant.ChampionId == 0);
     }
 
     private void RenderAdvice(
@@ -529,12 +729,22 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
                 "Current.Participant.State",
                 state,
                 FormatCreepScore(player.CreepScore));
+        var riotId = player.RiotId?.DisplayName ?? string.Empty;
+        var profileUri = LeagueOfGraphsProfileUriBuilder.Build(
+            player.RiotId,
+            _leagueClientRegion);
+        var profileLinkToolTip = profileUri is null
+            ? string.Empty
+            : _localization.Format("Current.Participant.ProfileLinkHint", riotId);
 
         return new ParticipantViewModel(
             GetPositionCode(player.Position),
             GetInitials(player.ChampionName),
             FindChampionImage(player.ChampionName),
             player.ChampionName,
+            riotId,
+            profileUri,
+            profileLinkToolTip,
             details,
             $"{player.Kills}/{player.Deaths}/{player.Assists}",
             player.Level,
@@ -602,6 +812,12 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
 
     private void RenderWaiting()
     {
+        HasCurrentMatch = false;
+        HasChampionSelect = false;
+        ClearIfNotEmpty(ChampionSelectParticipants);
+        CanRetry = Status is MatchSnapshotReadStatus.Timeout
+            or MatchSnapshotReadStatus.InvalidData
+            or MatchSnapshotReadStatus.Failed;
         ConnectionTitle = Status switch
         {
             MatchSnapshotReadStatus.GameLoading => _localization.Get("Current.Status.Loading"),
@@ -610,17 +826,28 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
             MatchSnapshotReadStatus.Failed => _localization.Get("Current.Status.Error"),
             _ => _localization.Get("Current.Status.Waiting")
         };
-        ConnectionDetails = Status == MatchSnapshotReadStatus.GameLoading
-            ? _localization.Get("Current.Status.LoadingDetails")
-            : _localization.Get("Current.Status.WaitingDetails");
-        GameTime = "00:00";
+        ConnectionDetails = Status switch
+        {
+            MatchSnapshotReadStatus.GameLoading =>
+                _localization.Get("Current.Status.LoadingDetails"),
+            MatchSnapshotReadStatus.Timeout =>
+                _localization.Get("Current.Status.TimeoutDetails"),
+            MatchSnapshotReadStatus.InvalidData =>
+                _localization.Get("Current.Status.InvalidDataDetails"),
+            MatchSnapshotReadStatus.Failed =>
+                _localization.Get("Current.Status.ErrorDetails"),
+            _ => _localization.Get("Current.Status.WaitingDetails")
+        };
+        StateTitle = _localization.Get(GetStateResourceKey("Title"));
+        StateMessage = _localization.Get(GetStateResourceKey("Message"));
+        GameTime = "—";
         ActiveChampion = "—";
         ActiveChampionInitials = "—";
         ActiveChampionImageUri = null;
         ActiveSummary = _localization.Get("Current.Player.Waiting");
         ActivePosition = "—";
-        ActiveKda = "0/0/0";
-        ActiveCreepScore = "0 CS";
+        ActiveKda = "—";
+        ActiveCreepScore = "—";
         OpponentChampion = "—";
         OpponentChampionInitials = "—";
         OpponentChampionImageUri = null;
@@ -639,6 +866,20 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(ParticipantCount));
     }
 
+    private string GetStateResourceKey(string suffix)
+    {
+        var state = Status switch
+        {
+            MatchSnapshotReadStatus.GameLoading => "Loading",
+            MatchSnapshotReadStatus.Timeout => "Timeout",
+            MatchSnapshotReadStatus.InvalidData => "InvalidData",
+            MatchSnapshotReadStatus.Failed => "Error",
+            _ => "Waiting"
+        };
+
+        return $"Current.State.{state}.{suffix}";
+    }
+
     private void Localization_PropertyChanged(
         object? sender,
         PropertyChangedEventArgs e)
@@ -648,9 +889,21 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
             return;
         }
 
-        if (_lastUpdate?.Snapshot is { } snapshot)
+        if (_lastUpdate is
+            {
+                Status: MatchSnapshotReadStatus.Success,
+                Snapshot: { } snapshot
+            })
         {
             RenderSnapshot(snapshot, _lastUpdate.CoachPackSelection);
+        }
+        else if (_lastUpdate is
+                 {
+                     ChampionSelectStatus: ChampionSelectReadStatus.Success,
+                     ChampionSelect: { } championSelect
+                 })
+        {
+            RenderChampionSelect(championSelect);
         }
         else
         {
@@ -786,13 +1039,26 @@ public sealed class CurrentMatchViewModel : ObservableObject, IDisposable
 
     private void RerenderLastUpdate()
     {
-        if (_lastUpdate?.Snapshot is not { } snapshot)
+        if (_lastUpdate is
+            {
+                Status: MatchSnapshotReadStatus.Success,
+                Snapshot: { } snapshot
+            })
         {
+            RenderSnapshot(snapshot, _lastUpdate.CoachPackSelection);
+            StateUpdated?.Invoke(this, EventArgs.Empty);
             return;
         }
 
-        RenderSnapshot(snapshot, _lastUpdate.CoachPackSelection);
-        StateUpdated?.Invoke(this, EventArgs.Empty);
+        if (_lastUpdate is
+            {
+                ChampionSelectStatus: ChampionSelectReadStatus.Success,
+                ChampionSelect: { } championSelect
+            })
+        {
+            RenderChampionSelect(championSelect);
+            StateUpdated?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     private static void TryCancel(CancellationTokenSource? cancellation)

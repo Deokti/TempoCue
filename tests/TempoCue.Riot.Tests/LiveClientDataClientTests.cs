@@ -38,7 +38,8 @@ public sealed class LiveClientDataClientTests
                   "isBot": false
                 },
                 {
-                  "riotId": "AllySupport#TEST",
+                  "riotIdGameName": "AllySupport",
+                  "riotIdTagLine": "TEST",
                   "summonerName": "AllySupport",
                   "championName": "Треш",
                   "rawChampionName": "game_character_displayname_Thresh",
@@ -119,6 +120,7 @@ public sealed class LiveClientDataClientTests
 
         var activePlayer = snapshot.Match.GetActivePlayer();
         Assert.NotNull(activePlayer);
+        Assert.Equal("UrgotPlayer#TEST", activePlayer.RiotId?.DisplayName);
         Assert.Equal("Urgot", activePlayer.ChampionName);
         Assert.Equal(PlayerPosition.Top, activePlayer.Position);
         Assert.Contains(3071, activePlayer.ItemIds);
@@ -128,10 +130,12 @@ public sealed class LiveClientDataClientTests
         Assert.Equal(91, activePlayer.CreepScore);
 
         var support = Assert.Single(snapshot.Match.GetAllies());
+        Assert.Equal("AllySupport#TEST", support.RiotId?.DisplayName);
         Assert.Equal(PlayerPosition.Support, support.Position);
         Assert.Equal(11, support.CreepScore);
 
         var sett = Assert.Single(snapshot.Match.GetEnemies());
+        Assert.Equal("SettPlayer#TEST", sett.RiotId?.DisplayName);
         Assert.Equal("Sett", sett.ChampionName);
         Assert.Equal(80, sett.CreepScore);
         Assert.True(sett.IsDead);
@@ -151,7 +155,7 @@ public sealed class LiveClientDataClientTests
         Assert.Equal(MatchEventKind.ChampionKill, championKill.Kind);
         Assert.Equal("UrgotPlayer#TEST", championKill.KillerParticipantId);
         Assert.Equal("SettPlayer#TEST", championKill.VictimParticipantId);
-        Assert.Equal(["AllySupport#TEST"], championKill.AssisterParticipantIds);
+        Assert.Equal(["AllySupport"], championKill.AssisterParticipantIds);
 
         // Проверяем всю цепочку: JSON Riot → MatchState → определение Sett на TOP → совет.
         var coach = new MatchupCoach(

@@ -6,8 +6,16 @@ public sealed record ParticipantViewModel(
     string ChampionInitials,
     Uri? ChampionImageUri,
     string ChampionName,
+    string RiotId,
+    Uri? ProfileUri,
+    string ProfileLinkToolTip,
     string Details,
     string Kda,
     int Level,
     bool IsActivePlayer,
-    bool IsDead);
+    bool IsDead)
+{
+    public bool HasRiotId => !string.IsNullOrWhiteSpace(RiotId);
+
+    public bool HasProfileUri => ProfileUri is not null;
+}

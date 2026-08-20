@@ -13,6 +13,12 @@ public sealed record PlayerState
     /// </summary>
     public required string ParticipantId { get; init; }
 
+    /// <summary>
+    /// Публичный Riot ID, если Live Client Data вернул обе его части.
+    /// Технический ParticipantId нельзя использовать как отображаемое имя.
+    /// </summary>
+    public RiotId? RiotId { get; init; }
+
     /// <summary>Название выбранного чемпиона.</summary>
     public required string ChampionName { get; init; }
 
