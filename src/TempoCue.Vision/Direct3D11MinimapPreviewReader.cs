@@ -36,6 +36,9 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
     private DateTimeOffset? _lastDetectionAt;
     private int _frameWidth;
     private int _frameHeight;
+    private byte[]? _leftSearchBuffer;
+    private byte[]? _rightSearchBuffer;
+    private byte[]? _minimapBuffer;
     private bool _isDisposed;
 
     public MinimapPreviewSnapshot Read(
@@ -70,7 +73,7 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
 
             var region = _detectedRegion ?? throw new InvalidOperationException(
                 "Граница миникарты не найдена в нижних углах кадра.");
-            var pixels = ReadRegion(sourceTexture, region);
+            var pixels = ReadRegion(sourceTexture, region, ref _minimapBuffer);
             var normalizedPixels = MinimapFrameNormalizer.Normalize(
                 pixels,
                 region.Width,
@@ -106,6 +109,9 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
         _isDisposed = true;
         _detectedRegion = null;
         _lastDetectionAt = null;
+        ClearBuffer(ref _leftSearchBuffer);
+        ClearBuffer(ref _rightSearchBuffer);
+        ClearBuffer(ref _minimapBuffer);
         Release(ref _stagingTexture);
         Release(ref _context);
         Release(ref _device);
@@ -127,8 +133,14 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
             frameWidth,
             frameHeight,
             MinimapScreenCorner.BottomLeft);
-        var leftPixels = ReadRegion(sourceTexture, leftSearchRegion);
-        var rightPixels = ReadRegion(sourceTexture, rightSearchRegion);
+        var leftPixels = ReadRegion(
+            sourceTexture,
+            leftSearchRegion,
+            ref _leftSearchBuffer);
+        var rightPixels = ReadRegion(
+            sourceTexture,
+            rightSearchRegion,
+            ref _rightSearchBuffer);
         var detection = MinimapRegionDetector.Detect(
             leftPixels,
             rightPixels,
@@ -161,10 +173,13 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
         _lastDetectionAt = null;
     }
 
-    private byte[] ReadRegion(nint sourceTexture, PixelRegion region)
+    private ReadOnlySpan<byte> ReadRegion(
+        nint sourceTexture,
+        PixelRegion region,
+        ref byte[]? buffer)
     {
         CopyRegion(sourceTexture, region);
-        return ReadStagingTexture(region.Width, region.Height);
+        return ReadStagingTexture(region.Width, region.Height, ref buffer);
     }
 
     private static nint GetTexture(IDirect3DSurface surface)
@@ -282,7 +297,10 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
             in sourceBox);
     }
 
-    private byte[] ReadStagingTexture(int width, int height)
+    private ReadOnlySpan<byte> ReadStagingTexture(
+        int width,
+        int height,
+        ref byte[]? buffer)
     {
         var map = GetDelegate<MapDelegate>(_context, ContextMapSlot);
         Marshal.ThrowExceptionForHR(map(
@@ -295,23 +313,46 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
         try
         {
             var targetStride = checked(width * BytesPerPixel);
-            var pixels = GC.AllocateUninitializedArray<byte>(checked(targetStride * height));
+            var requiredLength = checked(targetStride * height);
+            var targetBuffer = EnsureBuffer(ref buffer, requiredLength);
             for (var row = 0; row < height; row++)
             {
                 Marshal.Copy(
                     nint.Add(mapped.Data, checked((int)(row * mapped.RowPitch))),
-                    pixels,
+                    targetBuffer,
                     checked(row * targetStride),
                     targetStride);
             }
 
-            return pixels;
+            return targetBuffer.AsSpan(0, requiredLength);
         }
         finally
         {
             var unmap = GetDelegate<UnmapDelegate>(_context, ContextUnmapSlot);
             unmap(_context, _stagingTexture, 0);
         }
+    }
+
+    private static byte[] EnsureBuffer(ref byte[]? buffer, int requiredLength)
+    {
+        if (buffer is not null && buffer.Length >= requiredLength)
+        {
+            return buffer;
+        }
+
+        buffer = GC.AllocateUninitializedArray<byte>(requiredLength);
+        return buffer;
+    }
+
+    private static void ClearBuffer(ref byte[]? buffer)
+    {
+        if (buffer is null)
+        {
+            return;
+        }
+
+        Array.Clear(buffer);
+        buffer = null;
     }
 
     private static TDelegate GetDelegate<TDelegate>(nint instance, int slot)
