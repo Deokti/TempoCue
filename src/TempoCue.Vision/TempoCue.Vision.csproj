@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="OpenCvSharp5.Windows.Slim" Version="5.0.0.20260806" />
+  </ItemGroup>
+
 </Project>

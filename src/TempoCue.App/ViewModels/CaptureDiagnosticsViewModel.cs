@@ -378,7 +378,9 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
                 candidate.Height,
                 candidate.Affiliation == MinimapMarkerAffiliation.Ally
                     ? AllyMarkerBrush
-                    : EnemyMarkerBrush))
+                    : EnemyMarkerBrush,
+                candidate.ChampionId,
+                candidate.IdentityConfidence))
             .ToArray();
     }
 

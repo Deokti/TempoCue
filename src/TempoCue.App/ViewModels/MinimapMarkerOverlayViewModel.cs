@@ -8,4 +8,6 @@ public sealed record MinimapMarkerOverlayViewModel(
     int Y,
     int Width,
     int Height,
-    Brush Stroke);
+    Brush Stroke,
+    string? ChampionId,
+    double IdentityConfidence);

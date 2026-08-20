@@ -25,6 +25,8 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
     private static readonly Guid Direct3D11Texture2DGuid =
         new("6F15AAF2-D208-4E89-9AB4-489535D34F9C");
 
+    private readonly IMinimapChampionRecognizer _championRecognizer;
+
     private nint _device;
     private nint _context;
     private nint _stagingTexture;
@@ -40,6 +42,17 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
     private byte[]? _rightSearchBuffer;
     private byte[]? _minimapBuffer;
     private bool _isDisposed;
+
+    public Direct3D11MinimapPreviewReader()
+        : this(new OpenCvMinimapChampionRecognizer())
+    {
+    }
+
+    internal Direct3D11MinimapPreviewReader(IMinimapChampionRecognizer championRecognizer)
+    {
+        _championRecognizer = championRecognizer ??
+            throw new ArgumentNullException(nameof(championRecognizer));
+    }
 
     public MinimapPreviewSnapshot Read(
         IDirect3DSurface surface,
@@ -90,14 +103,13 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
                 MinimapFrameNormalizer.CanonicalSize,
                 MinimapFrameNormalizer.CanonicalSize,
                 markerCandidates);
-            var championMarkerCandidates = MinimapChampionIdentityMatcher.Match(
+            var recognition = _championRecognizer.Recognize(
                 normalizedPixels,
                 MinimapFrameNormalizer.CanonicalSize,
                 MinimapFrameNormalizer.CanonicalSize,
                 checked(MinimapFrameNormalizer.CanonicalSize * BytesPerPixel),
                 championProposals,
-                championReferences,
-                out var maximumIdentityConfidence);
+                championReferences);
 
             return new MinimapPreviewSnapshot(
                 region.X,
@@ -114,9 +126,9 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
             {
                 MarkerCandidates = markerCandidates,
                 ChampionProposalCount = championProposals.Length,
-                ChampionMarkerCandidates = championMarkerCandidates,
+                ChampionMarkerCandidates = recognition.Candidates,
                 ChampionReferenceCount = championReferences.Count,
-                MaximumIdentityConfidence = maximumIdentityConfidence
+                MaximumIdentityConfidence = recognition.MaximumObservedSimilarity
             };
         }
         finally

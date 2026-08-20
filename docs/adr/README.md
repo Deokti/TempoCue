@@ -57,3 +57,4 @@ ADR не переписывается задним числом после из�
 - [0006. Локальное хранение Map Control Pack](0006-map-control-pack-storage.md)
 - [0007. Отдельный адаптер Champion Select и граница приватности](0007-champion-select-client-adapter.md)
 - [0008. Внешний адаптер мониторинга изображения карты](0008-map-vision-adapter.md)
+- [0009. Сменяемое распознавание чемпионов с OpenCV](0009-replaceable-opencv-minimap-recognition.md)
