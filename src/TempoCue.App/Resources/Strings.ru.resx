@@ -1021,4 +1021,26 @@
   <data name="Coaching.MapControl.Details.Persistent.Title" xml:space="preserve"><value>Постоянные подсказки</value></data>
   <data name="Coaching.MapControl.Details.Persistent.Empty" xml:space="preserve"><value>В наборе нет постоянных подсказок.</value></data>
   <data name="Coaching.MapControl.Details.ReadOnly" xml:space="preserve"><value>Только для чтения. Чтобы изменить содержимое, откройте редактор набора.</value></data>
+  <data name="Settings.Capture.Section" xml:space="preserve"><value>Мониторинг карты</value></data>
+  <data name="Settings.Capture.Title" xml:space="preserve"><value>Захват окна игры</value></data>
+  <data name="Settings.Capture.Description" xml:space="preserve"><value>Выберите окно матча League of Legends, чтобы проверить стабильность кадров до подключения распознавания миникарты.</value></data>
+  <data name="Settings.Capture.State.Hint" xml:space="preserve"><value>Диагностика обновляется четыре раза в секунду без копирования кадров в интерфейс.</value></data>
+  <data name="Settings.Capture.State.Idle" xml:space="preserve"><value>Окно не выбрано</value></data>
+  <data name="Settings.Capture.State.Selecting" xml:space="preserve"><value>Ожидаем выбор окна</value></data>
+  <data name="Settings.Capture.State.Capturing" xml:space="preserve"><value>Кадры поступают</value></data>
+  <data name="Settings.Capture.State.Stopped" xml:space="preserve"><value>Захват остановлен</value></data>
+  <data name="Settings.Capture.State.Failed" xml:space="preserve"><value>Ошибка захвата</value></data>
+  <data name="Settings.Capture.State.Unsupported" xml:space="preserve"><value>Захват не поддерживается</value></data>
+  <data name="Settings.Capture.Select.Button" xml:space="preserve"><value>Выбрать окно игры</value></data>
+  <data name="Settings.Capture.Change.Button" xml:space="preserve"><value>Сменить окно</value></data>
+  <data name="Settings.Capture.Stop.Button" xml:space="preserve"><value>Остановить</value></data>
+  <data name="Settings.Capture.Target.Label" xml:space="preserve"><value>Выбранное окно</value></data>
+  <data name="Settings.Capture.Resolution.Label" xml:space="preserve"><value>Размер кадра</value></data>
+  <data name="Settings.Capture.Fps.Label" xml:space="preserve"><value>FPS захвата</value></data>
+  <data name="Settings.Capture.Frames.Label" xml:space="preserve"><value>Получено кадров</value></data>
+  <data name="Settings.Capture.LastFrame.Label" xml:space="preserve"><value>Последний кадр</value></data>
+  <data name="Settings.Capture.Value.NotAvailable" xml:space="preserve"><value>Нет данных</value></data>
+  <data name="Settings.Capture.Unsupported.Description" xml:space="preserve"><value>Для Windows Graphics Capture требуется Windows 10 версии 2004 или новее.</value></data>
+  <data name="Settings.Capture.Error.Label" xml:space="preserve"><value>Технические подробности</value></data>
+  <data name="Settings.Capture.Privacy.Hint" xml:space="preserve"><value>Windows разрешает доступ только к выбранному вами окну. TempoCue не читает память игры и не сохраняет кадры на диагностическом этапе.</value></data>
 </root>

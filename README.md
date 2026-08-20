@@ -63,11 +63,13 @@ src/TempoCue.Coaching   Coach Packs, валидаторы и детермини�
 src/TempoCue.Core       состояние матча и нормализованные игровые факты
 src/TempoCue.Overlay    WPF-окно оверлея и нейтральный контракт уведомления
 src/TempoCue.Riot       Live Client Data, Data Dragon, внешние DTO и преобразование JSON
+src/TempoCue.Vision     Windows-захват изображения и будущая нормализация наблюдений мини-карты
 tests/TempoCue.Core.Tests
 tests/TempoCue.Coaching.Tests
 tests/TempoCue.Application.Tests
 tests/TempoCue.Riot.Tests
 tests/TempoCue.Overlay.Tests
+tests/TempoCue.Vision.Tests
 tests/TempoCue.App.Tests
 docs/first-version.md    границы первой версии и следующий этап
 ```
@@ -90,7 +92,7 @@ docs/first-version.md    границы первой версии и следу�
 
 ## Проверка подключения к матчу
 
-Пошаговый сценарий запуска custom game описан в [инструкции по проверке Live Client Data API](docs/live-client-test.md), а контракт имён и ссылок — в [описании профилей игроков](docs/player-profiles.md).
+Пошаговый сценарий запуска custom game описан в [инструкции по проверке Live Client Data API](docs/live-client-test.md), контракт имён и ссылок — в [описании профилей игроков](docs/player-profiles.md), а базовый Windows-захват игрового окна — в [проверке мониторинга изображения карты](docs/map-vision-test.md).
 
 ## Следующий технический этап
 

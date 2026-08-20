@@ -56,3 +56,4 @@ ADR не переписывается задним числом после из�
 - [0005. Граница модуля коучинга](0005-coaching-module-boundary.md)
 - [0006. Локальное хранение Map Control Pack](0006-map-control-pack-storage.md)
 - [0007. Отдельный адаптер Champion Select и граница приватности](0007-champion-select-client-adapter.md)
+- [0008. Внешний адаптер мониторинга изображения карты](0008-map-vision-adapter.md)

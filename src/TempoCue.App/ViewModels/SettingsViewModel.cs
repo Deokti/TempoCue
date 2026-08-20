@@ -32,13 +32,15 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
         AppSettingsService settings,
         Action showOverlayPreview,
         OverlaySettingsState? overlaySettings = null,
-        IOverlaySetupSession? overlaySetupSession = null)
+        IOverlaySetupSession? overlaySetupSession = null,
+        CaptureDiagnosticsViewModel? captureDiagnostics = null)
     {
         _localization = localization;
         _settings = settings;
         _showOverlayPreview = showOverlayPreview ?? throw new ArgumentNullException(nameof(showOverlayPreview));
         _overlaySettings = overlaySettings ?? new OverlaySettingsState(settings.Load().Overlay);
         _overlaySetupSession = overlaySetupSession;
+        CaptureDiagnostics = captureDiagnostics;
         _selectedLanguageCode = localization.CurrentLanguageCode;
         var overlay = _overlaySettings.Current;
         _isOverlayEnabled = overlay.IsEnabled;
@@ -64,6 +66,8 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
     ];
 
     public IReadOnlyList<int> OverlayWidths { get; } = [300, 340, 400];
+
+    public CaptureDiagnosticsViewModel? CaptureDiagnostics { get; }
 
     public bool IsOverlayEnabled
     {
@@ -254,6 +258,7 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
         }
 
         _isDisposed = true;
+        CaptureDiagnostics?.Dispose();
         _localization.PropertyChanged -= Localization_PropertyChanged;
         if (_overlaySetupSession is not null)
         {

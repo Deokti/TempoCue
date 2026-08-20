@@ -10,6 +10,7 @@ using TempoCue.Application;
 using TempoCue.Core;
 using TempoCue.Overlay;
 using TempoCue.Riot;
+using TempoCue.Vision;
 
 namespace TempoCue.App;
 
@@ -32,6 +33,7 @@ public partial class App : System.Windows.Application
     private IOverlayPresenter? _overlayPresenter;
     private OverlaySetupSession? _overlaySetupSession;
     private ActiveMatchOverlayCoordinator? _activeMatchOverlayCoordinator;
+    private WindowsGraphicsCaptureSession? _windowCaptureSession;
     private readonly CancellationTokenSource _lifetimeCancellation = new();
     private int _overlayPreviewStep;
 
@@ -133,12 +135,18 @@ public partial class App : System.Windows.Application
             _overlayPresenter,
             overlaySettings,
             LocalizationService.Instance);
+        _windowCaptureSession = new WindowsGraphicsCaptureSession();
+        var captureDiagnostics = new CaptureDiagnosticsViewModel(
+            _windowCaptureSession,
+            new WindowsGraphicsCaptureSupport().IsSupported,
+            LocalizationService.Instance);
         _settingsViewModel = new SettingsViewModel(
             LocalizationService.Instance,
             settingsService,
             ShowOverlayPreview,
             overlaySettings,
-            _overlaySetupSession);
+            _overlaySetupSession,
+            captureDiagnostics);
         var coachingLibraryViewModel = new CoachingLibraryViewModel(
             builtInPacks,
             LocalizationService.Instance,
@@ -325,6 +333,7 @@ public partial class App : System.Windows.Application
         _overlayPresenter?.Dispose();
         _coachingViewModel?.Dispose();
         _settingsViewModel?.Dispose();
+        DisposeWindowCaptureSession();
         _homeViewModel?.Dispose();
         _currentMatchViewModel?.Dispose();
         _activeMatchMonitor?.Dispose();
@@ -332,5 +341,24 @@ public partial class App : System.Windows.Application
         _dataDragonClient?.Dispose();
         _liveClientDataClient?.Dispose();
         base.OnExit(e);
+    }
+
+    private void DisposeWindowCaptureSession()
+    {
+        var session = Interlocked.Exchange(ref _windowCaptureSession, null);
+        if (session is null)
+        {
+            return;
+        }
+
+        try
+        {
+            // WPF завершает Application синхронно; сессия не возвращается в UI-контекст.
+            session.DisposeAsync().AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+        catch (Exception exception)
+        {
+            Debug.WriteLine($"Не удалось штатно завершить захват окна: {exception}");
+        }
     }
 }
