@@ -81,7 +81,19 @@ public sealed class SettingsCaptureDiagnosticsViewTests
                         BgraPixels: new byte[320 * 320 * 4],
                         CapturedAt: DateTimeOffset.UtcNow,
                         Corner: MinimapScreenCorner.BottomRight,
-                        DetectionConfidence: 0.92)));
+                        DetectionConfidence: 0.92)
+                    {
+                        MarkerCandidates =
+                        [
+                            new MinimapMarkerCandidate(
+                                20,
+                                30,
+                                12,
+                                12,
+                                MinimapMarkerAffiliation.Ally,
+                                0.8)
+                        ]
+                    }));
                 captureDiagnostics.Refresh();
                 WpfTestHost.Pump();
 
@@ -97,6 +109,11 @@ public sealed class SettingsCaptureDiagnosticsViewTests
                     Visibility.Visible,
                     WpfTestHost.Find<Border>(view, "MinimapPreviewPanel").Visibility);
                 Assert.NotNull(WpfTestHost.Find<Image>(view, "MinimapPreviewImage").Source);
+                Assert.Equal(
+                    "Кандидатов: 1 · союзных: 1 · вражеских: 0",
+                    WpfTestHost.Find<TextBlock>(view, "MinimapMarkerCandidatesTextBlock").Text);
+                Assert.Single(
+                    WpfTestHost.Find<ItemsControl>(view, "MinimapMarkerCandidatesItemsControl").Items);
             }
             finally
             {

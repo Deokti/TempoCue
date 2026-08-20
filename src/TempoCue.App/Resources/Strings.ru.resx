@@ -1051,6 +1051,8 @@
   <data name="Settings.Capture.Minimap.Detection.Value" xml:space="preserve"><value>{0} · уверенность {1:P0}</value></data>
   <data name="Settings.Capture.Minimap.Corner.Left" xml:space="preserve"><value>слева внизу</value></data>
   <data name="Settings.Capture.Minimap.Corner.Right" xml:space="preserve"><value>справа внизу</value></data>
+  <data name="Settings.Capture.Minimap.Markers.Label" xml:space="preserve"><value>Предварительное обнаружение меток</value></data>
+  <data name="Settings.Capture.Minimap.Markers.Value" xml:space="preserve"><value>Кандидатов: {0} · союзных: {1} · вражеских: {2}</value></data>
   <data name="Settings.Capture.Minimap.Error.Label" xml:space="preserve"><value>Не удалось подготовить предпросмотр миникарты</value></data>
   <data name="Settings.Capture.Value.NotAvailable" xml:space="preserve"><value>Нет данных</value></data>
   <data name="Settings.Capture.Unsupported.Description" xml:space="preserve"><value>Для Windows Graphics Capture требуется Windows 10 версии 2004 или новее.</value></data>

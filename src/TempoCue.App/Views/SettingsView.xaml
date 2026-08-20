@@ -324,6 +324,16 @@
                                            Foreground="#57DDB3"
                                            FontSize="12"
                                            Margin="0,6,0,0" />
+                                <TextBlock Text="{localization:Loc Settings.Capture.Minimap.Markers.Label}"
+                                           Foreground="#778BA7"
+                                           FontSize="12"
+                                           Margin="0,12,0,0" />
+                                <TextBlock x:Name="MinimapMarkerCandidatesTextBlock"
+                                           Text="{Binding MinimapMarkerCandidatesText}"
+                                           Foreground="#DCE7F5"
+                                           FontWeight="SemiBold"
+                                           TextWrapping="Wrap"
+                                           Margin="0,4,0,0" />
                             </StackPanel>
                             <Border Grid.Column="1"
                                     Width="220"
@@ -333,9 +343,39 @@
                                     BorderThickness="1"
                                     CornerRadius="8"
                                     ClipToBounds="True">
-                                <Image x:Name="MinimapPreviewImage"
-                                       Source="{Binding MinimapPreviewImage}"
-                                       Stretch="Uniform" />
+                                <Viewbox Stretch="Uniform">
+                                    <Grid Width="320" Height="320">
+                                        <Image x:Name="MinimapPreviewImage"
+                                               Width="320"
+                                               Height="320"
+                                               Source="{Binding MinimapPreviewImage}"
+                                               Stretch="Fill" />
+                                        <ItemsControl x:Name="MinimapMarkerCandidatesItemsControl"
+                                                      ItemsSource="{Binding MinimapMarkerOverlays}"
+                                                      IsHitTestVisible="False">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <Canvas Width="320" Height="320" />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemContainerStyle>
+                                                <Style TargetType="ContentPresenter">
+                                                    <Setter Property="Canvas.Left" Value="{Binding X}" />
+                                                    <Setter Property="Canvas.Top" Value="{Binding Y}" />
+                                                </Style>
+                                            </ItemsControl.ItemContainerStyle>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border Width="{Binding Width}"
+                                                            Height="{Binding Height}"
+                                                            BorderBrush="{Binding Stroke}"
+                                                            BorderThickness="2"
+                                                            CornerRadius="2" />
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </Grid>
+                                </Viewbox>
                             </Border>
                         </Grid>
                     </Border>

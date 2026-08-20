@@ -15,8 +15,8 @@ public sealed class MinimapRegionDetectorTests
         DrawMinimap(right, side: 439, MinimapScreenCorner.BottomRight);
 
         var detection = MinimapRegionDetector.Detect(
-            left,
-            right,
+            left.Pixels,
+            right.Pixels,
             CandidateSide,
             Stride,
             FrameWidth,
@@ -38,8 +38,8 @@ public sealed class MinimapRegionDetectorTests
         DrawMinimap(left, side: 330, MinimapScreenCorner.BottomLeft);
 
         var detection = MinimapRegionDetector.Detect(
-            left,
-            right,
+            left.Pixels,
+            right.Pixels,
             CandidateSide,
             Stride,
             FrameWidth,
@@ -59,8 +59,8 @@ public sealed class MinimapRegionDetectorTests
         var right = CreateBackground();
 
         var detection = MinimapRegionDetector.Detect(
-            left,
-            right,
+            left.Pixels,
+            right.Pixels,
             CandidateSide,
             Stride,
             FrameWidth,
@@ -69,22 +69,11 @@ public sealed class MinimapRegionDetectorTests
         Assert.Null(detection);
     }
 
-    private static byte[] CreateBackground()
-    {
-        var pixels = new byte[Stride * CandidateSide];
-        for (var y = 0; y < CandidateSide; y++)
-        {
-            for (var x = 0; x < CandidateSide; x++)
-            {
-                SetPixel(pixels, x, y, 54, 67, 58);
-            }
-        }
-
-        return pixels;
-    }
+    private static BgraTestImage CreateBackground() =>
+        new(CandidateSide, CandidateSide, 54, 67, 58);
 
     private static void DrawMinimap(
-        byte[] pixels,
+        BgraTestImage image,
         int side,
         MinimapScreenCorner corner)
     {
@@ -103,13 +92,12 @@ public sealed class MinimapRegionDetectorTests
                         : startX + side - x <= 5);
                 if (border)
                 {
-                    SetPixel(pixels, x, y, 207, 171, 79);
+                    image.SetPixel(x, y, 207, 171, 79);
                     continue;
                 }
 
                 var pattern = ((x / 17) + (y / 13)) % 2 == 0;
-                SetPixel(
-                    pixels,
+                image.SetPixel(
                     x,
                     y,
                     pattern ? (byte)18 : (byte)105,
@@ -119,18 +107,4 @@ public sealed class MinimapRegionDetectorTests
         }
     }
 
-    private static void SetPixel(
-        byte[] pixels,
-        int x,
-        int y,
-        byte blue,
-        byte green,
-        byte red)
-    {
-        var offset = (y * Stride) + (x * 4);
-        pixels[offset] = blue;
-        pixels[offset + 1] = green;
-        pixels[offset + 2] = red;
-        pixels[offset + 3] = 255;
-    }
 }

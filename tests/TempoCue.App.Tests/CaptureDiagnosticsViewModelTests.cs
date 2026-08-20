@@ -68,6 +68,10 @@ public sealed class CaptureDiagnosticsViewModelTests
                     "320 × 320 пкс · фиксированная геометрия",
                     viewModel.MinimapNormalizedSizeText);
                 Assert.Equal("справа внизу · уверенность 92 %", viewModel.MinimapDetectionText);
+                Assert.Equal(
+                    "Кандидатов: 2 · союзных: 1 · вражеских: 1",
+                    viewModel.MinimapMarkerCandidatesText);
+                Assert.Equal(2, viewModel.MinimapMarkerOverlays.Count);
                 var previewImage = Assert.IsAssignableFrom<BitmapSource>(
                     viewModel.MinimapPreviewImage);
                 Assert.Equal(320, previewImage.PixelWidth);
@@ -122,5 +126,24 @@ public sealed class CaptureDiagnosticsViewModelTests
             BgraPixels: new byte[320 * 320 * 4],
             CapturedAt: new DateTimeOffset(2026, 8, 20, 7, 15, 30, TimeSpan.Zero),
             Corner: MinimapScreenCorner.BottomRight,
-            DetectionConfidence: 0.92);
+            DetectionConfidence: 0.92)
+        {
+            MarkerCandidates =
+            [
+                new MinimapMarkerCandidate(
+                    20,
+                    30,
+                    12,
+                    12,
+                    MinimapMarkerAffiliation.Ally,
+                    0.8),
+                new MinimapMarkerCandidate(
+                    180,
+                    120,
+                    14,
+                    14,
+                    MinimapMarkerAffiliation.Enemy,
+                    0.75)
+            ]
+        };
 }

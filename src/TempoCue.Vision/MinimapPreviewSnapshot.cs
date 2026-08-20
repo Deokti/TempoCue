@@ -15,4 +15,11 @@ public sealed record MinimapPreviewSnapshot(
     byte[] BgraPixels,
     DateTimeOffset CapturedAt,
     MinimapScreenCorner Corner,
-    double DetectionConfidence);
+    double DetectionConfidence)
+{
+    /// <summary>
+    /// Предварительные цветные контуры. Коллекция не содержит подтверждённых игровых фактов.
+    /// </summary>
+    public IReadOnlyList<MinimapMarkerCandidate> MarkerCandidates { get; init; } =
+        Array.Empty<MinimapMarkerCandidate>();
+}

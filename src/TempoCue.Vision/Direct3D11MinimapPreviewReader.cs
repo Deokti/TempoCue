@@ -79,6 +79,11 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
                 region.Width,
                 region.Height,
                 checked(region.Width * BytesPerPixel));
+            var markerCandidates = MinimapMarkerCandidateDetector.Detect(
+                normalizedPixels,
+                MinimapFrameNormalizer.CanonicalSize,
+                MinimapFrameNormalizer.CanonicalSize,
+                checked(MinimapFrameNormalizer.CanonicalSize * BytesPerPixel));
 
             return new MinimapPreviewSnapshot(
                 region.X,
@@ -91,7 +96,10 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
                 normalizedPixels,
                 capturedAt,
                 _detectedCorner,
-                _detectionConfidence);
+                _detectionConfidence)
+            {
+                MarkerCandidates = markerCandidates
+            };
         }
         finally
         {

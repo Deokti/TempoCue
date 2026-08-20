@@ -12,12 +12,16 @@ namespace TempoCue.App.ViewModels;
 public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
 {
     private static readonly TimeSpan RefreshInterval = TimeSpan.FromMilliseconds(250);
+    private static readonly Brush AllyMarkerBrush = CreateFrozenBrush(80, 183, 237);
+    private static readonly Brush EnemyMarkerBrush = CreateFrozenBrush(255, 89, 116);
     private readonly IWindowCaptureSession _captureSession;
     private readonly LocalizationService _localization;
     private readonly DispatcherTimer _refreshTimer;
     private readonly CancellationTokenSource _lifetimeCancellation = new();
     private CaptureDiagnosticsSnapshot _snapshot;
     private ImageSource? _minimapPreviewImage;
+    private IReadOnlyList<MinimapMarkerOverlayViewModel> _minimapMarkerOverlays =
+        Array.Empty<MinimapMarkerOverlayViewModel>();
     private DateTimeOffset? _renderedPreviewAt;
     private bool _isOperationRunning;
     private bool _isDisposed;
@@ -116,6 +120,26 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         _snapshot.MinimapPreview is not null && _minimapPreviewImage is not null;
 
     public ImageSource? MinimapPreviewImage => _minimapPreviewImage;
+
+    public IReadOnlyList<MinimapMarkerOverlayViewModel> MinimapMarkerOverlays =>
+        _minimapMarkerOverlays;
+
+    public string MinimapMarkerCandidatesText
+    {
+        get
+        {
+            var candidates = _snapshot.MinimapPreview?.MarkerCandidates ??
+                Array.Empty<MinimapMarkerCandidate>();
+            return string.Format(
+                CultureInfo.CurrentCulture,
+                _localization.Get("Settings.Capture.Minimap.Markers.Value"),
+                candidates.Count,
+                candidates.Count(candidate =>
+                    candidate.Affiliation == MinimapMarkerAffiliation.Ally),
+                candidates.Count(candidate =>
+                    candidate.Affiliation == MinimapMarkerAffiliation.Enemy));
+        }
+    }
 
     public string MinimapRegionText => _snapshot.MinimapPreview is { } preview
         ? string.Format(
@@ -263,6 +287,7 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(MinimapRegionText));
         OnPropertyChanged(nameof(MinimapNormalizedSizeText));
         OnPropertyChanged(nameof(MinimapDetectionText));
+        OnPropertyChanged(nameof(MinimapMarkerCandidatesText));
     }
 
     private void SetOperationRunning(bool value)
@@ -301,9 +326,11 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(TechnicalErrorText));
         OnPropertyChanged(nameof(HasMinimapPreview));
         OnPropertyChanged(nameof(MinimapPreviewImage));
+        OnPropertyChanged(nameof(MinimapMarkerOverlays));
         OnPropertyChanged(nameof(MinimapRegionText));
         OnPropertyChanged(nameof(MinimapNormalizedSizeText));
         OnPropertyChanged(nameof(MinimapDetectionText));
+        OnPropertyChanged(nameof(MinimapMarkerCandidatesText));
         OnPropertyChanged(nameof(HasMinimapPreviewError));
         OnPropertyChanged(nameof(MinimapPreviewErrorText));
     }
@@ -315,6 +342,7 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         {
             _renderedPreviewAt = null;
             _minimapPreviewImage = null;
+            _minimapMarkerOverlays = Array.Empty<MinimapMarkerOverlayViewModel>();
             return;
         }
 
@@ -335,5 +363,22 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         image.Freeze();
         _renderedPreviewAt = preview.CapturedAt;
         _minimapPreviewImage = image;
+        _minimapMarkerOverlays = preview.MarkerCandidates
+            .Select(candidate => new MinimapMarkerOverlayViewModel(
+                candidate.X,
+                candidate.Y,
+                candidate.Width,
+                candidate.Height,
+                candidate.Affiliation == MinimapMarkerAffiliation.Ally
+                    ? AllyMarkerBrush
+                    : EnemyMarkerBrush))
+            .ToArray();
+    }
+
+    private static Brush CreateFrozenBrush(byte red, byte green, byte blue)
+    {
+        var brush = new SolidColorBrush(Color.FromRgb(red, green, blue));
+        brush.Freeze();
+        return brush;
     }
 }
