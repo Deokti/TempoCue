@@ -5,15 +5,8 @@ namespace TempoCue.App.Tests;
 /// <summary>Управляемая сессия захвата для тестов ViewModel и WPF без системного пикера.</summary>
 internal sealed class TestWindowCaptureSession : IWindowCaptureSession
 {
-    public CaptureDiagnosticsSnapshot Snapshot { get; private set; } = new(
-        CaptureSessionState.Idle,
-        null,
-        0,
-        0,
-        0,
-        0,
-        null,
-        null);
+    public CaptureDiagnosticsSnapshot Snapshot { get; private set; } =
+        TestCaptureDiagnosticsSnapshot.Create();
 
     public int PickCount { get; private set; }
 

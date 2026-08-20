@@ -8,10 +8,13 @@ namespace TempoCue.Vision;
 public sealed class WindowsGraphicsCaptureSession : IWindowCaptureSession, IAsyncDisposable
 {
     private const int FrameBufferCount = 2;
+    private const int DefaultSelectionFrameRateLimit = 30;
     private readonly object _frameSync = new();
     private readonly object _stateSync = new();
     private readonly SemaphoreSlim _lifecycleGate = new(1, 1);
     private readonly FrameRateEstimator _frameRate = new();
+    private readonly FrameSelectionGate _frameSelection = new(DefaultSelectionFrameRateLimit);
+    private readonly FrameRateEstimator _selectionFrameRate = new();
     private Direct3D11CaptureFramePool? _framePool;
     private GraphicsCaptureSession? _captureSession;
     private GraphicsCaptureItem? _captureItem;
@@ -21,6 +24,8 @@ public sealed class WindowsGraphicsCaptureSession : IWindowCaptureSession, IAsyn
     private int _frameWidth;
     private int _frameHeight;
     private long _receivedFrameCount;
+    private long _selectedFrameCount;
+    private long _rateLimitedFrameCount;
     private long _lastFrameUtcTicks;
     private string? _errorMessage;
     private int _generation;
@@ -40,6 +45,10 @@ public sealed class WindowsGraphicsCaptureSession : IWindowCaptureSession, IAsyn
                     Volatile.Read(ref _frameHeight),
                     Interlocked.Read(ref _receivedFrameCount),
                     _frameRate.FramesPerSecond,
+                    _frameSelection.MaximumFramesPerSecond,
+                    Interlocked.Read(ref _selectedFrameCount),
+                    _selectionFrameRate.FramesPerSecond,
+                    Interlocked.Read(ref _rateLimitedFrameCount),
                     lastFrameTicks == 0 ? null : new DateTimeOffset(lastFrameTicks, TimeSpan.Zero),
                     _errorMessage);
             }
@@ -263,9 +272,19 @@ public sealed class WindowsGraphicsCaptureSession : IWindowCaptureSession, IAsyn
 
                     contentWidth = frame.ContentSize.Width;
                     contentHeight = frame.ContentSize.Height;
+                    var timestamp = System.Diagnostics.Stopwatch.GetTimestamp();
                     Interlocked.Increment(ref _receivedFrameCount);
                     Interlocked.Exchange(ref _lastFrameUtcTicks, DateTimeOffset.UtcNow.UtcTicks);
-                    _frameRate.RegisterFrame();
+                    _frameRate.RegisterFrame(timestamp);
+                    if (_frameSelection.TrySelect(timestamp))
+                    {
+                        Interlocked.Increment(ref _selectedFrameCount);
+                        _selectionFrameRate.RegisterFrame(timestamp);
+                    }
+                    else
+                    {
+                        Interlocked.Increment(ref _rateLimitedFrameCount);
+                    }
                 }
 
                 if (contentWidth <= 0 || contentHeight <= 0)
@@ -351,8 +370,12 @@ public sealed class WindowsGraphicsCaptureSession : IWindowCaptureSession, IAsyn
         Volatile.Write(ref _frameWidth, 0);
         Volatile.Write(ref _frameHeight, 0);
         Interlocked.Exchange(ref _receivedFrameCount, 0);
+        Interlocked.Exchange(ref _selectedFrameCount, 0);
+        Interlocked.Exchange(ref _rateLimitedFrameCount, 0);
         Interlocked.Exchange(ref _lastFrameUtcTicks, 0);
         _frameRate.Reset();
+        _frameSelection.Reset();
+        _selectionFrameRate.Reset();
     }
 
     private void SetState(CaptureSessionState state, string? errorMessage)

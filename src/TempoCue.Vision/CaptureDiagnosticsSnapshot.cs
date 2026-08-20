@@ -8,5 +8,9 @@ public sealed record CaptureDiagnosticsSnapshot(
     int FrameHeight,
     long ReceivedFrameCount,
     double FramesPerSecond,
+    int SelectionFrameRateLimit,
+    long SelectedFrameCount,
+    double SelectionFramesPerSecond,
+    long RateLimitedFrameCount,
     DateTimeOffset? LastFrameAt,
     string? ErrorMessage);

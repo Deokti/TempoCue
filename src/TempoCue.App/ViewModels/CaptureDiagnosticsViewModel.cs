@@ -84,8 +84,23 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         ? _snapshot.FramesPerSecond.ToString("N1", CultureInfo.CurrentCulture)
         : _localization.Get("Settings.Capture.Value.NotAvailable");
 
+    public string SelectionFramesPerSecondLabelText => string.Format(
+        CultureInfo.CurrentCulture,
+        _localization.Get("Settings.Capture.SelectionFps.Label"),
+        _snapshot.SelectionFrameRateLimit);
+
+    public string SelectionFramesPerSecondText => _snapshot.SelectedFrameCount > 0
+        ? _snapshot.SelectionFramesPerSecond.ToString("N1", CultureInfo.CurrentCulture)
+        : _localization.Get("Settings.Capture.Value.NotAvailable");
+
     public string ReceivedFrameCountText =>
         _snapshot.ReceivedFrameCount.ToString("N0", CultureInfo.CurrentCulture);
+
+    public string SelectedFrameCountText =>
+        _snapshot.SelectedFrameCount.ToString("N0", CultureInfo.CurrentCulture);
+
+    public string RateLimitedFrameCountText =>
+        _snapshot.RateLimitedFrameCount.ToString("N0", CultureInfo.CurrentCulture);
 
     public string LastFrameText => _snapshot.LastFrameAt is DateTimeOffset lastFrame
         ? lastFrame.ToLocalTime().ToString("HH:mm:ss.fff", CultureInfo.CurrentCulture)
@@ -195,7 +210,11 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(SelectedWindowText));
         OnPropertyChanged(nameof(ResolutionText));
         OnPropertyChanged(nameof(FramesPerSecondText));
+        OnPropertyChanged(nameof(SelectionFramesPerSecondLabelText));
+        OnPropertyChanged(nameof(SelectionFramesPerSecondText));
         OnPropertyChanged(nameof(ReceivedFrameCountText));
+        OnPropertyChanged(nameof(SelectedFrameCountText));
+        OnPropertyChanged(nameof(RateLimitedFrameCountText));
         OnPropertyChanged(nameof(LastFrameText));
     }
 
@@ -226,7 +245,11 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(SelectedWindowText));
         OnPropertyChanged(nameof(ResolutionText));
         OnPropertyChanged(nameof(FramesPerSecondText));
+        OnPropertyChanged(nameof(SelectionFramesPerSecondLabelText));
+        OnPropertyChanged(nameof(SelectionFramesPerSecondText));
         OnPropertyChanged(nameof(ReceivedFrameCountText));
+        OnPropertyChanged(nameof(SelectedFrameCountText));
+        OnPropertyChanged(nameof(RateLimitedFrameCountText));
         OnPropertyChanged(nameof(LastFrameText));
         OnPropertyChanged(nameof(TechnicalErrorText));
     }

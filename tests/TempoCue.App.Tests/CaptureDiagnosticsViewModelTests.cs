@@ -25,15 +25,25 @@ public sealed class CaptureDiagnosticsViewModelTests
                     session,
                     isSupported: true,
                     localization);
-                session.SetSnapshot(new CaptureDiagnosticsSnapshot(
-                    CaptureSessionState.Capturing,
-                    "League of Legends (TM) Client",
-                    1920,
-                    1080,
-                    42,
-                    59.5,
-                    new DateTimeOffset(2026, 8, 20, 7, 15, 30, 125, TimeSpan.Zero),
-                    null));
+                session.SetSnapshot(TestCaptureDiagnosticsSnapshot.Create(
+                    state: CaptureSessionState.Capturing,
+                    targetName: "League of Legends (TM) Client",
+                    frameWidth: 1920,
+                    frameHeight: 1080,
+                    receivedFrameCount: 42,
+                    framesPerSecond: 59.5,
+                    selectedFrameCount: 21,
+                    selectionFramesPerSecond: 29.8,
+                    rateLimitedFrameCount: 21,
+                    lastFrameAt: new DateTimeOffset(
+                        2026,
+                        8,
+                        20,
+                        7,
+                        15,
+                        30,
+                        125,
+                        TimeSpan.Zero)));
 
                 viewModel.Refresh();
 
@@ -46,6 +56,10 @@ public sealed class CaptureDiagnosticsViewModelTests
                 Assert.Equal("1920 × 1080", viewModel.ResolutionText);
                 Assert.Equal(59.5.ToString("N1", CultureInfo.CurrentCulture), viewModel.FramesPerSecondText);
                 Assert.Equal(42L.ToString("N0", CultureInfo.CurrentCulture), viewModel.ReceivedFrameCountText);
+                Assert.Equal("FPS отбора (лимит 30)", viewModel.SelectionFramesPerSecondLabelText);
+                Assert.Equal(29.8.ToString("N1", CultureInfo.CurrentCulture), viewModel.SelectionFramesPerSecondText);
+                Assert.Equal(21L.ToString("N0", CultureInfo.CurrentCulture), viewModel.SelectedFrameCountText);
+                Assert.Equal(21L.ToString("N0", CultureInfo.CurrentCulture), viewModel.RateLimitedFrameCountText);
                 Assert.False(viewModel.HasTechnicalError);
             }
             finally
@@ -70,15 +84,13 @@ public sealed class CaptureDiagnosticsViewModelTests
             Assert.Equal(1, session.PickCount);
             Assert.Equal((nint)123, session.LastOwnerWindow);
 
-            session.SetSnapshot(new CaptureDiagnosticsSnapshot(
-                CaptureSessionState.Capturing,
-                "League",
-                1280,
-                720,
-                1,
-                0,
-                DateTimeOffset.UtcNow,
-                null));
+            session.SetSnapshot(TestCaptureDiagnosticsSnapshot.Create(
+                state: CaptureSessionState.Capturing,
+                targetName: "League",
+                frameWidth: 1280,
+                frameHeight: 720,
+                receivedFrameCount: 1,
+                lastFrameAt: DateTimeOffset.UtcNow));
             viewModel.Refresh();
             viewModel.StopAsync().GetAwaiter().GetResult();
 

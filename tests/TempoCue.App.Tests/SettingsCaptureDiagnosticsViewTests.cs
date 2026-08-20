@@ -59,20 +59,25 @@ public sealed class SettingsCaptureDiagnosticsViewTests
                 Assert.False(stopButton.IsEnabled);
                 Assert.Equal("Выбрать окно игры", selectButton.Content);
 
-                session.SetSnapshot(new CaptureDiagnosticsSnapshot(
-                    CaptureSessionState.Capturing,
-                    "League of Legends",
-                    1920,
-                    1080,
-                    12,
-                    60,
-                    DateTimeOffset.UtcNow,
-                    null));
+                session.SetSnapshot(TestCaptureDiagnosticsSnapshot.Create(
+                    state: CaptureSessionState.Capturing,
+                    targetName: "League of Legends",
+                    frameWidth: 1920,
+                    frameHeight: 1080,
+                    receivedFrameCount: 12,
+                    framesPerSecond: 60,
+                    selectedFrameCount: 6,
+                    selectionFramesPerSecond: 30,
+                    rateLimitedFrameCount: 6,
+                    lastFrameAt: DateTimeOffset.UtcNow));
                 captureDiagnostics.Refresh();
                 WpfTestHost.Pump();
 
                 Assert.Equal("Сменить окно", selectButton.Content);
                 Assert.True(stopButton.IsEnabled);
+                Assert.Equal("30,0", WpfTestHost.Find<TextBlock>(view, "SelectionFpsTextBlock").Text);
+                Assert.Equal("6", WpfTestHost.Find<TextBlock>(view, "SelectedFramesTextBlock").Text);
+                Assert.Equal("6", WpfTestHost.Find<TextBlock>(view, "RateLimitedFramesTextBlock").Text);
             }
             finally
             {

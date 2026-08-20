@@ -1029,6 +1029,9 @@
   <data name="Settings.Capture.Fps.Label" xml:space="preserve"><value>Capture FPS</value></data>
   <data name="Settings.Capture.Frames.Label" xml:space="preserve"><value>Frames received</value></data>
   <data name="Settings.Capture.LastFrame.Label" xml:space="preserve"><value>Last frame</value></data>
+  <data name="Settings.Capture.SelectionFps.Label" xml:space="preserve"><value>Selection FPS (limit {0})</value></data>
+  <data name="Settings.Capture.SelectedFrames.Label" xml:space="preserve"><value>Frames selected</value></data>
+  <data name="Settings.Capture.RateLimitedFrames.Label" xml:space="preserve"><value>Skipped by limiter</value></data>
   <data name="Settings.Capture.Value.NotAvailable" xml:space="preserve"><value>Not available</value></data>
   <data name="Settings.Capture.Unsupported.Description" xml:space="preserve"><value>Windows Graphics Capture requires Windows 10 version 2004 or later.</value></data>
   <data name="Settings.Capture.Error.Label" xml:space="preserve"><value>Technical details</value></data>
