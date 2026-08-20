@@ -1046,6 +1046,8 @@
   <data name="Settings.Capture.Minimap.Description" xml:space="preserve"><value>TempoCue автоматически ищет границу миникарты в обоих нижних углах и копирует только найденную область.</value></data>
   <data name="Settings.Capture.Minimap.Region.Label" xml:space="preserve"><value>Автоматически найденная область кадра</value></data>
   <data name="Settings.Capture.Minimap.Region.Value" xml:space="preserve"><value>{0} × {1} пкс · x {2}, y {3}</value></data>
+  <data name="Settings.Capture.Minimap.Normalized.Label" xml:space="preserve"><value>Канонический кадр распознавания</value></data>
+  <data name="Settings.Capture.Minimap.Normalized.Value" xml:space="preserve"><value>{0} × {1} пкс · фиксированная геометрия</value></data>
   <data name="Settings.Capture.Minimap.Detection.Value" xml:space="preserve"><value>{0} · уверенность {1:P0}</value></data>
   <data name="Settings.Capture.Minimap.Corner.Left" xml:space="preserve"><value>слева внизу</value></data>
   <data name="Settings.Capture.Minimap.Corner.Right" xml:space="preserve"><value>справа внизу</value></data>

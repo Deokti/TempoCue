@@ -1036,6 +1036,8 @@
   <data name="Settings.Capture.Minimap.Description" xml:space="preserve"><value>TempoCue automatically finds the minimap boundary in either bottom corner and copies only the detected region.</value></data>
   <data name="Settings.Capture.Minimap.Region.Label" xml:space="preserve"><value>Automatically detected frame region</value></data>
   <data name="Settings.Capture.Minimap.Region.Value" xml:space="preserve"><value>{0} × {1} px · x {2}, y {3}</value></data>
+  <data name="Settings.Capture.Minimap.Normalized.Label" xml:space="preserve"><value>Canonical recognition frame</value></data>
+  <data name="Settings.Capture.Minimap.Normalized.Value" xml:space="preserve"><value>{0} × {1} px · fixed geometry</value></data>
   <data name="Settings.Capture.Minimap.Detection.Value" xml:space="preserve"><value>{0} · confidence {1:P0}</value></data>
   <data name="Settings.Capture.Minimap.Corner.Left" xml:space="preserve"><value>bottom left</value></data>
   <data name="Settings.Capture.Minimap.Corner.Right" xml:space="preserve"><value>bottom right</value></data>

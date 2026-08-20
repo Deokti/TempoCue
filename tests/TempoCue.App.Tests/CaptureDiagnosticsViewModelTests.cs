@@ -63,12 +63,15 @@ public sealed class CaptureDiagnosticsViewModelTests
                 Assert.Equal(21L.ToString("N0", CultureInfo.CurrentCulture), viewModel.SelectedFrameCountText);
                 Assert.Equal(21L.ToString("N0", CultureInfo.CurrentCulture), viewModel.RateLimitedFrameCountText);
                 Assert.True(viewModel.HasMinimapPreview);
-                Assert.Equal("2 × 2 пкс · x 1918, y 1078", viewModel.MinimapRegionText);
+                Assert.Equal("452 × 452 пкс · x 1918, y 1078", viewModel.MinimapRegionText);
+                Assert.Equal(
+                    "320 × 320 пкс · фиксированная геометрия",
+                    viewModel.MinimapNormalizedSizeText);
                 Assert.Equal("справа внизу · уверенность 92 %", viewModel.MinimapDetectionText);
                 var previewImage = Assert.IsAssignableFrom<BitmapSource>(
                     viewModel.MinimapPreviewImage);
-                Assert.Equal(2, previewImage.PixelWidth);
-                Assert.Equal(2, previewImage.PixelHeight);
+                Assert.Equal(320, previewImage.PixelWidth);
+                Assert.Equal(320, previewImage.PixelHeight);
                 Assert.False(viewModel.HasTechnicalError);
             }
             finally
@@ -111,16 +114,12 @@ public sealed class CaptureDiagnosticsViewModelTests
         new(
             X: 1918,
             Y: 1078,
-            Width: 2,
-            Height: 2,
-            Stride: 8,
-            BgraPixels:
-            [
-                0, 0, 255, 255,
-                0, 255, 0, 255,
-                255, 0, 0, 255,
-                255, 255, 255, 255
-            ],
+            RegionWidth: 452,
+            RegionHeight: 452,
+            ImageWidth: 320,
+            ImageHeight: 320,
+            ImageStride: 1280,
+            BgraPixels: new byte[320 * 320 * 4],
             CapturedAt: new DateTimeOffset(2026, 8, 20, 7, 15, 30, TimeSpan.Zero),
             Corner: MinimapScreenCorner.BottomRight,
             DetectionConfidence: 0.92);

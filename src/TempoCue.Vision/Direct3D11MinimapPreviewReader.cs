@@ -71,14 +71,21 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
             var region = _detectedRegion ?? throw new InvalidOperationException(
                 "Граница миникарты не найдена в нижних углах кадра.");
             var pixels = ReadRegion(sourceTexture, region);
+            var normalizedPixels = MinimapFrameNormalizer.Normalize(
+                pixels,
+                region.Width,
+                region.Height,
+                checked(region.Width * BytesPerPixel));
 
             return new MinimapPreviewSnapshot(
                 region.X,
                 region.Y,
                 region.Width,
                 region.Height,
-                checked(region.Width * BytesPerPixel),
-                pixels,
+                MinimapFrameNormalizer.CanonicalSize,
+                MinimapFrameNormalizer.CanonicalSize,
+                checked(MinimapFrameNormalizer.CanonicalSize * BytesPerPixel),
+                normalizedPixels,
                 capturedAt,
                 _detectedCorner,
                 _detectionConfidence);

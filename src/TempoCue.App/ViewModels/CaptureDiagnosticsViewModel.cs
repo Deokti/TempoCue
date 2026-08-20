@@ -121,10 +121,18 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         ? string.Format(
             CultureInfo.CurrentCulture,
             _localization.Get("Settings.Capture.Minimap.Region.Value"),
-            preview.Width,
-            preview.Height,
+            preview.RegionWidth,
+            preview.RegionHeight,
             preview.X,
             preview.Y)
+        : _localization.Get("Settings.Capture.Value.NotAvailable");
+
+    public string MinimapNormalizedSizeText => _snapshot.MinimapPreview is { } preview
+        ? string.Format(
+            CultureInfo.CurrentCulture,
+            _localization.Get("Settings.Capture.Minimap.Normalized.Value"),
+            preview.ImageWidth,
+            preview.ImageHeight)
         : _localization.Get("Settings.Capture.Value.NotAvailable");
 
     public string MinimapDetectionText => _snapshot.MinimapPreview is { } preview
@@ -253,6 +261,7 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(RateLimitedFrameCountText));
         OnPropertyChanged(nameof(LastFrameText));
         OnPropertyChanged(nameof(MinimapRegionText));
+        OnPropertyChanged(nameof(MinimapNormalizedSizeText));
         OnPropertyChanged(nameof(MinimapDetectionText));
     }
 
@@ -293,6 +302,7 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(HasMinimapPreview));
         OnPropertyChanged(nameof(MinimapPreviewImage));
         OnPropertyChanged(nameof(MinimapRegionText));
+        OnPropertyChanged(nameof(MinimapNormalizedSizeText));
         OnPropertyChanged(nameof(MinimapDetectionText));
         OnPropertyChanged(nameof(HasMinimapPreviewError));
         OnPropertyChanged(nameof(MinimapPreviewErrorText));
@@ -314,14 +324,14 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         }
 
         var image = BitmapSource.Create(
-            preview.Width,
-            preview.Height,
+            preview.ImageWidth,
+            preview.ImageHeight,
             96,
             96,
             PixelFormats.Bgra32,
             null,
             preview.BgraPixels,
-            preview.Stride);
+            preview.ImageStride);
         image.Freeze();
         _renderedPreviewAt = preview.CapturedAt;
         _minimapPreviewImage = image;

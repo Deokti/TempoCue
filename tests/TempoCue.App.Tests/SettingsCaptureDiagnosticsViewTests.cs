@@ -73,10 +73,12 @@ public sealed class SettingsCaptureDiagnosticsViewTests
                     minimapPreview: new MinimapPreviewSnapshot(
                         X: 1918,
                         Y: 1078,
-                        Width: 2,
-                        Height: 2,
-                        Stride: 8,
-                        BgraPixels: new byte[16],
+                        RegionWidth: 452,
+                        RegionHeight: 452,
+                        ImageWidth: 320,
+                        ImageHeight: 320,
+                        ImageStride: 1280,
+                        BgraPixels: new byte[320 * 320 * 4],
                         CapturedAt: DateTimeOffset.UtcNow,
                         Corner: MinimapScreenCorner.BottomRight,
                         DetectionConfidence: 0.92)));
@@ -88,6 +90,9 @@ public sealed class SettingsCaptureDiagnosticsViewTests
                 Assert.Equal("30,0", WpfTestHost.Find<TextBlock>(view, "SelectionFpsTextBlock").Text);
                 Assert.Equal("6", WpfTestHost.Find<TextBlock>(view, "SelectedFramesTextBlock").Text);
                 Assert.Equal("6", WpfTestHost.Find<TextBlock>(view, "RateLimitedFramesTextBlock").Text);
+                Assert.Equal(
+                    "320 × 320 пкс · фиксированная геометрия",
+                    WpfTestHost.Find<TextBlock>(view, "MinimapNormalizedSizeTextBlock").Text);
                 Assert.Equal(
                     Visibility.Visible,
                     WpfTestHost.Find<Border>(view, "MinimapPreviewPanel").Visibility);

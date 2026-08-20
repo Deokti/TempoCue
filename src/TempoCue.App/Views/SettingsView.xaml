@@ -269,7 +269,7 @@
                         </Border>
                     </UniformGrid>
 
-                    <!-- Предпросмотр получает только нижнюю правую область, а не полный кадр игры. -->
+                    <!-- Предпросмотр получает найденную миникарту и её каноническую копию, а не полный кадр игры. -->
                     <Border x:Name="MinimapPreviewPanel"
                             Margin="0,12,0,0"
                             Padding="14"
@@ -308,6 +308,15 @@
                                            Margin="0,16,0,0" />
                                 <TextBlock x:Name="MinimapRegionTextBlock"
                                            Text="{Binding MinimapRegionText}"
+                                           Foreground="#DCE7F5"
+                                           FontWeight="SemiBold"
+                                           Margin="0,4,0,0" />
+                                <TextBlock Text="{localization:Loc Settings.Capture.Minimap.Normalized.Label}"
+                                           Foreground="#778BA7"
+                                           FontSize="12"
+                                           Margin="0,12,0,0" />
+                                <TextBlock x:Name="MinimapNormalizedSizeTextBlock"
+                                           Text="{Binding MinimapNormalizedSizeText}"
                                            Foreground="#DCE7F5"
                                            FontWeight="SemiBold"
                                            Margin="0,4,0,0" />
