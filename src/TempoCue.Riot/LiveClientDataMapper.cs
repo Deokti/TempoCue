@@ -8,15 +8,13 @@ namespace TempoCue.Riot;
 /// </summary>
 internal static class LiveClientDataMapper
 {
-    public static MatchState Map(LiveClientAllGameDataDto source)
+    public static MatchState Map(
+        LiveClientAllGameDataDto source,
+        string? activePlayerName = null)
     {
         ArgumentNullException.ThrowIfNull(source);
 
-        var activePlayerId = GetParticipantId(
-            source.ActivePlayer.RiotId,
-            source.ActivePlayer.SummonerName);
-
-        if (activePlayerId is null)
+        if (!TryResolveActivePlayerId(source, activePlayerName, out var activePlayerId))
         {
             throw new InvalidDataException("Riot API не вернул идентификатор активного игрока.");
         }
@@ -31,6 +29,47 @@ internal static class LiveClientDataMapper
             ActivePlayerId = activePlayerId,
             Players = players
         };
+    }
+
+    internal static bool TryResolveActivePlayerId(
+        LiveClientAllGameDataDto source,
+        string? activePlayerName,
+        out string activePlayerId)
+    {
+        var directActivePlayerId = GetParticipantId(
+            source.ActivePlayer.RiotId,
+            source.ActivePlayer.SummonerName);
+        if (directActivePlayerId is not null)
+        {
+            activePlayerId = directActivePlayerId;
+            return true;
+        }
+
+        activePlayerId = string.Empty;
+        if (string.IsNullOrWhiteSpace(activePlayerName))
+        {
+            return false;
+        }
+
+        var matchingParticipantIds = source.AllPlayers
+            .Where(player =>
+                EqualsName(player.RiotId, activePlayerName)
+                || EqualsName(player.RiotIdGameName, activePlayerName)
+                || EqualsName(player.SummonerName, activePlayerName))
+            .Select(player => GetParticipantId(player.RiotId, player.SummonerName))
+            .Where(participantId => participantId is not null)
+            .Cast<string>()
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Take(2)
+            .ToArray();
+
+        if (matchingParticipantIds.Length != 1)
+        {
+            return false;
+        }
+
+        activePlayerId = matchingParticipantIds[0];
+        return true;
     }
 
     /// <summary>

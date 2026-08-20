@@ -1,5 +1,4 @@
 using System.Net;
-using System.Collections.Concurrent;
 using System.Text;
 using TempoCue.Application;
 using TempoCue.Core;
@@ -192,7 +191,12 @@ public sealed class LiveClientDataClientTests
             }
             """;
 
-        var handler = new StubHttpMessageHandler(json);
+        var handler = new StubHttpMessageHandler(
+            json,
+            responseJsonByUri: new Dictionary<Uri, string>
+            {
+                [LiveClientDataClient.ActivePlayerNameEndpoint] = "\"\""
+            });
         using var httpClient = new HttpClient(handler);
         using var client = new LiveClientDataClient(httpClient);
 
@@ -204,6 +208,59 @@ public sealed class LiveClientDataClientTests
         var result = await client.ReadAsync();
         Assert.Equal(MatchSnapshotReadStatus.InvalidData, result.Status);
         Assert.Null(result.Snapshot);
+    }
+
+    [Fact]
+    public async Task GetSnapshotAsync_ResolvesAndCachesActivePlayerNameWhenStartedMidMatch()
+    {
+        const string json = """
+            {
+              "activePlayer": {},
+              "allPlayers": [
+                {
+                  "riotId": "MidGamePlayer#TEST",
+                  "riotIdGameName": "MidGamePlayer",
+                  "riotIdTagLine": "TEST",
+                  "championName": "Urgot",
+                  "rawChampionName": "game_character_displayname_Urgot",
+                  "team": "ORDER",
+                  "position": "TOP",
+                  "level": 9,
+                  "scores": { "kills": 0, "deaths": 0, "assists": 0, "creepScore": 70 }
+                },
+                {
+                  "riotId": "Opponent#TEST",
+                  "championName": "Sett",
+                  "rawChampionName": "game_character_displayname_Sett",
+                  "team": "CHAOS",
+                  "position": "TOP",
+                  "level": 9,
+                  "scores": { "kills": 0, "deaths": 0, "assists": 0, "creepScore": 65 }
+                }
+              ],
+              "gameData": { "gameTime": 540 }
+            }
+            """;
+        var handler = new StubHttpMessageHandler(
+            json,
+            responseJsonByUri: new Dictionary<Uri, string>
+            {
+                [LiveClientDataClient.ActivePlayerNameEndpoint] = "\"MidGamePlayer#TEST\""
+            });
+        using var httpClient = new HttpClient(handler);
+        using var client = new LiveClientDataClient(httpClient);
+
+        var firstSnapshot = await client.GetSnapshotAsync();
+        var secondSnapshot = await client.GetSnapshotAsync();
+
+        Assert.Equal("MidGamePlayer#TEST", firstSnapshot.Match.ActivePlayerId);
+        Assert.Equal("MidGamePlayer#TEST", secondSnapshot.Match.ActivePlayerId);
+        Assert.Equal(
+            2,
+            handler.RequestedUris.Count(uri => uri == LiveClientDataClient.AllGameDataEndpoint));
+        Assert.Single(
+            handler.RequestedUris,
+            uri => uri == LiveClientDataClient.ActivePlayerNameEndpoint);
     }
 
     [Fact]
@@ -314,36 +371,6 @@ public sealed class LiveClientDataClientTests
         Assert.Equal(MatchSnapshotReadStatus.NoActiveMatch, result.Status);
         Assert.Null(result.Snapshot);
         Assert.Empty(handler.RequestedUris);
-    }
-
-    private sealed class StubHttpMessageHandler(
-        string responseJson,
-        HttpStatusCode allGameStatusCode = HttpStatusCode.OK,
-        Func<HttpContent>? contentFactory = null) : HttpMessageHandler
-    {
-        public ConcurrentBag<Uri> RequestedUris { get; } = [];
-
-        protected override Task<HttpResponseMessage> SendAsync(
-            HttpRequestMessage request,
-            CancellationToken cancellationToken)
-        {
-            var requestUri = request.RequestUri
-                ?? throw new InvalidOperationException("Тестовый запрос не содержит URI.");
-            RequestedUris.Add(requestUri);
-
-            if (allGameStatusCode != HttpStatusCode.OK)
-            {
-                return Task.FromResult(new HttpResponseMessage(allGameStatusCode));
-            }
-
-            var response = new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = contentFactory?.Invoke()
-                    ?? new StringContent(responseJson, Encoding.UTF8, "application/json")
-            };
-
-            return Task.FromResult(response);
-        }
     }
 
     private sealed class StreamOnlyHttpContent(string json) : HttpContent
