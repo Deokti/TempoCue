@@ -13,4 +13,6 @@ public sealed record CaptureDiagnosticsSnapshot(
     double SelectionFramesPerSecond,
     long RateLimitedFrameCount,
     DateTimeOffset? LastFrameAt,
+    MinimapPreviewSnapshot? MinimapPreview,
+    string? MinimapPreviewErrorMessage,
     string? ErrorMessage);

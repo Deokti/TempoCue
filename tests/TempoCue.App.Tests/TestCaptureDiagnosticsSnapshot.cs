@@ -17,6 +17,8 @@ internal static class TestCaptureDiagnosticsSnapshot
         double selectionFramesPerSecond = 0,
         long rateLimitedFrameCount = 0,
         DateTimeOffset? lastFrameAt = null,
+        MinimapPreviewSnapshot? minimapPreview = null,
+        string? minimapPreviewErrorMessage = null,
         string? errorMessage = null) =>
         new(
             state,
@@ -30,5 +32,7 @@ internal static class TestCaptureDiagnosticsSnapshot
             selectionFramesPerSecond,
             rateLimitedFrameCount,
             lastFrameAt,
+            minimapPreview,
+            minimapPreviewErrorMessage,
             errorMessage);
 }

@@ -269,6 +269,95 @@
                         </Border>
                     </UniformGrid>
 
+                    <!-- Предпросмотр получает только нижнюю правую область, а не полный кадр игры. -->
+                    <Border x:Name="MinimapPreviewPanel"
+                            Margin="0,12,0,0"
+                            Padding="14"
+                            Background="#0B1421"
+                            BorderBrush="#263750"
+                            BorderThickness="1"
+                            CornerRadius="10">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HasMinimapPreview}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="220" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Margin="0,0,20,0">
+                                <TextBlock Text="{localization:Loc Settings.Capture.Minimap.Title}"
+                                           Foreground="#F4F7FB"
+                                           FontSize="15"
+                                           FontWeight="SemiBold" />
+                                <TextBlock Text="{localization:Loc Settings.Capture.Minimap.Description}"
+                                           Style="{StaticResource SettingsCaption}"
+                                           TextWrapping="Wrap"
+                                           LineHeight="18"
+                                           Margin="0,5,0,0" />
+                                <TextBlock Text="{localization:Loc Settings.Capture.Minimap.Region.Label}"
+                                           Foreground="#778BA7"
+                                           FontSize="12"
+                                           Margin="0,16,0,0" />
+                                <TextBlock x:Name="MinimapRegionTextBlock"
+                                           Text="{Binding MinimapRegionText}"
+                                           Foreground="#DCE7F5"
+                                           FontWeight="SemiBold"
+                                           Margin="0,4,0,0" />
+                                <TextBlock Text="{Binding MinimapDetectionText}"
+                                           Foreground="#57DDB3"
+                                           FontSize="12"
+                                           Margin="0,6,0,0" />
+                            </StackPanel>
+                            <Border Grid.Column="1"
+                                    Width="220"
+                                    Height="220"
+                                    Background="#05080D"
+                                    BorderBrush="#34506F"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    ClipToBounds="True">
+                                <Image x:Name="MinimapPreviewImage"
+                                       Source="{Binding MinimapPreviewImage}"
+                                       Stretch="Uniform" />
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <Border Margin="0,10,0,0"
+                            Padding="12"
+                            Background="#2A1820"
+                            BorderBrush="#59303D"
+                            BorderThickness="1"
+                            CornerRadius="10">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HasMinimapPreviewError}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <StackPanel>
+                            <TextBlock Text="{localization:Loc Settings.Capture.Minimap.Error.Label}"
+                                       Foreground="#FF9AAA"
+                                       FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding MinimapPreviewErrorText}"
+                                       Foreground="#DCE7F5"
+                                       TextWrapping="Wrap"
+                                       Margin="0,4,0,0" />
+                        </StackPanel>
+                    </Border>
+
                     <Border Margin="0,10,0,0"
                             Padding="12"
                             Background="#2A1820"

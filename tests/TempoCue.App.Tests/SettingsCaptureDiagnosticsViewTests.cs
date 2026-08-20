@@ -69,7 +69,17 @@ public sealed class SettingsCaptureDiagnosticsViewTests
                     selectedFrameCount: 6,
                     selectionFramesPerSecond: 30,
                     rateLimitedFrameCount: 6,
-                    lastFrameAt: DateTimeOffset.UtcNow));
+                    lastFrameAt: DateTimeOffset.UtcNow,
+                    minimapPreview: new MinimapPreviewSnapshot(
+                        X: 1918,
+                        Y: 1078,
+                        Width: 2,
+                        Height: 2,
+                        Stride: 8,
+                        BgraPixels: new byte[16],
+                        CapturedAt: DateTimeOffset.UtcNow,
+                        Corner: MinimapScreenCorner.BottomRight,
+                        DetectionConfidence: 0.92)));
                 captureDiagnostics.Refresh();
                 WpfTestHost.Pump();
 
@@ -78,6 +88,10 @@ public sealed class SettingsCaptureDiagnosticsViewTests
                 Assert.Equal("30,0", WpfTestHost.Find<TextBlock>(view, "SelectionFpsTextBlock").Text);
                 Assert.Equal("6", WpfTestHost.Find<TextBlock>(view, "SelectedFramesTextBlock").Text);
                 Assert.Equal("6", WpfTestHost.Find<TextBlock>(view, "RateLimitedFramesTextBlock").Text);
+                Assert.Equal(
+                    Visibility.Visible,
+                    WpfTestHost.Find<Border>(view, "MinimapPreviewPanel").Visibility);
+                Assert.NotNull(WpfTestHost.Find<Image>(view, "MinimapPreviewImage").Source);
             }
             finally
             {

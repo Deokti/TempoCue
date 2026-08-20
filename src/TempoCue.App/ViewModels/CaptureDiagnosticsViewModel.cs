@@ -1,5 +1,7 @@
 using System.ComponentModel;
 using System.Globalization;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using TempoCue.App.Localization;
 using TempoCue.Vision;
@@ -15,6 +17,8 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
     private readonly DispatcherTimer _refreshTimer;
     private readonly CancellationTokenSource _lifetimeCancellation = new();
     private CaptureDiagnosticsSnapshot _snapshot;
+    private ImageSource? _minimapPreviewImage;
+    private DateTimeOffset? _renderedPreviewAt;
     private bool _isOperationRunning;
     private bool _isDisposed;
 
@@ -108,6 +112,37 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
 
     public string TechnicalErrorText => _snapshot.ErrorMessage ?? string.Empty;
 
+    public bool HasMinimapPreview =>
+        _snapshot.MinimapPreview is not null && _minimapPreviewImage is not null;
+
+    public ImageSource? MinimapPreviewImage => _minimapPreviewImage;
+
+    public string MinimapRegionText => _snapshot.MinimapPreview is { } preview
+        ? string.Format(
+            CultureInfo.CurrentCulture,
+            _localization.Get("Settings.Capture.Minimap.Region.Value"),
+            preview.Width,
+            preview.Height,
+            preview.X,
+            preview.Y)
+        : _localization.Get("Settings.Capture.Value.NotAvailable");
+
+    public string MinimapDetectionText => _snapshot.MinimapPreview is { } preview
+        ? string.Format(
+            CultureInfo.CurrentCulture,
+            _localization.Get("Settings.Capture.Minimap.Detection.Value"),
+            _localization.Get(preview.Corner == MinimapScreenCorner.BottomRight
+                ? "Settings.Capture.Minimap.Corner.Right"
+                : "Settings.Capture.Minimap.Corner.Left"),
+            preview.DetectionConfidence)
+        : _localization.Get("Settings.Capture.Value.NotAvailable");
+
+    public bool HasMinimapPreviewError =>
+        !string.IsNullOrWhiteSpace(_snapshot.MinimapPreviewErrorMessage);
+
+    public string MinimapPreviewErrorText =>
+        _snapshot.MinimapPreviewErrorMessage ?? string.Empty;
+
     public async Task SelectWindowAsync(nint ownerWindow)
     {
         if (!CanSelectWindow)
@@ -178,6 +213,7 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         }
 
         _snapshot = snapshot;
+        UpdateMinimapPreviewImage();
         NotifyDiagnosticsChanged();
     }
 
@@ -216,6 +252,8 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(SelectedFrameCountText));
         OnPropertyChanged(nameof(RateLimitedFrameCountText));
         OnPropertyChanged(nameof(LastFrameText));
+        OnPropertyChanged(nameof(MinimapRegionText));
+        OnPropertyChanged(nameof(MinimapDetectionText));
     }
 
     private void SetOperationRunning(bool value)
@@ -252,5 +290,40 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(RateLimitedFrameCountText));
         OnPropertyChanged(nameof(LastFrameText));
         OnPropertyChanged(nameof(TechnicalErrorText));
+        OnPropertyChanged(nameof(HasMinimapPreview));
+        OnPropertyChanged(nameof(MinimapPreviewImage));
+        OnPropertyChanged(nameof(MinimapRegionText));
+        OnPropertyChanged(nameof(MinimapDetectionText));
+        OnPropertyChanged(nameof(HasMinimapPreviewError));
+        OnPropertyChanged(nameof(MinimapPreviewErrorText));
+    }
+
+    private void UpdateMinimapPreviewImage()
+    {
+        var preview = _snapshot.MinimapPreview;
+        if (preview is null)
+        {
+            _renderedPreviewAt = null;
+            _minimapPreviewImage = null;
+            return;
+        }
+
+        if (_renderedPreviewAt == preview.CapturedAt)
+        {
+            return;
+        }
+
+        var image = BitmapSource.Create(
+            preview.Width,
+            preview.Height,
+            96,
+            96,
+            PixelFormats.Bgra32,
+            null,
+            preview.BgraPixels,
+            preview.Stride);
+        image.Freeze();
+        _renderedPreviewAt = preview.CapturedAt;
+        _minimapPreviewImage = image;
     }
 }

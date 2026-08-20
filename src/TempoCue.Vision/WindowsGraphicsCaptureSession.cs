@@ -9,12 +9,15 @@ public sealed class WindowsGraphicsCaptureSession : IWindowCaptureSession, IAsyn
 {
     private const int FrameBufferCount = 2;
     private const int DefaultSelectionFrameRateLimit = 30;
+    private const int DiagnosticPreviewFrameRateLimit = 4;
     private readonly object _frameSync = new();
     private readonly object _stateSync = new();
     private readonly SemaphoreSlim _lifecycleGate = new(1, 1);
     private readonly FrameRateEstimator _frameRate = new();
     private readonly FrameSelectionGate _frameSelection = new(DefaultSelectionFrameRateLimit);
     private readonly FrameRateEstimator _selectionFrameRate = new();
+    private readonly FrameSelectionGate _previewSelection = new(DiagnosticPreviewFrameRateLimit);
+    private Direct3D11MinimapPreviewReader? _minimapPreviewReader;
     private Direct3D11CaptureFramePool? _framePool;
     private GraphicsCaptureSession? _captureSession;
     private GraphicsCaptureItem? _captureItem;
@@ -27,6 +30,8 @@ public sealed class WindowsGraphicsCaptureSession : IWindowCaptureSession, IAsyn
     private long _selectedFrameCount;
     private long _rateLimitedFrameCount;
     private long _lastFrameUtcTicks;
+    private MinimapPreviewSnapshot? _minimapPreview;
+    private string? _minimapPreviewErrorMessage;
     private string? _errorMessage;
     private int _generation;
     private int _disposeState;
@@ -50,6 +55,8 @@ public sealed class WindowsGraphicsCaptureSession : IWindowCaptureSession, IAsyn
                     _selectionFrameRate.FramesPerSecond,
                     Interlocked.Read(ref _rateLimitedFrameCount),
                     lastFrameTicks == 0 ? null : new DateTimeOffset(lastFrameTicks, TimeSpan.Zero),
+                    _minimapPreview,
+                    _minimapPreviewErrorMessage,
                     _errorMessage);
             }
         }
@@ -276,7 +283,8 @@ public sealed class WindowsGraphicsCaptureSession : IWindowCaptureSession, IAsyn
                     Interlocked.Increment(ref _receivedFrameCount);
                     Interlocked.Exchange(ref _lastFrameUtcTicks, DateTimeOffset.UtcNow.UtcTicks);
                     _frameRate.RegisterFrame(timestamp);
-                    if (_frameSelection.TrySelect(timestamp))
+                    var selected = _frameSelection.TrySelect(timestamp);
+                    if (selected)
                     {
                         Interlocked.Increment(ref _selectedFrameCount);
                         _selectionFrameRate.RegisterFrame(timestamp);
@@ -284,6 +292,14 @@ public sealed class WindowsGraphicsCaptureSession : IWindowCaptureSession, IAsyn
                     else
                     {
                         Interlocked.Increment(ref _rateLimitedFrameCount);
+                    }
+
+                    if (selected && _previewSelection.TrySelect(timestamp))
+                    {
+                        TryUpdateMinimapPreview(
+                            frame.Surface,
+                            contentWidth,
+                            contentHeight);
                     }
                 }
 
@@ -358,9 +374,13 @@ public sealed class WindowsGraphicsCaptureSession : IWindowCaptureSession, IAsyn
             _framePool = null;
             _captureItem = null;
             _direct3DDevice = null;
+            _minimapPreviewReader?.Dispose();
+            _minimapPreviewReader = null;
             lock (_stateSync)
             {
                 _targetName = null;
+                _minimapPreview = null;
+                _minimapPreviewErrorMessage = null;
             }
         }
     }
@@ -376,6 +396,40 @@ public sealed class WindowsGraphicsCaptureSession : IWindowCaptureSession, IAsyn
         _frameRate.Reset();
         _frameSelection.Reset();
         _selectionFrameRate.Reset();
+        _previewSelection.Reset();
+        lock (_stateSync)
+        {
+            _minimapPreview = null;
+            _minimapPreviewErrorMessage = null;
+        }
+    }
+
+    private void TryUpdateMinimapPreview(
+        IDirect3DSurface surface,
+        int contentWidth,
+        int contentHeight)
+    {
+        try
+        {
+            _minimapPreviewReader ??= new Direct3D11MinimapPreviewReader();
+            var preview = _minimapPreviewReader.Read(
+                surface,
+                contentWidth,
+                contentHeight,
+                DateTimeOffset.UtcNow);
+            lock (_stateSync)
+            {
+                _minimapPreview = preview;
+                _minimapPreviewErrorMessage = null;
+            }
+        }
+        catch (Exception exception)
+        {
+            lock (_stateSync)
+            {
+                _minimapPreviewErrorMessage = exception.Message;
+            }
+        }
     }
 
     private void SetState(CaptureSessionState state, string? errorMessage)

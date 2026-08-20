@@ -1014,7 +1014,7 @@
   <data name="Settings.Capture.Section" xml:space="preserve"><value>Map monitoring</value></data>
   <data name="Settings.Capture.Title" xml:space="preserve"><value>Game window capture</value></data>
   <data name="Settings.Capture.Description" xml:space="preserve"><value>Select the League of Legends game window to verify stable frame capture before minimap recognition is enabled.</value></data>
-  <data name="Settings.Capture.State.Hint" xml:space="preserve"><value>Diagnostics are refreshed four times per second without copying frames into the interface.</value></data>
+  <data name="Settings.Capture.State.Hint" xml:space="preserve"><value>Metrics and the local minimap preview are refreshed up to four times per second.</value></data>
   <data name="Settings.Capture.State.Idle" xml:space="preserve"><value>Window not selected</value></data>
   <data name="Settings.Capture.State.Selecting" xml:space="preserve"><value>Waiting for window selection</value></data>
   <data name="Settings.Capture.State.Capturing" xml:space="preserve"><value>Frames are being received</value></data>
@@ -1032,6 +1032,14 @@
   <data name="Settings.Capture.SelectionFps.Label" xml:space="preserve"><value>Selection FPS (limit {0})</value></data>
   <data name="Settings.Capture.SelectedFrames.Label" xml:space="preserve"><value>Frames selected</value></data>
   <data name="Settings.Capture.RateLimitedFrames.Label" xml:space="preserve"><value>Skipped by limiter</value></data>
+  <data name="Settings.Capture.Minimap.Title" xml:space="preserve"><value>Detected minimap</value></data>
+  <data name="Settings.Capture.Minimap.Description" xml:space="preserve"><value>TempoCue automatically finds the minimap boundary in either bottom corner and copies only the detected region.</value></data>
+  <data name="Settings.Capture.Minimap.Region.Label" xml:space="preserve"><value>Automatically detected frame region</value></data>
+  <data name="Settings.Capture.Minimap.Region.Value" xml:space="preserve"><value>{0} × {1} px · x {2}, y {3}</value></data>
+  <data name="Settings.Capture.Minimap.Detection.Value" xml:space="preserve"><value>{0} · confidence {1:P0}</value></data>
+  <data name="Settings.Capture.Minimap.Corner.Left" xml:space="preserve"><value>bottom left</value></data>
+  <data name="Settings.Capture.Minimap.Corner.Right" xml:space="preserve"><value>bottom right</value></data>
+  <data name="Settings.Capture.Minimap.Error.Label" xml:space="preserve"><value>Could not prepare the minimap preview</value></data>
   <data name="Settings.Capture.Value.NotAvailable" xml:space="preserve"><value>Not available</value></data>
   <data name="Settings.Capture.Unsupported.Description" xml:space="preserve"><value>Windows Graphics Capture requires Windows 10 version 2004 or later.</value></data>
   <data name="Settings.Capture.Error.Label" xml:space="preserve"><value>Technical details</value></data>

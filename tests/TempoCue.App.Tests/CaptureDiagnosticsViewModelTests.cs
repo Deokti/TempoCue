@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Windows.Media.Imaging;
 using TempoCue.App.Localization;
 using TempoCue.App.ViewModels;
 using TempoCue.Vision;
@@ -43,7 +44,8 @@ public sealed class CaptureDiagnosticsViewModelTests
                         15,
                         30,
                         125,
-                        TimeSpan.Zero)));
+                        TimeSpan.Zero),
+                    minimapPreview: CreatePreview()));
 
                 viewModel.Refresh();
 
@@ -60,6 +62,13 @@ public sealed class CaptureDiagnosticsViewModelTests
                 Assert.Equal(29.8.ToString("N1", CultureInfo.CurrentCulture), viewModel.SelectionFramesPerSecondText);
                 Assert.Equal(21L.ToString("N0", CultureInfo.CurrentCulture), viewModel.SelectedFrameCountText);
                 Assert.Equal(21L.ToString("N0", CultureInfo.CurrentCulture), viewModel.RateLimitedFrameCountText);
+                Assert.True(viewModel.HasMinimapPreview);
+                Assert.Equal("2 × 2 пкс · x 1918, y 1078", viewModel.MinimapRegionText);
+                Assert.Equal("справа внизу · уверенность 92 %", viewModel.MinimapDetectionText);
+                var previewImage = Assert.IsAssignableFrom<BitmapSource>(
+                    viewModel.MinimapPreviewImage);
+                Assert.Equal(2, previewImage.PixelWidth);
+                Assert.Equal(2, previewImage.PixelHeight);
                 Assert.False(viewModel.HasTechnicalError);
             }
             finally
@@ -97,4 +106,22 @@ public sealed class CaptureDiagnosticsViewModelTests
             Assert.Equal(1, session.StopCount);
         });
     }
+
+    private static MinimapPreviewSnapshot CreatePreview() =>
+        new(
+            X: 1918,
+            Y: 1078,
+            Width: 2,
+            Height: 2,
+            Stride: 8,
+            BgraPixels:
+            [
+                0, 0, 255, 255,
+                0, 255, 0, 255,
+                255, 0, 0, 255,
+                255, 255, 255, 255
+            ],
+            CapturedAt: new DateTimeOffset(2026, 8, 20, 7, 15, 30, TimeSpan.Zero),
+            Corner: MinimapScreenCorner.BottomRight,
+            DetectionConfidence: 0.92);
 }
