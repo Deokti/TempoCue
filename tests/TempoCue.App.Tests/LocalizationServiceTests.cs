@@ -141,7 +141,7 @@ public sealed class LocalizationServiceTests
             Assert.Equal(
                 "Rosters, levels, K/D/A, and approximate CS come from Live Client Data. Riot ID is shown when the client provides it.",
                 localization.Get("Current.Rosters.RiotFact.Description"));
-            Assert.Equal("v0.4.0", AppVersion.Display);
+            Assert.Equal("v0.5.0", AppVersion.Display);
             Assert.Equal("1 player", localization.Plural("Count.Player", 1));
             Assert.Equal("10 players", localization.Plural("Count.Player", 10));
 
