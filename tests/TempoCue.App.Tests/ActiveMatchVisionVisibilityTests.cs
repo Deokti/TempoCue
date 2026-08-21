@@ -62,21 +62,79 @@ public sealed class ActiveMatchVisionVisibilityTests
 
         var dead = FindEnemy(coordinator);
         Assert.True(dead.IsDead);
-        Assert.Equal(ParticipantVisibilityStatus.NotVisible, dead.VisibilityStatus);
+        Assert.Equal(ParticipantVisibilityStatus.Unknown, dead.VisibilityStatus);
         Assert.Null(dead.LastSeenAt);
+    }
+
+    [Fact]
+    public async Task EmptyObservation_ExpiresVisibilityAfterGracePeriod()
+    {
+        var monitor = new TestActiveMatchMonitor();
+        var sink = new ActiveMatchVisionTestSupport.RecordingChampionReferenceSink();
+        var observations = new ActiveMatchVisionTestSupport.TestObservationSource();
+        using var coordinator = CreateCoordinator(monitor, sink, observations);
+        monitor.Publish(ActiveMatchVisionTestSupport.CreateUpdate());
+        await sink.WaitForReferencesAsync(2);
+        var capturedAt = new DateTimeOffset(2026, 8, 21, 10, 0, 0, TimeSpan.Zero);
+        observations.Publish(capturedAt, CreateEnemyAniviaCandidate());
+        observations.Publish(
+            capturedAt.AddMilliseconds(250),
+            CreateEnemyAniviaCandidate());
+        Assert.Equal(
+            ParticipantVisibilityStatus.Visible,
+            FindEnemy(coordinator).VisibilityStatus);
+
+        // Кадр без кандидатов приходит и при потерянной миникарте: он должен
+        // завершить удержание видимости точно так же, как обычный пропуск.
+        observations.Publish(capturedAt.AddMilliseconds(1500));
+
+        var expired = FindEnemy(coordinator);
+        Assert.Equal(ParticipantVisibilityStatus.NotVisible, expired.VisibilityStatus);
+        Assert.Equal(capturedAt.AddMilliseconds(250), expired.LastSeenAt);
+    }
+
+    [Fact]
+    public async Task StaleObservationStream_DegradesVisibilityToUnknown()
+    {
+        var monitor = new TestActiveMatchMonitor();
+        var sink = new ActiveMatchVisionTestSupport.RecordingChampionReferenceSink();
+        var observations = new ActiveMatchVisionTestSupport.TestObservationSource();
+        using var coordinator = CreateCoordinator(
+            monitor,
+            sink,
+            observations,
+            observationTimeout: TimeSpan.Zero);
+        monitor.Publish(ActiveMatchVisionTestSupport.CreateUpdate());
+        await sink.WaitForReferencesAsync(2);
+        var capturedAt = new DateTimeOffset(2026, 8, 21, 10, 0, 0, TimeSpan.Zero);
+        observations.Publish(capturedAt, CreateEnemyAniviaCandidate());
+        observations.Publish(
+            capturedAt.AddMilliseconds(250),
+            CreateEnemyAniviaCandidate());
+        Assert.Equal(
+            ParticipantVisibilityStatus.Visible,
+            FindEnemy(coordinator).VisibilityStatus);
+
+        monitor.Publish(ActiveMatchVisionTestSupport.CreateUpdate());
+
+        var stale = FindEnemy(coordinator);
+        Assert.Equal(ParticipantVisibilityStatus.Unknown, stale.VisibilityStatus);
+        Assert.Equal(capturedAt.AddMilliseconds(250), stale.LastSeenAt);
     }
 
     private static ActiveMatchVisionCoordinator CreateCoordinator(
         TestActiveMatchMonitor monitor,
         IMinimapChampionReferenceSink sink,
-        IMinimapChampionObservationSource observations) =>
+        IMinimapChampionObservationSource observations,
+        TimeSpan? observationTimeout = null) =>
         new(
             monitor,
             ActiveMatchVisionTestSupport.CreateCatalog(),
             new ActiveMatchVisionTestSupport.TestPortraitReferenceLoader(),
             sink,
             LocalizationService.Instance,
-            observations);
+            observations,
+            observationTimeout);
 
     private static ActiveMatchVisionParticipantSnapshot FindEnemy(
         ActiveMatchVisionCoordinator coordinator) =>

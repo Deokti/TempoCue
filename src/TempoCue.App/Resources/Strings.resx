@@ -1066,6 +1066,8 @@
   <data name="Settings.Capture.Participants.Status.Confirming.Value" xml:space="preserve"><value>Confirming · confidence {0:P0}</value></data>
   <data name="Settings.Capture.Participants.Status.LastSeen.Value" xml:space="preserve"><value>Not visible · last seen at {0:HH:mm:ss}</value></data>
   <data name="Settings.Capture.Participants.Status.Dead" xml:space="preserve"><value>Dead · observation paused</value></data>
+  <data name="Settings.Capture.Participants.Status.NoData" xml:space="preserve"><value>No visibility data</value></data>
+  <data name="Settings.Capture.Participants.Status.NoData.LastSeen.Value" xml:space="preserve"><value>No data · last confirmed at {0:HH:mm:ss}</value></data>
   <data name="Settings.Capture.Value.NotAvailable" xml:space="preserve"><value>Not available</value></data>
   <data name="Settings.Capture.Unsupported.Description" xml:space="preserve"><value>Windows Graphics Capture requires Windows 10 version 2004 or later.</value></data>
   <data name="Settings.Capture.Error.Label" xml:space="preserve"><value>Technical details</value></data>

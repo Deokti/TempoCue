@@ -27,7 +27,7 @@ internal sealed record ActiveMatchVisionParticipantSnapshot(
         ChampionPortraitReferenceStatus.Ready,
     bool IsDead = false,
     ParticipantVisibilityStatus VisibilityStatus =
-        ParticipantVisibilityStatus.NotVisible,
+        ParticipantVisibilityStatus.Unknown,
     DateTimeOffset? LastSeenAt = null,
     double VisibilityConfidence = 0,
     double? MapX = null,

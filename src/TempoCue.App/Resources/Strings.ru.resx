@@ -1076,6 +1076,8 @@
   <data name="Settings.Capture.Participants.Status.Confirming.Value" xml:space="preserve"><value>Подтверждается · уверенность {0:P0}</value></data>
   <data name="Settings.Capture.Participants.Status.LastSeen.Value" xml:space="preserve"><value>Не виден · последний раз в {0:HH:mm:ss}</value></data>
   <data name="Settings.Capture.Participants.Status.Dead" xml:space="preserve"><value>Мёртв · наблюдение приостановлено</value></data>
+  <data name="Settings.Capture.Participants.Status.NoData" xml:space="preserve"><value>Нет данных о видимости</value></data>
+  <data name="Settings.Capture.Participants.Status.NoData.LastSeen.Value" xml:space="preserve"><value>Нет данных · последнее подтверждение в {0:HH:mm:ss}</value></data>
   <data name="Settings.Capture.Value.NotAvailable" xml:space="preserve"><value>Нет данных</value></data>
   <data name="Settings.Capture.Unsupported.Description" xml:space="preserve"><value>Для Windows Graphics Capture требуется Windows 10 версии 2004 или новее.</value></data>
   <data name="Settings.Capture.Error.Label" xml:space="preserve"><value>Технические подробности</value></data>

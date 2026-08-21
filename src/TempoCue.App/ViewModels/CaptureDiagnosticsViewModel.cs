@@ -589,6 +589,18 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
                 participant.VisibilityConfidence);
             statusBrush = PendingStatusBrush;
         }
+        else if (participant.VisibilityStatus == ParticipantVisibilityStatus.Unknown)
+        {
+            // Прерванный поток наблюдений не означает «не виден»: интерфейс честно
+            // сообщает об отсутствии данных, сохраняя последнее подтверждение.
+            statusText = participant.LastSeenAt is { } lastConfirmedAt
+                ? string.Format(
+                    CultureInfo.CurrentCulture,
+                    _localization.Get("Settings.Capture.Participants.Status.NoData.LastSeen.Value"),
+                    lastConfirmedAt.ToLocalTime())
+                : _localization.Get("Settings.Capture.Participants.Status.NoData");
+            statusBrush = MissingStatusBrush;
+        }
         else if (participant.LastSeenAt is { } lastSeenAt)
         {
             statusText = string.Format(

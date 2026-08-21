@@ -94,6 +94,59 @@ public sealed class CaptureDiagnosticsParticipantTests
         });
     }
 
+    [Fact]
+    public void Refresh_ReportsMissingObservationDataInsteadOfGuessingNotVisible()
+    {
+        RunInRussian(localization =>
+        {
+            using var viewModel = CreateViewModel(
+                localization,
+                new ActiveMatchVisionParticipantSnapshot(
+                    "enemy-player",
+                    "Anivia",
+                    "Anivia",
+                    PlayerPosition.Middle,
+                    TeamSide.Chaos,
+                    MinimapMarkerAffiliation.Enemy,
+                    VisibilityStatus: ParticipantVisibilityStatus.Unknown));
+
+            viewModel.Refresh();
+
+            Assert.Equal(
+                "Нет данных о видимости",
+                Assert.Single(viewModel.EnemyParticipantStatuses).StatusText);
+        });
+    }
+
+    [Fact]
+    public void Refresh_KeepsLastConfirmationTimeWhenObservationStreamIsLost()
+    {
+        RunInRussian(localization =>
+        {
+            var lastSeenAt = new DateTimeOffset(2026, 8, 21, 10, 0, 0, TimeSpan.Zero);
+            using var viewModel = CreateViewModel(
+                localization,
+                new ActiveMatchVisionParticipantSnapshot(
+                    "enemy-player",
+                    "Anivia",
+                    "Anivia",
+                    PlayerPosition.Middle,
+                    TeamSide.Chaos,
+                    MinimapMarkerAffiliation.Enemy,
+                    VisibilityStatus: ParticipantVisibilityStatus.Unknown,
+                    LastSeenAt: lastSeenAt));
+
+            viewModel.Refresh();
+
+            Assert.Equal(
+                string.Format(
+                    System.Globalization.CultureInfo.CurrentCulture,
+                    "Нет данных · последнее подтверждение в {0:HH:mm:ss}",
+                    lastSeenAt.ToLocalTime()),
+                Assert.Single(viewModel.EnemyParticipantStatuses).StatusText);
+        });
+    }
+
     private static ActiveMatchVisionDiagnosticsSnapshot CreateVisionSnapshot() => new(
         TeamSide.Chaos,
         [
@@ -103,7 +156,8 @@ public sealed class CaptureDiagnosticsParticipantTests
                 "Pyke",
                 PlayerPosition.Support,
                 TeamSide.Chaos,
-                MinimapMarkerAffiliation.Ally),
+                MinimapMarkerAffiliation.Ally,
+                VisibilityStatus: ParticipantVisibilityStatus.NotVisible),
             new ActiveMatchVisionParticipantSnapshot(
                 "enemy-player",
                 "Anivia",

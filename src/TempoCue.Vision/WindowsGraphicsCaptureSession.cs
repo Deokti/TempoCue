@@ -579,6 +579,14 @@ public sealed class WindowsGraphicsCaptureSession :
             {
                 _minimapPreviewErrorMessage = exception.Message;
             }
+
+            // Неудачное чтение — тоже тик времени: подписчик должен засчитать пропуск
+            // кадра, иначе удержание видимости не истечёт при потерянной миникарте.
+            PublishObservation(new MinimapChampionObservationEventArgs(
+                DateTimeOffset.UtcNow,
+                MinimapFrameNormalizer.CanonicalSize,
+                MinimapFrameNormalizer.CanonicalSize,
+                []));
         }
     }
 

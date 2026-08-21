@@ -15,6 +15,7 @@ internal sealed class ActiveMatchVisionCoordinator :
     IDisposable
 {
     private static readonly TimeSpan ReferenceLoadTimeout = TimeSpan.FromSeconds(20);
+    private static readonly TimeSpan DefaultObservationTimeout = TimeSpan.FromSeconds(2);
 
     private readonly IActiveMatchMonitor _monitor;
     private readonly IChampionCatalog _championCatalog;
@@ -24,6 +25,8 @@ internal sealed class ActiveMatchVisionCoordinator :
     private readonly LocalizationService _localization;
     private readonly object _sync = new();
     private readonly ParticipantVisibilityTracker _visibilityTracker = new();
+    private readonly TimeSpan _observationTimeout;
+    private DateTimeOffset? _lastObservationReceivedAt;
 
     private CancellationTokenSource? _loadCancellation;
     private ActiveMatchVisionDiagnosticsSnapshot _diagnosticsSnapshot =
@@ -45,8 +48,10 @@ internal sealed class ActiveMatchVisionCoordinator :
         IChampionPortraitReferenceLoader portraitLoader,
         IMinimapChampionReferenceSink referenceSink,
         LocalizationService localization,
-        IMinimapChampionObservationSource? observationSource = null)
+        IMinimapChampionObservationSource? observationSource = null,
+        TimeSpan? observationTimeout = null)
     {
+        _observationTimeout = observationTimeout ?? DefaultObservationTimeout;
         _monitor = monitor ?? throw new ArgumentNullException(nameof(monitor));
         _championCatalog = championCatalog ?? throw new ArgumentNullException(nameof(championCatalog));
         _portraitLoader = portraitLoader ?? throw new ArgumentNullException(nameof(portraitLoader));
@@ -107,13 +112,8 @@ internal sealed class ActiveMatchVisionCoordinator :
                 return;
             }
 
-            var trackedPlayers = context.Players
-                .Where(player =>
-                    !player.IsDead &&
-                    _resolutions.TryGetValue(player.ReferenceKey, out var resolution) &&
-                    resolution.Status == ChampionPortraitReferenceStatus.Ready &&
-                    !string.IsNullOrWhiteSpace(resolution.ChampionId))
-                .ToArray();
+            _lastObservationReceivedAt = DateTimeOffset.UtcNow;
+            var trackedPlayers = GetTrackedPlayersLocked(context);
             var observations = e.Candidates
                 .Select(candidate => CreateObservation(
                     candidate,
@@ -167,9 +167,13 @@ internal sealed class ActiveMatchVisionCoordinator :
                     StringComparison.Ordinal))
             {
                 _currentContext = context;
+                DegradeVisibilityWhenStreamIsStaleLocked(context);
                 Volatile.Write(
                     ref _diagnosticsSnapshot,
-                    context.CreateDiagnosticsSnapshot(_resolutions, _visibilityStates));
+                    context.CreateDiagnosticsSnapshot(
+                        _resolutions,
+                        _visibilityStates,
+                        ObservationsAreStaleLocked()));
                 return;
             }
 
@@ -180,6 +184,7 @@ internal sealed class ActiveMatchVisionCoordinator :
             _visibilityTracker.Reset();
             _visibilityStates = new Dictionary<string, ParticipantVisibilitySnapshot>(
                 StringComparer.OrdinalIgnoreCase);
+            _lastObservationReceivedAt = null;
             _generation++;
             generation = _generation;
             _loadCancellation?.Cancel();
@@ -333,7 +338,8 @@ internal sealed class ActiveMatchVisionCoordinator :
                 ref _diagnosticsSnapshot,
                 (_currentContext ?? context).CreateDiagnosticsSnapshot(
                     resolutions,
-                    _visibilityStates));
+                    _visibilityStates,
+                    ObservationsAreStaleLocked()));
         }
 
         _referenceSink.SetChampionReferences(references);
@@ -401,6 +407,40 @@ internal sealed class ActiveMatchVisionCoordinator :
             players);
     }
 
+    private ParticipantReference[] GetTrackedPlayersLocked(ParticipantContext context) =>
+        context.Players
+            .Where(player =>
+                !player.IsDead &&
+                _resolutions.TryGetValue(player.ReferenceKey, out var resolution) &&
+                resolution.Status == ChampionPortraitReferenceStatus.Ready &&
+                !string.IsNullOrWhiteSpace(resolution.ChampionId))
+            .ToArray();
+
+    private bool ObservationsAreStaleLocked() =>
+        _lastObservationReceivedAt is not { } receivedAt ||
+        DateTimeOffset.UtcNow - receivedAt >= _observationTimeout;
+
+    /// <summary>
+    /// Прерванный поток кадров не должен бессрочно удерживать «Виден»: синтетический
+    /// пропуск проводит состояния через обычный период удержания трекера, поэтому
+    /// возобновлённый поток требует полного повторного подтверждения.
+    /// </summary>
+    private void DegradeVisibilityWhenStreamIsStaleLocked(ParticipantContext context)
+    {
+        if (!ObservationsAreStaleLocked() || _visibilityStates.Count == 0)
+        {
+            return;
+        }
+
+        var trackedIds = GetTrackedPlayersLocked(context)
+            .Select(static player => player.ParticipantId)
+            .ToArray();
+        var states = _visibilityTracker.Update(DateTimeOffset.UtcNow, trackedIds, []);
+        _visibilityStates = states.ToDictionary(
+            static state => state.ParticipantId,
+            StringComparer.OrdinalIgnoreCase);
+    }
+
     private ParticipantVisionObservation? CreateObservation(
         MinimapChampionMarkerCandidate candidate,
         IReadOnlyList<ParticipantReference> trackedPlayers,
@@ -457,7 +497,8 @@ internal sealed class ActiveMatchVisionCoordinator :
     {
         public ActiveMatchVisionDiagnosticsSnapshot CreateDiagnosticsSnapshot(
             IReadOnlyDictionary<string, ParticipantReferenceResolution>? resolutions = null,
-            IReadOnlyDictionary<string, ParticipantVisibilitySnapshot>? visibilityStates = null) =>
+            IReadOnlyDictionary<string, ParticipantVisibilitySnapshot>? visibilityStates = null,
+            bool observationsAreStale = false) =>
             new(
                 ActivePlayerTeam,
                 Players.Select(player =>
@@ -471,6 +512,12 @@ internal sealed class ActiveMatchVisionCoordinator :
                         visibilityStates.TryGetValue(player.ParticipantId, out var tracked)
                             ? tracked
                             : null;
+                    // Без живого потока наблюдений «не виден» — это догадка: статус
+                    // честно опускается до «нет данных», а последнее подтверждённое
+                    // время и координаты сохраняются для диагностики.
+                    var visibilityStatus = observationsAreStale || visibility is null
+                        ? ParticipantVisibilityStatus.Unknown
+                        : visibility.Status;
                     return new ActiveMatchVisionParticipantSnapshot(
                         player.ParticipantId,
                         player.ChampionName,
@@ -480,7 +527,7 @@ internal sealed class ActiveMatchVisionCoordinator :
                         player.Affiliation,
                         resolution?.Status ?? ChampionPortraitReferenceStatus.Pending,
                         player.IsDead,
-                        visibility?.Status ?? ParticipantVisibilityStatus.NotVisible,
+                        visibilityStatus,
                         visibility?.LastSeenAt,
                         visibility?.Confidence ?? 0,
                         visibility?.MapX,
