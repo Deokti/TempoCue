@@ -12,6 +12,7 @@ namespace TempoCue.App.Coordinators;
 /// </summary>
 internal sealed class ActiveMatchVisionCoordinator :
     IActiveMatchVisionDiagnosticsSource,
+    IParticipantVisibilityTransitionSource,
     IDisposable
 {
     private static readonly TimeSpan ReferenceLoadTimeout = TimeSpan.FromSeconds(20);
@@ -26,6 +27,7 @@ internal sealed class ActiveMatchVisionCoordinator :
     private readonly LocalizationService _localization;
     private readonly object _sync = new();
     private readonly ParticipantVisibilityTracker _visibilityTracker = new();
+    private readonly ParticipantVisibilityTransitionDetector _transitionDetector = new();
     private readonly TimeSpan _observationTimeout;
     private readonly TimeSpan _referenceRetryInterval;
     private DateTimeOffset? _lastObservationReceivedAt;
@@ -76,6 +78,8 @@ internal sealed class ActiveMatchVisionCoordinator :
     public ActiveMatchVisionDiagnosticsSnapshot DiagnosticsSnapshot =>
         Volatile.Read(ref _diagnosticsSnapshot);
 
+    public event EventHandler<ParticipantVisibilityTransition>? TransitionAvailable;
+
     public void Dispose()
     {
         lock (_sync)
@@ -90,6 +94,7 @@ internal sealed class ActiveMatchVisionCoordinator :
             _loadCancellation?.Cancel();
             _loadCancellation = null;
             _visibilityTracker.Reset();
+            _transitionDetector.Reset();
             _visibilityStates = new Dictionary<string, ParticipantVisibilitySnapshot>(
                 StringComparer.OrdinalIgnoreCase);
             _currentContext = null;
@@ -110,6 +115,7 @@ internal sealed class ActiveMatchVisionCoordinator :
         object? sender,
         MinimapChampionObservationEventArgs e)
     {
+        IReadOnlyList<ParticipantVisibilityTransition> transitions;
         lock (_sync)
         {
             if (_isDisposed || _currentContext is not { } context)
@@ -140,12 +146,25 @@ internal sealed class ActiveMatchVisionCoordinator :
             _visibilityStates = states.ToDictionary(
                 static state => state.ParticipantId,
                 StringComparer.OrdinalIgnoreCase);
+            var observationsAreStale = !e.IsSuccessful && ObservationsAreStaleLocked();
+            var transitionStates = observationsAreStale
+                ? states.Select(static state => state with
+                    {
+                        Status = ParticipantVisibilityStatus.Unknown
+                    }).ToArray()
+                : states;
+            transitions = _transitionDetector.Update(e.CapturedAt, transitionStates);
             Volatile.Write(
                 ref _diagnosticsSnapshot,
                 context.CreateDiagnosticsSnapshot(
                     _resolutions,
                     _visibilityStates,
-                    !e.IsSuccessful && ObservationsAreStaleLocked()));
+                    observationsAreStale));
+        }
+
+        foreach (var transition in transitions)
+        {
+            TransitionAvailable?.Invoke(this, transition);
         }
     }
 
@@ -213,6 +232,7 @@ internal sealed class ActiveMatchVisionCoordinator :
                 _resolutions = new Dictionary<string, ParticipantReferenceResolution>(
                     StringComparer.OrdinalIgnoreCase);
                 _visibilityTracker.Reset();
+                _transitionDetector.Reset();
                 _visibilityStates = new Dictionary<string, ParticipantVisibilitySnapshot>(
                     StringComparer.OrdinalIgnoreCase);
                 _lastObservationReceivedAt = null;
@@ -525,7 +545,10 @@ internal sealed class ActiveMatchVisionCoordinator :
         var centerY = candidate.Y + (candidate.Height / 2d);
         return new ParticipantVisionObservation(
             player.ParticipantId,
-            Math.Clamp(candidate.IdentityConfidence, 0, 1),
+            // Сходство с портретом само по себе завышает уверенность на башнях и
+            // миньонах. Для прикладного состояния нужна итоговая оценка, которая
+            // также учитывает качество цветного контура метки чемпиона.
+            Math.Clamp(candidate.Confidence, 0, 1),
             Math.Clamp(centerX / imageWidth, 0, 1),
             Math.Clamp(centerY / imageHeight, 0, 1));
     }

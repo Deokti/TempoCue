@@ -37,6 +37,7 @@ public sealed class WindowsGraphicsCaptureSession :
     private long _selectedFrameCount;
     private long _rateLimitedFrameCount;
     private long _lastFrameUtcTicks;
+    private long _captureStartedUtcTicks;
     private MinimapPreviewSnapshot? _minimapPreview;
     private MinimapChampionReference[] _minimapPreviewReferences = [];
     private string? _minimapPreviewErrorMessage;
@@ -210,9 +211,19 @@ public sealed class WindowsGraphicsCaptureSession :
         do
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var state = Snapshot.State;
-            if (state is not CaptureSessionState.Capturing and
-                not CaptureSessionState.SelectingTarget)
+            var snapshot = Snapshot;
+            var captureStartedTicks = Interlocked.Read(ref _captureStartedUtcTicks);
+            DateTimeOffset? captureStartedAt = captureStartedTicks == 0
+                ? null
+                : new DateTimeOffset(captureStartedTicks, TimeSpan.Zero);
+            var shouldRestart = AutomaticCaptureRecoveryPolicy.ShouldRestart(
+                snapshot.State,
+                captureStartedAt,
+                snapshot.LastFrameAt,
+                DateTimeOffset.UtcNow);
+            if (shouldRestart ||
+                snapshot.State is not CaptureSessionState.Capturing and
+                    not CaptureSessionState.SelectingTarget)
             {
                 await TryStartLeagueWindowAsync(cancellationToken).ConfigureAwait(false);
             }
@@ -324,6 +335,9 @@ public sealed class WindowsGraphicsCaptureSession :
                 _framePool.FrameArrived += FramePool_FrameArrived;
                 _captureItem.Closed += CaptureItem_Closed;
                 _captureSession.StartCapture();
+                Interlocked.Exchange(
+                    ref _captureStartedUtcTicks,
+                    DateTimeOffset.UtcNow.UtcTicks);
                 SetState(CaptureSessionState.Capturing, null);
                 return true;
             }
@@ -500,6 +514,7 @@ public sealed class WindowsGraphicsCaptureSession :
             _framePool = null;
             _captureItem = null;
             _direct3DDevice = null;
+            Interlocked.Exchange(ref _captureStartedUtcTicks, 0);
             _minimapPreviewReader?.Dispose();
             _minimapPreviewReader = null;
             lock (_stateSync)

@@ -33,6 +33,7 @@ public partial class App : System.Windows.Application
     private IOverlayPresenter? _overlayPresenter;
     private OverlaySetupSession? _overlaySetupSession;
     private ActiveMatchOverlayCoordinator? _activeMatchOverlayCoordinator;
+    private ActiveMatchMapAwarenessCoordinator? _activeMatchMapAwarenessCoordinator;
     private ActiveMatchVisionCoordinator? _activeMatchVisionCoordinator;
     private ChampionPortraitReferenceLoader? _championPortraitReferenceLoader;
     private WindowsGraphicsCaptureSession? _windowCaptureSession;
@@ -146,6 +147,12 @@ public partial class App : System.Windows.Application
             _windowCaptureSession,
             LocalizationService.Instance,
             _windowCaptureSession);
+        _activeMatchMapAwarenessCoordinator = new ActiveMatchMapAwarenessCoordinator(
+            _activeMatchMonitor,
+            _activeMatchVisionCoordinator,
+            _overlayPresenter,
+            LocalizationService.Instance,
+            overlaySettings);
         var captureDiagnostics = new CaptureDiagnosticsViewModel(
             _windowCaptureSession,
             new WindowsGraphicsCaptureSupport().IsSupported,
@@ -341,6 +348,7 @@ public partial class App : System.Windows.Application
     protected override void OnExit(ExitEventArgs e)
     {
         _lifetimeCancellation.Cancel();
+        _activeMatchMapAwarenessCoordinator?.Dispose();
         _activeMatchVisionCoordinator?.Dispose();
         _championPortraitReferenceLoader?.Dispose();
         _activeMatchOverlayCoordinator?.Dispose();

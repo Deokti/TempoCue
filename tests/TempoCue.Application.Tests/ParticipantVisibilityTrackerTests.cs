@@ -177,6 +177,45 @@ public sealed class ParticipantVisibilityTrackerTests
         Assert.Equal(0.7, result.MapY);
     }
 
+    [Fact]
+    public void Update_LowConfidenceDetectionsDoNotOccupyVisibleState()
+    {
+        var tracker = new ParticipantVisibilityTracker();
+
+        var first = Assert.Single(tracker.Update(
+            Start,
+            ["enemy-jungle"],
+            [Observation("enemy-jungle", 0.66)]));
+        var repeated = Assert.Single(tracker.Update(
+            Start.AddMilliseconds(250),
+            ["enemy-jungle"],
+            [Observation("enemy-jungle", 0.66)]));
+        var realAppearanceStart = Assert.Single(tracker.Update(
+            Start.AddMilliseconds(500),
+            ["enemy-jungle"],
+            [Observation("enemy-jungle", 0.90)]));
+        var realAppearanceConfirmed = Assert.Single(tracker.Update(
+            Start.AddMilliseconds(750),
+            ["enemy-jungle"],
+            [Observation("enemy-jungle", 0.91)]));
+
+        Assert.Equal(ParticipantVisibilityStatus.NotVisible, first.Status);
+        Assert.Equal(ParticipantVisibilityStatus.NotVisible, repeated.Status);
+        Assert.Equal(ParticipantVisibilityStatus.Confirming, realAppearanceStart.Status);
+        Assert.Equal(ParticipantVisibilityStatus.Visible, realAppearanceConfirmed.Status);
+    }
+
+    [Fact]
+    public void Constructor_RejectsInvalidMinimumObservationConfidence()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            new ParticipantVisibilityTracker(minimumObservationConfidence: -0.01));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            new ParticipantVisibilityTracker(minimumObservationConfidence: 1.01));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            new ParticipantVisibilityTracker(minimumObservationConfidence: double.NaN));
+    }
+
     private static ParticipantVisionObservation Observation(
         string participantId,
         double confidence = 0.85,

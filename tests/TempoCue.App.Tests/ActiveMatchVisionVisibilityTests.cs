@@ -31,7 +31,7 @@ public sealed class ActiveMatchVisionVisibilityTests
 
         var visible = FindEnemy(coordinator);
         Assert.Equal(ParticipantVisibilityStatus.Visible, visible.VisibilityStatus);
-        Assert.Equal(0.86, visible.VisibilityConfidence, 2);
+        Assert.Equal(0.90, visible.VisibilityConfidence, 2);
         Assert.Equal(0.34375, Assert.IsType<double>(visible.MapX), 5);
         Assert.Equal(0.4375, Assert.IsType<double>(visible.MapY), 5);
         Assert.Equal(capturedAt.AddMilliseconds(250), visible.LastSeenAt);

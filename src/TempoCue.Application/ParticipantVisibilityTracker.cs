@@ -6,12 +6,14 @@ namespace TempoCue.Application;
 public sealed class ParticipantVisibilityTracker
 {
     public const int DefaultRequiredConsecutiveDetections = 2;
+    public const double DefaultMinimumObservationConfidence = 0.77;
     public static readonly TimeSpan DefaultMaximumDetectionGap =
         TimeSpan.FromMilliseconds(600);
     public static readonly TimeSpan DefaultDisappearanceGracePeriod =
         TimeSpan.FromSeconds(1);
 
     private readonly int _requiredConsecutiveDetections;
+    private readonly double _minimumObservationConfidence;
     private readonly TimeSpan _maximumDetectionGap;
     private readonly TimeSpan _disappearanceGracePeriod;
     private readonly Dictionary<string, TrackedParticipant> _participants =
@@ -19,11 +21,19 @@ public sealed class ParticipantVisibilityTracker
 
     public ParticipantVisibilityTracker(
         int requiredConsecutiveDetections = DefaultRequiredConsecutiveDetections,
+        double minimumObservationConfidence = DefaultMinimumObservationConfidence,
         TimeSpan? maximumDetectionGap = null,
         TimeSpan? disappearanceGracePeriod = null)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(requiredConsecutiveDetections);
         _requiredConsecutiveDetections = requiredConsecutiveDetections;
+        if (!double.IsFinite(minimumObservationConfidence)
+            || minimumObservationConfidence is < 0 or > 1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(minimumObservationConfidence));
+        }
+
+        _minimumObservationConfidence = minimumObservationConfidence;
         _maximumDetectionGap = maximumDetectionGap ?? DefaultMaximumDetectionGap;
         _disappearanceGracePeriod = disappearanceGracePeriod ??
             DefaultDisappearanceGracePeriod;
@@ -56,6 +66,10 @@ public sealed class ParticipantVisibilityTracker
             .Where(observation => expected.Contains(
                 observation.ParticipantId,
                 StringComparer.OrdinalIgnoreCase))
+            // Слабый кандидат не должен занимать устойчивое состояние участника:
+            // иначе настоящее появление не создаст переход NotVisible -> Visible.
+            .Where(observation =>
+                observation.Confidence >= _minimumObservationConfidence)
             .GroupBy(
                 static observation => observation.ParticipantId,
                 StringComparer.OrdinalIgnoreCase)
