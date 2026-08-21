@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using OpenCvSharp;
 
 namespace TempoCue.Vision;
@@ -6,7 +7,7 @@ namespace TempoCue.Vision;
 /// Сопоставляет цветные портреты средствами OpenCV и не допускает повторного
 /// назначения одного участника нескольким областям одного кадра.
 /// </summary>
-internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecognizer
+internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecognizer, IDisposable
 {
     private const int BytesPerPixel = 4;
     private const int AlignmentRadius = 8;
@@ -19,6 +20,17 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
     private const double MinimumIdentityConfidence = 0.75;
     private const double MinimumIdentityMargin = 0.04;
     private static readonly int[] SourceSides = [13, 15, 17, 19, 21];
+    private static readonly int[] TemplateSides = SourceSides
+        .Select(static sourceSide => Math.Max(
+            7,
+            (int)Math.Round(
+                sourceSide * ReferenceCropSide /
+                (double)MinimapChampionReference.ImageSide)))
+        .ToArray();
+
+    private IReadOnlyList<MinimapChampionReference>? _preparedSource;
+    private PreparedReference[] _preparedReferences = [];
+    private bool _isDisposed;
 
     public MinimapChampionRecognitionResult Recognize(
         ReadOnlyMemory<byte> pixels,
@@ -28,6 +40,7 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
         IReadOnlyList<MinimapChampionMarkerCandidate> candidates,
         IReadOnlyList<MinimapChampionReference> references)
     {
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         ValidateImage(pixels.Span, width, height, stride);
         ArgumentNullException.ThrowIfNull(candidates);
         ArgumentNullException.ThrowIfNull(references);
@@ -36,30 +49,66 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
             return new MinimapChampionRecognitionResult([], 0);
         }
 
-        var sourcePixels = pixels.ToArray();
-        using var sourceBgra = Mat.FromPixelData(
-            height,
-            width,
-            MatType.CV_8UC4,
-            sourcePixels,
-            stride);
+        using var sourceBgra = CreateBgraMat(pixels, width, height, stride);
         using var sourceBgr = new Mat();
         Cv2.CvtColor(sourceBgra, sourceBgr, ColorConversionCodes.BGRA2BGR);
 
-        var preparedReferences = references
-            .Select(PreparedReference.Create)
-            .ToArray();
-        try
+        return MatchCandidates(sourceBgr, candidates, GetPreparedReferences(references));
+    }
+
+    public void Dispose()
+    {
+        if (_isDisposed)
         {
-            return MatchCandidates(sourceBgr, candidates, preparedReferences);
+            return;
         }
-        finally
+
+        _isDisposed = true;
+        DisposePreparedReferences();
+    }
+
+    private static Mat CreateBgraMat(
+        ReadOnlyMemory<byte> pixels,
+        int width,
+        int height,
+        int stride)
+    {
+        // Кадр оборачивается без копирования: Mat живёт только внутри синхронного
+        // прохода, а копия канонического кадра на каждом обработанном кадре
+        // засоряла кучу больших объектов при длительном матче.
+        var buffer = MemoryMarshal.TryGetArray(pixels, out var segment) &&
+            segment.Offset == 0 &&
+            segment.Array is { } array
+                ? array
+                : pixels.ToArray();
+        return Mat.FromPixelData(height, width, MatType.CV_8UC4, buffer, stride);
+    }
+
+    private PreparedReference[] GetPreparedReferences(
+        IReadOnlyList<MinimapChampionReference> references)
+    {
+        if (ReferenceEquals(_preparedSource, references))
         {
-            foreach (var reference in preparedReferences)
-            {
-                reference.Dispose();
-            }
+            return _preparedReferences;
         }
+
+        DisposePreparedReferences();
+        // Эталоны меняются только вместе с составом матча, поэтому конвертация и
+        // масштабирование выполняются один раз, а не для каждой пары кадр × кандидат.
+        _preparedReferences = references.Select(PreparedReference.Create).ToArray();
+        _preparedSource = references;
+        return _preparedReferences;
+    }
+
+    private void DisposePreparedReferences()
+    {
+        foreach (var reference in _preparedReferences)
+        {
+            reference.Dispose();
+        }
+
+        _preparedReferences = [];
+        _preparedSource = null;
     }
 
     private static MinimapChampionRecognitionResult MatchCandidates(
@@ -93,7 +142,7 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
                         reference.Reference.Affiliation == candidate.Affiliation) ??
                     referenceGroup[0];
 
-                var similarity = FindBestSimilarity(source, candidate, reference.Bgr);
+                var similarity = FindBestSimilarity(source, candidate, reference);
                 if (similarity > bestSimilarity)
                 {
                     secondSimilarity = bestSimilarity;
@@ -134,19 +183,15 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
     private static double FindBestSimilarity(
         Mat source,
         MinimapChampionMarkerCandidate candidate,
-        Mat reference)
+        PreparedReference reference)
     {
         var bestSimilarity = -1d;
         var centerX = candidate.X + ((candidate.Width - 1) / 2d);
         var centerY = candidate.Y + ((candidate.Height - 1) / 2d);
 
-        foreach (var sourceSide in SourceSides)
+        for (var scaleIndex = 0; scaleIndex < TemplateSides.Length; scaleIndex++)
         {
-            var templateSide = Math.Max(
-                7,
-                (int)Math.Round(
-                    sourceSide * ReferenceCropSide /
-                    (double)MinimapChampionReference.ImageSide));
+            var templateSide = TemplateSides[scaleIndex];
             var halfSide = (templateSide - 1) / 2d;
             var expectedX = (int)Math.Round(centerX - halfSide);
             var expectedY = (int)Math.Round(centerY - halfSide);
@@ -165,29 +210,20 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
                 continue;
             }
 
-            using var resizedReference = new Mat();
-            Cv2.Resize(
-                reference,
-                resizedReference,
-                new Size(templateSide, templateSide),
-                0,
-                0,
-                templateSide < reference.Width
-                    ? InterpolationFlags.Area
-                    : InterpolationFlags.Linear);
+            var template = reference.ScaledTemplates[scaleIndex];
             using var searchRegion = new Mat(
                 source,
                 new Rect(searchX, searchY, searchWidth, searchHeight));
             using var structureMap = new Mat();
             Cv2.MatchTemplate(
                 searchRegion,
-                resizedReference,
+                template,
                 structureMap,
                 TemplateMatchModes.CCoeffNormed);
             using var colorDifferenceMap = new Mat();
             Cv2.MatchTemplate(
                 searchRegion,
-                resizedReference,
+                template,
                 colorDifferenceMap,
                 TemplateMatchModes.SqDiffNormed);
             bestSimilarity = Math.Max(
@@ -302,15 +338,16 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
 
     private sealed class PreparedReference : IDisposable
     {
-        private PreparedReference(MinimapChampionReference reference, Mat bgr)
+        private PreparedReference(MinimapChampionReference reference, Mat[] scaledTemplates)
         {
             Reference = reference;
-            Bgr = bgr;
+            ScaledTemplates = scaledTemplates;
         }
 
         public MinimapChampionReference Reference { get; }
 
-        public Mat Bgr { get; }
+        /// <summary>Шаблоны BGR, выровненные по индексам с <see cref="TemplateSides"/>.</summary>
+        public IReadOnlyList<Mat> ScaledTemplates { get; }
 
         public static PreparedReference Create(MinimapChampionReference reference)
         {
@@ -329,10 +366,45 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
                     ReferenceCropOffset,
                     ReferenceCropSide,
                     ReferenceCropSide));
-            return new PreparedReference(reference, center.Clone());
+            var scaledTemplates = new Mat[TemplateSides.Length];
+            try
+            {
+                for (var index = 0; index < TemplateSides.Length; index++)
+                {
+                    var templateSide = TemplateSides[index];
+                    var scaled = new Mat();
+                    Cv2.Resize(
+                        center,
+                        scaled,
+                        new Size(templateSide, templateSide),
+                        0,
+                        0,
+                        templateSide < ReferenceCropSide
+                            ? InterpolationFlags.Area
+                            : InterpolationFlags.Linear);
+                    scaledTemplates[index] = scaled;
+                }
+            }
+            catch
+            {
+                foreach (var scaled in scaledTemplates)
+                {
+                    scaled?.Dispose();
+                }
+
+                throw;
+            }
+
+            return new PreparedReference(reference, scaledTemplates);
         }
 
-        public void Dispose() => Bgr.Dispose();
+        public void Dispose()
+        {
+            foreach (var template in ScaledTemplates)
+            {
+                template.Dispose();
+            }
+        }
     }
 
     private sealed record ProposedMatch(

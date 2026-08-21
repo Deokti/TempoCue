@@ -26,6 +26,7 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
         new("6F15AAF2-D208-4E89-9AB4-489535D34F9C");
 
     private readonly MinimapRecognitionPipeline _recognitionPipeline;
+    private readonly IMinimapChampionRecognizer _championRecognizer;
 
     private nint _device;
     private nint _context;
@@ -50,6 +51,7 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
 
     internal Direct3D11MinimapPreviewReader(IMinimapChampionRecognizer championRecognizer)
     {
+        _championRecognizer = championRecognizer;
         _recognitionPipeline = new MinimapRecognitionPipeline(championRecognizer);
     }
 
@@ -142,6 +144,9 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
         Release(ref _stagingTexture);
         Release(ref _context);
         Release(ref _device);
+        // Распознаватель кэширует подготовленные эталоны, поэтому владеющий им
+        // ридер освобождает нативные ресурсы вместе с остальными буферами.
+        (_championRecognizer as IDisposable)?.Dispose();
     }
 
     private bool ShouldRefreshDetection(DateTimeOffset capturedAt) =>
