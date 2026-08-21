@@ -62,3 +62,4 @@ ADR не переписывается задним числом после из�
 - [0011. Временная стабилизация видимости участников](0011-temporal-participant-visibility.md)
 - [0012. Ручная разметка replay-кадров в сопутствующем файле](0012-replay-ground-truth-sidecar.md)
 - [0013. Отрицательные эталоны статичных объектов](0013-negative-reference-rejection.md)
+- [0014. Отрицательное подтверждение исчезновения участника](0014-negative-disappearance-confirmation.md)
