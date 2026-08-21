@@ -43,6 +43,7 @@ public sealed class CaptureDiagnosticsParticipantTests
                 Assert.Equal("Не распознан в текущем кадре", ally.StatusText);
                 Assert.Contains("Riot: CHAOS", ally.TeamTraceText, StringComparison.Ordinal);
                 Assert.Contains("ожидается: союзник", ally.TeamTraceText, StringComparison.Ordinal);
+                Assert.Contains("распознанный контур: —", ally.TeamTraceText, StringComparison.Ordinal);
 
                 var enemy = Assert.Single(viewModel.EnemyParticipantStatuses);
                 Assert.Equal("Anivia", enemy.ChampionName);

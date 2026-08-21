@@ -478,9 +478,10 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
                 : "Settings.Capture.Participants.RelativeTeam.Enemy");
         var teamTrace = string.Format(
             CultureInfo.CurrentCulture,
-            _localization.Get("Settings.Capture.Participants.TeamTrace.Value"),
+            _localization.Get("Settings.Capture.Participants.TeamTrace.WithRing.Value"),
             FormatRawTeam(participant.RawTeam),
-            relativeTeam);
+            relativeTeam,
+            "—");
 
         string statusText;
         Brush statusBrush;
@@ -492,8 +493,9 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         }
         else if (match is not null)
         {
+            var contourAffiliation = match.ContourAffiliation ?? match.Affiliation;
             var recognizedTeam = _localization.Get(
-                match.Affiliation == MinimapMarkerAffiliation.Ally
+                contourAffiliation == MinimapMarkerAffiliation.Ally
                     ? "Settings.Capture.Participants.RelativeTeam.Ally"
                     : "Settings.Capture.Participants.RelativeTeam.Enemy");
             var isExpectedTeam = match.Affiliation == participant.RelativeAffiliation;

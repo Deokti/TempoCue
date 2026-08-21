@@ -14,7 +14,11 @@ public sealed class OpenCvMinimapChampionRecognizerTests
             first: (25, 65, 185),
             second: (180, 215, 225));
         image.DrawBorder(x: 60, y: 15, width: 12, height: 12, 210, 155, 35);
-        var reference = CreateReference(image, 10, 14, "ExampleChampion");
+        var reference = MinimapRecognitionTestData.CreateReference(
+            image,
+            10,
+            14,
+            "ExampleChampion");
         MinimapChampionMarkerCandidate[] candidates =
         [
             new(6, 10, 25, 25, MinimapMarkerAffiliation.Ally, 0.72),
@@ -40,7 +44,11 @@ public sealed class OpenCvMinimapChampionRecognizerTests
             height: MinimapChampionReference.ImageSide,
             first: (25, 65, 185),
             second: (180, 215, 225));
-        var reference = CreateReference(image, 20, 16, "ExampleChampion");
+        var reference = MinimapRecognitionTestData.CreateReference(
+            image,
+            20,
+            16,
+            "ExampleChampion");
         MinimapChampionMarkerCandidate[] candidates =
         [
             new(14, 10, 25, 25, MinimapMarkerAffiliation.Ally, 0.72),
@@ -54,7 +62,7 @@ public sealed class OpenCvMinimapChampionRecognizerTests
     }
 
     [Fact]
-    public void Recognize_DoesNotUseEnemyReferenceForAllyCandidate()
+    public void Recognize_UsesRosterAffiliationWhenContourColorIsWrong()
     {
         var image = new BgraTestImage(50, 50, 20, 30, 25);
         image.DrawCheckerboard(
@@ -64,7 +72,7 @@ public sealed class OpenCvMinimapChampionRecognizerTests
             height: MinimapChampionReference.ImageSide,
             first: (25, 65, 185),
             second: (180, 215, 225));
-        var enemyReference = CreateReference(
+        var enemyReference = MinimapRecognitionTestData.CreateReference(
             image,
             16,
             16,
@@ -77,7 +85,45 @@ public sealed class OpenCvMinimapChampionRecognizerTests
 
         var result = Recognize(image, candidates, enemyReference);
 
-        Assert.Empty(result.Candidates);
+        var match = Assert.Single(result.Candidates);
+        Assert.Equal("EnemyChampion", match.ChampionId);
+        Assert.Equal(MinimapMarkerAffiliation.Enemy, match.Affiliation);
+        Assert.Equal(MinimapMarkerAffiliation.Ally, match.ContourAffiliation);
+    }
+
+    [Fact]
+    public void Recognize_UsesContourAffiliationForMirroredChampion()
+    {
+        var image = new BgraTestImage(50, 50, 20, 30, 25);
+        image.DrawCheckerboard(
+            x: 16,
+            y: 16,
+            width: MinimapChampionReference.ImageSide,
+            height: MinimapChampionReference.ImageSide,
+            first: (25, 65, 185),
+            second: (180, 215, 225));
+        var allyReference = MinimapRecognitionTestData.CreateReference(
+            image,
+            16,
+            16,
+            "MirrorChampion",
+            MinimapMarkerAffiliation.Ally);
+        var enemyReference = MinimapRecognitionTestData.CreateReference(
+            image,
+            16,
+            16,
+            "MirrorChampion",
+            MinimapMarkerAffiliation.Enemy);
+        MinimapChampionMarkerCandidate[] candidates =
+        [
+            new(12, 12, 25, 25, MinimapMarkerAffiliation.Enemy, 0.72)
+        ];
+
+        var result = Recognize(image, candidates, allyReference, enemyReference);
+
+        var match = Assert.Single(result.Candidates);
+        Assert.Equal(MinimapMarkerAffiliation.Enemy, match.Affiliation);
+        Assert.Equal(MinimapMarkerAffiliation.Enemy, match.ContourAffiliation);
     }
 
     private static MinimapChampionRecognitionResult Recognize(
@@ -92,30 +138,4 @@ public sealed class OpenCvMinimapChampionRecognizerTests
             candidates,
             references);
 
-    private static MinimapChampionReference CreateReference(
-        BgraTestImage image,
-        int startX,
-        int startY,
-        string championId,
-        MinimapMarkerAffiliation affiliation = MinimapMarkerAffiliation.Ally)
-    {
-        var pixels = new byte[
-            MinimapChampionReference.ImageSide *
-            MinimapChampionReference.ImageSide *
-            MinimapChampionReference.BytesPerPixel];
-        for (var y = 0; y < MinimapChampionReference.ImageSide; y++)
-        {
-            var sourceOffset = ((startY + y) * image.Stride) +
-                (startX * MinimapChampionReference.BytesPerPixel);
-            var targetOffset = y *
-                MinimapChampionReference.ImageSide *
-                MinimapChampionReference.BytesPerPixel;
-            image.Pixels.AsSpan(
-                    sourceOffset,
-                    MinimapChampionReference.ImageSide * MinimapChampionReference.BytesPerPixel)
-                .CopyTo(pixels.AsSpan(targetOffset));
-        }
-
-        return new MinimapChampionReference(championId, affiliation, pixels);
-    }
 }

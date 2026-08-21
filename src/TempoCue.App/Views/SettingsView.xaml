@@ -16,6 +16,7 @@
             <DataTemplate x:Key="VisionParticipantStatusTemplate">
                 <Border Padding="10"
                         Margin="0,0,0,6"
+                        MinHeight="106"
                         Background="#101C2C"
                         CornerRadius="8">
                     <Grid>
@@ -30,11 +31,17 @@
                             <TextBlock Text="{Binding TeamTraceText}"
                                        Foreground="#778BA7"
                                        FontSize="11"
+                                       MinHeight="30"
+                                       LineHeight="15"
+                                       LineStackingStrategy="BlockLineHeight"
                                        TextWrapping="Wrap"
                                        Margin="0,3,8,0" />
                             <TextBlock Text="{Binding StatusText}"
                                        Foreground="{Binding StatusBrush}"
                                        FontSize="12"
+                                       MinHeight="32"
+                                       LineHeight="16"
+                                       LineStackingStrategy="BlockLineHeight"
                                        TextWrapping="Wrap"
                                        Margin="0,4,8,0" />
                         </StackPanel>

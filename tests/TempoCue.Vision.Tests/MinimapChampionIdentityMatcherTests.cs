@@ -21,7 +21,11 @@ public sealed class MinimapChampionIdentityMatcherTests
             new(6, 10, 25, 25, MinimapMarkerAffiliation.Ally, 0.72),
             new(43, 8, 25, 25, MinimapMarkerAffiliation.Ally, 0.68)
         ];
-        var reference = CreateReference(image, startX: 10, startY: 14, "ExampleChampion");
+        var reference = MinimapRecognitionTestData.CreateReference(
+            image,
+            startX: 10,
+            startY: 14,
+            "ExampleChampion");
 
         var matches = Match(image, candidates, reference);
 
@@ -42,7 +46,12 @@ public sealed class MinimapChampionIdentityMatcherTests
             height: MinimapChampionReference.ImageSide,
             first: (25, 65, 185),
             second: (180, 215, 225));
-        var reference = CreateReference(image, 10, 10, "EnemyChampion", MinimapMarkerAffiliation.Enemy);
+        var reference = MinimapRecognitionTestData.CreateReference(
+            image,
+            10,
+            10,
+            "EnemyChampion",
+            MinimapMarkerAffiliation.Enemy);
         MinimapChampionMarkerCandidate[] candidates =
         [
             new(6, 6, 25, 25, MinimapMarkerAffiliation.Ally, 0.72)
@@ -70,7 +79,11 @@ public sealed class MinimapChampionIdentityMatcherTests
             }
         }
 
-        var reference = CreateReference(referenceImage, 0, 0, "ScaledChampion");
+        var reference = MinimapRecognitionTestData.CreateReference(
+            referenceImage,
+            0,
+            0,
+            "ScaledChampion");
         var observedImage = new BgraTestImage(50, 50, 15, 20, 25);
         DrawScaledReference(observedImage, reference, startX: 18, startY: 18, side: 13);
         MinimapChampionMarkerCandidate[] candidates =
@@ -95,7 +108,11 @@ public sealed class MinimapChampionIdentityMatcherTests
             height: MinimapChampionReference.ImageSide,
             first: (25, 65, 185),
             second: (180, 215, 225));
-        var reference = CreateReference(image, 24, 16, "OffsetChampion");
+        var reference = MinimapRecognitionTestData.CreateReference(
+            image,
+            24,
+            16,
+            "OffsetChampion");
         MinimapChampionMarkerCandidate[] candidates =
         [
             new(12, 12, 25, 25, MinimapMarkerAffiliation.Ally, 0.72)
@@ -118,33 +135,6 @@ public sealed class MinimapChampionIdentityMatcherTests
             image.Stride,
             candidates,
             references);
-
-    private static MinimapChampionReference CreateReference(
-        BgraTestImage image,
-        int startX,
-        int startY,
-        string championId,
-        MinimapMarkerAffiliation affiliation = MinimapMarkerAffiliation.Ally)
-    {
-        var pixels = new byte[
-            MinimapChampionReference.ImageSide *
-            MinimapChampionReference.ImageSide *
-            MinimapChampionReference.BytesPerPixel];
-        for (var y = 0; y < MinimapChampionReference.ImageSide; y++)
-        {
-            var sourceOffset = ((startY + y) * image.Stride) +
-                (startX * MinimapChampionReference.BytesPerPixel);
-            var targetOffset = y *
-                MinimapChampionReference.ImageSide *
-                MinimapChampionReference.BytesPerPixel;
-            image.Pixels.AsSpan(
-                    sourceOffset,
-                    MinimapChampionReference.ImageSide * MinimapChampionReference.BytesPerPixel)
-                .CopyTo(pixels.AsSpan(targetOffset));
-        }
-
-        return new MinimapChampionReference(championId, affiliation, pixels);
-    }
 
     private static void DrawScaledReference(
         BgraTestImage image,

@@ -67,6 +67,14 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
         IReadOnlyList<MinimapChampionMarkerCandidate> candidates,
         IReadOnlyList<PreparedReference> references)
     {
+        var referenceGroups = references
+            .GroupBy(
+                static reference => reference.Reference.ChampionId,
+                StringComparer.OrdinalIgnoreCase)
+            .Select(static group => group
+                .OrderBy(static reference => reference.Reference.Affiliation)
+                .ToArray())
+            .ToArray();
         var proposedMatches = new List<ProposedMatch>(candidates.Count);
         var maximumObservedSimilarity = -1d;
         for (var candidateIndex = 0; candidateIndex < candidates.Count; candidateIndex++)
@@ -76,12 +84,14 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
             var bestSimilarity = -1d;
             var secondSimilarity = -1d;
 
-            foreach (var reference in references)
+            foreach (var referenceGroup in referenceGroups)
             {
-                if (reference.Reference.Affiliation != candidate.Affiliation)
-                {
-                    continue;
-                }
+                // Портрет определяет участника независимо от шумного цвета контура.
+                // При зеркальном чемпионе сторона контура выбирает один из двух
+                // одинаковых эталонов уже после определения личности.
+                var reference = referenceGroup.FirstOrDefault(reference =>
+                        reference.Reference.Affiliation == candidate.Affiliation) ??
+                    referenceGroup[0];
 
                 var similarity = FindBestSimilarity(source, candidate, reference.Bgr);
                 if (similarity > bestSimilarity)
@@ -248,9 +258,11 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
             .OrderBy(match => match.CandidateIndex)
             .Select(match => match.Candidate with
             {
+                Affiliation = match.Reference.Affiliation,
                 ChampionId = match.Reference.ChampionId,
                 IdentityConfidence = match.Similarity,
-                Confidence = (match.Candidate.Confidence + match.Similarity) / 2
+                Confidence = (match.Candidate.Confidence + match.Similarity) / 2,
+                ContourAffiliation = match.Candidate.Affiliation
             })
             .ToArray();
     }

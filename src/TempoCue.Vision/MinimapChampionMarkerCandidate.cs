@@ -12,4 +12,5 @@ public sealed record MinimapChampionMarkerCandidate(
     MinimapMarkerAffiliation Affiliation,
     double Confidence,
     string? ChampionId = null,
-    double IdentityConfidence = 0);
+    double IdentityConfidence = 0,
+    MinimapMarkerAffiliation? ContourAffiliation = null);
