@@ -141,7 +141,9 @@ public sealed class ParticipantVisibilityTracker
             }
             else
             {
-                _consecutiveDetections = 0;
+                // Пропуск отдельного кадра не сбрасывает подтверждение: последовательность
+                // обнаружений определяется только интервалом maximumDetectionGap, иначе
+                // мигающее распознавание никогда не достигло бы двух подряд.
                 if (_isVisible &&
                     _lastSeenAt is { } lastSeen &&
                     capturedAt >= lastSeen &&

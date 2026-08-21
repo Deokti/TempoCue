@@ -53,6 +53,93 @@ public sealed class ParticipantVisibilityTrackerTests
     }
 
     [Fact]
+    public void Update_ConfirmsVisibilityWhenMissedFrameSeparatesDetectionsWithinGap()
+    {
+        var tracker = new ParticipantVisibilityTracker();
+
+        _ = tracker.Update(Start, ["enemy-jungle"], [Observation("enemy-jungle")]);
+        _ = tracker.Update(Start.AddMilliseconds(250), ["enemy-jungle"], []);
+        var confirmed = Assert.Single(tracker.Update(
+            Start.AddMilliseconds(500),
+            ["enemy-jungle"],
+            [Observation("enemy-jungle")]));
+
+        Assert.Equal(ParticipantVisibilityStatus.Visible, confirmed.Status);
+        Assert.Equal(Start.AddMilliseconds(500), confirmed.LastSeenAt);
+    }
+
+    [Fact]
+    public void Update_DoesNotConfirmVisibilityWhenDetectionGapExceedsLimit()
+    {
+        var tracker = new ParticipantVisibilityTracker();
+
+        _ = tracker.Update(Start, ["enemy-jungle"], [Observation("enemy-jungle")]);
+        var late = Assert.Single(tracker.Update(
+            Start.AddMilliseconds(700),
+            ["enemy-jungle"],
+            [Observation("enemy-jungle")]));
+
+        Assert.Equal(ParticipantVisibilityStatus.Confirming, late.Status);
+        Assert.Null(late.LastSeenAt);
+    }
+
+    [Fact]
+    public void Update_ConfirmsVisibilityAtExactDetectionGapBoundary()
+    {
+        var tracker = new ParticipantVisibilityTracker();
+
+        _ = tracker.Update(Start, ["enemy-jungle"], [Observation("enemy-jungle")]);
+        var boundary = Assert.Single(tracker.Update(
+            Start.AddMilliseconds(600),
+            ["enemy-jungle"],
+            [Observation("enemy-jungle")]));
+
+        Assert.Equal(ParticipantVisibilityStatus.Visible, boundary.Status);
+    }
+
+    [Fact]
+    public void Update_KeepsVisibleAtExactGracePeriodBoundary()
+    {
+        var tracker = new ParticipantVisibilityTracker();
+        _ = tracker.Update(Start, ["enemy-jungle"], [Observation("enemy-jungle")]);
+        _ = tracker.Update(
+            Start.AddMilliseconds(250),
+            ["enemy-jungle"],
+            [Observation("enemy-jungle")]);
+
+        var atBoundary = Assert.Single(tracker.Update(
+            Start.AddMilliseconds(1250),
+            ["enemy-jungle"],
+            []));
+        var pastBoundary = Assert.Single(tracker.Update(
+            Start.AddMilliseconds(1251),
+            ["enemy-jungle"],
+            []));
+
+        Assert.Equal(ParticipantVisibilityStatus.Visible, atBoundary.Status);
+        Assert.Equal(ParticipantVisibilityStatus.NotVisible, pastBoundary.Status);
+    }
+
+    [Fact]
+    public void Update_RequiresFreshConfirmationAfterVisibilityExpires()
+    {
+        var tracker = new ParticipantVisibilityTracker();
+        _ = tracker.Update(Start, ["enemy-jungle"], [Observation("enemy-jungle")]);
+        _ = tracker.Update(
+            Start.AddMilliseconds(250),
+            ["enemy-jungle"],
+            [Observation("enemy-jungle")]);
+        _ = tracker.Update(Start.AddSeconds(5), ["enemy-jungle"], []);
+
+        var reappeared = Assert.Single(tracker.Update(
+            Start.AddSeconds(10),
+            ["enemy-jungle"],
+            [Observation("enemy-jungle")]));
+
+        Assert.Equal(ParticipantVisibilityStatus.Confirming, reappeared.Status);
+    }
+
+    [Fact]
     public void Update_RemovesParticipantThatIsNoLongerExpected()
     {
         var tracker = new ParticipantVisibilityTracker(requiredConsecutiveDetections: 1);
