@@ -319,8 +319,6 @@ internal sealed class ActiveMatchVisionCoordinator :
         ParticipantContext context,
         IReadOnlyDictionary<string, ParticipantReferenceResolution> resolutions)
     {
-        ParticipantContext currentContext;
-        IReadOnlyDictionary<string, ParticipantVisibilitySnapshot> visibilityStates;
         lock (_sync)
         {
             if (_isDisposed || generation != _generation)
@@ -329,13 +327,15 @@ internal sealed class ActiveMatchVisionCoordinator :
             }
 
             _resolutions = resolutions;
-            currentContext = _currentContext ?? context;
-            visibilityStates = _visibilityStates;
+            // Запись снимка выполняется под общим замком: параллельное наблюдение кадра
+            // не должно быть перезаписано более старым результатом загрузки портретов.
+            Volatile.Write(
+                ref _diagnosticsSnapshot,
+                (_currentContext ?? context).CreateDiagnosticsSnapshot(
+                    resolutions,
+                    _visibilityStates));
         }
 
-        Volatile.Write(
-            ref _diagnosticsSnapshot,
-            currentContext.CreateDiagnosticsSnapshot(resolutions, visibilityStates));
         _referenceSink.SetChampionReferences(references);
     }
 
