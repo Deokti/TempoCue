@@ -13,7 +13,7 @@ public sealed class MinimapNegativeReferenceTests
             MinimapChampionReference.ImageSide *
             MinimapChampionReference.ImageSide *
             MinimapChampionReference.BytesPerPixel;
-        Assert.Equal(9, templates.Count);
+        Assert.Equal(10, templates.Count);
         Assert.All(templates, template => Assert.Equal(expectedLength, template.Length));
     }
 
