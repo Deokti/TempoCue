@@ -22,4 +22,8 @@
     <ProjectReference Include="..\..\src\TempoCue.Vision\TempoCue.Vision.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="ReplayCorpus\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
