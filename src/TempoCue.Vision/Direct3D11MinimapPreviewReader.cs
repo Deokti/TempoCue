@@ -25,9 +25,6 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
     private static readonly Guid Direct3D11Texture2DGuid =
         new("6F15AAF2-D208-4E89-9AB4-489535D34F9C");
 
-    private readonly MinimapRecognitionPipeline _recognitionPipeline;
-    private readonly IMinimapChampionRecognizer _championRecognizer;
-
     private nint _device;
     private nint _context;
     private nint _stagingTexture;
@@ -44,27 +41,14 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
     private byte[]? _minimapBuffer;
     private bool _isDisposed;
 
-    public Direct3D11MinimapPreviewReader()
-        : this(new OpenCvMinimapChampionRecognizer())
-    {
-    }
-
-    internal Direct3D11MinimapPreviewReader(IMinimapChampionRecognizer championRecognizer)
-    {
-        _championRecognizer = championRecognizer;
-        _recognitionPipeline = new MinimapRecognitionPipeline(championRecognizer);
-    }
-
     public MinimapPreviewSnapshot Read(
         IDirect3DSurface surface,
         int frameWidth,
         int frameHeight,
-        DateTimeOffset capturedAt,
-        IReadOnlyList<MinimapChampionReference> championReferences)
+        DateTimeOffset capturedAt)
     {
         ObjectDisposedException.ThrowIf(_isDisposed, this);
         ArgumentNullException.ThrowIfNull(surface);
-        ArgumentNullException.ThrowIfNull(championReferences);
 
         var sourceTexture = GetTexture(surface);
         try
@@ -95,13 +79,6 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
                 region.Width,
                 region.Height,
                 checked(region.Width * BytesPerPixel));
-            var recognition = _recognitionPipeline.Analyze(
-                normalizedPixels,
-                MinimapFrameNormalizer.CanonicalSize,
-                MinimapFrameNormalizer.CanonicalSize,
-                checked(MinimapFrameNormalizer.CanonicalSize * BytesPerPixel),
-                championReferences);
-
             return new MinimapPreviewSnapshot(
                 region.X,
                 region.Y,
@@ -113,14 +90,7 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
                 normalizedPixels,
                 capturedAt,
                 _detectedCorner,
-                _detectionConfidence)
-            {
-                MarkerCandidates = recognition.MarkerCandidates,
-                ChampionProposalCount = recognition.ChampionProposalCount,
-                ChampionMarkerCandidates = recognition.ChampionCandidates,
-                ChampionReferenceCount = championReferences.Count,
-                MaximumIdentityConfidence = recognition.MaximumIdentityConfidence
-            };
+                _detectionConfidence);
         }
         finally
         {
@@ -144,9 +114,6 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
         Release(ref _stagingTexture);
         Release(ref _context);
         Release(ref _device);
-        // Распознаватель кэширует подготовленные эталоны, поэтому владеющий им
-        // ридер освобождает нативные ресурсы вместе с остальными буферами.
-        (_championRecognizer as IDisposable)?.Dispose();
     }
 
     private bool ShouldRefreshDetection(DateTimeOffset capturedAt) =>

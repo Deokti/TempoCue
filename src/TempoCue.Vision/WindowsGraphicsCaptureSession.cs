@@ -23,6 +23,7 @@ public sealed class WindowsGraphicsCaptureSession :
     private readonly FrameSelectionGate _frameSelection = new(DefaultSelectionFrameRateLimit);
     private readonly FrameRateEstimator _selectionFrameRate = new();
     private readonly FrameSelectionGate _previewSelection = new(DiagnosticPreviewFrameRateLimit);
+    private readonly MinimapRecognitionWorker _recognitionWorker;
     private Direct3D11MinimapPreviewReader? _minimapPreviewReader;
     private Direct3D11CaptureFramePool? _framePool;
     private GraphicsCaptureSession? _captureSession;
@@ -47,6 +48,11 @@ public sealed class WindowsGraphicsCaptureSession :
     private int _disposeState;
 
     public event EventHandler<MinimapChampionObservationEventArgs>? ObservationAvailable;
+
+    public WindowsGraphicsCaptureSession()
+    {
+        _recognitionWorker = new MinimapRecognitionWorker(CompleteMinimapRecognition);
+    }
 
     public CaptureDiagnosticsSnapshot Snapshot
     {
@@ -194,6 +200,8 @@ public sealed class WindowsGraphicsCaptureSession :
             _lifecycleGate.Dispose();
             _automaticCaptureCancellation?.Dispose();
         }
+
+        await _recognitionWorker.DisposeAsync().ConfigureAwait(false);
     }
 
     private async Task MonitorLeagueWindowAsync(CancellationToken cancellationToken)
@@ -414,7 +422,7 @@ public sealed class WindowsGraphicsCaptureSession :
 
                     if (selected && _previewSelection.TrySelect(timestamp))
                     {
-                        TryUpdateMinimapPreview(
+                        TryQueueMinimapPreview(
                             frame.Surface,
                             contentWidth,
                             contentHeight);
@@ -545,7 +553,7 @@ public sealed class WindowsGraphicsCaptureSession :
         }
     }
 
-    private void TryUpdateMinimapPreview(
+    private void TryQueueMinimapPreview(
         IDirect3DSurface surface,
         int contentWidth,
         int contentHeight)
@@ -558,20 +566,8 @@ public sealed class WindowsGraphicsCaptureSession :
                 surface,
                 contentWidth,
                 contentHeight,
-                DateTimeOffset.UtcNow,
-                championReferences);
-            lock (_stateSync)
-            {
-                _minimapPreview = preview;
-                _minimapPreviewReferences = championReferences;
-                _minimapPreviewErrorMessage = null;
-            }
-
-            PublishObservation(new MinimapChampionObservationEventArgs(
-                preview.CapturedAt,
-                preview.ImageWidth,
-                preview.ImageHeight,
-                preview.ChampionMarkerCandidates));
+                DateTimeOffset.UtcNow);
+            _recognitionWorker.TrySubmit(preview, championReferences, _generation);
         }
         catch (Exception exception)
         {
@@ -590,6 +586,44 @@ public sealed class WindowsGraphicsCaptureSession :
                 [],
                 isSuccessful: false));
         }
+    }
+
+    private void CompleteMinimapRecognition(RecognitionWorkResult result)
+    {
+        if (result.Generation != Volatile.Read(ref _generation) ||
+            Volatile.Read(ref _disposeState) != 0)
+        {
+            return;
+        }
+
+        if (result.ErrorMessage is not null)
+        {
+            lock (_stateSync)
+            {
+                _minimapPreviewErrorMessage = result.ErrorMessage;
+            }
+
+            PublishObservation(new MinimapChampionObservationEventArgs(
+                result.Preview.CapturedAt,
+                result.Preview.ImageWidth,
+                result.Preview.ImageHeight,
+                [],
+                isSuccessful: false));
+            return;
+        }
+
+        lock (_stateSync)
+        {
+            _minimapPreview = result.Preview;
+            _minimapPreviewReferences = result.ChampionReferences;
+            _minimapPreviewErrorMessage = null;
+        }
+
+        PublishObservation(new MinimapChampionObservationEventArgs(
+            result.Preview.CapturedAt,
+            result.Preview.ImageWidth,
+            result.Preview.ImageHeight,
+            result.Preview.ChampionMarkerCandidates));
     }
 
     private void PublishObservation(MinimapChampionObservationEventArgs args)
