@@ -88,4 +88,13 @@ public sealed class MinimapReplayGroundTruthTests
         Assert.Throws<ArgumentOutOfRangeException>(() =>
             new MinimapReplayGroundTruth([], allowedFalsePositives: -1));
     }
+
+    [Fact]
+    public void Constructor_RejectsRegionOutsideCanonicalFrame()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            new MinimapGroundTruthRegion(310, 10, 25, 25, MinimapGroundTruthKind.Tower));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            new MinimapGroundTruthRegion(10, 300, 16, 25, MinimapGroundTruthKind.Tower));
+    }
 }

@@ -18,8 +18,6 @@ public enum MinimapGroundTruthKind
 /// </summary>
 public sealed record MinimapGroundTruthRegion
 {
-    private const int MaximumSide = 1024;
-
     public MinimapGroundTruthRegion(
         int x,
         int y,
@@ -33,7 +31,10 @@ public sealed record MinimapGroundTruthRegion
         ArgumentOutOfRangeException.ThrowIfNegative(y);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(width);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(height);
-        if (x > MaximumSide || y > MaximumSide || width > MaximumSide || height > MaximumSide)
+        // Разметка описывает канонический кадр: область за его границей исказила
+        // бы метрики корпуса и поэтому отклоняется при создании.
+        if (checked(x + width) > MinimapFrameNormalizer.CanonicalSize ||
+            checked(y + height) > MinimapFrameNormalizer.CanonicalSize)
         {
             throw new ArgumentOutOfRangeException(nameof(width));
         }
