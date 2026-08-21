@@ -13,6 +13,43 @@
                 <ResourceDictionary Source="../Styles/ShellControls.xaml" />
                 <ResourceDictionary Source="../Styles/SettingsControls.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <DataTemplate x:Key="VisionParticipantStatusTemplate">
+                <Border Padding="10"
+                        Margin="0,0,0,6"
+                        Background="#101C2C"
+                        CornerRadius="8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="{Binding ChampionName}"
+                                       Foreground="#F4F7FB"
+                                       FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding TeamTraceText}"
+                                       Foreground="#778BA7"
+                                       FontSize="11"
+                                       TextWrapping="Wrap"
+                                       Margin="0,3,8,0" />
+                            <TextBlock Text="{Binding StatusText}"
+                                       Foreground="{Binding StatusBrush}"
+                                       FontSize="12"
+                                       TextWrapping="Wrap"
+                                       Margin="0,4,8,0" />
+                        </StackPanel>
+                        <Border Grid.Column="1"
+                                Padding="7,3"
+                                VerticalAlignment="Top"
+                                Background="#16263B"
+                                CornerRadius="10">
+                            <TextBlock Text="{Binding PositionCode}"
+                                       Foreground="#AFC3DE"
+                                       FontSize="11" />
+                        </Border>
+                    </Grid>
+                </Border>
+            </DataTemplate>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -180,6 +217,67 @@
                                            Margin="0,3,0,0" />
                             </StackPanel>
                         </Grid>
+                    </Border>
+
+                    <!-- Этот блок разделяет факты Riot и краткоживущее наблюдение Vision по каждому участнику. -->
+                    <Border x:Name="ParticipantDiagnosticsPanel"
+                            Margin="0,12,0,0"
+                            Padding="14"
+                            Background="#0B1421"
+                            BorderBrush="#263750"
+                            BorderThickness="1"
+                            CornerRadius="10">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HasParticipantDiagnostics}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <StackPanel>
+                            <TextBlock Text="{localization:Loc Settings.Capture.Participants.Title}"
+                                       Foreground="#F4F7FB"
+                                       FontSize="15"
+                                       FontWeight="SemiBold" />
+                            <TextBlock Text="{localization:Loc Settings.Capture.Participants.Description}"
+                                       Style="{StaticResource SettingsCaption}"
+                                       TextWrapping="Wrap"
+                                       LineHeight="18"
+                                       Margin="0,5,0,0" />
+                            <TextBlock x:Name="ActivePlayerTeamTextBlock"
+                                       Text="{Binding ActivePlayerTeamText}"
+                                       Foreground="#DCE7F5"
+                                       FontWeight="SemiBold"
+                                       Margin="0,10,0,0" />
+                            <Grid Margin="0,14,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="16" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="{localization:Loc Settings.Capture.Participants.Allies.Title}"
+                                               Foreground="#57DDB3"
+                                               FontWeight="SemiBold"
+                                               Margin="0,0,0,8" />
+                                    <ItemsControl x:Name="AllyParticipantStatusesItemsControl"
+                                                  ItemsSource="{Binding AllyParticipantStatuses}"
+                                                  ItemTemplate="{StaticResource VisionParticipantStatusTemplate}" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="{localization:Loc Settings.Capture.Participants.Enemies.Title}"
+                                               Foreground="#FF5974"
+                                               FontWeight="SemiBold"
+                                               Margin="0,0,0,8" />
+                                    <ItemsControl x:Name="EnemyParticipantStatusesItemsControl"
+                                                  ItemsSource="{Binding EnemyParticipantStatuses}"
+                                                  ItemTemplate="{StaticResource VisionParticipantStatusTemplate}" />
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
                     </Border>
 
                     <Border Margin="0,10,0,0"

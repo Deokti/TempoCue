@@ -1044,6 +1044,19 @@
   <data name="Settings.Capture.Minimap.Markers.Label" xml:space="preserve"><value>Participant portrait verification</value></data>
   <data name="Settings.Capture.Minimap.Markers.Value" xml:space="preserve"><value>Color objects: {0} · comparison regions: {4} · portrait-confirmed: {1} (allied: {2}, enemy: {3}) · references: {5} · best score: {6:P0}</value></data>
   <data name="Settings.Capture.Minimap.Error.Label" xml:space="preserve"><value>Could not prepare the minimap preview</value></data>
+  <data name="Settings.Capture.Participants.Title" xml:space="preserve"><value>Active-match participant diagnostics</value></data>
+  <data name="Settings.Capture.Participants.Description" xml:space="preserve"><value>This shows the Riot team, TempoCue's expected relative side, and recognition result for the current frame. A missing marker is a diagnostic observation, not proof that the champion is hidden.</value></data>
+  <data name="Settings.Capture.Participants.ActiveTeam.Value" xml:space="preserve"><value>Active player Riot team: {0}</value></data>
+  <data name="Settings.Capture.Participants.Allies.Title" xml:space="preserve"><value>Allies</value></data>
+  <data name="Settings.Capture.Participants.Enemies.Title" xml:space="preserve"><value>Enemies</value></data>
+  <data name="Settings.Capture.Participants.RelativeTeam.Ally" xml:space="preserve"><value>ally</value></data>
+  <data name="Settings.Capture.Participants.RelativeTeam.Enemy" xml:space="preserve"><value>enemy</value></data>
+  <data name="Settings.Capture.Participants.TeamTrace.Value" xml:space="preserve"><value>Riot: {0} · expected: {1}</value></data>
+  <data name="Settings.Capture.Participants.TeamTrace.WithRing.Value" xml:space="preserve"><value>Riot: {0} · expected: {1} · recognized ring: {2}</value></data>
+  <data name="Settings.Capture.Participants.Status.ReferencePending" xml:space="preserve"><value>Portrait reference is loading</value></data>
+  <data name="Settings.Capture.Participants.Status.NotDetected" xml:space="preserve"><value>Not recognized in the current frame</value></data>
+  <data name="Settings.Capture.Participants.Status.Visible.Value" xml:space="preserve"><value>Recognized now · confidence {0:P0}</value></data>
+  <data name="Settings.Capture.Participants.Status.TeamMismatch.Value" xml:space="preserve"><value>Recognized with conflicting side: {0} · confidence {1:P0}</value></data>
   <data name="Settings.Capture.Value.NotAvailable" xml:space="preserve"><value>Not available</value></data>
   <data name="Settings.Capture.Unsupported.Description" xml:space="preserve"><value>Windows Graphics Capture requires Windows 10 version 2004 or later.</value></data>
   <data name="Settings.Capture.Error.Label" xml:space="preserve"><value>Technical details</value></data>

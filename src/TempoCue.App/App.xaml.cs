@@ -148,7 +148,8 @@ public partial class App : System.Windows.Application
         var captureDiagnostics = new CaptureDiagnosticsViewModel(
             _windowCaptureSession,
             new WindowsGraphicsCaptureSupport().IsSupported,
-            LocalizationService.Instance);
+            LocalizationService.Instance,
+            _activeMatchVisionCoordinator);
         _settingsViewModel = new SettingsViewModel(
             LocalizationService.Instance,
             settingsService,
