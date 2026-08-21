@@ -98,6 +98,41 @@ public sealed class ActiveMatchVisionCoordinatorTests
     }
 
     [Fact]
+    public async Task TemporaryCatalogFailure_RetriesPreparationOnNextMatchUpdate()
+    {
+        var monitor = new TestActiveMatchMonitor();
+        var sink = new ActiveMatchVisionTestSupport.RecordingChampionReferenceSink();
+        using var coordinator = new ActiveMatchVisionCoordinator(
+            monitor,
+            new FlakyChampionCatalog(),
+            new ActiveMatchVisionTestSupport.TestPortraitReferenceLoader(),
+            sink,
+            LocalizationService.Instance,
+            observationSource: null,
+            observationTimeout: null,
+            referenceRetryInterval: TimeSpan.Zero);
+
+        monitor.Publish(ActiveMatchVisionTestSupport.CreateUpdate());
+        // Первая публикация — пустые эталоны при старте, вторая — итог неудачной попытки.
+        await sink.WaitForPublicationsAsync(2);
+        Assert.All(
+            coordinator.DiagnosticsSnapshot.Participants,
+            participant => Assert.Equal(
+                ChampionPortraitReferenceStatus.Unavailable,
+                participant.ReferenceStatus));
+
+        monitor.Publish(ActiveMatchVisionTestSupport.CreateUpdate());
+
+        var references = await sink.WaitForReferencesAsync(2);
+        Assert.Equal(2, references.Count);
+        Assert.All(
+            coordinator.DiagnosticsSnapshot.Participants,
+            participant => Assert.Equal(
+                ChampionPortraitReferenceStatus.Ready,
+                participant.ReferenceStatus));
+    }
+
+    [Fact]
     public async Task MatchUpdate_MapsChaosPlayerAndParticipantsToRelativeAffiliations()
     {
         var monitor = new TestActiveMatchMonitor();
@@ -140,4 +175,28 @@ public sealed class ActiveMatchVisionCoordinatorTests
                          reference.Affiliation == MinimapMarkerAffiliation.Enemy);
     }
 
+    private sealed class FlakyChampionCatalog : IChampionCatalog
+    {
+        private int _callCount;
+
+        public Task<ChampionCatalogLoadResult> LoadAsync(
+            string languageCode,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(Interlocked.Increment(ref _callCount) == 1
+                ? ChampionCatalogLoadResult.Unavailable()
+                : new ChampionCatalogLoadResult(
+                    [
+                        new ChampionCatalogEntry(
+                            "Pyke",
+                            555,
+                            "Pyke",
+                            new Uri("https://example.test/Pyke.png")),
+                        new ChampionCatalogEntry(
+                            "Anivia",
+                            34,
+                            "Anivia",
+                            new Uri("https://example.test/Anivia.png"))
+                    ],
+                    ChampionCatalogSource.Network));
+    }
 }

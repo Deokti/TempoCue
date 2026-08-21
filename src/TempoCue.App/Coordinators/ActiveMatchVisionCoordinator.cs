@@ -16,6 +16,7 @@ internal sealed class ActiveMatchVisionCoordinator :
 {
     private static readonly TimeSpan ReferenceLoadTimeout = TimeSpan.FromSeconds(20);
     private static readonly TimeSpan DefaultObservationTimeout = TimeSpan.FromSeconds(2);
+    private static readonly TimeSpan DefaultReferenceRetryInterval = TimeSpan.FromSeconds(30);
 
     private readonly IActiveMatchMonitor _monitor;
     private readonly IChampionCatalog _championCatalog;
@@ -26,7 +27,9 @@ internal sealed class ActiveMatchVisionCoordinator :
     private readonly object _sync = new();
     private readonly ParticipantVisibilityTracker _visibilityTracker = new();
     private readonly TimeSpan _observationTimeout;
+    private readonly TimeSpan _referenceRetryInterval;
     private DateTimeOffset? _lastObservationReceivedAt;
+    private DateTimeOffset? _referencesFailedAt;
 
     private CancellationTokenSource? _loadCancellation;
     private ActiveMatchVisionDiagnosticsSnapshot _diagnosticsSnapshot =
@@ -49,9 +52,11 @@ internal sealed class ActiveMatchVisionCoordinator :
         IMinimapChampionReferenceSink referenceSink,
         LocalizationService localization,
         IMinimapChampionObservationSource? observationSource = null,
-        TimeSpan? observationTimeout = null)
+        TimeSpan? observationTimeout = null,
+        TimeSpan? referenceRetryInterval = null)
     {
         _observationTimeout = observationTimeout ?? DefaultObservationTimeout;
+        _referenceRetryInterval = referenceRetryInterval ?? DefaultReferenceRetryInterval;
         _monitor = monitor ?? throw new ArgumentNullException(nameof(monitor));
         _championCatalog = championCatalog ?? throw new ArgumentNullException(nameof(championCatalog));
         _portraitLoader = portraitLoader ?? throw new ArgumentNullException(nameof(portraitLoader));
@@ -153,6 +158,7 @@ internal sealed class ActiveMatchVisionCoordinator :
         var context = CreateContext(update);
         CancellationTokenSource? cancellation;
         int generation;
+        var isReferenceRetry = false;
         lock (_sync)
         {
             if (_isDisposed)
@@ -174,22 +180,46 @@ internal sealed class ActiveMatchVisionCoordinator :
                         _resolutions,
                         _visibilityStates,
                         ObservationsAreStaleLocked()));
-                return;
-            }
+                if (_referencesFailedAt is not { } failedAt ||
+                    DateTimeOffset.UtcNow - failedAt < _referenceRetryInterval)
+                {
+                    return;
+                }
 
-            _participantSignature = context?.Signature;
-            _currentContext = context;
-            _resolutions = new Dictionary<string, ParticipantReferenceResolution>(
-                StringComparer.OrdinalIgnoreCase);
-            _visibilityTracker.Reset();
-            _visibilityStates = new Dictionary<string, ParticipantVisibilitySnapshot>(
-                StringComparer.OrdinalIgnoreCase);
-            _lastObservationReceivedAt = null;
-            _generation++;
-            generation = _generation;
-            _loadCancellation?.Cancel();
-            _loadCancellation = context is null ? null : new CancellationTokenSource();
-            cancellation = _loadCancellation;
+                // Временный сбой сети в начале матча не должен выключать
+                // распознавание до смены состава: подготовка повторяется
+                // на очередном обновлении монитора с ограниченной частотой.
+                _referencesFailedAt = null;
+                _generation++;
+                generation = _generation;
+                _loadCancellation?.Cancel();
+                _loadCancellation = new CancellationTokenSource();
+                cancellation = _loadCancellation;
+                isReferenceRetry = true;
+            }
+            else
+            {
+                _participantSignature = context?.Signature;
+                _currentContext = context;
+                _resolutions = new Dictionary<string, ParticipantReferenceResolution>(
+                    StringComparer.OrdinalIgnoreCase);
+                _visibilityTracker.Reset();
+                _visibilityStates = new Dictionary<string, ParticipantVisibilitySnapshot>(
+                    StringComparer.OrdinalIgnoreCase);
+                _lastObservationReceivedAt = null;
+                _referencesFailedAt = null;
+                _generation++;
+                generation = _generation;
+                _loadCancellation?.Cancel();
+                _loadCancellation = context is null ? null : new CancellationTokenSource();
+                cancellation = _loadCancellation;
+            }
+        }
+
+        if (isReferenceRetry)
+        {
+            _ = LoadAndPublishAsync(context!, generation, cancellation!.Token);
+            return;
         }
 
         if (context is null)
@@ -226,6 +256,7 @@ internal sealed class ActiveMatchVisionCoordinator :
                 loadToken).ConfigureAwait(false);
             if (!catalog.IsAvailable)
             {
+                MarkReferenceLoadFailed(generation);
                 PublishIfCurrent(
                     generation,
                     [],
@@ -275,6 +306,7 @@ internal sealed class ActiveMatchVisionCoordinator :
             Trace.TraceError(
                 "Подготовка портретов участников превысила лимит {0} секунд.",
                 ReferenceLoadTimeout.TotalSeconds);
+            MarkReferenceLoadFailed(generation);
             PublishIfCurrent(
                 generation,
                 [],
@@ -287,11 +319,27 @@ internal sealed class ActiveMatchVisionCoordinator :
                 "Не удалось подготовить портреты участников для миникарты ({0}): {1}",
                 exception.GetType().Name,
                 exception.Message);
+            MarkReferenceLoadFailed(generation);
             PublishIfCurrent(
                 generation,
                 [],
                 context,
                 CreateUnavailableResolutions(context));
+        }
+    }
+
+    /// <summary>
+    /// Отдельный отсутствующий в каталоге чемпион не считается сбоем: повторяются
+    /// только полные неудачи подготовки — недоступный каталог, таймаут и исключение.
+    /// </summary>
+    private void MarkReferenceLoadFailed(int generation)
+    {
+        lock (_sync)
+        {
+            if (!_isDisposed && generation == _generation)
+            {
+                _referencesFailedAt = DateTimeOffset.UtcNow;
+            }
         }
     }
 
