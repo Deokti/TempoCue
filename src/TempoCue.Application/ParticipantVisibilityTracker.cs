@@ -66,10 +66,6 @@ public sealed class ParticipantVisibilityTracker
             .Where(observation => expected.Contains(
                 observation.ParticipantId,
                 StringComparer.OrdinalIgnoreCase))
-            // Слабый кандидат не должен занимать устойчивое состояние участника:
-            // иначе настоящее появление не создаст переход NotVisible -> Visible.
-            .Where(observation =>
-                observation.Confidence >= _minimumObservationConfidence)
             .GroupBy(
                 static observation => observation.ParticipantId,
                 StringComparer.OrdinalIgnoreCase)
@@ -95,6 +91,7 @@ public sealed class ParticipantVisibilityTracker
                 capturedAt,
                 observation,
                 _requiredConsecutiveDetections,
+                _minimumObservationConfidence,
                 _maximumDetectionGap,
                 _disappearanceGracePeriod);
         }
@@ -131,10 +128,13 @@ public sealed class ParticipantVisibilityTracker
             DateTimeOffset capturedAt,
             ParticipantVisionObservation? observation,
             int requiredConsecutiveDetections,
+            double minimumObservationConfidence,
             TimeSpan maximumDetectionGap,
             TimeSpan disappearanceGracePeriod)
         {
-            if (observation is not null)
+            var isStrongObservation = observation is not null &&
+                observation.Confidence >= minimumObservationConfidence;
+            if (observation is not null && isStrongObservation)
             {
                 var followsPrevious = _lastDetectionAt is { } previous &&
                     capturedAt >= previous &&
@@ -153,6 +153,16 @@ public sealed class ParticipantVisibilityTracker
                     _lastSeenAt = capturedAt;
                 }
             }
+            else if (observation is not null && _isVisible)
+            {
+                // Слабое наблюдение не подтверждает новую видимость, но является
+                // доказательством присутствия уже видимого участника: перекрытый
+                // пингом или миньонами мид не должен «исчезать» из-за просевшего
+                // балла. Сохранённая уверенность не занижается слабым кадром.
+                _lastSeenAt = capturedAt;
+                _mapX = observation.MapX;
+                _mapY = observation.MapY;
+            }
             else
             {
                 // Пропуск отдельного кадра не сбрасывает подтверждение: последовательность
@@ -169,7 +179,7 @@ public sealed class ParticipantVisibilityTracker
 
             var status = _isVisible
                 ? ParticipantVisibilityStatus.Visible
-                : observation is not null
+                : isStrongObservation
                     ? ParticipantVisibilityStatus.Confirming
                     : ParticipantVisibilityStatus.NotVisible;
             return new ParticipantVisibilitySnapshot(

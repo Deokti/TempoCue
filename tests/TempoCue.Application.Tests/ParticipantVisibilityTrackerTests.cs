@@ -140,6 +140,59 @@ public sealed class ParticipantVisibilityTrackerTests
     }
 
     [Fact]
+    public void Update_WeakObservationSustainsConfirmedVisibility()
+    {
+        var tracker = new ParticipantVisibilityTracker();
+        _ = tracker.Update(Start, ["enemy-mid"], [Observation("enemy-mid", 0.85)]);
+        _ = tracker.Update(
+            Start.AddMilliseconds(250),
+            ["enemy-mid"],
+            [Observation("enemy-mid", 0.86)]);
+
+        // Балл просел из-за пинга или миньонов, но наблюдение есть: перекрытый
+        // мид не должен «исчезать». Слабые кадры продлевают видимость даже за
+        // пределами периода удержания.
+        var weak = Assert.Single(tracker.Update(
+            Start.AddMilliseconds(1500),
+            ["enemy-mid"],
+            [Observation("enemy-mid", 0.6, 0.45, 0.65)]));
+        var stillWeak = Assert.Single(tracker.Update(
+            Start.AddMilliseconds(2750),
+            ["enemy-mid"],
+            [Observation("enemy-mid", 0.58, 0.46, 0.66)]));
+
+        Assert.Equal(ParticipantVisibilityStatus.Visible, weak.Status);
+        Assert.Equal(ParticipantVisibilityStatus.Visible, stillWeak.Status);
+        Assert.Equal(Start.AddMilliseconds(2750), stillWeak.LastSeenAt);
+        // Сохранённая уверенность не занижается слабым кадром: она описывает
+        // последнее сильное подтверждение личности.
+        Assert.Equal(0.86, stillWeak.Confidence);
+        Assert.Equal(0.46, stillWeak.MapX);
+        Assert.Equal(0.66, stillWeak.MapY);
+    }
+
+    [Fact]
+    public void Update_WeakObservationDoesNotConfirmNewVisibility()
+    {
+        var tracker = new ParticipantVisibilityTracker();
+
+        // Для не подтверждённого участника слабое наблюдение остаётся пропуском:
+        // статичный ложный кандидат не должен занимать состояние Visible.
+        var weakOnly = Assert.Single(tracker.Update(
+            Start,
+            ["enemy-mid"],
+            [Observation("enemy-mid", 0.6)]));
+        var weakAgain = Assert.Single(tracker.Update(
+            Start.AddMilliseconds(250),
+            ["enemy-mid"],
+            [Observation("enemy-mid", 0.62)]));
+
+        Assert.Equal(ParticipantVisibilityStatus.NotVisible, weakOnly.Status);
+        Assert.Equal(ParticipantVisibilityStatus.NotVisible, weakAgain.Status);
+        Assert.Null(weakAgain.LastSeenAt);
+    }
+
+    [Fact]
     public void Update_RemovesParticipantThatIsNoLongerExpected()
     {
         var tracker = new ParticipantVisibilityTracker(requiredConsecutiveDetections: 1);
