@@ -125,7 +125,7 @@ public sealed class ActiveMatchVisionVisibilityTests
     }
 
     [Fact]
-    public async Task FailedObservation_KeepsNotVisibleWhileStreamIsRecentlyAlive()
+    public async Task FailedObservation_PreservesVisibilityWhileStreamIsRecentlyAlive()
     {
         var monitor = new TestActiveMatchMonitor();
         var sink = new ActiveMatchVisionTestSupport.RecordingChampionReferenceSink();
@@ -139,13 +139,13 @@ public sealed class ActiveMatchVisionVisibilityTests
             capturedAt.AddMilliseconds(250),
             CreateEnemyAniviaCandidate());
 
-        // Одиночная ошибка среди недавних успешных кадров — поток ещё жив,
-        // поэтому истечение удержания честно показывает «не виден».
+        // Непрочитанный кадр — не доказательство отсутствия: пока поток недавно
+        // жив, подтверждённая видимость сохраняется, а не превращается в «не виден».
         observations.PublishFailed(capturedAt.AddMilliseconds(1500));
 
-        var expired = FindEnemy(coordinator);
-        Assert.Equal(ParticipantVisibilityStatus.NotVisible, expired.VisibilityStatus);
-        Assert.Equal(capturedAt.AddMilliseconds(250), expired.LastSeenAt);
+        var preserved = FindEnemy(coordinator);
+        Assert.Equal(ParticipantVisibilityStatus.Visible, preserved.VisibilityStatus);
+        Assert.Equal(capturedAt.AddMilliseconds(250), preserved.LastSeenAt);
     }
 
     [Fact]

@@ -37,11 +37,26 @@ public sealed class ActiveMatchVisionTransitionTests
         Assert.Equal("enemy-player", appeared.ParticipantId);
         Assert.Equal(0.90, appeared.Confidence);
 
+        // Ошибка чтения кадра — не доказательство отсутствия и не рождает переход.
+        observations.PublishFailed(capturedAt.AddMilliseconds(1300));
+        Assert.Single(transitions);
+
+        // Исчезновение требует отрицательного подтверждения: нескольких успешных
+        // кадров без участника и минимальной длительности отсутствия.
         observations.Publish(capturedAt.AddMilliseconds(1500));
+        observations.Publish(capturedAt.AddMilliseconds(1750));
+        observations.Publish(capturedAt.AddMilliseconds(2000));
+        Assert.Single(transitions);
+
+        observations.Publish(capturedAt.AddMilliseconds(2250));
         Assert.Equal(2, transitions.Count);
         Assert.Equal(
             ParticipantVisibilityTransitionKind.Disappeared,
             transitions[1].Kind);
+
+        // Продолжение отсутствия не повторяет событие.
+        observations.Publish(capturedAt.AddMilliseconds(2500));
+        Assert.Equal(2, transitions.Count);
     }
 
     private static MinimapChampionMarkerCandidate CreateEnemyCandidate() =>

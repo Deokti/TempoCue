@@ -119,13 +119,23 @@ internal sealed class ActiveMatchVisionCoordinator :
                 return;
             }
 
-            // Только успешно прочитанный кадр подтверждает живой поток: длительные
-            // ошибки чтения старят видимость трекером, но приводят к «нет данных».
-            if (e.IsSuccessful)
+            if (!e.IsSuccessful)
             {
-                _lastObservationReceivedAt = DateTimeOffset.UtcNow;
+                // Непрочитанный кадр — не доказательство отсутствия: состояние
+                // участников сохраняется и не рождает переходов, а продолжительный
+                // сбой чтения переводит статусы в «нет данных» тем же путём, что
+                // и полное отсутствие кадров.
+                DegradeVisibilityWhenStreamIsStaleLocked(context);
+                Volatile.Write(
+                    ref _diagnosticsSnapshot,
+                    context.CreateDiagnosticsSnapshot(
+                        _resolutions,
+                        _visibilityStates,
+                        ObservationsAreStaleLocked()));
+                return;
             }
 
+            _lastObservationReceivedAt = DateTimeOffset.UtcNow;
             var trackedPlayers = GetTrackedPlayersLocked(context);
             var observations = e.Candidates
                 .Select(candidate => CreateObservation(
@@ -142,20 +152,13 @@ internal sealed class ActiveMatchVisionCoordinator :
             _visibilityStates = states.ToDictionary(
                 static state => state.ParticipantId,
                 StringComparer.OrdinalIgnoreCase);
-            var observationsAreStale = !e.IsSuccessful && ObservationsAreStaleLocked();
-            var transitionStates = observationsAreStale
-                ? states.Select(static state => state with
-                    {
-                        Status = ParticipantVisibilityStatus.Unknown
-                    }).ToArray()
-                : states;
-            transitions = _transitionDetector.Update(e.CapturedAt, transitionStates);
+            transitions = _transitionDetector.Update(e.CapturedAt, states);
             Volatile.Write(
                 ref _diagnosticsSnapshot,
                 context.CreateDiagnosticsSnapshot(
                     _resolutions,
                     _visibilityStates,
-                    observationsAreStale));
+                    observationsAreStale: false));
         }
 
         foreach (var transition in transitions)
@@ -364,6 +367,14 @@ internal sealed class ActiveMatchVisionCoordinator :
         _visibilityStates = states.ToDictionary(
             static state => state.ParticipantId,
             StringComparer.OrdinalIgnoreCase);
+        // Якоря детектора снимаются вместе с деградацией: первое устойчивое
+        // состояние после восстановления потока фиксируется без игрового события.
+        _ = _transitionDetector.Update(
+            DateTimeOffset.UtcNow,
+            states.Select(static state => state with
+            {
+                Status = ParticipantVisibilityStatus.Unknown
+            }).ToArray());
     }
 
     private ParticipantVisionObservation? CreateObservation(
