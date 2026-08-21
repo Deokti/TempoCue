@@ -51,10 +51,17 @@ public sealed class SettingsCaptureDiagnosticsViewTests
                 window.Show();
                 WpfTestHost.Pump();
 
-                var card = WpfTestHost.Find<Border>(view, "CaptureDiagnosticsCard");
-                var selectButton = WpfTestHost.Find<Button>(view, "SelectCaptureWindowButton");
-                var stopButton = WpfTestHost.Find<Button>(view, "StopCaptureButton");
-                var saveReplayButton = WpfTestHost.Find<Button>(view, "SaveReplaySampleButton");
+                var captureView = WpfTestHost.Find<CaptureDiagnosticsView>(
+                    view,
+                    "CaptureDiagnosticsView");
+                var card = FindCaptureElement<Border>(captureView, "CaptureDiagnosticsCard");
+                var selectButton = FindCaptureElement<Button>(
+                    captureView,
+                    "SelectCaptureWindowButton");
+                var stopButton = FindCaptureElement<Button>(captureView, "StopCaptureButton");
+                var saveReplayButton = FindCaptureElement<Button>(
+                    captureView,
+                    "SaveReplaySampleButton");
                 Assert.Equal(Visibility.Visible, card.Visibility);
                 Assert.True(selectButton.IsEnabled);
                 Assert.False(stopButton.IsEnabled);
@@ -115,21 +122,34 @@ public sealed class SettingsCaptureDiagnosticsViewTests
                 Assert.Equal("Сменить окно", selectButton.Content);
                 Assert.True(stopButton.IsEnabled);
                 Assert.True(saveReplayButton.IsEnabled);
-                Assert.Equal("30,0", WpfTestHost.Find<TextBlock>(view, "SelectionFpsTextBlock").Text);
-                Assert.Equal("6", WpfTestHost.Find<TextBlock>(view, "SelectedFramesTextBlock").Text);
-                Assert.Equal("6", WpfTestHost.Find<TextBlock>(view, "RateLimitedFramesTextBlock").Text);
+                Assert.Equal(
+                    "30,0",
+                    FindCaptureElement<TextBlock>(captureView, "SelectionFpsTextBlock").Text);
+                Assert.Equal(
+                    "6",
+                    FindCaptureElement<TextBlock>(captureView, "SelectedFramesTextBlock").Text);
+                Assert.Equal(
+                    "6",
+                    FindCaptureElement<TextBlock>(captureView, "RateLimitedFramesTextBlock").Text);
                 Assert.Equal(
                     "320 × 320 пкс · фиксированная геометрия",
-                    WpfTestHost.Find<TextBlock>(view, "MinimapNormalizedSizeTextBlock").Text);
+                    FindCaptureElement<TextBlock>(
+                        captureView,
+                        "MinimapNormalizedSizeTextBlock").Text);
                 Assert.Equal(
                     Visibility.Visible,
-                    WpfTestHost.Find<Border>(view, "MinimapPreviewPanel").Visibility);
-                Assert.NotNull(WpfTestHost.Find<Image>(view, "MinimapPreviewImage").Source);
+                    FindCaptureElement<Border>(captureView, "MinimapPreviewPanel").Visibility);
+                Assert.NotNull(
+                    FindCaptureElement<Image>(captureView, "MinimapPreviewImage").Source);
                 Assert.Equal(
                     "Цветовых объектов: 1 · областей сравнения: 0 · подтверждено портретами: 1 (союзных: 1, вражеских: 0) · эталонов: 0 · лучший балл: 0 %",
-                    WpfTestHost.Find<TextBlock>(view, "MinimapMarkerCandidatesTextBlock").Text);
+                    FindCaptureElement<TextBlock>(
+                        captureView,
+                        "MinimapMarkerCandidatesTextBlock").Text);
                 Assert.Single(
-                    WpfTestHost.Find<ItemsControl>(view, "MinimapMarkerCandidatesItemsControl").Items);
+                    FindCaptureElement<ItemsControl>(
+                        captureView,
+                        "MinimapMarkerCandidatesItemsControl").Items);
             }
             finally
             {
@@ -138,4 +158,8 @@ public sealed class SettingsCaptureDiagnosticsViewTests
             }
         });
     }
+
+    private static T FindCaptureElement<T>(CaptureDiagnosticsView view, string name)
+        where T : FrameworkElement =>
+        WpfTestHost.Find<T>(view, name);
 }

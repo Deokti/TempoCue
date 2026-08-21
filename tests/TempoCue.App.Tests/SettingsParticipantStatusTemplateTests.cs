@@ -14,9 +14,9 @@ public sealed class SettingsParticipantStatusTemplateTests
     {
         WpfTestHost.Run(() =>
         {
-            var settingsView = new SettingsView();
+            var participantDiagnosticsView = new VisionParticipantDiagnosticsView();
             var template = Assert.IsType<DataTemplate>(
-                settingsView.Resources["VisionParticipantStatusTemplate"]);
+                participantDiagnosticsView.Resources["VisionParticipantStatusTemplate"]);
             var presenter = new ContentPresenter
             {
                 Width = 340,

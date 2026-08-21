@@ -19,10 +19,9 @@ public sealed class WindowsGraphicsCaptureSession :
     private readonly object _frameSync = new();
     private readonly object _stateSync = new();
     private readonly SemaphoreSlim _lifecycleGate = new(1, 1);
-    private readonly FrameRateEstimator _frameRate = new();
-    private readonly FrameSelectionGate _frameSelection = new(DefaultSelectionFrameRateLimit);
-    private readonly FrameRateEstimator _selectionFrameRate = new();
-    private readonly FrameSelectionGate _previewSelection = new(DiagnosticPreviewFrameRateLimit);
+    private readonly CaptureFrameMetrics _frameMetrics = new(
+        DefaultSelectionFrameRateLimit,
+        DiagnosticPreviewFrameRateLimit);
     private readonly MinimapRecognitionWorker _recognitionWorker;
     private Direct3D11MinimapPreviewReader? _minimapPreviewReader;
     private Direct3D11CaptureFramePool? _framePool;
@@ -31,13 +30,6 @@ public sealed class WindowsGraphicsCaptureSession :
     private IDirect3DDevice? _direct3DDevice;
     private CaptureSessionState _state = CaptureSessionState.Idle;
     private string? _targetName;
-    private int _frameWidth;
-    private int _frameHeight;
-    private long _receivedFrameCount;
-    private long _selectedFrameCount;
-    private long _rateLimitedFrameCount;
-    private long _lastFrameUtcTicks;
-    private long _captureStartedUtcTicks;
     private MinimapPreviewSnapshot? _minimapPreview;
     private MinimapChampionReference[] _minimapPreviewReferences = [];
     private string? _minimapPreviewErrorMessage;
@@ -59,21 +51,21 @@ public sealed class WindowsGraphicsCaptureSession :
     {
         get
         {
-            var lastFrameTicks = Interlocked.Read(ref _lastFrameUtcTicks);
+            var metrics = _frameMetrics.Snapshot;
             lock (_stateSync)
             {
                 return new CaptureDiagnosticsSnapshot(
                     _state,
                     _targetName,
-                    Volatile.Read(ref _frameWidth),
-                    Volatile.Read(ref _frameHeight),
-                    Interlocked.Read(ref _receivedFrameCount),
-                    _frameRate.FramesPerSecond,
-                    _frameSelection.MaximumFramesPerSecond,
-                    Interlocked.Read(ref _selectedFrameCount),
-                    _selectionFrameRate.FramesPerSecond,
-                    Interlocked.Read(ref _rateLimitedFrameCount),
-                    lastFrameTicks == 0 ? null : new DateTimeOffset(lastFrameTicks, TimeSpan.Zero),
+                    metrics.FrameWidth,
+                    metrics.FrameHeight,
+                    metrics.ReceivedFrameCount,
+                    metrics.FramesPerSecond,
+                    metrics.SelectionFrameRateLimit,
+                    metrics.SelectedFrameCount,
+                    metrics.SelectionFramesPerSecond,
+                    metrics.RateLimitedFrameCount,
+                    metrics.LastFrameAt,
                     _minimapPreview,
                     _minimapPreviewErrorMessage,
                     _errorMessage);
@@ -212,13 +204,10 @@ public sealed class WindowsGraphicsCaptureSession :
         {
             cancellationToken.ThrowIfCancellationRequested();
             var snapshot = Snapshot;
-            var captureStartedTicks = Interlocked.Read(ref _captureStartedUtcTicks);
-            DateTimeOffset? captureStartedAt = captureStartedTicks == 0
-                ? null
-                : new DateTimeOffset(captureStartedTicks, TimeSpan.Zero);
+            var frameMetrics = _frameMetrics.Snapshot;
             var shouldRestart = AutomaticCaptureRecoveryPolicy.ShouldRestart(
                 snapshot.State,
-                captureStartedAt,
+                frameMetrics.CaptureStartedAt,
                 snapshot.LastFrameAt,
                 DateTimeOffset.UtcNow);
             if (shouldRestart ||
@@ -282,7 +271,7 @@ public sealed class WindowsGraphicsCaptureSession :
         {
             var generation = ++_generation;
             StopCaptureResources();
-            ResetMetrics();
+            _frameMetrics.Reset();
             SetState(CaptureSessionState.SelectingTarget, null);
             return generation;
         }
@@ -330,14 +319,11 @@ public sealed class WindowsGraphicsCaptureSession :
                 {
                     _targetName = item.DisplayName;
                 }
-                _frameWidth = item.Size.Width;
-                _frameHeight = item.Size.Height;
+                _frameMetrics.SetInitialFrameSize(item.Size.Width, item.Size.Height);
                 _framePool.FrameArrived += FramePool_FrameArrived;
                 _captureItem.Closed += CaptureItem_Closed;
                 _captureSession.StartCapture();
-                Interlocked.Exchange(
-                    ref _captureStartedUtcTicks,
-                    DateTimeOffset.UtcNow.UtcTicks);
+                _frameMetrics.MarkCaptureStarted(DateTimeOffset.UtcNow);
                 SetState(CaptureSessionState.Capturing, null);
                 return true;
             }
@@ -410,6 +396,7 @@ public sealed class WindowsGraphicsCaptureSession :
 
                 var contentWidth = 0;
                 var contentHeight = 0;
+                var decision = default(CaptureFrameDecision);
                 using (var frame = sender.TryGetNextFrame())
                 {
                     if (frame is null)
@@ -419,22 +406,12 @@ public sealed class WindowsGraphicsCaptureSession :
 
                     contentWidth = frame.ContentSize.Width;
                     contentHeight = frame.ContentSize.Height;
-                    var timestamp = System.Diagnostics.Stopwatch.GetTimestamp();
-                    Interlocked.Increment(ref _receivedFrameCount);
-                    Interlocked.Exchange(ref _lastFrameUtcTicks, DateTimeOffset.UtcNow.UtcTicks);
-                    _frameRate.RegisterFrame(timestamp);
-                    var selected = _frameSelection.TrySelect(timestamp);
-                    if (selected)
-                    {
-                        Interlocked.Increment(ref _selectedFrameCount);
-                        _selectionFrameRate.RegisterFrame(timestamp);
-                    }
-                    else
-                    {
-                        Interlocked.Increment(ref _rateLimitedFrameCount);
-                    }
-
-                    if (selected && _previewSelection.TrySelect(timestamp))
+                    decision = _frameMetrics.RegisterFrame(
+                        contentWidth,
+                        contentHeight,
+                        Stopwatch.GetTimestamp(),
+                        DateTimeOffset.UtcNow);
+                    if (decision.ShouldCreatePreview)
                     {
                         TryQueueMinimapPreview(
                             frame.Surface,
@@ -448,11 +425,7 @@ public sealed class WindowsGraphicsCaptureSession :
                     return;
                 }
 
-                var sizeChanged = contentWidth != Volatile.Read(ref _frameWidth) ||
-                    contentHeight != Volatile.Read(ref _frameHeight);
-                Volatile.Write(ref _frameWidth, contentWidth);
-                Volatile.Write(ref _frameHeight, contentHeight);
-                if (sizeChanged && _direct3DDevice is not null)
+                if (decision.IsSizeChanged && _direct3DDevice is not null)
                 {
                     sender.Recreate(
                         _direct3DDevice,
@@ -514,7 +487,7 @@ public sealed class WindowsGraphicsCaptureSession :
             _framePool = null;
             _captureItem = null;
             _direct3DDevice = null;
-            Interlocked.Exchange(ref _captureStartedUtcTicks, 0);
+            _frameMetrics.ClearCaptureStarted();
             _minimapPreviewReader?.Dispose();
             _minimapPreviewReader = null;
             lock (_stateSync)
@@ -524,26 +497,6 @@ public sealed class WindowsGraphicsCaptureSession :
                 _minimapPreviewReferences = [];
                 _minimapPreviewErrorMessage = null;
             }
-        }
-    }
-
-    private void ResetMetrics()
-    {
-        Volatile.Write(ref _frameWidth, 0);
-        Volatile.Write(ref _frameHeight, 0);
-        Interlocked.Exchange(ref _receivedFrameCount, 0);
-        Interlocked.Exchange(ref _selectedFrameCount, 0);
-        Interlocked.Exchange(ref _rateLimitedFrameCount, 0);
-        Interlocked.Exchange(ref _lastFrameUtcTicks, 0);
-        _frameRate.Reset();
-        _frameSelection.Reset();
-        _selectionFrameRate.Reset();
-        _previewSelection.Reset();
-        lock (_stateSync)
-        {
-            _minimapPreview = null;
-            _minimapPreviewReferences = [];
-            _minimapPreviewErrorMessage = null;
         }
     }
 

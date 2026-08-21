@@ -2,7 +2,6 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using TempoCue.App.Coordinators;
 using TempoCue.App.Localization;
@@ -16,15 +15,10 @@ namespace TempoCue.App.ViewModels;
 public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
 {
     private static readonly TimeSpan RefreshInterval = TimeSpan.FromMilliseconds(250);
-    private static readonly Brush AllyMarkerBrush = CreateFrozenBrush(80, 183, 237);
-    private static readonly Brush EnemyMarkerBrush = CreateFrozenBrush(255, 89, 116);
-    private static readonly Brush VisibleStatusBrush = CreateFrozenBrush(87, 221, 179);
-    private static readonly Brush MissingStatusBrush = CreateFrozenBrush(119, 139, 167);
-    private static readonly Brush PendingStatusBrush = CreateFrozenBrush(255, 201, 85);
-    private static readonly Brush MismatchedTeamStatusBrush = CreateFrozenBrush(255, 89, 116);
     private readonly IWindowCaptureSession _captureSession;
     private readonly IActiveMatchVisionDiagnosticsSource? _visionDiagnostics;
     private readonly LocalizationService _localization;
+    private readonly VisionParticipantStatusPresenter _participantStatusPresenter;
     private readonly DispatcherTimer _refreshTimer;
     private readonly CancellationTokenSource _lifetimeCancellation = new();
     private CaptureDiagnosticsSnapshot _snapshot;
@@ -59,6 +53,7 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         _captureSession = captureSession ?? throw new ArgumentNullException(nameof(captureSession));
         _visionDiagnostics = visionDiagnostics;
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        _participantStatusPresenter = new VisionParticipantStatusPresenter(_localization);
         IsSupported = isSupported;
         _snapshot = captureSession.Snapshot;
         _localization.PropertyChanged += Localization_PropertyChanged;
@@ -172,7 +167,7 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
     public string ActivePlayerTeamText => string.Format(
         CultureInfo.CurrentCulture,
         _localization.Get("Settings.Capture.Participants.ActiveTeam.Value"),
-        FormatRawTeam(_visionSnapshot.ActivePlayerTeam));
+        _participantStatusPresenter.FormatRawTeam(_visionSnapshot.ActivePlayerTeam));
 
     public IReadOnlyList<VisionParticipantStatusViewModel> AllyParticipantStatuses =>
         _allyParticipantStatuses;
@@ -494,168 +489,20 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
             return;
         }
 
-        var image = BitmapSource.Create(
-            preview.ImageWidth,
-            preview.ImageHeight,
-            96,
-            96,
-            PixelFormats.Bgra32,
-            null,
-            preview.BgraPixels,
-            preview.ImageStride);
-        image.Freeze();
-        _renderedPreviewAt = preview.CapturedAt;
-        _minimapPreviewImage = image;
-        _minimapMarkerOverlays = preview.ChampionMarkerCandidates
-            .Select(candidate => new MinimapMarkerOverlayViewModel(
-                candidate.X,
-                candidate.Y,
-                candidate.Width,
-                candidate.Height,
-                candidate.Affiliation == MinimapMarkerAffiliation.Ally
-                    ? AllyMarkerBrush
-                    : EnemyMarkerBrush,
-                candidate.ChampionId,
-                candidate.IdentityConfidence))
-            .ToArray();
+        var presentation = MinimapPreviewPresentationFactory.Create(preview);
+        _renderedPreviewAt = presentation.CapturedAt;
+        _minimapPreviewImage = presentation.Image;
+        _minimapMarkerOverlays = presentation.MarkerOverlays;
     }
 
     private void UpdateParticipantStatuses()
     {
-        _allyParticipantStatuses = BuildParticipantStatuses(
+        _allyParticipantStatuses = _participantStatusPresenter.Create(
+            _visionSnapshot,
             MinimapMarkerAffiliation.Ally);
-        _enemyParticipantStatuses = BuildParticipantStatuses(
+        _enemyParticipantStatuses = _participantStatusPresenter.Create(
+            _visionSnapshot,
             MinimapMarkerAffiliation.Enemy);
-    }
-
-    private IReadOnlyList<VisionParticipantStatusViewModel> BuildParticipantStatuses(
-        MinimapMarkerAffiliation affiliation)
-    {
-        return _visionSnapshot.Participants
-            .Where(participant => participant.RelativeAffiliation == affiliation)
-            .OrderBy(static participant => GetPositionOrder(participant.Position))
-            .ThenBy(static participant => participant.ChampionName, StringComparer.OrdinalIgnoreCase)
-            .Select(CreateParticipantStatus)
-            .ToArray();
-    }
-
-    private VisionParticipantStatusViewModel CreateParticipantStatus(
-        ActiveMatchVisionParticipantSnapshot participant)
-    {
-        var relativeTeam = _localization.Get(
-            participant.RelativeAffiliation == MinimapMarkerAffiliation.Ally
-                ? "Settings.Capture.Participants.RelativeTeam.Ally"
-                : "Settings.Capture.Participants.RelativeTeam.Enemy");
-        var teamTrace = string.Format(
-            CultureInfo.CurrentCulture,
-            _localization.Get("Settings.Capture.Participants.TeamTrace.WithRing.Value"),
-            FormatRawTeam(participant.RawTeam),
-            relativeTeam,
-            "—");
-
-        string statusText;
-        Brush statusBrush;
-        if (participant.IsDead)
-        {
-            statusText = _localization.Get(
-                "Settings.Capture.Participants.Status.Dead");
-            statusBrush = MissingStatusBrush;
-        }
-        else if (participant.ReferenceStatus == ChampionPortraitReferenceStatus.Pending)
-        {
-            statusText = _localization.Get(
-                "Settings.Capture.Participants.Status.ReferencePending");
-            statusBrush = PendingStatusBrush;
-        }
-        else if (participant.ReferenceStatus == ChampionPortraitReferenceStatus.Unavailable)
-        {
-            statusText = _localization.Get(
-                "Settings.Capture.Participants.Status.ReferenceUnavailable");
-            statusBrush = MismatchedTeamStatusBrush;
-        }
-        else if (participant.VisibilityStatus == ParticipantVisibilityStatus.Visible)
-        {
-            statusText = string.Format(
-                CultureInfo.CurrentCulture,
-                _localization.Get("Settings.Capture.Participants.Status.Visible.Value"),
-                participant.VisibilityConfidence);
-            statusBrush = VisibleStatusBrush;
-        }
-        else if (participant.VisibilityStatus == ParticipantVisibilityStatus.Confirming)
-        {
-            statusText = string.Format(
-                CultureInfo.CurrentCulture,
-                _localization.Get("Settings.Capture.Participants.Status.Confirming.Value"),
-                participant.VisibilityConfidence);
-            statusBrush = PendingStatusBrush;
-        }
-        else if (participant.VisibilityStatus == ParticipantVisibilityStatus.Unknown)
-        {
-            // Прерванный поток наблюдений не означает «не виден»: интерфейс честно
-            // сообщает об отсутствии данных, сохраняя последнее подтверждение.
-            statusText = participant.LastSeenAt is { } lastConfirmedAt
-                ? string.Format(
-                    CultureInfo.CurrentCulture,
-                    _localization.Get("Settings.Capture.Participants.Status.NoData.LastSeen.Value"),
-                    lastConfirmedAt.ToLocalTime())
-                : _localization.Get("Settings.Capture.Participants.Status.NoData");
-            statusBrush = MissingStatusBrush;
-        }
-        else if (participant.LastSeenAt is { } lastSeenAt)
-        {
-            statusText = string.Format(
-                CultureInfo.CurrentCulture,
-                _localization.Get("Settings.Capture.Participants.Status.LastSeen.Value"),
-                lastSeenAt.ToLocalTime());
-            statusBrush = MissingStatusBrush;
-        }
-        else
-        {
-            statusText = _localization.Get(
-                "Settings.Capture.Participants.Status.NotVisible");
-            statusBrush = MissingStatusBrush;
-        }
-
-        return new VisionParticipantStatusViewModel(
-            participant.ChampionName,
-            FormatPositionCode(participant.Position),
-            statusText,
-            teamTrace,
-            statusBrush);
-    }
-
-    private static string FormatRawTeam(TeamSide team) => team switch
-    {
-        TeamSide.Order => "ORDER",
-        TeamSide.Chaos => "CHAOS",
-        _ => "UNKNOWN"
-    };
-
-    private static string FormatPositionCode(PlayerPosition position) => position switch
-    {
-        PlayerPosition.Top => "TOP",
-        PlayerPosition.Jungle => "JGL",
-        PlayerPosition.Middle => "MID",
-        PlayerPosition.Bottom => "BOT",
-        PlayerPosition.Support => "SUP",
-        _ => "—"
-    };
-
-    private static int GetPositionOrder(PlayerPosition position) => position switch
-    {
-        PlayerPosition.Top => 0,
-        PlayerPosition.Jungle => 1,
-        PlayerPosition.Middle => 2,
-        PlayerPosition.Bottom => 3,
-        PlayerPosition.Support => 4,
-        _ => 5
-    };
-
-    private static Brush CreateFrozenBrush(byte red, byte green, byte blue)
-    {
-        var brush = new SolidColorBrush(Color.FromRgb(red, green, blue));
-        brush.Freeze();
-        return brush;
     }
 
     private enum ReplaySampleExportState
