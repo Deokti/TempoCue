@@ -11,14 +11,11 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
 {
     private const int BytesPerPixel = 4;
     private const int AlignmentRadius = 8;
-    private const int DuplicateCenterDistance = 10;
     private const int ReferenceCropSide = 11;
     private const int ReferenceCropOffset =
         (MinimapChampionReference.ImageSide - ReferenceCropSide) / 2;
     private const double StructureWeight = 0.4;
     private const double ColorWeight = 0.6;
-    private const double MinimumIdentityConfidence = 0.75;
-    private const double MinimumIdentityMargin = 0.04;
     private static readonly int[] SourceSides = [13, 15, 17, 19, 21];
     private static readonly int[] TemplateSides = SourceSides
         .Select(static sourceSide => Math.Max(
@@ -147,14 +144,12 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
                 .OrderBy(static reference => reference.Reference.Affiliation)
                 .ToArray())
             .ToArray();
-        var proposedMatches = new List<ProposedMatch>(candidates.Count);
+        var candidateMatches = new List<MinimapRosterCandidateScore>(candidates.Count);
         var maximumObservedSimilarity = -1d;
         for (var candidateIndex = 0; candidateIndex < candidates.Count; candidateIndex++)
         {
             var candidate = candidates[candidateIndex];
-            PreparedReference? bestReference = null;
-            var bestSimilarity = -1d;
-            var secondSimilarity = -1d;
+            var referenceMatches = new List<MinimapRosterReferenceScore>(referenceGroups.Length);
 
             foreach (var referenceGroup in referenceGroups)
             {
@@ -169,70 +164,56 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
                     source,
                     candidate,
                     reference.ScaledTemplates);
-                if (similarity > bestSimilarity)
-                {
-                    secondSimilarity = bestSimilarity;
-                    bestSimilarity = similarity;
-                    bestReference = reference;
-                }
-                else if (similarity > secondSimilarity)
-                {
-                    secondSimilarity = similarity;
-                }
+                referenceMatches.Add(new MinimapRosterReferenceScore(
+                    reference.Reference,
+                    similarity));
             }
 
-            if (bestReference is null)
+            if (referenceMatches.Count == 0)
             {
                 continue;
             }
 
+            var bestSimilarity = referenceMatches.Max(static match => match.Similarity);
             maximumObservedSimilarity = Math.Max(maximumObservedSimilarity, bestSimilarity);
-            if (bestSimilarity < MinimumIdentityConfidence ||
-                bestSimilarity - secondSimilarity < MinimumIdentityMargin)
-            {
-                continue;
-            }
-
             // Башни, строения базы, метки местности и миньоны статичны и проходят
-            // временную стабилизацию, поэтому отсекаются здесь: область, похожая на
-            // такой объект не слабее, чем на лучший портрет, не является чемпионом.
-            if (MatchesNegativeReference(
-                    source,
-                    candidate,
-                    negativeTemplates,
-                    bestSimilarity))
-            {
-                continue;
-            }
-
-            proposedMatches.Add(new ProposedMatch(
+            // временную стабилизацию. Максимальное сходство с ними сохраняется,
+            // чтобы при выборе каждого доступного участника отрицательный эталон
+            // сравнивался именно с его баллом, а не только с первоначальным лидером.
+            var negativeSimilarity = FindBestNegativeSimilarity(
+                source,
+                candidate,
+                negativeTemplates);
+            candidateMatches.Add(new MinimapRosterCandidateScore(
                 candidateIndex,
                 candidate,
-                bestReference.Reference,
-                bestSimilarity));
+                referenceMatches
+                    .OrderByDescending(static match => match.Similarity)
+                    .ThenBy(static match => match.Reference.ChampionId, StringComparer.Ordinal)
+                    .ToArray(),
+                negativeSimilarity));
         }
 
-        var selected = SelectUniqueMatches(proposedMatches);
+        var selected = MinimapRosterAssignment.Select(candidateMatches);
         return new MinimapChampionRecognitionResult(
             selected,
             maximumObservedSimilarity < 0 ? 0 : maximumObservedSimilarity);
     }
 
-    private static bool MatchesNegativeReference(
+    private static double FindBestNegativeSimilarity(
         Mat source,
         MinimapChampionMarkerCandidate candidate,
-        IReadOnlyList<Mat[]> negativeTemplates,
-        double championSimilarity)
+        IReadOnlyList<Mat[]> negativeTemplates)
     {
+        var bestSimilarity = -1d;
         foreach (var negative in negativeTemplates)
         {
-            if (FindBestSimilarity(source, candidate, negative) >= championSimilarity)
-            {
-                return true;
-            }
+            bestSimilarity = Math.Max(
+                bestSimilarity,
+                FindBestSimilarity(source, candidate, negative));
         }
 
-        return false;
+        return bestSimilarity;
     }
 
     private static double FindBestSimilarity(
@@ -316,60 +297,6 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
         }
 
         return bestSimilarity;
-    }
-
-    private static MinimapChampionMarkerCandidate[] SelectUniqueMatches(
-        IReadOnlyList<ProposedMatch> proposedMatches)
-    {
-        var selected = new List<ProposedMatch>(proposedMatches.Count);
-        var assignedParticipants = new HashSet<(string ChampionId, MinimapMarkerAffiliation Affiliation)>();
-
-        foreach (var proposal in proposedMatches
-                     .OrderByDescending(match => match.Similarity)
-                     .ThenBy(match => match.Candidate.Y)
-                     .ThenBy(match => match.Candidate.X)
-                     .ThenBy(match => match.Reference.ChampionId, StringComparer.Ordinal))
-        {
-            var participant = (
-                proposal.Reference.ChampionId,
-                proposal.Reference.Affiliation);
-            if (assignedParticipants.Contains(participant) ||
-                selected.Any(existing => AreDuplicateRegions(
-                    existing.Candidate,
-                    proposal.Candidate)))
-            {
-                continue;
-            }
-
-            assignedParticipants.Add(participant);
-            selected.Add(proposal);
-        }
-
-        return selected
-            .OrderBy(match => match.CandidateIndex)
-            .Select(match => match.Candidate with
-            {
-                Affiliation = match.Reference.Affiliation,
-                ChampionId = match.Reference.ChampionId,
-                IdentityConfidence = match.Similarity,
-                Confidence = (match.Candidate.Confidence + match.Similarity) / 2,
-                ContourAffiliation = match.Candidate.Affiliation
-            })
-            .ToArray();
-    }
-
-    private static bool AreDuplicateRegions(
-        MinimapChampionMarkerCandidate first,
-        MinimapChampionMarkerCandidate second)
-    {
-        var firstCenterX = first.X + (first.Width / 2d);
-        var firstCenterY = first.Y + (first.Height / 2d);
-        var secondCenterX = second.X + (second.Width / 2d);
-        var secondCenterY = second.Y + (second.Height / 2d);
-        var deltaX = firstCenterX - secondCenterX;
-        var deltaY = firstCenterY - secondCenterY;
-        return (deltaX * deltaX) + (deltaY * deltaY) <=
-            DuplicateCenterDistance * DuplicateCenterDistance;
     }
 
     private static void ValidateImage(
@@ -468,9 +395,4 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
         }
     }
 
-    private sealed record ProposedMatch(
-        int CandidateIndex,
-        MinimapChampionMarkerCandidate Candidate,
-        MinimapChampionReference Reference,
-        double Similarity);
 }

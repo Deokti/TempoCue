@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "regions": [
+    {
+      "x": 90,
+      "y": 26,
+      "width": 25,
+      "height": 25,
+      "kind": "Champion",
+      "championId": "Shen",
+      "affiliation": "Enemy"
+    },
+    {
+      "x": 142,
+      "y": 162,
+      "width": 25,
+      "height": 25,
+      "kind": "Champion",
+      "championId": "Malzahar",
+      "affiliation": "Ally"
+    },
+    {
+      "x": 126,
+      "y": 206,
+      "width": 25,
+      "height": 25,
+      "kind": "Champion",
+      "championId": "Teemo",
+      "affiliation": "Enemy"
+    },
+    {
+      "x": 109,
+      "y": 226,
+      "width": 25,
+      "height": 25,
+      "kind": "Champion",
+      "championId": "Sett",
+      "affiliation": "Ally"
+    },
+    {
+      "x": 170,
+      "y": 272,
+      "width": 25,
+      "height": 25,
+      "kind": "Champion",
+      "championId": "Ziggs",
+      "affiliation": "Ally"
+    },
+    {
+      "x": 3,
+      "y": 289,
+      "width": 25,
+      "height": 25,
+      "kind": "Champion",
+      "championId": "Diana",
+      "affiliation": "Ally"
+    }
+  ],
+  "allowedFalsePositives": 0,
+  "allowedMissedChampions": 0
+}

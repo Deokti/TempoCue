@@ -54,7 +54,9 @@ public sealed class MinimapReplayCorpusTests
                 var explainedFalsePositives = string.Join(
                     ", ",
                     evaluation.FalsePositives.Select(static falsePositive =>
-                        falsePositive.NearestRegion?.Kind.ToString() ?? "Unlabeled"));
+                        $"{falsePositive.Candidate.ChampionId}@" +
+                        $"({falsePositive.Candidate.X},{falsePositive.Candidate.Y}):" +
+                        (falsePositive.NearestRegion?.Kind.ToString() ?? "Unlabeled")));
                 failures.Add(
                     $"{sampleName}: ложных подтверждений {evaluation.FalsePositives.Count} " +
                     $"(допуск {groundTruth.AllowedFalsePositives}; {explainedFalsePositives}), " +
