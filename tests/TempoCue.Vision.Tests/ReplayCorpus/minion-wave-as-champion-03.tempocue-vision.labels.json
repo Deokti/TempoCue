@@ -13,6 +13,6 @@
     { "x": 23, "y": 91, "width": 16, "height": 16, "kind": "Tower",
       "affiliation": "Ally" }
   ],
-  "allowedFalsePositives": 2,
+  "allowedFalsePositives": 0,
   "allowedMissedChampions": 2
 }

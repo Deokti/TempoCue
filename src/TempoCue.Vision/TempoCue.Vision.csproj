@@ -10,4 +10,8 @@
     <PackageReference Include="OpenCvSharp5.Windows.Slim" Version="5.0.0.20260806" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\NegativeReferences\*.bgra" />
+  </ItemGroup>
+
 </Project>

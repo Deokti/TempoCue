@@ -21,6 +21,6 @@
     { "x": 93, "y": 18, "width": 16, "height": 16, "kind": "Tower",
       "affiliation": "Enemy" }
   ],
-  "allowedFalsePositives": 3,
+  "allowedFalsePositives": 0,
   "allowedMissedChampions": 1
 }
