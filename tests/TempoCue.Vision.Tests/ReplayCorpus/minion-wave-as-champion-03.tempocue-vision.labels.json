@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "regions": [
+    { "x": 248, "y": 244, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Teemo", "affiliation": "Enemy" },
+    { "x": 22, "y": 72, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Sett", "affiliation": "Ally" },
+    { "x": 245, "y": 256, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Ziggs", "affiliation": "Ally" },
+    { "x": 30, "y": 108, "width": 16, "height": 40, "kind": "MinionWave",
+      "affiliation": "Ally" },
+    { "x": 80, "y": 168, "width": 16, "height": 16, "kind": "Other" },
+    { "x": 23, "y": 91, "width": 16, "height": 16, "kind": "Tower",
+      "affiliation": "Ally" }
+  ],
+  "allowedFalsePositives": 2,
+  "allowedMissedChampions": 2
+}
