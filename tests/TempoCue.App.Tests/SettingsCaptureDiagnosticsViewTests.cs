@@ -54,9 +54,11 @@ public sealed class SettingsCaptureDiagnosticsViewTests
                 var card = WpfTestHost.Find<Border>(view, "CaptureDiagnosticsCard");
                 var selectButton = WpfTestHost.Find<Button>(view, "SelectCaptureWindowButton");
                 var stopButton = WpfTestHost.Find<Button>(view, "StopCaptureButton");
+                var saveReplayButton = WpfTestHost.Find<Button>(view, "SaveReplaySampleButton");
                 Assert.Equal(Visibility.Visible, card.Visibility);
                 Assert.True(selectButton.IsEnabled);
                 Assert.False(stopButton.IsEnabled);
+                Assert.False(saveReplayButton.IsEnabled);
                 Assert.Equal("Выбрать окно игры", selectButton.Content);
 
                 session.SetSnapshot(TestCaptureDiagnosticsSnapshot.Create(
@@ -104,11 +106,15 @@ public sealed class SettingsCaptureDiagnosticsViewTests
                                 0.65)
                         ]
                     }));
+                session.SetReplaySample(MinimapReplaySample.FromPreview(
+                    Assert.IsType<MinimapPreviewSnapshot>(session.Snapshot.MinimapPreview),
+                    []));
                 captureDiagnostics.Refresh();
                 WpfTestHost.Pump();
 
                 Assert.Equal("Сменить окно", selectButton.Content);
                 Assert.True(stopButton.IsEnabled);
+                Assert.True(saveReplayButton.IsEnabled);
                 Assert.Equal("30,0", WpfTestHost.Find<TextBlock>(view, "SelectionFpsTextBlock").Text);
                 Assert.Equal("6", WpfTestHost.Find<TextBlock>(view, "SelectedFramesTextBlock").Text);
                 Assert.Equal("6", WpfTestHost.Find<TextBlock>(view, "RateLimitedFramesTextBlock").Text);

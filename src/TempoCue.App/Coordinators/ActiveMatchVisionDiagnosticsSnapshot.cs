@@ -21,7 +21,17 @@ internal sealed record ActiveMatchVisionParticipantSnapshot(
     string? ChampionId,
     PlayerPosition Position,
     TeamSide RawTeam,
-    MinimapMarkerAffiliation RelativeAffiliation);
+    MinimapMarkerAffiliation RelativeAffiliation,
+    ChampionPortraitReferenceStatus ReferenceStatus =
+        ChampionPortraitReferenceStatus.Ready);
+
+/// <summary>Отделяет незавершённую загрузку эталона от её конечной ошибки.</summary>
+internal enum ChampionPortraitReferenceStatus
+{
+    Pending,
+    Ready,
+    Unavailable
+}
 
 /// <summary>Предоставляет UI последний неизменяемый снимок подготовки Vision.</summary>
 internal interface IActiveMatchVisionDiagnosticsSource

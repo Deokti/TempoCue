@@ -63,4 +63,16 @@ public partial class SettingsView : UserControl
             await captureDiagnostics.StopAsync();
         }
     }
+
+    private async void SaveReplaySampleButton_Click(
+        object sender,
+        System.Windows.RoutedEventArgs e)
+    {
+        if (DataContext is SettingsViewModel { CaptureDiagnostics: { } captureDiagnostics })
+        {
+            await MinimapReplaySampleFileDialog.ShowAsync(
+                System.Windows.Window.GetWindow(this),
+                captureDiagnostics);
+        }
+    }
 }

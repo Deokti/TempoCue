@@ -11,6 +11,47 @@ namespace TempoCue.App.Tests;
 public sealed class CaptureDiagnosticsParticipantTests
 {
     [Fact]
+    public void Refresh_ShowsTerminalStateWhenPortraitReferenceIsUnavailable()
+    {
+        WpfTestHost.Run(() =>
+        {
+            var localization = LocalizationService.Instance;
+            var initialLanguage = localization.CurrentLanguageCode;
+
+            try
+            {
+                localization.SetLanguage("ru-RU");
+                using var viewModel = new CaptureDiagnosticsViewModel(
+                    new TestWindowCaptureSession(),
+                    isSupported: true,
+                    localization,
+                    new TestVisionDiagnosticsSource(new ActiveMatchVisionDiagnosticsSnapshot(
+                        TeamSide.Order,
+                        [
+                            new ActiveMatchVisionParticipantSnapshot(
+                                "active-player",
+                                "Urgot",
+                                null,
+                                PlayerPosition.Top,
+                                TeamSide.Order,
+                                MinimapMarkerAffiliation.Ally,
+                                ChampionPortraitReferenceStatus.Unavailable)
+                        ])));
+
+                viewModel.Refresh();
+
+                Assert.Equal(
+                    "Эталон портрета недоступен",
+                    Assert.Single(viewModel.AllyParticipantStatuses).StatusText);
+            }
+            finally
+            {
+                localization.SetLanguage(initialLanguage);
+            }
+        });
+    }
+
+    [Fact]
     public void Refresh_SeparatesRiotTeamFromCurrentFrameRecognition()
     {
         WpfTestHost.Run(() =>

@@ -8,6 +8,7 @@ namespace TempoCue.Vision;
 public sealed class WindowsGraphicsCaptureSession :
     IWindowCaptureSession,
     IMinimapChampionReferenceSink,
+    IMinimapReplaySampleSource,
     IAsyncDisposable
 {
     private const int FrameBufferCount = 2;
@@ -34,6 +35,7 @@ public sealed class WindowsGraphicsCaptureSession :
     private long _rateLimitedFrameCount;
     private long _lastFrameUtcTicks;
     private MinimapPreviewSnapshot? _minimapPreview;
+    private MinimapChampionReference[] _minimapPreviewReferences = [];
     private string? _minimapPreviewErrorMessage;
     private string? _errorMessage;
     private MinimapChampionReference[] _championReferences = [];
@@ -86,6 +88,17 @@ public sealed class WindowsGraphicsCaptureSession :
             _automaticCaptureTask = Task.Run(
                 () => MonitorLeagueWindowAsync(automaticCaptureToken),
                 automaticCaptureToken);
+        }
+    }
+
+    public bool HasReplaySample
+    {
+        get
+        {
+            lock (_stateSync)
+            {
+                return _minimapPreview is not null;
+            }
         }
     }
 
@@ -481,6 +494,7 @@ public sealed class WindowsGraphicsCaptureSession :
             {
                 _targetName = null;
                 _minimapPreview = null;
+                _minimapPreviewReferences = [];
                 _minimapPreviewErrorMessage = null;
             }
         }
@@ -501,6 +515,7 @@ public sealed class WindowsGraphicsCaptureSession :
         lock (_stateSync)
         {
             _minimapPreview = null;
+            _minimapPreviewReferences = [];
             _minimapPreviewErrorMessage = null;
         }
     }
@@ -513,6 +528,19 @@ public sealed class WindowsGraphicsCaptureSession :
         Volatile.Write(ref _championReferences, references.ToArray());
     }
 
+    public MinimapReplaySample? CreateReplaySample()
+    {
+        ObjectDisposedException.ThrowIf(Volatile.Read(ref _disposeState) != 0, this);
+        lock (_stateSync)
+        {
+            return _minimapPreview is null
+                ? null
+                : MinimapReplaySample.FromPreview(
+                    _minimapPreview,
+                    _minimapPreviewReferences);
+        }
+    }
+
     private void TryUpdateMinimapPreview(
         IDirect3DSurface surface,
         int contentWidth,
@@ -521,15 +549,17 @@ public sealed class WindowsGraphicsCaptureSession :
         try
         {
             _minimapPreviewReader ??= new Direct3D11MinimapPreviewReader();
+            var championReferences = Volatile.Read(ref _championReferences);
             var preview = _minimapPreviewReader.Read(
                 surface,
                 contentWidth,
                 contentHeight,
                 DateTimeOffset.UtcNow,
-                Volatile.Read(ref _championReferences));
+                championReferences);
             lock (_stateSync)
             {
                 _minimapPreview = preview;
+                _minimapPreviewReferences = championReferences;
                 _minimapPreviewErrorMessage = null;
             }
         }

@@ -439,6 +439,30 @@
                                            FontWeight="SemiBold"
                                            TextWrapping="Wrap"
                                            Margin="0,4,0,0" />
+                                <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                                    <Button x:Name="SaveReplaySampleButton"
+                                            Content="{localization:Loc Settings.Capture.Replay.Save.Button}"
+                                            Style="{StaticResource SecondaryButton}"
+                                            IsEnabled="{Binding CanSaveReplaySample}"
+                                            Click="SaveReplaySampleButton_Click" />
+                                    <TextBlock Text="{Binding ReplaySampleExportStatusText}"
+                                               Foreground="#8EA8C9"
+                                               VerticalAlignment="Center"
+                                               TextWrapping="Wrap"
+                                               Margin="12,0,0,0">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding HasReplaySampleExportStatus}"
+                                                                 Value="True">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
                             </StackPanel>
                             <Border Grid.Column="1"
                                     Width="220"

@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
@@ -37,6 +38,7 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         Array.Empty<VisionParticipantStatusViewModel>();
     private DateTimeOffset? _renderedPreviewAt;
     private bool _isOperationRunning;
+    private ReplaySampleExportState _replaySampleExportState;
     private bool _isDisposed;
 
     public CaptureDiagnosticsViewModel(
@@ -87,6 +89,23 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
     public bool CanSelectWindow => IsSupported && !_isOperationRunning && !_isDisposed;
 
     public bool CanStop => IsCapturing && !_isOperationRunning && !_isDisposed;
+
+    public bool CanSaveReplaySample =>
+        !_isOperationRunning &&
+        !_isDisposed &&
+        HasMinimapPreview &&
+        _captureSession is IMinimapReplaySampleSource { HasReplaySample: true };
+
+    public bool HasReplaySampleExportStatus =>
+        _replaySampleExportState != ReplaySampleExportState.None;
+
+    public string ReplaySampleExportStatusText => _localization.Get(
+        _replaySampleExportState == ReplaySampleExportState.Saved
+            ? "Settings.Capture.Replay.Status.Saved"
+            : "Settings.Capture.Replay.Status.Failed");
+
+    public string ReplaySampleDialogFilter =>
+        _localization.Get("Settings.Capture.Replay.Filter");
 
     public string StateText => _localization.Get(IsUnsupported
         ? "Settings.Capture.State.Unsupported"
@@ -273,6 +292,56 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         }
     }
 
+    /// <summary>
+    /// Сохраняет явную копию текущего кадра; фоновый захват сам ничего на диск не пишет.
+    /// </summary>
+    public async Task<bool> SaveReplaySampleAsync(Stream destination)
+    {
+        ArgumentNullException.ThrowIfNull(destination);
+        if (!CanSaveReplaySample ||
+            _captureSession is not IMinimapReplaySampleSource replaySource)
+        {
+            return false;
+        }
+
+        var sample = replaySource.CreateReplaySample();
+        if (sample is null)
+        {
+            SetReplaySampleExportState(ReplaySampleExportState.Failed);
+            return false;
+        }
+
+        SetOperationRunning(true);
+        try
+        {
+            await MinimapReplaySampleStore.SaveAsync(
+                destination,
+                sample,
+                _lifetimeCancellation.Token);
+            SetReplaySampleExportState(ReplaySampleExportState.Saved);
+            return true;
+        }
+        catch (OperationCanceledException) when (_lifetimeCancellation.IsCancellationRequested)
+        {
+            return false;
+        }
+        catch (Exception)
+        {
+            SetReplaySampleExportState(ReplaySampleExportState.Failed);
+            return false;
+        }
+        finally
+        {
+            if (!_isDisposed)
+            {
+                SetOperationRunning(false);
+            }
+        }
+    }
+
+    public void ReportReplaySampleExportFailure() =>
+        SetReplaySampleExportState(ReplaySampleExportState.Failed);
+
     /// <summary>Считывает очередной неизменяемый снимок без доступа к самому кадру.</summary>
     public void Refresh()
     {
@@ -331,6 +400,7 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(SelectedFrameCountText));
         OnPropertyChanged(nameof(RateLimitedFrameCountText));
         OnPropertyChanged(nameof(LastFrameText));
+        OnPropertyChanged(nameof(ReplaySampleExportStatusText));
         OnPropertyChanged(nameof(MinimapRegionText));
         OnPropertyChanged(nameof(MinimapNormalizedSizeText));
         OnPropertyChanged(nameof(MinimapDetectionText));
@@ -352,6 +422,19 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         _isOperationRunning = value;
         OnPropertyChanged(nameof(CanSelectWindow));
         OnPropertyChanged(nameof(CanStop));
+        OnPropertyChanged(nameof(CanSaveReplaySample));
+    }
+
+    private void SetReplaySampleExportState(ReplaySampleExportState state)
+    {
+        if (_replaySampleExportState == state)
+        {
+            return;
+        }
+
+        _replaySampleExportState = state;
+        OnPropertyChanged(nameof(HasReplaySampleExportStatus));
+        OnPropertyChanged(nameof(ReplaySampleExportStatusText));
     }
 
     private void NotifyDiagnosticsChanged()
@@ -364,6 +447,7 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(HasTechnicalError));
         OnPropertyChanged(nameof(CanSelectWindow));
         OnPropertyChanged(nameof(CanStop));
+        OnPropertyChanged(nameof(CanSaveReplaySample));
         OnPropertyChanged(nameof(StateText));
         OnPropertyChanged(nameof(SelectButtonText));
         OnPropertyChanged(nameof(SelectedWindowText));
@@ -389,6 +473,8 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(EnemyParticipantStatuses));
         OnPropertyChanged(nameof(HasMinimapPreviewError));
         OnPropertyChanged(nameof(MinimapPreviewErrorText));
+        OnPropertyChanged(nameof(HasReplaySampleExportStatus));
+        OnPropertyChanged(nameof(ReplaySampleExportStatusText));
     }
 
     private void UpdateMinimapPreviewImage()
@@ -485,11 +571,17 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
 
         string statusText;
         Brush statusBrush;
-        if (string.IsNullOrWhiteSpace(participant.ChampionId))
+        if (participant.ReferenceStatus == ChampionPortraitReferenceStatus.Pending)
         {
             statusText = _localization.Get(
                 "Settings.Capture.Participants.Status.ReferencePending");
             statusBrush = PendingStatusBrush;
+        }
+        else if (participant.ReferenceStatus == ChampionPortraitReferenceStatus.Unavailable)
+        {
+            statusText = _localization.Get(
+                "Settings.Capture.Participants.Status.ReferenceUnavailable");
+            statusBrush = MismatchedTeamStatusBrush;
         }
         else if (match is not null)
         {
@@ -563,5 +655,12 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         var brush = new SolidColorBrush(Color.FromRgb(red, green, blue));
         brush.Freeze();
         return brush;
+    }
+
+    private enum ReplaySampleExportState
+    {
+        None,
+        Saved,
+        Failed
     }
 }

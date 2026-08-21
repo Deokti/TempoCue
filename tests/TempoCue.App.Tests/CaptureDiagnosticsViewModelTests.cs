@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.IO;
 using System.Windows.Media.Imaging;
 using TempoCue.App.Localization;
 using TempoCue.App.ViewModels;
@@ -111,6 +112,35 @@ public sealed class CaptureDiagnosticsViewModelTests
             viewModel.StopAsync().GetAwaiter().GetResult();
 
             Assert.Equal(1, session.StopCount);
+        });
+    }
+
+    [Fact]
+    public void SaveReplaySample_WritesCurrentDiagnosticFrame()
+    {
+        WpfTestHost.Run(() =>
+        {
+            var preview = CreatePreview();
+            var session = new TestWindowCaptureSession();
+            using var viewModel = new CaptureDiagnosticsViewModel(
+                session,
+                isSupported: true,
+                LocalizationService.Instance);
+            session.SetSnapshot(TestCaptureDiagnosticsSnapshot.Create(
+                state: CaptureSessionState.Capturing,
+                minimapPreview: preview));
+            session.SetReplaySample(MinimapReplaySample.FromPreview(preview, []));
+            viewModel.Refresh();
+            using var destination = new MemoryStream();
+
+            var saved = viewModel.SaveReplaySampleAsync(destination)
+                .GetAwaiter()
+                .GetResult();
+
+            Assert.True(saved);
+            Assert.True(destination.Length > 0);
+            Assert.True(viewModel.HasReplaySampleExportStatus);
+            Assert.True(viewModel.CanSaveReplaySample);
         });
     }
 

@@ -1054,6 +1054,10 @@
   <data name="Settings.Capture.Minimap.Markers.Label" xml:space="preserve"><value>Проверка портретов участников</value></data>
   <data name="Settings.Capture.Minimap.Markers.Value" xml:space="preserve"><value>Цветовых объектов: {0} · областей сравнения: {4} · подтверждено портретами: {1} (союзных: {2}, вражеских: {3}) · эталонов: {5} · лучший балл: {6:P0}</value></data>
   <data name="Settings.Capture.Minimap.Error.Label" xml:space="preserve"><value>Не удалось подготовить предпросмотр миникарты</value></data>
+  <data name="Settings.Capture.Replay.Save.Button" xml:space="preserve"><value>Сохранить кадр для replay</value></data>
+  <data name="Settings.Capture.Replay.Filter" xml:space="preserve"><value>Диагностический кадр TempoCue (*.tempocue-vision)|*.tempocue-vision</value></data>
+  <data name="Settings.Capture.Replay.Status.Saved" xml:space="preserve"><value>Кадр сохранён. Его можно повторно проверить без запущенной League.</value></data>
+  <data name="Settings.Capture.Replay.Status.Failed" xml:space="preserve"><value>Не удалось сохранить диагностический кадр.</value></data>
   <data name="Settings.Capture.Participants.Title" xml:space="preserve"><value>Диагностика участников активного матча</value></data>
   <data name="Settings.Capture.Participants.Description" xml:space="preserve"><value>Здесь показаны команда Riot, ожидаемая сторона TempoCue и результат распознавания в текущем кадре. Отсутствие метки — диагностическое наблюдение, а не доказательство того, что чемпион скрыт.</value></data>
   <data name="Settings.Capture.Participants.ActiveTeam.Value" xml:space="preserve"><value>Команда активного игрока Riot: {0}</value></data>
@@ -1064,6 +1068,7 @@
   <data name="Settings.Capture.Participants.TeamTrace.Value" xml:space="preserve"><value>Riot: {0} · ожидается: {1}</value></data>
   <data name="Settings.Capture.Participants.TeamTrace.WithRing.Value" xml:space="preserve"><value>Riot: {0} · ожидается: {1} · распознанный контур: {2}</value></data>
   <data name="Settings.Capture.Participants.Status.ReferencePending" xml:space="preserve"><value>Загружается эталон портрета</value></data>
+  <data name="Settings.Capture.Participants.Status.ReferenceUnavailable" xml:space="preserve"><value>Эталон портрета недоступен</value></data>
   <data name="Settings.Capture.Participants.Status.NotDetected" xml:space="preserve"><value>Не распознан в текущем кадре</value></data>
   <data name="Settings.Capture.Participants.Status.Visible.Value" xml:space="preserve"><value>Распознан сейчас · уверенность {0:P0}</value></data>
   <data name="Settings.Capture.Participants.Status.TeamMismatch.Value" xml:space="preserve"><value>Распознан с ошибочной стороной: {0} · уверенность {1:P0}</value></data>

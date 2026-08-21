@@ -14,6 +14,8 @@ internal sealed class ActiveMatchVisionCoordinator :
     IActiveMatchVisionDiagnosticsSource,
     IDisposable
 {
+    private static readonly TimeSpan ReferenceLoadTimeout = TimeSpan.FromSeconds(20);
+
     private readonly IActiveMatchMonitor _monitor;
     private readonly IChampionCatalog _championCatalog;
     private readonly IChampionPortraitReferenceLoader _portraitLoader;
@@ -24,6 +26,9 @@ internal sealed class ActiveMatchVisionCoordinator :
     private CancellationTokenSource? _loadCancellation;
     private ActiveMatchVisionDiagnosticsSnapshot _diagnosticsSnapshot =
         ActiveMatchVisionDiagnosticsSnapshot.Empty;
+    private IReadOnlyDictionary<string, ParticipantReferenceResolution> _resolutions =
+        new Dictionary<string, ParticipantReferenceResolution>(
+            StringComparer.OrdinalIgnoreCase);
     private string? _participantSignature;
     private int _generation;
     private bool _isDisposed;
@@ -102,10 +107,15 @@ internal sealed class ActiveMatchVisionCoordinator :
                     _participantSignature,
                     StringComparison.Ordinal))
             {
+                Volatile.Write(
+                    ref _diagnosticsSnapshot,
+                    context.CreateDiagnosticsSnapshot(_resolutions));
                 return;
             }
 
             _participantSignature = context?.Signature;
+            _resolutions = new Dictionary<string, ParticipantReferenceResolution>(
+                StringComparer.OrdinalIgnoreCase);
             _generation++;
             generation = _generation;
             _loadCancellation?.Cancel();
@@ -123,6 +133,9 @@ internal sealed class ActiveMatchVisionCoordinator :
         }
 
         Volatile.Write(ref _diagnosticsSnapshot, context.CreateDiagnosticsSnapshot());
+        // Эталоны прошлого матча нельзя применять к новому составу, пока его портреты
+        // ещё загружаются: это дало бы уверенное, но заведомо неверное распознавание.
+        _referenceSink.SetChampionReferences([]);
 
         _ = LoadAndPublishAsync(context, generation, cancellation!.Token);
     }
@@ -132,14 +145,23 @@ internal sealed class ActiveMatchVisionCoordinator :
         int generation,
         CancellationToken cancellationToken)
     {
+        using var timeoutCancellation =
+            CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeoutCancellation.CancelAfter(ReferenceLoadTimeout);
+        var loadToken = timeoutCancellation.Token;
+
         try
         {
             var catalog = await _championCatalog.LoadAsync(
                 context.LanguageCode,
-                cancellationToken).ConfigureAwait(false);
+                loadToken).ConfigureAwait(false);
             if (!catalog.IsAvailable)
             {
-                PublishIfCurrent(generation, []);
+                PublishIfCurrent(
+                    generation,
+                    [],
+                    context,
+                    CreateUnavailableResolutions(context));
                 return;
             }
 
@@ -148,7 +170,7 @@ internal sealed class ActiveMatchVisionCoordinator :
                 .Select(player => LoadPlayerReferenceAsync(
                     player,
                     champions,
-                    cancellationToken))
+                    loadToken))
                 .ToArray();
             var loadedParticipants = await Task.WhenAll(loadingTasks).ConfigureAwait(false);
             var references = loadedParticipants
@@ -158,18 +180,37 @@ internal sealed class ActiveMatchVisionCoordinator :
                     static reference => (reference.ChampionId, reference.Affiliation))
                 .Select(static group => group.First())
                 .ToArray();
-            var diagnostics = context.CreateDiagnosticsSnapshot(
-                loadedParticipants
-                    .Where(static participant => participant?.Reference is not null)
-                    .Select(static participant => participant!)
-                    .ToDictionary(
-                        static participant => participant.ParticipantId,
-                        static participant => participant.ChampionId,
-                        StringComparer.OrdinalIgnoreCase));
-            PublishIfCurrent(generation, references, diagnostics);
+            var resolutions = loadedParticipants
+                .GroupBy(
+                    static participant => participant.ReferenceKey,
+                    StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(
+                    static group => group.Key,
+                    static group =>
+                    {
+                        var participant = group.First();
+                        return new ParticipantReferenceResolution(
+                            participant.ChampionId,
+                            participant.Reference is null
+                                ? ChampionPortraitReferenceStatus.Unavailable
+                                : ChampionPortraitReferenceStatus.Ready);
+                    },
+                    StringComparer.OrdinalIgnoreCase);
+            PublishIfCurrent(generation, references, context, resolutions);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
+        }
+        catch (OperationCanceledException)
+        {
+            Trace.TraceError(
+                "Подготовка портретов участников превысила лимит {0} секунд.",
+                ReferenceLoadTimeout.TotalSeconds);
+            PublishIfCurrent(
+                generation,
+                [],
+                context,
+                CreateUnavailableResolutions(context));
         }
         catch (Exception exception)
         {
@@ -177,18 +218,25 @@ internal sealed class ActiveMatchVisionCoordinator :
                 "Не удалось подготовить портреты участников для миникарты ({0}): {1}",
                 exception.GetType().Name,
                 exception.Message);
-            PublishIfCurrent(generation, []);
+            PublishIfCurrent(
+                generation,
+                [],
+                context,
+                CreateUnavailableResolutions(context));
         }
     }
 
-    private async Task<LoadedParticipantReference?> LoadPlayerReferenceAsync(
+    private async Task<LoadedParticipantReference> LoadPlayerReferenceAsync(
         ParticipantReference player,
         IReadOnlyDictionary<string, ChampionCatalogEntry> champions,
         CancellationToken cancellationToken)
     {
         if (!champions.TryGetValue(NormalizeChampionKey(player.ChampionName), out var champion))
         {
-            return null;
+            Trace.TraceWarning(
+                "В каталоге Data Dragon не найден чемпион {0}.",
+                player.ChampionName);
+            return new LoadedParticipantReference(player.ReferenceKey, null, null);
         }
 
         var reference = await _portraitLoader.LoadAsync(
@@ -196,7 +244,7 @@ internal sealed class ActiveMatchVisionCoordinator :
             player.Affiliation,
             cancellationToken).ConfigureAwait(false);
         return new LoadedParticipantReference(
-            player.ParticipantId,
+            player.ReferenceKey,
             champion.Id,
             reference);
     }
@@ -204,7 +252,8 @@ internal sealed class ActiveMatchVisionCoordinator :
     private void PublishIfCurrent(
         int generation,
         IReadOnlyList<MinimapChampionReference> references,
-        ActiveMatchVisionDiagnosticsSnapshot? diagnostics = null)
+        ParticipantContext context,
+        IReadOnlyDictionary<string, ParticipantReferenceResolution> resolutions)
     {
         lock (_sync)
         {
@@ -212,15 +261,27 @@ internal sealed class ActiveMatchVisionCoordinator :
             {
                 return;
             }
+
+            _resolutions = resolutions;
         }
 
-        if (diagnostics is not null)
-        {
-            Volatile.Write(ref _diagnosticsSnapshot, diagnostics);
-        }
-
+        Volatile.Write(
+            ref _diagnosticsSnapshot,
+            context.CreateDiagnosticsSnapshot(resolutions));
         _referenceSink.SetChampionReferences(references);
     }
+
+    private static IReadOnlyDictionary<string, ParticipantReferenceResolution>
+        CreateUnavailableResolutions(ParticipantContext context) =>
+        context.Players
+            .Select(static player => player.ReferenceKey)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(
+            static referenceKey => referenceKey,
+            static _ => new ParticipantReferenceResolution(
+                    null,
+                    ChampionPortraitReferenceStatus.Unavailable),
+            StringComparer.OrdinalIgnoreCase);
 
     private ParticipantContext? CreateContext(ActiveMatchUpdate? update)
     {
@@ -261,14 +322,9 @@ internal sealed class ActiveMatchVisionCoordinator :
         var signature = string.Join(
             '|',
             players
-                .OrderBy(static player => player.ParticipantId, StringComparer.OrdinalIgnoreCase)
-                .Select(static player => string.Join(
-                    ':',
-                    player.ParticipantId,
-                    player.ChampionName,
-                    player.Position,
-                    player.RawTeam,
-                    player.Affiliation)));
+                .Select(static player => player.ReferenceKey)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(static key => key, StringComparer.OrdinalIgnoreCase));
         return new ParticipantContext(
             $"{languageCode}|{activePlayer.Team}|{signature}",
             languageCode,
@@ -299,20 +355,25 @@ internal sealed class ActiveMatchVisionCoordinator :
         IReadOnlyList<ParticipantReference> Players)
     {
         public ActiveMatchVisionDiagnosticsSnapshot CreateDiagnosticsSnapshot(
-            IReadOnlyDictionary<string, string>? championIds = null) =>
+            IReadOnlyDictionary<string, ParticipantReferenceResolution>? resolutions = null) =>
             new(
                 ActivePlayerTeam,
-                Players.Select(player => new ActiveMatchVisionParticipantSnapshot(
-                    player.ParticipantId,
-                    player.ChampionName,
-                    championIds is not null && championIds.TryGetValue(
+                Players.Select(player =>
+                {
+                    var resolution = resolutions is not null && resolutions.TryGetValue(
+                        player.ReferenceKey,
+                        out var resolved)
+                            ? resolved
+                            : null;
+                    return new ActiveMatchVisionParticipantSnapshot(
                         player.ParticipantId,
-                        out var championId)
-                            ? championId
-                            : null,
-                    player.Position,
-                    player.RawTeam,
-                    player.Affiliation)).ToArray());
+                        player.ChampionName,
+                        resolution?.ChampionId,
+                        player.Position,
+                        player.RawTeam,
+                        player.Affiliation,
+                        resolution?.Status ?? ChampionPortraitReferenceStatus.Pending);
+                }).ToArray());
     }
 
     private sealed record ParticipantReference(
@@ -320,10 +381,18 @@ internal sealed class ActiveMatchVisionCoordinator :
         string ChampionName,
         PlayerPosition Position,
         TeamSide RawTeam,
-        MinimapMarkerAffiliation Affiliation);
+        MinimapMarkerAffiliation Affiliation)
+    {
+        public string ReferenceKey =>
+            $"{NormalizeChampionKey(ChampionName)}:{Affiliation}";
+    }
 
     private sealed record LoadedParticipantReference(
-        string ParticipantId,
-        string ChampionId,
+        string ReferenceKey,
+        string? ChampionId,
         MinimapChampionReference? Reference);
+
+    private sealed record ParticipantReferenceResolution(
+        string? ChampionId,
+        ChampionPortraitReferenceStatus Status);
 }

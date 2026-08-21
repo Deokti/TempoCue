@@ -25,7 +25,7 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
     private static readonly Guid Direct3D11Texture2DGuid =
         new("6F15AAF2-D208-4E89-9AB4-489535D34F9C");
 
-    private readonly IMinimapChampionRecognizer _championRecognizer;
+    private readonly MinimapRecognitionPipeline _recognitionPipeline;
 
     private nint _device;
     private nint _context;
@@ -50,8 +50,7 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
 
     internal Direct3D11MinimapPreviewReader(IMinimapChampionRecognizer championRecognizer)
     {
-        _championRecognizer = championRecognizer ??
-            throw new ArgumentNullException(nameof(championRecognizer));
+        _recognitionPipeline = new MinimapRecognitionPipeline(championRecognizer);
     }
 
     public MinimapPreviewSnapshot Read(
@@ -94,21 +93,11 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
                 region.Width,
                 region.Height,
                 checked(region.Width * BytesPerPixel));
-            var markerCandidates = MinimapMarkerCandidateDetector.Detect(
-                normalizedPixels,
-                MinimapFrameNormalizer.CanonicalSize,
-                MinimapFrameNormalizer.CanonicalSize,
-                checked(MinimapFrameNormalizer.CanonicalSize * BytesPerPixel));
-            var championProposals = MinimapChampionProposalGenerator.Create(
-                MinimapFrameNormalizer.CanonicalSize,
-                MinimapFrameNormalizer.CanonicalSize,
-                markerCandidates);
-            var recognition = _championRecognizer.Recognize(
+            var recognition = _recognitionPipeline.Analyze(
                 normalizedPixels,
                 MinimapFrameNormalizer.CanonicalSize,
                 MinimapFrameNormalizer.CanonicalSize,
                 checked(MinimapFrameNormalizer.CanonicalSize * BytesPerPixel),
-                championProposals,
                 championReferences);
 
             return new MinimapPreviewSnapshot(
@@ -124,11 +113,11 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
                 _detectedCorner,
                 _detectionConfidence)
             {
-                MarkerCandidates = markerCandidates,
-                ChampionProposalCount = championProposals.Length,
-                ChampionMarkerCandidates = recognition.Candidates,
+                MarkerCandidates = recognition.MarkerCandidates,
+                ChampionProposalCount = recognition.ChampionProposalCount,
+                ChampionMarkerCandidates = recognition.ChampionCandidates,
                 ChampionReferenceCount = championReferences.Count,
-                MaximumIdentityConfidence = recognition.MaximumObservedSimilarity
+                MaximumIdentityConfidence = recognition.MaximumIdentityConfidence
             };
         }
         finally
