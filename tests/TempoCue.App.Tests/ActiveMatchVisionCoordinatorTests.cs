@@ -14,15 +14,15 @@ public sealed class ActiveMatchVisionCoordinatorTests
     public async Task UnavailableCatalog_EndsPortraitLoadingWithUnavailableState()
     {
         var monitor = new TestActiveMatchMonitor();
-        var sink = new RecordingChampionReferenceSink();
+        var sink = new ActiveMatchVisionTestSupport.RecordingChampionReferenceSink();
         using var coordinator = new ActiveMatchVisionCoordinator(
             monitor,
             new TestChampionCatalog(ChampionCatalogLoadResult.Unavailable()),
-            new TestPortraitReferenceLoader(),
+            new ActiveMatchVisionTestSupport.TestPortraitReferenceLoader(),
             sink,
             LocalizationService.Instance);
 
-        monitor.Publish(CreateUpdate());
+        monitor.Publish(ActiveMatchVisionTestSupport.CreateUpdate());
         await sink.WaitForPublicationAsync();
 
         Assert.All(
@@ -36,19 +36,19 @@ public sealed class ActiveMatchVisionCoordinatorTests
     public async Task PositionUpdate_DoesNotRestartPortraitLoading()
     {
         var monitor = new TestActiveMatchMonitor();
-        var sink = new RecordingChampionReferenceSink();
-        var loader = new DeferredCountingPortraitReferenceLoader();
+        var sink = new ActiveMatchVisionTestSupport.RecordingChampionReferenceSink();
+        var loader = new ActiveMatchVisionTestSupport.DeferredCountingPortraitReferenceLoader();
         using var coordinator = new ActiveMatchVisionCoordinator(
             monitor,
-            CreateCatalog(),
+            ActiveMatchVisionTestSupport.CreateCatalog(),
             loader,
             sink,
             LocalizationService.Instance);
 
-        monitor.Publish(CreateUpdate(PlayerPosition.Support));
+        monitor.Publish(ActiveMatchVisionTestSupport.CreateUpdate(PlayerPosition.Support));
         Assert.Equal(2, loader.CallCount);
 
-        monitor.Publish(CreateUpdate(PlayerPosition.Middle));
+        monitor.Publish(ActiveMatchVisionTestSupport.CreateUpdate(PlayerPosition.Middle));
 
         Assert.Equal(2, loader.CallCount);
         Assert.Equal(
@@ -65,7 +65,7 @@ public sealed class ActiveMatchVisionCoordinatorTests
     public async Task ChampionMissingFromCatalog_EndsOnlyThatParticipantsLoading()
     {
         var monitor = new TestActiveMatchMonitor();
-        var sink = new RecordingChampionReferenceSink();
+        var sink = new ActiveMatchVisionTestSupport.RecordingChampionReferenceSink();
         using var coordinator = new ActiveMatchVisionCoordinator(
             monitor,
             new TestChampionCatalog(new ChampionCatalogLoadResult(
@@ -77,11 +77,11 @@ public sealed class ActiveMatchVisionCoordinatorTests
                         new Uri("https://example.test/Pyke.png"))
                 ],
                 ChampionCatalogSource.Network)),
-            new TestPortraitReferenceLoader(),
+            new ActiveMatchVisionTestSupport.TestPortraitReferenceLoader(),
             sink,
             LocalizationService.Instance);
 
-        monitor.Publish(CreateUpdate());
+        monitor.Publish(ActiveMatchVisionTestSupport.CreateUpdate());
         await sink.WaitForPublicationAsync();
 
         var diagnostics = coordinator.DiagnosticsSnapshot;
@@ -101,16 +101,16 @@ public sealed class ActiveMatchVisionCoordinatorTests
     public async Task MatchUpdate_MapsChaosPlayerAndParticipantsToRelativeAffiliations()
     {
         var monitor = new TestActiveMatchMonitor();
-        var sink = new RecordingChampionReferenceSink();
+        var sink = new ActiveMatchVisionTestSupport.RecordingChampionReferenceSink();
         var localization = LocalizationService.Instance;
         using var coordinator = new ActiveMatchVisionCoordinator(
             monitor,
-            CreateCatalog(),
-            new TestPortraitReferenceLoader(),
+            ActiveMatchVisionTestSupport.CreateCatalog(),
+            new ActiveMatchVisionTestSupport.TestPortraitReferenceLoader(),
             sink,
             localization);
 
-        monitor.Publish(CreateUpdate());
+        monitor.Publish(ActiveMatchVisionTestSupport.CreateUpdate());
         var references = await sink.WaitForReferencesAsync(2);
 
         var diagnostics = coordinator.DiagnosticsSnapshot;
@@ -140,121 +140,4 @@ public sealed class ActiveMatchVisionCoordinatorTests
                          reference.Affiliation == MinimapMarkerAffiliation.Enemy);
     }
 
-    private static IChampionCatalog CreateCatalog() => new TestChampionCatalog(
-        new ChampionCatalogLoadResult(
-            [
-                new ChampionCatalogEntry(
-                    "Pyke",
-                    555,
-                    "Pyke",
-                    new Uri("https://example.test/Pyke.png")),
-                new ChampionCatalogEntry(
-                    "Anivia",
-                    34,
-                    "Anivia",
-                    new Uri("https://example.test/Anivia.png"))
-            ],
-            ChampionCatalogSource.Network));
-
-    private static ActiveMatchUpdate CreateUpdate(
-        PlayerPosition activePlayerPosition = PlayerPosition.Support)
-    {
-        var match = new MatchState
-        {
-            GameTimeSeconds = 120,
-            ActivePlayerId = "active-player",
-            Players =
-            [
-                new PlayerState
-                {
-                    ParticipantId = "active-player",
-                    ChampionName = "Pyke",
-                    Team = TeamSide.Chaos,
-                    Position = activePlayerPosition,
-                    Level = 2
-                },
-                new PlayerState
-                {
-                    ParticipantId = "enemy-player",
-                    ChampionName = "Anivia",
-                    Team = TeamSide.Order,
-                    Position = PlayerPosition.Middle,
-                    Level = 2
-                }
-            ]
-        };
-        return new ActiveMatchUpdate(
-            MatchSnapshotReadStatus.Success,
-            new MatchSnapshot(match, [], DateTimeOffset.UtcNow),
-            ActiveCoachPackSelection.NotFound());
-    }
-
-    private sealed class TestPortraitReferenceLoader : IChampionPortraitReferenceLoader
-    {
-        public Task<MinimapChampionReference?> LoadAsync(
-            ChampionCatalogEntry champion,
-            MinimapMarkerAffiliation affiliation,
-            CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult<MinimapChampionReference?>(new(
-                champion.Id,
-                affiliation,
-                new byte[
-                    MinimapChampionReference.ImageSide *
-                    MinimapChampionReference.ImageSide *
-                    MinimapChampionReference.BytesPerPixel]));
-        }
-    }
-
-    private sealed class DeferredCountingPortraitReferenceLoader :
-        IChampionPortraitReferenceLoader
-    {
-        private readonly TaskCompletionSource _completion =
-            new(TaskCreationOptions.RunContinuationsAsynchronously);
-        private int _callCount;
-
-        public int CallCount => Volatile.Read(ref _callCount);
-
-        public async Task<MinimapChampionReference?> LoadAsync(
-            ChampionCatalogEntry champion,
-            MinimapMarkerAffiliation affiliation,
-            CancellationToken cancellationToken = default)
-        {
-            Interlocked.Increment(ref _callCount);
-            await _completion.Task.WaitAsync(cancellationToken);
-            return new MinimapChampionReference(
-                champion.Id,
-                affiliation,
-                new byte[
-                    MinimapChampionReference.ImageSide *
-                    MinimapChampionReference.ImageSide *
-                    MinimapChampionReference.BytesPerPixel]);
-        }
-
-        public void Complete() => _completion.TrySetResult();
-    }
-
-    private sealed class RecordingChampionReferenceSink : IMinimapChampionReferenceSink
-    {
-        private readonly TaskCompletionSource<IReadOnlyList<MinimapChampionReference>> _ready =
-            new(TaskCreationOptions.RunContinuationsAsynchronously);
-        private readonly TaskCompletionSource _published =
-            new(TaskCreationOptions.RunContinuationsAsynchronously);
-
-        public void SetChampionReferences(IReadOnlyList<MinimapChampionReference> references)
-        {
-            _published.TrySetResult();
-            if (references.Count >= 2)
-            {
-                _ready.TrySetResult(references);
-            }
-        }
-
-        public Task<IReadOnlyList<MinimapChampionReference>> WaitForReferencesAsync(int count) =>
-            _ready.Task.WaitAsync(TimeSpan.FromSeconds(2));
-
-        public Task WaitForPublicationAsync() =>
-            _published.Task.WaitAsync(TimeSpan.FromSeconds(2));
-    }
 }

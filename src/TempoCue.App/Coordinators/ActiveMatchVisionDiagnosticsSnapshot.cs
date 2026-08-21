@@ -1,4 +1,5 @@
 using TempoCue.Core;
+using TempoCue.Application;
 using TempoCue.Vision;
 
 namespace TempoCue.App.Coordinators;
@@ -23,7 +24,14 @@ internal sealed record ActiveMatchVisionParticipantSnapshot(
     TeamSide RawTeam,
     MinimapMarkerAffiliation RelativeAffiliation,
     ChampionPortraitReferenceStatus ReferenceStatus =
-        ChampionPortraitReferenceStatus.Ready);
+        ChampionPortraitReferenceStatus.Ready,
+    bool IsDead = false,
+    ParticipantVisibilityStatus VisibilityStatus =
+        ParticipantVisibilityStatus.NotVisible,
+    DateTimeOffset? LastSeenAt = null,
+    double VisibilityConfidence = 0,
+    double? MapX = null,
+    double? MapY = null);
 
 /// <summary>Отделяет незавершённую загрузку эталона от её конечной ошибки.</summary>
 internal enum ChampionPortraitReferenceStatus

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Windows.Graphics.Capture;
 using Windows.Graphics.DirectX;
 using Windows.Graphics.DirectX.Direct3D11;
@@ -8,6 +9,7 @@ namespace TempoCue.Vision;
 public sealed class WindowsGraphicsCaptureSession :
     IWindowCaptureSession,
     IMinimapChampionReferenceSink,
+    IMinimapChampionObservationSource,
     IMinimapReplaySampleSource,
     IAsyncDisposable
 {
@@ -43,6 +45,8 @@ public sealed class WindowsGraphicsCaptureSession :
     private Task? _automaticCaptureTask;
     private int _generation;
     private int _disposeState;
+
+    public event EventHandler<MinimapChampionObservationEventArgs>? ObservationAvailable;
 
     public CaptureDiagnosticsSnapshot Snapshot
     {
@@ -562,12 +566,43 @@ public sealed class WindowsGraphicsCaptureSession :
                 _minimapPreviewReferences = championReferences;
                 _minimapPreviewErrorMessage = null;
             }
+
+            PublishObservation(new MinimapChampionObservationEventArgs(
+                preview.CapturedAt,
+                preview.ImageWidth,
+                preview.ImageHeight,
+                preview.ChampionMarkerCandidates));
         }
         catch (Exception exception)
         {
             lock (_stateSync)
             {
                 _minimapPreviewErrorMessage = exception.Message;
+            }
+        }
+    }
+
+    private void PublishObservation(MinimapChampionObservationEventArgs args)
+    {
+        var handlers = ObservationAvailable?.GetInvocationList();
+        if (handlers is null)
+        {
+            return;
+        }
+
+        foreach (var handler in handlers.Cast<EventHandler<MinimapChampionObservationEventArgs>>())
+        {
+            try
+            {
+                handler(this, args);
+            }
+            catch (Exception exception)
+            {
+                // Ошибка потребителя наблюдений не должна останавливать WGC и поток кадров.
+                Trace.TraceError(
+                    "Обработчик наблюдения миникарты завершился ошибкой ({0}): {1}",
+                    exception.GetType().Name,
+                    exception.Message);
             }
         }
     }

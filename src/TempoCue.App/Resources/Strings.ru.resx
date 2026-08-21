@@ -1070,8 +1070,12 @@
   <data name="Settings.Capture.Participants.Status.ReferencePending" xml:space="preserve"><value>Загружается эталон портрета</value></data>
   <data name="Settings.Capture.Participants.Status.ReferenceUnavailable" xml:space="preserve"><value>Эталон портрета недоступен</value></data>
   <data name="Settings.Capture.Participants.Status.NotDetected" xml:space="preserve"><value>Не распознан в текущем кадре</value></data>
-  <data name="Settings.Capture.Participants.Status.Visible.Value" xml:space="preserve"><value>Распознан сейчас · уверенность {0:P0}</value></data>
+  <data name="Settings.Capture.Participants.Status.Visible.Value" xml:space="preserve"><value>Виден · уверенность {0:P0}</value></data>
   <data name="Settings.Capture.Participants.Status.TeamMismatch.Value" xml:space="preserve"><value>Распознан с ошибочной стороной: {0} · уверенность {1:P0}</value></data>
+  <data name="Settings.Capture.Participants.Status.NotVisible" xml:space="preserve"><value>Не виден</value></data>
+  <data name="Settings.Capture.Participants.Status.Confirming.Value" xml:space="preserve"><value>Подтверждается · уверенность {0:P0}</value></data>
+  <data name="Settings.Capture.Participants.Status.LastSeen.Value" xml:space="preserve"><value>Не виден · последний раз в {0:HH:mm:ss}</value></data>
+  <data name="Settings.Capture.Participants.Status.Dead" xml:space="preserve"><value>Мёртв · наблюдение приостановлено</value></data>
   <data name="Settings.Capture.Value.NotAvailable" xml:space="preserve"><value>Нет данных</value></data>
   <data name="Settings.Capture.Unsupported.Description" xml:space="preserve"><value>Для Windows Graphics Capture требуется Windows 10 версии 2004 или новее.</value></data>
   <data name="Settings.Capture.Error.Label" xml:space="preserve"><value>Технические подробности</value></data>

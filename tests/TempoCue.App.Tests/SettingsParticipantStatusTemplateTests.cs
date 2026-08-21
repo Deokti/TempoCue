@@ -6,7 +6,7 @@ using TempoCue.App.Views;
 
 namespace TempoCue.App.Tests;
 
-/// <summary>Проверяет стабильную геометрию динамического статуса распознавания.</summary>
+/// <summary>Проверяет стабильную геометрию динамического статуса видимости.</summary>
 public sealed class SettingsParticipantStatusTemplateTests
 {
     [Fact]
@@ -23,8 +23,8 @@ public sealed class SettingsParticipantStatusTemplateTests
                 VerticalAlignment = VerticalAlignment.Top,
                 ContentTemplate = template,
                 Content = CreateStatus(
-                    "Riot: CHAOS · ожидается: союзник · распознанный контур: —",
-                    "Не распознан в текущем кадре")
+                    "Riot: CHAOS · ожидается: союзник · диагностический контур: —",
+                    "Не виден")
             };
             var window = new Window
             {
@@ -43,8 +43,8 @@ public sealed class SettingsParticipantStatusTemplateTests
                 var missingHeight = presenter.ActualHeight;
 
                 presenter.Content = CreateStatus(
-                    "Riot: CHAOS · ожидается: союзник · распознанный контур: союзник",
-                    "Распознан сейчас · уверенность 86 %");
+                    "Riot: CHAOS · ожидается: союзник · диагностический контур: союзник",
+                    "Виден · уверенность 86 %");
                 WpfTestHost.Pump();
                 presenter.UpdateLayout();
 

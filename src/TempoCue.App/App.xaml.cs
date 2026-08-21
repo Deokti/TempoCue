@@ -144,7 +144,8 @@ public partial class App : System.Windows.Application
             _championCatalog,
             _championPortraitReferenceLoader,
             _windowCaptureSession,
-            LocalizationService.Instance);
+            LocalizationService.Instance,
+            _windowCaptureSession);
         var captureDiagnostics = new CaptureDiagnosticsViewModel(
             _windowCaptureSession,
             new WindowsGraphicsCaptureSupport().IsSupported,

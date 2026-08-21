@@ -6,6 +6,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using TempoCue.App.Coordinators;
 using TempoCue.App.Localization;
+using TempoCue.Application;
 using TempoCue.Core;
 using TempoCue.Vision;
 
@@ -521,43 +522,26 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
 
     private void UpdateParticipantStatuses()
     {
-        var recognized = _snapshot.MinimapPreview?.ChampionMarkerCandidates ??
-            Array.Empty<MinimapChampionMarkerCandidate>();
         _allyParticipantStatuses = BuildParticipantStatuses(
-            MinimapMarkerAffiliation.Ally,
-            recognized);
+            MinimapMarkerAffiliation.Ally);
         _enemyParticipantStatuses = BuildParticipantStatuses(
-            MinimapMarkerAffiliation.Enemy,
-            recognized);
+            MinimapMarkerAffiliation.Enemy);
     }
 
     private IReadOnlyList<VisionParticipantStatusViewModel> BuildParticipantStatuses(
-        MinimapMarkerAffiliation affiliation,
-        IReadOnlyList<MinimapChampionMarkerCandidate> recognized)
+        MinimapMarkerAffiliation affiliation)
     {
         return _visionSnapshot.Participants
             .Where(participant => participant.RelativeAffiliation == affiliation)
             .OrderBy(static participant => GetPositionOrder(participant.Position))
             .ThenBy(static participant => participant.ChampionName, StringComparer.OrdinalIgnoreCase)
-            .Select(participant => CreateParticipantStatus(participant, recognized))
+            .Select(CreateParticipantStatus)
             .ToArray();
     }
 
     private VisionParticipantStatusViewModel CreateParticipantStatus(
-        ActiveMatchVisionParticipantSnapshot participant,
-        IReadOnlyList<MinimapChampionMarkerCandidate> recognized)
+        ActiveMatchVisionParticipantSnapshot participant)
     {
-        var match = string.IsNullOrWhiteSpace(participant.ChampionId)
-            ? null
-            : recognized
-                .Where(candidate =>
-                    string.Equals(
-                        candidate.ChampionId,
-                        participant.ChampionId,
-                        StringComparison.OrdinalIgnoreCase))
-                .OrderByDescending(static candidate => candidate.IdentityConfidence)
-                .FirstOrDefault();
-
         var relativeTeam = _localization.Get(
             participant.RelativeAffiliation == MinimapMarkerAffiliation.Ally
                 ? "Settings.Capture.Participants.RelativeTeam.Ally"
@@ -571,7 +555,13 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
 
         string statusText;
         Brush statusBrush;
-        if (participant.ReferenceStatus == ChampionPortraitReferenceStatus.Pending)
+        if (participant.IsDead)
+        {
+            statusText = _localization.Get(
+                "Settings.Capture.Participants.Status.Dead");
+            statusBrush = MissingStatusBrush;
+        }
+        else if (participant.ReferenceStatus == ChampionPortraitReferenceStatus.Pending)
         {
             statusText = _localization.Get(
                 "Settings.Capture.Participants.Status.ReferencePending");
@@ -583,35 +573,34 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
                 "Settings.Capture.Participants.Status.ReferenceUnavailable");
             statusBrush = MismatchedTeamStatusBrush;
         }
-        else if (match is not null)
+        else if (participant.VisibilityStatus == ParticipantVisibilityStatus.Visible)
         {
-            var contourAffiliation = match.ContourAffiliation ?? match.Affiliation;
-            var recognizedTeam = _localization.Get(
-                contourAffiliation == MinimapMarkerAffiliation.Ally
-                    ? "Settings.Capture.Participants.RelativeTeam.Ally"
-                    : "Settings.Capture.Participants.RelativeTeam.Enemy");
-            var isExpectedTeam = match.Affiliation == participant.RelativeAffiliation;
             statusText = string.Format(
                 CultureInfo.CurrentCulture,
-                _localization.Get(isExpectedTeam
-                    ? "Settings.Capture.Participants.Status.Visible.Value"
-                    : "Settings.Capture.Participants.Status.TeamMismatch.Value"),
-                isExpectedTeam ? match.IdentityConfidence : recognizedTeam,
-                match.IdentityConfidence);
-            statusBrush = isExpectedTeam
-                ? VisibleStatusBrush
-                : MismatchedTeamStatusBrush;
-            teamTrace = string.Format(
+                _localization.Get("Settings.Capture.Participants.Status.Visible.Value"),
+                participant.VisibilityConfidence);
+            statusBrush = VisibleStatusBrush;
+        }
+        else if (participant.VisibilityStatus == ParticipantVisibilityStatus.Confirming)
+        {
+            statusText = string.Format(
                 CultureInfo.CurrentCulture,
-                _localization.Get("Settings.Capture.Participants.TeamTrace.WithRing.Value"),
-                FormatRawTeam(participant.RawTeam),
-                relativeTeam,
-                recognizedTeam);
+                _localization.Get("Settings.Capture.Participants.Status.Confirming.Value"),
+                participant.VisibilityConfidence);
+            statusBrush = PendingStatusBrush;
+        }
+        else if (participant.LastSeenAt is { } lastSeenAt)
+        {
+            statusText = string.Format(
+                CultureInfo.CurrentCulture,
+                _localization.Get("Settings.Capture.Participants.Status.LastSeen.Value"),
+                lastSeenAt.ToLocalTime());
+            statusBrush = MissingStatusBrush;
         }
         else
         {
             statusText = _localization.Get(
-                "Settings.Capture.Participants.Status.NotDetected");
+                "Settings.Capture.Participants.Status.NotVisible");
             statusBrush = MissingStatusBrush;
         }
 

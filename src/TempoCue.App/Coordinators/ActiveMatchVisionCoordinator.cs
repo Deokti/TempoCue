@@ -20,8 +20,10 @@ internal sealed class ActiveMatchVisionCoordinator :
     private readonly IChampionCatalog _championCatalog;
     private readonly IChampionPortraitReferenceLoader _portraitLoader;
     private readonly IMinimapChampionReferenceSink _referenceSink;
+    private readonly IMinimapChampionObservationSource? _observationSource;
     private readonly LocalizationService _localization;
     private readonly object _sync = new();
+    private readonly ParticipantVisibilityTracker _visibilityTracker = new();
 
     private CancellationTokenSource? _loadCancellation;
     private ActiveMatchVisionDiagnosticsSnapshot _diagnosticsSnapshot =
@@ -29,6 +31,10 @@ internal sealed class ActiveMatchVisionCoordinator :
     private IReadOnlyDictionary<string, ParticipantReferenceResolution> _resolutions =
         new Dictionary<string, ParticipantReferenceResolution>(
             StringComparer.OrdinalIgnoreCase);
+    private IReadOnlyDictionary<string, ParticipantVisibilitySnapshot> _visibilityStates =
+        new Dictionary<string, ParticipantVisibilitySnapshot>(
+            StringComparer.OrdinalIgnoreCase);
+    private ParticipantContext? _currentContext;
     private string? _participantSignature;
     private int _generation;
     private bool _isDisposed;
@@ -38,16 +44,22 @@ internal sealed class ActiveMatchVisionCoordinator :
         IChampionCatalog championCatalog,
         IChampionPortraitReferenceLoader portraitLoader,
         IMinimapChampionReferenceSink referenceSink,
-        LocalizationService localization)
+        LocalizationService localization,
+        IMinimapChampionObservationSource? observationSource = null)
     {
         _monitor = monitor ?? throw new ArgumentNullException(nameof(monitor));
         _championCatalog = championCatalog ?? throw new ArgumentNullException(nameof(championCatalog));
         _portraitLoader = portraitLoader ?? throw new ArgumentNullException(nameof(portraitLoader));
         _referenceSink = referenceSink ?? throw new ArgumentNullException(nameof(referenceSink));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        _observationSource = observationSource;
 
         _monitor.Updated += OnMatchUpdated;
         _localization.PropertyChanged += OnLocalizationChanged;
+        if (_observationSource is not null)
+        {
+            _observationSource.ObservationAvailable += OnObservationAvailable;
+        }
         Schedule(_monitor.CurrentUpdate);
     }
 
@@ -67,14 +79,61 @@ internal sealed class ActiveMatchVisionCoordinator :
             _generation++;
             _loadCancellation?.Cancel();
             _loadCancellation = null;
+            _visibilityTracker.Reset();
+            _visibilityStates = new Dictionary<string, ParticipantVisibilitySnapshot>(
+                StringComparer.OrdinalIgnoreCase);
+            _currentContext = null;
         }
 
         _monitor.Updated -= OnMatchUpdated;
         _localization.PropertyChanged -= OnLocalizationChanged;
+        if (_observationSource is not null)
+        {
+            _observationSource.ObservationAvailable -= OnObservationAvailable;
+        }
     }
 
     private void OnMatchUpdated(object? sender, ActiveMatchUpdateEventArgs e) =>
         Schedule(e.Update);
+
+    private void OnObservationAvailable(
+        object? sender,
+        MinimapChampionObservationEventArgs e)
+    {
+        lock (_sync)
+        {
+            if (_isDisposed || _currentContext is not { } context)
+            {
+                return;
+            }
+
+            var trackedPlayers = context.Players
+                .Where(player =>
+                    !player.IsDead &&
+                    _resolutions.TryGetValue(player.ReferenceKey, out var resolution) &&
+                    resolution.Status == ChampionPortraitReferenceStatus.Ready &&
+                    !string.IsNullOrWhiteSpace(resolution.ChampionId))
+                .ToArray();
+            var observations = e.Candidates
+                .Select(candidate => CreateObservation(
+                    candidate,
+                    trackedPlayers,
+                    e.ImageWidth,
+                    e.ImageHeight))
+                .OfType<ParticipantVisionObservation>()
+                .ToArray();
+            var states = _visibilityTracker.Update(
+                e.CapturedAt,
+                trackedPlayers.Select(static player => player.ParticipantId).ToArray(),
+                observations);
+            _visibilityStates = states.ToDictionary(
+                static state => state.ParticipantId,
+                StringComparer.OrdinalIgnoreCase);
+            Volatile.Write(
+                ref _diagnosticsSnapshot,
+                context.CreateDiagnosticsSnapshot(_resolutions, _visibilityStates));
+        }
+    }
 
     private void OnLocalizationChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -107,14 +166,19 @@ internal sealed class ActiveMatchVisionCoordinator :
                     _participantSignature,
                     StringComparison.Ordinal))
             {
+                _currentContext = context;
                 Volatile.Write(
                     ref _diagnosticsSnapshot,
-                    context.CreateDiagnosticsSnapshot(_resolutions));
+                    context.CreateDiagnosticsSnapshot(_resolutions, _visibilityStates));
                 return;
             }
 
             _participantSignature = context?.Signature;
+            _currentContext = context;
             _resolutions = new Dictionary<string, ParticipantReferenceResolution>(
+                StringComparer.OrdinalIgnoreCase);
+            _visibilityTracker.Reset();
+            _visibilityStates = new Dictionary<string, ParticipantVisibilitySnapshot>(
                 StringComparer.OrdinalIgnoreCase);
             _generation++;
             generation = _generation;
@@ -255,6 +319,8 @@ internal sealed class ActiveMatchVisionCoordinator :
         ParticipantContext context,
         IReadOnlyDictionary<string, ParticipantReferenceResolution> resolutions)
     {
+        ParticipantContext currentContext;
+        IReadOnlyDictionary<string, ParticipantVisibilitySnapshot> visibilityStates;
         lock (_sync)
         {
             if (_isDisposed || generation != _generation)
@@ -263,11 +329,13 @@ internal sealed class ActiveMatchVisionCoordinator :
             }
 
             _resolutions = resolutions;
+            currentContext = _currentContext ?? context;
+            visibilityStates = _visibilityStates;
         }
 
         Volatile.Write(
             ref _diagnosticsSnapshot,
-            context.CreateDiagnosticsSnapshot(resolutions));
+            currentContext.CreateDiagnosticsSnapshot(resolutions, visibilityStates));
         _referenceSink.SetChampionReferences(references);
     }
 
@@ -309,6 +377,7 @@ internal sealed class ActiveMatchVisionCoordinator :
                 player.ChampionName,
                 player.Position,
                 player.Team,
+                player.IsDead,
                 player.Team == activePlayer.Team
                     ? MinimapMarkerAffiliation.Ally
                     : MinimapMarkerAffiliation.Enemy))
@@ -330,6 +399,38 @@ internal sealed class ActiveMatchVisionCoordinator :
             languageCode,
             activePlayer.Team,
             players);
+    }
+
+    private ParticipantVisionObservation? CreateObservation(
+        MinimapChampionMarkerCandidate candidate,
+        IReadOnlyList<ParticipantReference> trackedPlayers,
+        int imageWidth,
+        int imageHeight)
+    {
+        if (string.IsNullOrWhiteSpace(candidate.ChampionId))
+        {
+            return null;
+        }
+
+        var player = trackedPlayers.FirstOrDefault(player =>
+            player.Affiliation == candidate.Affiliation &&
+            _resolutions.TryGetValue(player.ReferenceKey, out var resolution) &&
+            string.Equals(
+                resolution.ChampionId,
+                candidate.ChampionId,
+                StringComparison.OrdinalIgnoreCase));
+        if (player is null)
+        {
+            return null;
+        }
+
+        var centerX = candidate.X + (candidate.Width / 2d);
+        var centerY = candidate.Y + (candidate.Height / 2d);
+        return new ParticipantVisionObservation(
+            player.ParticipantId,
+            Math.Clamp(candidate.IdentityConfidence, 0, 1),
+            Math.Clamp(centerX / imageWidth, 0, 1),
+            Math.Clamp(centerY / imageHeight, 0, 1));
     }
 
     private static IReadOnlyDictionary<string, ChampionCatalogEntry> BuildChampionLookup(
@@ -355,7 +456,8 @@ internal sealed class ActiveMatchVisionCoordinator :
         IReadOnlyList<ParticipantReference> Players)
     {
         public ActiveMatchVisionDiagnosticsSnapshot CreateDiagnosticsSnapshot(
-            IReadOnlyDictionary<string, ParticipantReferenceResolution>? resolutions = null) =>
+            IReadOnlyDictionary<string, ParticipantReferenceResolution>? resolutions = null,
+            IReadOnlyDictionary<string, ParticipantVisibilitySnapshot>? visibilityStates = null) =>
             new(
                 ActivePlayerTeam,
                 Players.Select(player =>
@@ -365,6 +467,10 @@ internal sealed class ActiveMatchVisionCoordinator :
                         out var resolved)
                             ? resolved
                             : null;
+                    var visibility = visibilityStates is not null &&
+                        visibilityStates.TryGetValue(player.ParticipantId, out var tracked)
+                            ? tracked
+                            : null;
                     return new ActiveMatchVisionParticipantSnapshot(
                         player.ParticipantId,
                         player.ChampionName,
@@ -372,7 +478,13 @@ internal sealed class ActiveMatchVisionCoordinator :
                         player.Position,
                         player.RawTeam,
                         player.Affiliation,
-                        resolution?.Status ?? ChampionPortraitReferenceStatus.Pending);
+                        resolution?.Status ?? ChampionPortraitReferenceStatus.Pending,
+                        player.IsDead,
+                        visibility?.Status ?? ParticipantVisibilityStatus.NotVisible,
+                        visibility?.LastSeenAt,
+                        visibility?.Confidence ?? 0,
+                        visibility?.MapX,
+                        visibility?.MapY);
                 }).ToArray());
     }
 
@@ -381,6 +493,7 @@ internal sealed class ActiveMatchVisionCoordinator :
         string ChampionName,
         PlayerPosition Position,
         TeamSide RawTeam,
+        bool IsDead,
         MinimapMarkerAffiliation Affiliation)
     {
         public string ReferenceKey =>

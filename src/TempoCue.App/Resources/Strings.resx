@@ -1060,8 +1060,12 @@
   <data name="Settings.Capture.Participants.Status.ReferencePending" xml:space="preserve"><value>Portrait reference is loading</value></data>
   <data name="Settings.Capture.Participants.Status.ReferenceUnavailable" xml:space="preserve"><value>Portrait reference is unavailable</value></data>
   <data name="Settings.Capture.Participants.Status.NotDetected" xml:space="preserve"><value>Not recognized in the current frame</value></data>
-  <data name="Settings.Capture.Participants.Status.Visible.Value" xml:space="preserve"><value>Recognized now · confidence {0:P0}</value></data>
+  <data name="Settings.Capture.Participants.Status.Visible.Value" xml:space="preserve"><value>Visible · confidence {0:P0}</value></data>
   <data name="Settings.Capture.Participants.Status.TeamMismatch.Value" xml:space="preserve"><value>Recognized with conflicting side: {0} · confidence {1:P0}</value></data>
+  <data name="Settings.Capture.Participants.Status.NotVisible" xml:space="preserve"><value>Not visible</value></data>
+  <data name="Settings.Capture.Participants.Status.Confirming.Value" xml:space="preserve"><value>Confirming · confidence {0:P0}</value></data>
+  <data name="Settings.Capture.Participants.Status.LastSeen.Value" xml:space="preserve"><value>Not visible · last seen at {0:HH:mm:ss}</value></data>
+  <data name="Settings.Capture.Participants.Status.Dead" xml:space="preserve"><value>Dead · observation paused</value></data>
   <data name="Settings.Capture.Value.NotAvailable" xml:space="preserve"><value>Not available</value></data>
   <data name="Settings.Capture.Unsupported.Description" xml:space="preserve"><value>Windows Graphics Capture requires Windows 10 version 2004 or later.</value></data>
   <data name="Settings.Capture.Error.Label" xml:space="preserve"><value>Technical details</value></data>
