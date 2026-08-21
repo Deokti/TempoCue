@@ -38,13 +38,10 @@ public sealed class MinimapReplayCorpusTests
             MinimapReplayGroundTruth groundTruth;
             try
             {
-                await using var sampleStream = File.OpenRead(samplePath);
-                var sample = await MinimapReplaySampleStore.LoadAsync(sampleStream);
-                await using var labelsStream = File.OpenRead(labelsPath);
-                groundTruth = await MinimapReplayGroundTruthStore.LoadAsync(labelsStream);
-                evaluation = MinimapReplayEvaluator.Evaluate(
-                    runner.Run(sample).Actual,
-                    groundTruth);
+                (groundTruth, evaluation) = await EvaluateAsync(
+                    runner,
+                    samplePath,
+                    labelsPath);
             }
             catch (InvalidDataException exception)
             {
@@ -69,5 +66,22 @@ public sealed class MinimapReplayCorpusTests
         Assert.True(
             failures.Count == 0,
             "Корпус replay-кадров разошёлся с разметкой:\n" + string.Join('\n', failures));
+    }
+
+    private static async Task<(
+        MinimapReplayGroundTruth GroundTruth,
+        MinimapReplayEvaluation Evaluation)> EvaluateAsync(
+        MinimapReplayRunner runner,
+        string samplePath,
+        string labelsPath)
+    {
+        await using var sampleStream = File.OpenRead(samplePath);
+        var sample = await MinimapReplaySampleStore.LoadAsync(sampleStream);
+        await using var labelsStream = File.OpenRead(labelsPath);
+        var groundTruth = await MinimapReplayGroundTruthStore.LoadAsync(labelsStream);
+        var evaluation = MinimapReplayEvaluator.Evaluate(
+            runner.Run(sample).Actual,
+            groundTruth);
+        return (groundTruth, evaluation);
     }
 }
