@@ -173,5 +173,15 @@ internal static class ActiveMatchVisionTestSupport
                     320,
                     320,
                     candidates));
+
+        public void PublishFailed(DateTimeOffset capturedAt) =>
+            ObservationAvailable?.Invoke(
+                this,
+                new MinimapChampionObservationEventArgs(
+                    capturedAt,
+                    320,
+                    320,
+                    [],
+                    isSuccessful: false));
     }
 }

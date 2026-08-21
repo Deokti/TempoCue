@@ -582,11 +582,13 @@ public sealed class WindowsGraphicsCaptureSession :
 
             // Неудачное чтение — тоже тик времени: подписчик должен засчитать пропуск
             // кадра, иначе удержание видимости не истечёт при потерянной миникарте.
+            // Признак неуспеха не даёт ошибке выдавать поток за работоспособный.
             PublishObservation(new MinimapChampionObservationEventArgs(
                 DateTimeOffset.UtcNow,
                 MinimapFrameNormalizer.CanonicalSize,
                 MinimapFrameNormalizer.CanonicalSize,
-                []));
+                [],
+                isSuccessful: false));
         }
     }
 

@@ -117,7 +117,13 @@ internal sealed class ActiveMatchVisionCoordinator :
                 return;
             }
 
-            _lastObservationReceivedAt = DateTimeOffset.UtcNow;
+            // Только успешно прочитанный кадр подтверждает живой поток: длительные
+            // ошибки чтения старят видимость трекером, но приводят к «нет данных».
+            if (e.IsSuccessful)
+            {
+                _lastObservationReceivedAt = DateTimeOffset.UtcNow;
+            }
+
             var trackedPlayers = GetTrackedPlayersLocked(context);
             var observations = e.Candidates
                 .Select(candidate => CreateObservation(
@@ -136,7 +142,10 @@ internal sealed class ActiveMatchVisionCoordinator :
                 StringComparer.OrdinalIgnoreCase);
             Volatile.Write(
                 ref _diagnosticsSnapshot,
-                context.CreateDiagnosticsSnapshot(_resolutions, _visibilityStates));
+                context.CreateDiagnosticsSnapshot(
+                    _resolutions,
+                    _visibilityStates,
+                    !e.IsSuccessful && ObservationsAreStaleLocked()));
         }
     }
 
