@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "regions": [
+    { "x": 159, "y": 59, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Ambessa", "affiliation": "Ally" },
+    { "x": 113, "y": 179, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Sivir", "affiliation": "Ally" },
+    { "x": 118, "y": 266, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Janna", "affiliation": "Enemy" },
+    { "x": 101, "y": 268, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Sona", "affiliation": "Ally" },
+    { "x": 88, "y": 268, "width": 16, "height": 16, "kind": "Tower",
+      "affiliation": "Ally" },
+    { "x": 160, "y": 140, "width": 18, "height": 18, "kind": "Other" },
+    { "x": 147, "y": 155, "width": 18, "height": 18, "kind": "Other" }
+  ],
+  "allowedFalsePositives": 0,
+  "allowedMissedChampions": 1
+}
