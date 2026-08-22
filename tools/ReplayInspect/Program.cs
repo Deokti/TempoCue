@@ -25,6 +25,8 @@ try
             await CorpusStatistics.PrintReferenceBaselinesAsync(args[1]),
         "--margin" when args.Length == 2 =>
             await CorpusStatistics.PrintNegativeMarginsAsync(args[1]),
+        "--compare" when args.Length == 2 =>
+            await DeeperLeagueComparison.RunAsync(args[1]),
         _ when args[0].StartsWith("--", StringComparison.Ordinal) =>
             Fail($"Неизвестный или неполный режим: {args[0]}"),
         _ => await FrameInspector.PrintRecognitionAsync(args)
@@ -72,6 +74,10 @@ static void PrintUsage()
 
           ReplayInspect --margin <каталог корпуса>
               запас лучшего балла над отрицательными эталонами
+
+          ReplayInspect --compare <каталог корпуса>
+              сравнение основного распознавателя и модели DeeperLeague на одной
+              разметке; требует models/deeperleague с best.onnx и champMap.json
 
         Координаты точек задаются в канонической системе кадра 320 x 320.
         """);

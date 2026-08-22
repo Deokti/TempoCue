@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\TempoCue.Vision\TempoCue.Vision.csproj" />
+    <ProjectReference Include="..\..\src\TempoCue.Vision.DeeperLeague\TempoCue.Vision.DeeperLeague.csproj" />
   </ItemGroup>
 
 </Project>
