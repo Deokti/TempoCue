@@ -21,4 +21,13 @@ internal static class AutomaticCaptureRecoveryPolicy
             : captureStartedAt.Value;
         return now - lastActivityAt >= StalledFrameTimeout;
     }
+
+    /// <summary>
+    /// Определяет, нужно ли освободить захват, когда окно матча больше не найдено.
+    /// Без этого завершённый матч оставлял диагностику в состоянии «кадры поступают»
+    /// с замершими метриками: попытка переподключения просто не находила окно и
+    /// молча возвращала управление, не трогая состояние.
+    /// </summary>
+    public static bool ShouldReleaseMissingTarget(CaptureSessionState state) =>
+        state is CaptureSessionState.Capturing;
 }

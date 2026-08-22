@@ -53,4 +53,28 @@ public sealed class AutomaticCaptureRecoveryPolicyTests
 
         Assert.False(result);
     }
+
+    [Fact]
+    public void ShouldReleaseMissingTarget_FreesActiveCaptureAfterMatchEnds()
+    {
+        // Завершённый матч закрывает окно, и переподключение его не находит.
+        // Активный захват в этот момент обязан освободиться, иначе диагностика
+        // навсегда остаётся в состоянии «кадры поступают» с замершими метриками.
+        Assert.True(AutomaticCaptureRecoveryPolicy.ShouldReleaseMissingTarget(
+            CaptureSessionState.Capturing));
+    }
+
+    [Theory]
+    [InlineData(CaptureSessionState.Idle)]
+    [InlineData(CaptureSessionState.Stopped)]
+    [InlineData(CaptureSessionState.Failed)]
+    [InlineData(CaptureSessionState.SelectingTarget)]
+    [InlineData(CaptureSessionState.Unsupported)]
+    public void ShouldReleaseMissingTarget_LeavesInactiveAndDeliberateStatesAlone(
+        CaptureSessionState state)
+    {
+        // Остановку пользователем, ожидание окна и выбор цели трогать нельзя:
+        // отсутствие окна для них является нормальным состоянием, а не событием.
+        Assert.False(AutomaticCaptureRecoveryPolicy.ShouldReleaseMissingTarget(state));
+    }
 }

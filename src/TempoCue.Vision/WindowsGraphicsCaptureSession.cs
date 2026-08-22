@@ -251,6 +251,7 @@ public sealed class WindowsGraphicsCaptureSession :
         var windowHandle = LeagueWindowCaptureTarget.FindWindowHandle();
         if (windowHandle == nint.Zero)
         {
+            await ReleaseMissingTargetAsync().ConfigureAwait(false);
             return false;
         }
 
@@ -367,6 +368,37 @@ public sealed class WindowsGraphicsCaptureSession :
             captureSession?.Dispose();
             framePool?.Dispose();
             (device as IDisposable)?.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Возвращает сессию в исходное состояние, когда окно матча исчезло: освобождает
+    /// ресурсы захвата и обнуляет метрики, чтобы диагностика показывала «окно не
+    /// выбрано», а не замершие цифры прошлого матча.
+    /// </summary>
+    private async Task ReleaseMissingTargetAsync()
+    {
+        if (!AutomaticCaptureRecoveryPolicy.ShouldReleaseMissingTarget(Snapshot.State))
+        {
+            return;
+        }
+
+        await _lifecycleGate.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            if (!AutomaticCaptureRecoveryPolicy.ShouldReleaseMissingTarget(Snapshot.State))
+            {
+                return;
+            }
+
+            _generation++;
+            StopCaptureResources();
+            _frameMetrics.Reset();
+            SetState(CaptureSessionState.Idle, null);
+        }
+        finally
+        {
+            _lifecycleGate.Release();
         }
     }
 
