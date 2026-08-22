@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "regions": [
+    { "x": 28, "y": 64, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Teemo", "affiliation": "Ally" },
+    { "x": 92, "y": 193, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Ambessa", "affiliation": "Ally" },
+    { "x": 143, "y": 149, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Anivia", "affiliation": "Enemy" },
+    { "x": 154, "y": 219, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Poppy", "affiliation": "Ally" },
+    { "x": 252, "y": 249, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Smolder", "affiliation": "Enemy" },
+    { "x": 244, "y": 261, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Blitzcrank", "affiliation": "Enemy" },
+    { "x": 239, "y": 263, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Tristana", "affiliation": "Ally" },
+    { "x": 38, "y": 276, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Janna", "affiliation": "Ally" },
+    { "x": 38, "y": 252, "width": 22, "height": 24, "kind": "Tower",
+      "affiliation": "Ally" },
+    { "x": 58, "y": 270, "width": 22, "height": 16, "kind": "MinionWave",
+      "affiliation": "Ally" }
+  ],
+  "allowedFalsePositives": 1,
+  "allowedMissedChampions": 2
+}
