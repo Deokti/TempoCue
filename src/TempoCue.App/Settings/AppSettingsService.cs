@@ -88,6 +88,17 @@ public sealed class AppSettingsService
         Save(current with { Overlay = overlay.Normalize() });
     }
 
+    /// <summary>
+    /// Сохраняет выбор распознавателя миникарты. Он применяется при следующем
+    /// запуске: способ распознавания выбирается один раз при создании сессии
+    /// захвата, и подмена на ходу усложнила бы её жизненный цикл без пользы.
+    /// </summary>
+    public void SaveExperimentalMinimapRecognizer(bool isEnabled)
+    {
+        var current = Load();
+        Save(current with { UseExperimentalMinimapRecognizer = isEnabled });
+    }
+
     private void Save(AppSettings settings)
     {
         try

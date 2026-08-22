@@ -848,6 +848,9 @@
   <data name="Settings.Overlay.Unsaved" xml:space="preserve"><value>Есть несохранённые изменения</value></data>
   <data name="Settings.Overlay.Preview.Label" xml:space="preserve"><value>Предпросмотр оверлея</value></data>
   <data name="Settings.Overlay.Description" xml:space="preserve"><value>Показывает советы Coach Pack поверх игры. Текст и цветовая полоса остаются полностью непрозрачными.</value></data>
+  <data name="Settings.Experiment.Recognizer.Title" xml:space="preserve"><value>Экспериментальное распознавание миникарты</value></data>
+  <data name="Settings.Experiment.Recognizer.Description" xml:space="preserve"><value>Использует стороннюю нейросетевую модель вместо встроенного распознавателя. Она чаще находит перекрытых и отзывающихся чемпионов, но не знает вышедших после патча 13.14 и иногда принимает значки базы за чемпионов. Без файлов модели TempoCue продолжает работать на встроенном распознавателе.</value></data>
+  <data name="Settings.Experiment.Recognizer.RestartNotice" xml:space="preserve"><value>Выбор применяется после перезапуска TempoCue.</value></data>
   <data name="Settings.Overlay.Preview.Button" xml:space="preserve"><value>Показать следующее уведомление</value></data>
   <data name="Settings.Overlay.Preview.Warning.Label" xml:space="preserve"><value>Осторожно</value></data>
   <data name="Settings.Overlay.Preview.Warning.Title" xml:space="preserve"><value>Соперник пропал с линии</value></data>

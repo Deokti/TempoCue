@@ -37,6 +37,32 @@ public sealed class SettingsViewModelTests
     }
 
     [Fact]
+    public void ExperimentalRecognizer_PersistsImmediatelyAndAsksForRestart()
+    {
+        using var settingsContext = new TemporarySettingsContext();
+        var service = settingsContext.Service;
+        using var viewModel = new SettingsViewModel(
+            LocalizationService.Instance,
+            service,
+            static () => { });
+
+        Assert.False(viewModel.IsExperimentalMinimapRecognizerEnabled);
+        Assert.False(viewModel.HasExperimentalRecognizerRestartNotice);
+
+        viewModel.IsExperimentalMinimapRecognizerEnabled = true;
+
+        // Выбор сохраняется сразу, но применяется только при следующем запуске,
+        // поэтому пользователю показывается напоминание о перезапуске.
+        Assert.True(service.Load().UseExperimentalMinimapRecognizer);
+        Assert.True(viewModel.HasExperimentalRecognizerRestartNotice);
+
+        viewModel.IsExperimentalMinimapRecognizerEnabled = false;
+
+        Assert.False(service.Load().UseExperimentalMinimapRecognizer);
+        Assert.False(viewModel.HasExperimentalRecognizerRestartNotice);
+    }
+
+    [Fact]
     public void SaveOverlaySettings_PersistsDraftAndAppliesRuntimeState()
     {
         using var settingsContext = new TemporarySettingsContext();

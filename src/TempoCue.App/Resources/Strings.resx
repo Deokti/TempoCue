@@ -838,6 +838,9 @@
   <data name="Settings.Overlay.Unsaved" xml:space="preserve"><value>There are unsaved changes</value></data>
   <data name="Settings.Overlay.Preview.Label" xml:space="preserve"><value>Overlay preview</value></data>
   <data name="Settings.Overlay.Description" xml:space="preserve"><value>Shows Coach Pack advice over the game. Text and the accent rail stay fully opaque.</value></data>
+  <data name="Settings.Experiment.Recognizer.Title" xml:space="preserve"><value>Experimental minimap recognition</value></data>
+  <data name="Settings.Experiment.Recognizer.Description" xml:space="preserve"><value>Uses a third-party neural model instead of the built-in recognizer. It finds overlapping and recalling champions more often, but does not know champions released after patch 13.14 and may confirm base icons by mistake. Without the model files TempoCue keeps using the built-in recognizer.</value></data>
+  <data name="Settings.Experiment.Recognizer.RestartNotice" xml:space="preserve"><value>The choice applies after TempoCue restarts.</value></data>
   <data name="Settings.Overlay.Preview.Button" xml:space="preserve"><value>Show next notification</value></data>
   <data name="Settings.Overlay.Preview.Warning.Label" xml:space="preserve"><value>Caution</value></data>
   <data name="Settings.Overlay.Preview.Warning.Title" xml:space="preserve"><value>An opponent has left their lane</value></data>

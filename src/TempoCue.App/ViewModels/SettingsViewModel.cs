@@ -25,6 +25,8 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
     private OverlayUserSettings _savedOverlaySettings;
     private bool _overlaySetupWasOpened;
     private bool _isApplyingDraft;
+    private bool _isExperimentalMinimapRecognizerEnabled;
+    private readonly bool _initialExperimentalMinimapRecognizer;
     private bool _isDisposed;
 
     public SettingsViewModel(
@@ -41,6 +43,9 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
         _overlaySettings = overlaySettings ?? new OverlaySettingsState(settings.Load().Overlay);
         _overlaySetupSession = overlaySetupSession;
         CaptureDiagnostics = captureDiagnostics;
+        _initialExperimentalMinimapRecognizer =
+            settings.Load().UseExperimentalMinimapRecognizer;
+        _isExperimentalMinimapRecognizerEnabled = _initialExperimentalMinimapRecognizer;
         _selectedLanguageCode = localization.CurrentLanguageCode;
         var overlay = _overlaySettings.Current;
         _isOverlayEnabled = overlay.IsEnabled;
@@ -68,6 +73,29 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
     public IReadOnlyList<int> OverlayWidths { get; } = [300, 340, 400];
 
     public CaptureDiagnosticsViewModel? CaptureDiagnostics { get; }
+
+    /// <summary>
+    /// Включает экспериментальное распознавание миникарты сторонней моделью.
+    /// Значение сохраняется сразу, но применяется при следующем запуске.
+    /// </summary>
+    public bool IsExperimentalMinimapRecognizerEnabled
+    {
+        get => _isExperimentalMinimapRecognizerEnabled;
+        set
+        {
+            if (!SetProperty(ref _isExperimentalMinimapRecognizerEnabled, value))
+            {
+                return;
+            }
+
+            _settings.SaveExperimentalMinimapRecognizer(value);
+            OnPropertyChanged(nameof(HasExperimentalRecognizerRestartNotice));
+        }
+    }
+
+    /// <summary>Показывает напоминание о перезапуске только после фактической смены.</summary>
+    public bool HasExperimentalRecognizerRestartNotice =>
+        _isExperimentalMinimapRecognizerEnabled != _initialExperimentalMinimapRecognizer;
 
     public bool IsOverlayEnabled
     {
