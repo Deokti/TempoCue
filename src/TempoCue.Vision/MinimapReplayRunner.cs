@@ -4,6 +4,7 @@ namespace TempoCue.Vision;
 public sealed class MinimapReplayRunner
 {
     private readonly MinimapRecognitionPipeline _pipeline;
+    private readonly IMinimapChampionRecognizer _championRecognizer;
 
     public MinimapReplayRunner()
         : this(new OpenCvMinimapChampionRecognizer())
@@ -12,7 +13,108 @@ public sealed class MinimapReplayRunner
 
     internal MinimapReplayRunner(IMinimapChampionRecognizer championRecognizer)
     {
+        _championRecognizer = championRecognizer;
         _pipeline = new MinimapRecognitionPipeline(championRecognizer);
+    }
+
+    /// <summary>
+    /// Диагностический срез: сырые баллы каждой области сравнения до назначения
+    /// состава и измерение кольца значка. Служит калибровке правил по корпусу и
+    /// не участвует в живом распознавании.
+    /// </summary>
+    public IReadOnlyList<MinimapRegionDiagnostics> RunRegionDiagnostics(
+        MinimapReplaySample sample)
+    {
+        ArgumentNullException.ThrowIfNull(sample);
+        if (_championRecognizer is not OpenCvMinimapChampionRecognizer recognizer)
+        {
+            throw new InvalidOperationException(
+                "Диагностика областей доступна только для распознавателя OpenCV.");
+        }
+
+        var markers = MinimapMarkerCandidateDetector.Detect(
+            sample.BgraPixels.Span,
+            sample.ImageWidth,
+            sample.ImageHeight,
+            sample.ImageStride);
+        var proposals = MinimapChampionProposalGenerator.Create(
+            sample.ImageWidth,
+            sample.ImageHeight,
+            markers);
+        var scores = recognizer.ScoreCandidates(
+            sample.BgraPixels,
+            sample.ImageWidth,
+            sample.ImageHeight,
+            sample.ImageStride,
+            proposals,
+            sample.ChampionReferences);
+        var diagnostics = new MinimapRegionDiagnostics[scores.Length];
+        for (var index = 0; index < scores.Length; index++)
+        {
+            var score = scores[index];
+            diagnostics[index] = new MinimapRegionDiagnostics(
+                score.Candidate,
+                score.ReferenceScores
+                    .Select(static reference => new MinimapReferenceSimilarity(
+                        reference.Reference.ChampionId,
+                        reference.Reference.Affiliation,
+                        reference.Similarity))
+                    .ToArray(),
+                score.NegativeSimilarity,
+                MinimapIconRingSampler.Sample(
+                    sample.BgraPixels.Span,
+                    sample.ImageWidth,
+                    sample.ImageHeight,
+                    sample.ImageStride,
+                    score.Candidate));
+        }
+
+        return diagnostics;
+    }
+
+    /// <summary>
+    /// Диагностический зонд одной точки: оценивает область портрета в заданном
+    /// месте, даже если конвейер не создал там предложение. Служит измерению
+    /// пропусков, невидимых обычной диагностике.
+    /// </summary>
+    public MinimapRegionDiagnostics ProbeRegion(MinimapReplaySample sample, int x, int y)
+    {
+        ArgumentNullException.ThrowIfNull(sample);
+        if (_championRecognizer is not OpenCvMinimapChampionRecognizer recognizer)
+        {
+            throw new InvalidOperationException(
+                "Диагностика областей доступна только для распознавателя OpenCV.");
+        }
+
+        var probe = new MinimapChampionMarkerCandidate(
+            x,
+            y,
+            Width: 25,
+            Height: 25,
+            MinimapMarkerAffiliation.Ally,
+            Confidence: 0);
+        var score = recognizer.ScoreCandidates(
+            sample.BgraPixels,
+            sample.ImageWidth,
+            sample.ImageHeight,
+            sample.ImageStride,
+            [probe],
+            sample.ChampionReferences).Single();
+        return new MinimapRegionDiagnostics(
+            score.Candidate,
+            score.ReferenceScores
+                .Select(static reference => new MinimapReferenceSimilarity(
+                    reference.Reference.ChampionId,
+                    reference.Reference.Affiliation,
+                    reference.Similarity))
+                .ToArray(),
+            score.NegativeSimilarity,
+            MinimapIconRingSampler.Sample(
+                sample.BgraPixels.Span,
+                sample.ImageWidth,
+                sample.ImageHeight,
+                sample.ImageStride,
+                score.Candidate));
     }
 
     public MinimapReplayRunResult Run(MinimapReplaySample sample)
@@ -77,3 +179,16 @@ public sealed record MinimapReplayRunResult(
     public bool MatchesBaseline =>
         MissingBaselineAssignments == 0 && UnexpectedAssignments == 0;
 }
+
+/// <summary>Сырые баллы одной области сравнения до назначения состава.</summary>
+public sealed record MinimapRegionDiagnostics(
+    MinimapChampionMarkerCandidate Proposal,
+    IReadOnlyList<MinimapReferenceSimilarity> ReferenceSimilarities,
+    double NegativeSimilarity,
+    MinimapRingSampleStats RingStats);
+
+/// <summary>Сходство области с эталоном одного участника.</summary>
+public sealed record MinimapReferenceSimilarity(
+    string ChampionId,
+    MinimapMarkerAffiliation Affiliation,
+    double Similarity);

@@ -130,11 +130,63 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
             .Select(static template => CreateScaledTemplates(template))
             .ToArray();
 
+    /// <summary>
+    /// Диагностический срез сырых баллов каждой области до назначения состава.
+    /// Используется offline-инструментами replay для калибровки правил.
+    /// </summary>
+    internal MinimapRosterCandidateScore[] ScoreCandidates(
+        ReadOnlyMemory<byte> pixels,
+        int width,
+        int height,
+        int stride,
+        IReadOnlyList<MinimapChampionMarkerCandidate> candidates,
+        IReadOnlyList<MinimapChampionReference> references)
+    {
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
+        ValidateImage(pixels.Span, width, height, stride);
+        ArgumentNullException.ThrowIfNull(candidates);
+        ArgumentNullException.ThrowIfNull(references);
+        if (candidates.Count == 0 || references.Count == 0)
+        {
+            return [];
+        }
+
+        using var sourceBgra = CreateBgraMat(pixels, width, height, stride);
+        using var sourceBgr = new Mat();
+        Cv2.CvtColor(sourceBgra, sourceBgr, ColorConversionCodes.BGRA2BGR);
+
+        return ComputeCandidateScores(
+            sourceBgr,
+            candidates,
+            GetPreparedReferences(references),
+            GetPreparedNegatives(),
+            out _).ToArray();
+    }
+
     private static MinimapChampionRecognitionResult MatchCandidates(
         Mat source,
         IReadOnlyList<MinimapChampionMarkerCandidate> candidates,
         IReadOnlyList<PreparedReference> references,
         IReadOnlyList<Mat[]> negativeTemplates)
+    {
+        var candidateMatches = ComputeCandidateScores(
+            source,
+            candidates,
+            references,
+            negativeTemplates,
+            out var maximumObservedSimilarity);
+        var selected = MinimapRosterAssignment.Select(candidateMatches);
+        return new MinimapChampionRecognitionResult(
+            selected,
+            maximumObservedSimilarity < 0 ? 0 : maximumObservedSimilarity);
+    }
+
+    private static List<MinimapRosterCandidateScore> ComputeCandidateScores(
+        Mat source,
+        IReadOnlyList<MinimapChampionMarkerCandidate> candidates,
+        IReadOnlyList<PreparedReference> references,
+        IReadOnlyList<Mat[]> negativeTemplates,
+        out double maximumObservedSimilarity)
     {
         var referenceGroups = references
             .GroupBy(
@@ -145,7 +197,7 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
                 .ToArray())
             .ToArray();
         var candidateMatches = new List<MinimapRosterCandidateScore>(candidates.Count);
-        var maximumObservedSimilarity = -1d;
+        maximumObservedSimilarity = -1d;
         for (var candidateIndex = 0; candidateIndex < candidates.Count; candidateIndex++)
         {
             var candidate = candidates[candidateIndex];
@@ -194,10 +246,7 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
                 negativeSimilarity));
         }
 
-        var selected = MinimapRosterAssignment.Select(candidateMatches);
-        return new MinimapChampionRecognitionResult(
-            selected,
-            maximumObservedSimilarity < 0 ? 0 : maximumObservedSimilarity);
+        return candidateMatches;
     }
 
     private static double FindBestNegativeSimilarity(
