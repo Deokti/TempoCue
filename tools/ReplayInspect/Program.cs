@@ -29,6 +29,10 @@ try
             await DeeperLeagueComparison.RunAsync(args[1]),
         "--model" when args.Length >= 2 =>
             await DeeperLeagueComparison.RunOnFramesAsync(args.Skip(1)),
+        "--icons" when args.Length == 3 =>
+            await ChampionIconComparison.RunAsync(args[1], args[2]),
+        "--icon-recognition" when args.Length == 3 =>
+            await ChampionIconComparison.RunRecognitionAsync(args[1], args[2]),
         "--model-raw" when args.Length >= 2 =>
             await DeeperLeagueComparison.RunOnFramesAsync(
                 args.Skip(1),
