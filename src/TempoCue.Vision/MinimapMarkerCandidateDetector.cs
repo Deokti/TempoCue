@@ -11,6 +11,9 @@ internal static class MinimapMarkerCandidateDetector
     private const int BytesPerPixel = 4;
     private const byte Ally = 1;
     private const byte Enemy = 2;
+    // Значение выбрано так, чтобы посещённые классы (класс + VisitedOffset)
+    // не пересекались с самими классами: 1/2/5 -> 3/4/7.
+    private const byte Bright = 5;
     private const byte VisitedOffset = 2;
     private const int MinimumSide = 5;
     private const int MaximumSide = 32;
@@ -18,7 +21,18 @@ internal static class MinimapMarkerCandidateDetector
     private const double MinimumAspectRatio = 0.55;
     private const double MinimumDensity = 0.12;
     private const double MaximumDensity = 0.72;
+
+    /// <summary>
+    /// Свечение отзыва, подсветки активного игрока или фонтана — от тонкой
+    /// дуги до плотной заливки, поэтому для яркого класса снижается только
+    /// нижний порог плотности. Плотный яркий текст таймеров и похожие элементы
+    /// интерфейса отклоняются отрицательными эталонами на этапе сопоставления.
+    /// </summary>
+    private const double MinimumGlowDensity = 0.05;
     private const double MinimumConfidence = 0.35;
+
+    /// <summary>Порог «яркого» пикселя свечения: белёсый цвет без командного оттенка.</summary>
+    private const int BrightMinimumChannel = 150;
 
     public static MinimapMarkerCandidate[] Detect(
         ReadOnlySpan<byte> pixels,
@@ -37,7 +51,7 @@ internal static class MinimapMarkerCandidateDetector
             for (var index = 0; index < pixelCount; index++)
             {
                 var affiliation = classifications[index];
-                if (affiliation is not Ally and not Enemy)
+                if (affiliation is not Ally and not Enemy and not Bright)
                 {
                     continue;
                 }
@@ -90,18 +104,26 @@ internal static class MinimapMarkerCandidateDetector
         }
     }
 
-    private static byte Classify(byte blue, byte green, byte red)
+    internal static byte Classify(byte blue, byte green, byte red)
     {
         if (red >= 145 && red - green >= 45 && red - blue >= 25)
         {
             return Enemy;
         }
 
-        return blue >= 135 &&
-               green >= 85 &&
-               blue - red >= 35 &&
-               green - red >= 15
-            ? Ally
+        if (blue >= 135 &&
+            green >= 85 &&
+            blue - red >= 35 &&
+            green - red >= 15)
+        {
+            return Ally;
+        }
+
+        // Белёсое свечение отзыва и подсветки активного игрока: ярко по всем
+        // каналам, но без командного оттенка. Такой значок не имеет цветного
+        // контура и без этого класса вовсе не получал области сравнения.
+        return Math.Min(blue, Math.Min(green, red)) >= BrightMinimumChannel
+            ? Bright
             : (byte)0;
     }
 
@@ -179,8 +201,10 @@ internal static class MinimapMarkerCandidateDetector
 
         var aspectRatio = minimumSide / (double)maximumSide;
         var density = component.ColoredPixels / (double)(component.Width * component.Height);
+        var minimumDensity = affiliation == Bright ? MinimumGlowDensity : MinimumDensity;
         if (aspectRatio < MinimumAspectRatio ||
-            density is < MinimumDensity or > MaximumDensity)
+            density < minimumDensity ||
+            density > MaximumDensity)
         {
             return null;
         }
@@ -198,9 +222,12 @@ internal static class MinimapMarkerCandidateDetector
             component.Y,
             component.Width,
             component.Height,
-            affiliation == Ally
-                ? MinimapMarkerAffiliation.Ally
-                : MinimapMarkerAffiliation.Enemy,
+            affiliation switch
+            {
+                Ally => MinimapMarkerAffiliation.Ally,
+                Enemy => MinimapMarkerAffiliation.Enemy,
+                _ => MinimapMarkerAffiliation.Unknown
+            },
             confidence);
     }
 

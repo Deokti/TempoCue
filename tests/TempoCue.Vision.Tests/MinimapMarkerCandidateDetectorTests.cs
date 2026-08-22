@@ -30,6 +30,66 @@ public sealed class MinimapMarkerCandidateDetectorTests
     }
 
     [Fact]
+    public void Detect_FindsLargeHollowGlowRingAsUnknownAffiliation()
+    {
+        var image = new BgraTestImage(80, 80, 24, 35, 29);
+        // Кольцо отзыва: крупная тонкая белёсая окружность без командного оттенка.
+        DrawRing(image, centerX: 40, centerY: 40, radius: 12, 235, 225, 210);
+
+        var candidates = MinimapMarkerCandidateDetector.Detect(
+            image.Pixels,
+            image.Width,
+            image.Height,
+            image.Stride);
+
+        var glow = Assert.Single(candidates);
+        Assert.Equal(MinimapMarkerAffiliation.Unknown, glow.Affiliation);
+        Assert.InRange(glow.Width, 20, 32);
+        Assert.InRange(glow.Height, 20, 32);
+    }
+
+    [Fact]
+    public void Detect_IgnoresDenseBrightShapes()
+    {
+        var image = new BgraTestImage(80, 80, 24, 35, 29);
+        // Плотный яркий блок — текст таймера, а не полое кольцо свечения.
+        image.DrawFilledRectangle(x: 10, y: 10, width: 12, height: 10, 235, 235, 235);
+
+        var candidates = MinimapMarkerCandidateDetector.Detect(
+            image.Pixels,
+            image.Width,
+            image.Height,
+            image.Stride);
+
+        Assert.DoesNotContain(candidates, candidate =>
+            candidate.Affiliation == MinimapMarkerAffiliation.Unknown);
+    }
+
+    private static void DrawRing(
+        BgraTestImage image,
+        int centerX,
+        int centerY,
+        int radius,
+        byte blue,
+        byte green,
+        byte red)
+    {
+        for (var y = centerY - radius - 1; y <= centerY + radius + 1; y++)
+        {
+            for (var x = centerX - radius - 1; x <= centerX + radius + 1; x++)
+            {
+                var deltaX = x - centerX;
+                var deltaY = y - centerY;
+                var distance = Math.Sqrt((deltaX * deltaX) + (deltaY * deltaY));
+                if (distance >= radius - 1 && distance <= radius + 1)
+                {
+                    image.SetPixel(x, y, blue, green, red);
+                }
+            }
+        }
+    }
+
+    [Fact]
     public void Detect_RejectsIncompleteImage()
     {
         var exception = Assert.Throws<ArgumentException>(() =>

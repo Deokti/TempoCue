@@ -9,6 +9,8 @@
       "championId": "Sett", "affiliation": "Ally" },
     { "x": 126, "y": 157, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Malzahar", "affiliation": "Ally" },
+    { "x": 22, "y": 288, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Morgana", "affiliation": "Ally" },
     { "x": 104, "y": 199, "width": 16, "height": 16, "kind": "Tower",
       "affiliation": "Ally" },
     { "x": 86, "y": 202, "width": 14, "height": 16, "kind": "MinionWave",
