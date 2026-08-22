@@ -233,6 +233,39 @@ public sealed class OverlayNotificationSchedulerTests
             snapshot.Items.Select(item => item.Notification.Key));
     }
 
+    [Fact]
+    public void Publish_ShowsRepeatedMapAwarenessEventOnlyOncePerSuppressionInterval()
+    {
+        // Появление вражеского лесника использует стабильный ключ участника,
+        // поэтому повторное событие не должно превращаться во вторую карточку,
+        // пока не истечёт окно подавления.
+        const string key = "map-awareness:jungle:enemy-jungle:appeared";
+        var scheduler = new OverlayNotificationScheduler();
+        var suppression = new OverlayDisplayPolicy().DuplicateSuppressionInterval;
+
+        scheduler.Publish(Create(key, OverlayNotificationTone.Danger), Start);
+        Assert.Single(scheduler.Current.Items);
+
+        // Повтор, пока карточка ещё на экране: обновляет её, а не добавляет вторую.
+        scheduler.Publish(
+            Create(key, OverlayNotificationTone.Danger),
+            Start.AddSeconds(2));
+        Assert.Single(scheduler.Current.Items);
+
+        // Карточка уже исчезла по времени жизни, но окно подавления не истекло:
+        // повторное появление того же лесника не показывается вовсе.
+        var beforeWindowEnds = Start + suppression - TimeSpan.FromSeconds(1);
+        scheduler.Publish(Create(key, OverlayNotificationTone.Danger), beforeWindowEnds);
+        Assert.Empty(scheduler.Current.Items);
+
+        // После окна подавления настоящее повторное появление снова показывается.
+        var afterWindowEnds = Start + suppression + TimeSpan.FromSeconds(1);
+        scheduler.Publish(Create(key, OverlayNotificationTone.Danger), afterWindowEnds);
+        Assert.Equal(
+            [key],
+            scheduler.Current.Items.Select(item => item.Notification.Key));
+    }
+
     private static OverlayNotification Create(
         string key,
         OverlayNotificationTone tone,
