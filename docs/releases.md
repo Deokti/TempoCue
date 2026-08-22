@@ -36,6 +36,22 @@ powershell -ExecutionPolicy Bypass -File .\scripts\build-release.ps1
 .\scripts\build-release.ps1 -InnoCompilerPath 'C:\Tools\Inno Setup 6\ISCC.exe'
 ```
 
+## Веса экспериментальной модели
+
+По умолчанию веса DeeperLeague в выпуск **не попадают**, даже если лежат в
+`models\deeperleague`. Они обучены через Ultralytics с лицензией AGPL-3.0, а
+выпуск, который куда-то передаётся, — это распространение со всеми его
+обязательствами.
+
+Сборка для собственных машин может включить их явно:
+
+```powershell
+.\scripts\build-release.ps1 -IncludeExperimentalModel
+```
+
+Такой файл нельзя выкладывать на страницу релиза: копия на свой второй
+компьютер распространением не является, публикация — является.
+
 ## Публикация на GitHub
 
 1. Открыть тег нужной версии и создать GitHub Release.

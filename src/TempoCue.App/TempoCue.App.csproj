@@ -15,8 +15,13 @@
     Веса сторонней модели не входят в репозиторий, поэтому копируются в сборку
     только если лежат локально. Их отсутствие не ломает сборку: приложение просто
     остаётся на штатном распознавателе.
+
+    Свойство IncludeExperimentalModel=false исключает веса из сборки. Оно нужно
+    выпуску: веса обучены через Ultralytics с лицензией AGPL-3.0, и передача
+    файлов посторонним — это распространение со всеми его обязательствами.
+    Копия на собственный второй компьютер распространением не является.
   -->
-  <ItemGroup Condition="Exists('$(MSBuildProjectDirectory)\..\..\models\deeperleague')">
+  <ItemGroup Condition="Exists('$(MSBuildProjectDirectory)\..\..\models\deeperleague') And '$(IncludeExperimentalModel)' != 'false'">
     <None Include="..\..\models\deeperleague\**" LinkBase="deeperleague" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 

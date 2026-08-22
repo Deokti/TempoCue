@@ -1,6 +1,12 @@
 [CmdletBinding()]
 param(
-    [string] $InnoCompilerPath
+    [string] $InnoCompilerPath,
+
+    # Веса сторонней модели обучены через Ultralytics с лицензией AGPL-3.0.
+    # Выпуск, который куда-то передаётся, — это распространение, поэтому по
+    # умолчанию веса в него не попадают. Ключ нужен только для сборки, которая
+    # останется на своих машинах.
+    [switch] $IncludeExperimentalModel
 )
 
 $ErrorActionPreference = 'Stop'
@@ -49,13 +55,20 @@ dotnet publish $applicationProject `
     --self-contained true `
     --no-restore `
     --output $publishDirectory `
-    -p:PublishProfile=$publishProfile
+    -p:PublishProfile=$publishProfile `
+    "-p:IncludeExperimentalModel=$($IncludeExperimentalModel.IsPresent.ToString().ToLowerInvariant())"
 if ($LASTEXITCODE -ne 0) {
     throw 'Application publish failed.'
 }
 
 Write-Host 'Creating portable ZIP...'
 Compress-Archive -Path (Join-Path $publishDirectory '*') -DestinationPath $zipPath -CompressionLevel Optimal
+
+# Сжатие уже однажды завершилось молча, не создав архив, и выпуск оказался
+# неполным. Отсутствие файла должно ломать сборку, а не обнаруживаться потом.
+if (-not (Test-Path -LiteralPath $zipPath)) {
+    throw "Portable ZIP was not created at $zipPath."
+}
 
 if ([string]::IsNullOrWhiteSpace($InnoCompilerPath)) {
     $compilerCandidates = @(
