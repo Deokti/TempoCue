@@ -101,6 +101,7 @@ internal static class DeeperLeagueComparison
         var ours = new Totals();
         var theirs = new Totals();
         var elapsed = new List<double>();
+        var ourElapsed = new List<double>();
 
         foreach (var path in ReplaySampleFile.EnumerateCorpus(corpusDirectory))
         {
@@ -112,7 +113,10 @@ internal static class DeeperLeagueComparison
             var sample = await ReplaySampleFile.LoadAsync(path);
             var unsupported = FindUnsupportedChampions(sample, truth);
 
+            var ourStopwatch = Stopwatch.StartNew();
             var ourOutcome = runner.Run(sample).Actual;
+            ourStopwatch.Stop();
+            ourElapsed.Add(ourStopwatch.Elapsed.TotalMilliseconds);
             var stopwatch = Stopwatch.StartNew();
             var theirCandidates = model.Recognize(
                 sample.BgraPixels.Span,
@@ -180,15 +184,23 @@ internal static class DeeperLeagueComparison
         Console.WriteLine("=== ИТОГО ПО КОРПУСУ ===");
         Console.WriteLine($"  наш:          {ours}");
         Console.WriteLine($"  DeeperLeague: {theirs}");
-        if (elapsed.Count > 0)
-        {
-            var sorted = elapsed.OrderBy(static value => value).ToArray();
-            Console.WriteLine(
-                $"  время инференса: медиана {sorted[sorted.Length / 2]:F0} мс, " +
-                $"максимум {sorted[^1]:F0} мс");
-        }
+        PrintTiming("нашего распознавания", ourElapsed);
+        PrintTiming("инференса модели", elapsed);
 
         return 0;
+    }
+
+    private static void PrintTiming(string label, List<double> samples)
+    {
+        if (samples.Count == 0)
+        {
+            return;
+        }
+
+        var sorted = samples.OrderBy(static value => value).ToArray();
+        Console.WriteLine(
+            $"  время {label}: медиана {sorted[sorted.Length / 2]:F1} мс, " +
+            $"максимум {sorted[^1]:F1} мс");
     }
 
     /// <summary>

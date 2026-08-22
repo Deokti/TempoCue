@@ -25,6 +25,8 @@ try
             await CorpusStatistics.PrintReferenceBaselinesAsync(args[1]),
         "--margin" when args.Length == 2 =>
             await CorpusStatistics.PrintNegativeMarginsAsync(args[1]),
+        "--timing" when args.Length is 2 or 3 =>
+            await RecognitionTiming.RunAsync(args[1], args.Length == 3 ? args[2] : null),
         "--compare" when args.Length == 2 =>
             await DeeperLeagueComparison.RunAsync(args[1]),
         "--model" when args.Length >= 2 =>
@@ -85,6 +87,10 @@ static void PrintUsage()
 
           ReplayInspect --margin <каталог корпуса>
               запас лучшего балла над отрицательными эталонами
+
+          ReplayInspect --timing <каталог корпуса> [<каталог модели>]
+              стоимость одного кадра в установившемся режиме и частота, которую
+              эта стоимость позволяет; каталог модели необязателен
 
           ReplayInspect --compare <каталог корпуса>
               сравнение основного распознавателя и модели DeeperLeague на одной
