@@ -11,6 +11,8 @@
       "championId": "Lulu", "affiliation": "Ally" },
     { "x": 246, "y": 271, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Jinx", "affiliation": "Ally" },
+    { "x": 235, "y": 250, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Fiddlesticks", "affiliation": "Ally" },
     { "x": 159, "y": 107, "width": 16, "height": 16, "kind": "Other" },
     { "x": 30, "y": 257, "width": 22, "height": 22, "kind": "Tower",
       "affiliation": "Ally" }
