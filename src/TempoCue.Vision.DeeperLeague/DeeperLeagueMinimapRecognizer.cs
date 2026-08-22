@@ -17,8 +17,16 @@ public sealed class DeeperLeagueMinimapRecognizer : IDisposable
     private const double DefaultMinimumConfidence = 0.25;
     private const double DefaultMaximumOverlap = 0.45;
 
+    /// <summary>
+    /// Порог сходства со статичным объектом, начиная с которого предсказание
+    /// отклоняется. Значение подобрано по корпусу и требует перепроверки при
+    /// пополнении набора отрицательных эталонов.
+    /// </summary>
+    private const double StaticObjectRejectionSimilarity = 0.86;
+
     private readonly InferenceSession _session;
     private readonly DeeperLeagueChampionMap _championMap;
+    private readonly StaticObjectFilter? _staticObjectFilter;
     private readonly string _inputName;
     private readonly double _minimumConfidence;
     private readonly double _maximumOverlap;
@@ -30,8 +38,10 @@ public sealed class DeeperLeagueMinimapRecognizer : IDisposable
         string modelPath,
         string championMapPath,
         double minimumConfidence = DefaultMinimumConfidence,
-        double maximumOverlap = DefaultMaximumOverlap)
+        double maximumOverlap = DefaultMaximumOverlap,
+        bool rejectStaticObjects = true)
     {
+        _staticObjectFilter = rejectStaticObjects ? new StaticObjectFilter() : null;
         if (!File.Exists(modelPath))
         {
             throw new FileNotFoundException($"Файл модели не найден: {modelPath}");
@@ -85,6 +95,10 @@ public sealed class DeeperLeagueMinimapRecognizer : IDisposable
             _maximumOverlap);
 
         var rosterSides = BuildRosterSides(roster);
+        var portraits = roster.ToDictionary(
+            static reference => reference.ChampionId,
+            static reference => reference,
+            StringComparer.OrdinalIgnoreCase);
         var scaleX = width / (double)NetworkSide;
         var scaleY = height / (double)NetworkSide;
         var candidates = new List<MinimapChampionMarkerCandidate>(detections.Count);
@@ -101,6 +115,24 @@ public sealed class DeeperLeagueMinimapRecognizer : IDisposable
             var boxHeight = Math.Max(1, (int)Math.Round(detection.Height * scaleY));
             var x = (int)Math.Round((detection.CenterX * scaleX) - (boxWidth / 2d));
             var y = (int)Math.Round((detection.CenterY * scaleY) - (boxHeight / 2d));
+
+            // Модель обучалась на синтетике и не видела части элементов интерфейса:
+            // круглые значки базы она уверенно принимает за чемпионов. Наши
+            // отрицательные эталоны отсекают их, не трогая настоящие портреты.
+            if (_staticObjectFilter is not null &&
+                portraits.TryGetValue(championId, out var portrait) &&
+                _staticObjectFilter.ResemblesStaticObjectMoreThanPortrait(
+                    canonicalFrame,
+                    width,
+                    height,
+                    stride,
+                    (int)Math.Round(detection.CenterX * scaleX),
+                    (int)Math.Round(detection.CenterY * scaleY),
+                    portrait))
+            {
+                continue;
+            }
+
             candidates.Add(new MinimapChampionMarkerCandidate(
                 Math.Clamp(x, 0, Math.Max(0, width - boxWidth)),
                 Math.Clamp(y, 0, Math.Max(0, height - boxHeight)),
@@ -128,6 +160,7 @@ public sealed class DeeperLeagueMinimapRecognizer : IDisposable
 
         _isDisposed = true;
         _session.Dispose();
+        _staticObjectFilter?.Dispose();
     }
 
     /// <summary>
