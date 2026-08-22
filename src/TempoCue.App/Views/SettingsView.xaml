@@ -107,7 +107,8 @@
                         </StackPanel>
                         <ComboBox x:Name="RecognitionThreadsSelector"
                                   Grid.Column="1"
-                                  Width="180"
+                                  Style="{StaticResource SettingsLanguageComboBox}"
+                                  Width="240"
                                   VerticalAlignment="Center"
                                   Margin="16,0,0,0"
                                   ItemsSource="{Binding MinimapRecognitionThreadOptions}"
@@ -119,9 +120,12 @@
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                             <!-- Подсказка висит на самом варианте: она нужна при
-                                 выборе, то есть до того, как вариант применён. -->
+                                 выборе, то есть до того, как вариант применён.
+                                 Стиль наследуется от общего, иначе список потерял бы
+                                 оформление вместе с заменой ItemContainerStyle. -->
                             <ComboBox.ItemContainerStyle>
-                                <Style TargetType="ComboBoxItem">
+                                <Style TargetType="ComboBoxItem"
+                                       BasedOn="{StaticResource SettingsLanguageComboBoxItem}">
                                     <Setter Property="ToolTip" Value="{Binding HintText}" />
                                     <Setter Property="ToolTipService.ShowDuration" Value="30000" />
                                 </Style>

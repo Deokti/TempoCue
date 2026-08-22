@@ -50,6 +50,11 @@ public sealed class SettingsRecognitionThreadsViewTests
 
                 var selector = WpfTestHost.Find<ComboBox>(view, "RecognitionThreadsSelector");
                 Assert.Equal(viewModel.MinimapRecognitionThreadOptions.Count, selector.Items.Count);
+
+                // Список обязан выглядеть как остальные списки настроек. Обычный
+                // ComboBox приносит светлую системную тему и выбивается из окна.
+                var languageSelector = WpfTestHost.Find<ComboBox>(view, "LanguageComboBox");
+                Assert.Same(languageSelector.Style, selector.Style);
                 Assert.Equal(
                     MinimapRecognitionThreadOptionViewModel.AutomaticThreads,
                     selector.SelectedValue);
