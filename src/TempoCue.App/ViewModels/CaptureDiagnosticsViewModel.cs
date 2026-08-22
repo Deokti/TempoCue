@@ -139,6 +139,26 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         ? _snapshot.SelectionFramesPerSecond.ToString("N1", CultureInfo.CurrentCulture)
         : _localization.Get("Settings.Capture.Value.NotAvailable");
 
+    /// <summary>
+    /// Ограничение частоты разбора — потолок, а не факт: дорогой кадр не даёт его
+    /// достичь. Подпись называет потолок, значение — то, что получилось.
+    /// </summary>
+    public string RecognitionFramesPerSecondLabelText => string.Format(
+        CultureInfo.CurrentCulture,
+        _localization.Get("Settings.Capture.RecognitionFps.Label"),
+        _snapshot.RecognitionFrameRateLimit);
+
+    public string RecognitionFramesPerSecondText => _snapshot.RecognitionDurationMilliseconds > 0
+        ? _snapshot.RecognitionFramesPerSecond.ToString("N1", CultureInfo.CurrentCulture)
+        : _localization.Get("Settings.Capture.Value.NotAvailable");
+
+    public string RecognitionDurationText => _snapshot.RecognitionDurationMilliseconds > 0
+        ? string.Format(
+            CultureInfo.CurrentCulture,
+            _localization.Get("Settings.Capture.RecognitionDuration.Value"),
+            _snapshot.RecognitionDurationMilliseconds)
+        : _localization.Get("Settings.Capture.Value.NotAvailable");
+
     public string ReceivedFrameCountText =>
         _snapshot.ReceivedFrameCount.ToString("N0", CultureInfo.CurrentCulture);
 
@@ -392,6 +412,9 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(FramesPerSecondText));
         OnPropertyChanged(nameof(SelectionFramesPerSecondLabelText));
         OnPropertyChanged(nameof(SelectionFramesPerSecondText));
+        OnPropertyChanged(nameof(RecognitionFramesPerSecondLabelText));
+        OnPropertyChanged(nameof(RecognitionFramesPerSecondText));
+        OnPropertyChanged(nameof(RecognitionDurationText));
         OnPropertyChanged(nameof(ReceivedFrameCountText));
         OnPropertyChanged(nameof(SelectedFrameCountText));
         OnPropertyChanged(nameof(RateLimitedFrameCountText));
@@ -451,6 +474,9 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(FramesPerSecondText));
         OnPropertyChanged(nameof(SelectionFramesPerSecondLabelText));
         OnPropertyChanged(nameof(SelectionFramesPerSecondText));
+        OnPropertyChanged(nameof(RecognitionFramesPerSecondLabelText));
+        OnPropertyChanged(nameof(RecognitionFramesPerSecondText));
+        OnPropertyChanged(nameof(RecognitionDurationText));
         OnPropertyChanged(nameof(ReceivedFrameCountText));
         OnPropertyChanged(nameof(SelectedFrameCountText));
         OnPropertyChanged(nameof(RateLimitedFrameCountText));

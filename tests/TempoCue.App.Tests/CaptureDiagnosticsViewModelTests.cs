@@ -144,6 +144,51 @@ public sealed class CaptureDiagnosticsViewModelTests
         });
     }
 
+    [Fact]
+    public void Refresh_ShowsActualAnalysisRateInsteadOfRepeatingTheLimit()
+    {
+        WpfTestHost.Run(() =>
+        {
+            var localization = LocalizationService.Instance;
+            var initialLanguage = localization.CurrentLanguageCode;
+            var session = new TestWindowCaptureSession();
+
+            try
+            {
+                localization.SetLanguage("ru-RU");
+                using var viewModel = new CaptureDiagnosticsViewModel(
+                    session,
+                    isSupported: true,
+                    localization);
+
+                // До первого разбора показывать нечего: ноль миллисекунд означал бы
+                // мгновенное распознавание, а на деле его ещё не было.
+                viewModel.Refresh();
+                Assert.Equal("Нет данных", viewModel.RecognitionDurationText);
+                Assert.Equal("Нет данных", viewModel.RecognitionFramesPerSecondText);
+
+                session.SetSnapshot(TestCaptureDiagnosticsSnapshot.Create(
+                    state: CaptureSessionState.Capturing,
+                    recognitionFrameRateLimit: 8,
+                    recognitionFramesPerSecond: 5.4,
+                    recognitionDurationMilliseconds: 184.2));
+                viewModel.Refresh();
+
+                // Подпись называет потолок, значение — то, что получилось. Если
+                // разбор дороже интервала, эти числа обязаны расходиться.
+                Assert.Equal("FPS разбора карты (лимит 8)", viewModel.RecognitionFramesPerSecondLabelText);
+                Assert.Equal(
+                    5.4.ToString("N1", CultureInfo.CurrentCulture),
+                    viewModel.RecognitionFramesPerSecondText);
+                Assert.Equal("184 мс", viewModel.RecognitionDurationText);
+            }
+            finally
+            {
+                localization.SetLanguage(initialLanguage);
+            }
+        });
+    }
+
     private static MinimapPreviewSnapshot CreatePreview() =>
         new(
             X: 1918,

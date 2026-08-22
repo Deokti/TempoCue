@@ -1045,6 +1045,9 @@
   <data name="Settings.Capture.Frames.Label" xml:space="preserve"><value>Frames received</value></data>
   <data name="Settings.Capture.LastFrame.Label" xml:space="preserve"><value>Last frame</value></data>
   <data name="Settings.Capture.SelectionFps.Label" xml:space="preserve"><value>Selection FPS (limit {0})</value></data>
+  <data name="Settings.Capture.RecognitionFps.Label" xml:space="preserve"><value>Map analysis FPS (limit {0})</value></data>
+  <data name="Settings.Capture.RecognitionDuration.Label" xml:space="preserve"><value>Frame analysis time</value></data>
+  <data name="Settings.Capture.RecognitionDuration.Value" xml:space="preserve"><value>{0:N0} ms</value></data>
   <data name="Settings.Capture.SelectedFrames.Label" xml:space="preserve"><value>Frames selected</value></data>
   <data name="Settings.Capture.RateLimitedFrames.Label" xml:space="preserve"><value>Skipped by limiter</value></data>
   <data name="Settings.Capture.Minimap.Title" xml:space="preserve"><value>Detected minimap</value></data>

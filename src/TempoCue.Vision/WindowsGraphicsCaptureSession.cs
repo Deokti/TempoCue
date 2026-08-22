@@ -85,6 +85,9 @@ public sealed class WindowsGraphicsCaptureSession :
                     metrics.SelectedFrameCount,
                     metrics.SelectionFramesPerSecond,
                     metrics.RateLimitedFrameCount,
+                    metrics.RecognitionFrameRateLimit,
+                    metrics.RecognitionFramesPerSecond,
+                    metrics.RecognitionDurationMilliseconds,
                     metrics.LastFrameAt,
                     _minimapPreview,
                     _minimapPreviewErrorMessage,
@@ -615,6 +618,10 @@ public sealed class WindowsGraphicsCaptureSession :
         {
             return;
         }
+
+        // Учитывается и неудачный разбор: он тоже занимает поток и тоже определяет,
+        // с какой частотой приходят наблюдения.
+        _frameMetrics.RegisterRecognition(result.Duration, Stopwatch.GetTimestamp());
 
         if (result.ErrorMessage is not null)
         {

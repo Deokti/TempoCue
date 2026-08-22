@@ -7,6 +7,8 @@ internal sealed class CaptureFrameMetrics
     private readonly FrameSelectionGate _frameSelection;
     private readonly FrameRateEstimator _selectionFrameRate = new();
     private readonly FrameSelectionGate _previewSelection;
+    private readonly FrameRateEstimator _recognitionFrameRate = new();
+    private readonly RecognitionDurationEstimator _recognitionDuration = new();
     private int _frameWidth;
     private int _frameHeight;
     private long _receivedFrameCount;
@@ -38,6 +40,9 @@ internal sealed class CaptureFrameMetrics
                 Interlocked.Read(ref _selectedFrameCount),
                 _selectionFrameRate.FramesPerSecond,
                 Interlocked.Read(ref _rateLimitedFrameCount),
+                _previewSelection.MaximumFramesPerSecond,
+                _recognitionFrameRate.FramesPerSecond,
+                _recognitionDuration.AverageMilliseconds,
                 lastFrameTicks == 0
                     ? null
                     : new DateTimeOffset(lastFrameTicks, TimeSpan.Zero),
@@ -83,6 +88,17 @@ internal sealed class CaptureFrameMetrics
             sizeChanged);
     }
 
+    /// <summary>
+    /// Учитывает завершённое распознавание кадра. Ограничение частоты разбора —
+    /// это потолок, а не факт: если кадр обходится дороже интервала, фактическая
+    /// частота оказывается ниже, и человек должен видеть именно её.
+    /// </summary>
+    public void RegisterRecognition(TimeSpan duration, long timestamp)
+    {
+        _recognitionFrameRate.RegisterFrame(timestamp);
+        _recognitionDuration.Register(duration);
+    }
+
     public void SetInitialFrameSize(int width, int height)
     {
         Volatile.Write(ref _frameWidth, width);
@@ -108,6 +124,8 @@ internal sealed class CaptureFrameMetrics
         _frameSelection.Reset();
         _selectionFrameRate.Reset();
         _previewSelection.Reset();
+        _recognitionFrameRate.Reset();
+        _recognitionDuration.Reset();
     }
 }
 
@@ -120,6 +138,9 @@ internal sealed record CaptureFrameMetricsSnapshot(
     long SelectedFrameCount,
     double SelectionFramesPerSecond,
     long RateLimitedFrameCount,
+    int RecognitionFrameRateLimit,
+    double RecognitionFramesPerSecond,
+    double RecognitionDurationMilliseconds,
     DateTimeOffset? LastFrameAt,
     DateTimeOffset? CaptureStartedAt);
 

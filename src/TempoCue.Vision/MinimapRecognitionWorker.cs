@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Threading.Channels;
 
 namespace TempoCue.Vision;
@@ -79,6 +80,7 @@ internal sealed class MinimapRecognitionWorker : IAsyncDisposable
             .ConfigureAwait(false))
         {
             RecognitionWorkResult result;
+            var stopwatch = Stopwatch.StartNew();
             try
             {
                 var recognition = _analyzer.Analyze(
@@ -99,6 +101,7 @@ internal sealed class MinimapRecognitionWorker : IAsyncDisposable
                     recognizedPreview,
                     item.ChampionReferences,
                     item.Generation,
+                    stopwatch.Elapsed,
                     null);
             }
             catch (Exception exception)
@@ -107,6 +110,7 @@ internal sealed class MinimapRecognitionWorker : IAsyncDisposable
                     item.Preview,
                     item.ChampionReferences,
                     item.Generation,
+                    stopwatch.Elapsed,
                     exception.Message);
             }
 
@@ -123,8 +127,13 @@ internal sealed class MinimapRecognitionWorker : IAsyncDisposable
         int Generation);
 }
 
+/// <param name="Duration">
+/// Сколько заняло распознавание кадра. Показывается в диагностике: без этого
+/// числа настройка числа потоков остаётся слепой.
+/// </param>
 internal sealed record RecognitionWorkResult(
     MinimapPreviewSnapshot Preview,
     MinimapChampionReference[] ChampionReferences,
     int Generation,
+    TimeSpan Duration,
     string? ErrorMessage);
