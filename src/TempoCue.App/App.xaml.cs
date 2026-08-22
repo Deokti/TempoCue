@@ -11,6 +11,7 @@ using TempoCue.Core;
 using TempoCue.Overlay;
 using TempoCue.Riot;
 using TempoCue.Vision;
+using TempoCue.Vision.DeeperLeague;
 
 namespace TempoCue.App;
 
@@ -138,7 +139,8 @@ public partial class App : System.Windows.Application
             _overlayPresenter,
             overlaySettings,
             LocalizationService.Instance);
-        _windowCaptureSession = new WindowsGraphicsCaptureSession();
+        _windowCaptureSession = new WindowsGraphicsCaptureSession(
+            CreateExperimentalFrameAnalyzer(settings));
         _championPortraitReferenceLoader = new ChampionPortraitReferenceLoader();
         _activeMatchVisionCoordinator = new ActiveMatchVisionCoordinator(
             _activeMatchMonitor,
@@ -343,6 +345,38 @@ public partial class App : System.Windows.Application
         string resourceSuffix,
         OverlayNotificationTone tone) =>
         OverlayPreviewNotificationFactory.Create(localization, resourceSuffix, tone);
+
+    /// <summary>
+    /// Создаёт экспериментальный распознаватель, если он включён в настройках и его
+    /// файлы лежат рядом с приложением. Отсутствие файлов не является ошибкой:
+    /// сборка без них просто работает на штатном конвейере.
+    /// </summary>
+    private static IMinimapFrameAnalyzer? CreateExperimentalFrameAnalyzer(AppSettings settings)
+    {
+        if (!settings.UseExperimentalMinimapRecognizer)
+        {
+            return null;
+        }
+
+        var modelDirectory = DeeperLeagueFrameAnalyzer.FindModelDirectory();
+        if (modelDirectory is null)
+        {
+            Debug.WriteLine(
+                "Экспериментальное распознавание включено, но файлы модели не найдены.");
+            return null;
+        }
+
+        try
+        {
+            return new DeeperLeagueFrameAnalyzer(modelDirectory);
+        }
+        catch (Exception exception)
+        {
+            // Неудачная загрузка модели не должна лишать пользователя распознавания.
+            Debug.WriteLine($"Не удалось загрузить экспериментальную модель: {exception}");
+            return null;
+        }
+    }
 
     // Освобождение выполняется в обратном порядке владения долгоживущими объектами.
     protected override void OnExit(ExitEventArgs e)

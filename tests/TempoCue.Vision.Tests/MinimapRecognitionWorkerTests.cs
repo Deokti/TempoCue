@@ -8,10 +8,11 @@ public sealed class MinimapRecognitionWorkerTests
     public async Task TrySubmit_DropsStalePendingFrameWhileRecognitionIsBusy()
     {
         var recognizer = new BlockingRecognizer();
+        var analyzer = new DefaultMinimapFrameAnalyzer(recognizer);
         var completedGenerations = new ConcurrentQueue<int>();
         var twoResultsReceived = new TaskCompletionSource(
             TaskCreationOptions.RunContinuationsAsynchronously);
-        await using var worker = new MinimapRecognitionWorker(recognizer, result =>
+        await using var worker = new MinimapRecognitionWorker(analyzer, result =>
         {
             completedGenerations.Enqueue(result.Generation);
             if (completedGenerations.Count == 2)

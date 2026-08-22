@@ -43,8 +43,19 @@ public sealed class WindowsGraphicsCaptureSession :
     public event EventHandler<MinimapChampionObservationEventArgs>? ObservationAvailable;
 
     public WindowsGraphicsCaptureSession()
+        : this(null)
     {
-        _recognitionWorker = new MinimapRecognitionWorker(CompleteMinimapRecognition);
+    }
+
+    /// <summary>
+    /// Позволяет composition root выбрать способ распознавания, не меняя захват.
+    /// Значение по умолчанию — штатный конвейер на цветных контурах и эталонах.
+    /// </summary>
+    public WindowsGraphicsCaptureSession(IMinimapFrameAnalyzer? analyzer)
+    {
+        _recognitionWorker = new MinimapRecognitionWorker(
+            analyzer ?? new DefaultMinimapFrameAnalyzer(),
+            CompleteMinimapRecognition);
     }
 
     public CaptureDiagnosticsSnapshot Snapshot

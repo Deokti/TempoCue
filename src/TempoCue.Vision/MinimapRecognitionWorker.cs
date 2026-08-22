@@ -9,25 +9,22 @@ namespace TempoCue.Vision;
 internal sealed class MinimapRecognitionWorker : IAsyncDisposable
 {
     private readonly Channel<RecognitionWorkItem> _pendingFrames;
-    private readonly IMinimapChampionRecognizer _championRecognizer;
-    private readonly MinimapRecognitionPipeline _pipeline;
+    private readonly IMinimapFrameAnalyzer _analyzer;
     private readonly Action<RecognitionWorkResult> _completed;
     private readonly CancellationTokenSource _stopping = new();
     private readonly Task _processingTask;
     private int _disposeState;
 
     public MinimapRecognitionWorker(Action<RecognitionWorkResult> completed)
-        : this(new OpenCvMinimapChampionRecognizer(), completed)
+        : this(new DefaultMinimapFrameAnalyzer(), completed)
     {
     }
 
-    internal MinimapRecognitionWorker(
-        IMinimapChampionRecognizer championRecognizer,
+    public MinimapRecognitionWorker(
+        IMinimapFrameAnalyzer analyzer,
         Action<RecognitionWorkResult> completed)
     {
-        _championRecognizer = championRecognizer ??
-            throw new ArgumentNullException(nameof(championRecognizer));
-        _pipeline = new MinimapRecognitionPipeline(championRecognizer);
+        _analyzer = analyzer ?? throw new ArgumentNullException(nameof(analyzer));
         _completed = completed ?? throw new ArgumentNullException(nameof(completed));
         _pendingFrames = Channel.CreateBounded<RecognitionWorkItem>(
             new BoundedChannelOptions(1)
@@ -72,7 +69,7 @@ internal sealed class MinimapRecognitionWorker : IAsyncDisposable
         finally
         {
             _stopping.Dispose();
-            (_championRecognizer as IDisposable)?.Dispose();
+            (_analyzer as IDisposable)?.Dispose();
         }
     }
 
@@ -84,7 +81,7 @@ internal sealed class MinimapRecognitionWorker : IAsyncDisposable
             RecognitionWorkResult result;
             try
             {
-                var recognition = _pipeline.Analyze(
+                var recognition = _analyzer.Analyze(
                     item.Preview.BgraPixels,
                     item.Preview.ImageWidth,
                     item.Preview.ImageHeight,
@@ -92,8 +89,8 @@ internal sealed class MinimapRecognitionWorker : IAsyncDisposable
                     item.ChampionReferences);
                 var recognizedPreview = item.Preview with
                 {
-                    MarkerCandidates = recognition.MarkerCandidates,
-                    ChampionProposalCount = recognition.ChampionProposalCount,
+                    MarkerCandidates = recognition.MarkerCandidates.ToArray(),
+                    ChampionProposalCount = recognition.ProposalCount,
                     ChampionMarkerCandidates = recognition.ChampionCandidates,
                     ChampionReferenceCount = item.ChampionReferences.Length,
                     MaximumIdentityConfidence = recognition.MaximumIdentityConfidence

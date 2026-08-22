@@ -7,6 +7,17 @@
     <ProjectReference Include="..\TempoCue.Overlay\TempoCue.Overlay.csproj" />
     <ProjectReference Include="..\TempoCue.Riot\TempoCue.Riot.csproj" />
     <ProjectReference Include="..\TempoCue.Vision\TempoCue.Vision.csproj" />
+    <!-- Экспериментальный распознаватель; включается только переключателем в настройках. -->
+    <ProjectReference Include="..\TempoCue.Vision.DeeperLeague\TempoCue.Vision.DeeperLeague.csproj" />
+  </ItemGroup>
+
+  <!--
+    Веса сторонней модели не входят в репозиторий, поэтому копируются в сборку
+    только если лежат локально. Их отсутствие не ломает сборку: приложение просто
+    остаётся на штатном распознавателе.
+  -->
+  <ItemGroup Condition="Exists('$(MSBuildProjectDirectory)\..\..\models\deeperleague')">
+    <None Include="..\..\models\deeperleague\**" LinkBase="deeperleague" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
