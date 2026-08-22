@@ -45,7 +45,11 @@ public sealed class AppSettingsService
                     return settings with
                     {
                         Language = LocalizationService.NormalizeLanguageCode(settings.Language),
-                        Overlay = (settings.Overlay ?? new OverlayUserSettings()).Normalize()
+                        Overlay = (settings.Overlay ?? new OverlayUserSettings()).Normalize(),
+                        // Отрицательное число потоков в подправленном вручную файле
+                        // не должно ронять запуск: оно означает «выбрать по машине».
+                        MinimapRecognitionThreads =
+                            Math.Max(0, settings.MinimapRecognitionThreads)
                     };
                 }
             }
@@ -97,6 +101,18 @@ public sealed class AppSettingsService
     {
         var current = Load();
         Save(current with { UseExperimentalMinimapRecognizer = isEnabled });
+    }
+
+    /// <summary>
+    /// Сохраняет число потоков распознавания. Применяется при следующем запуске по
+    /// той же причине, что и выбор распознавателя: он создаётся один раз вместе с
+    /// сессией захвата.
+    /// </summary>
+    public void SaveMinimapRecognitionThreads(int threads)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(threads);
+        var current = Load();
+        Save(current with { MinimapRecognitionThreads = threads });
     }
 
     private void Save(AppSettings settings)

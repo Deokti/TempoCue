@@ -852,6 +852,11 @@
   <data name="Settings.Experiment.Recognizer.Description" xml:space="preserve"><value>Использует стороннюю нейросетевую модель вместо встроенного распознавателя. Она чаще находит перекрытых и отзывающихся чемпионов, но иногда принимает значки базы за чемпионов. Без файлов модели TempoCue продолжает работать на встроенном распознавателе.</value></data>
   <data name="Settings.Experiment.Recognizer.UnsupportedChampions" xml:space="preserve"><value>Модель обучена на патче 13.14. Она не знает вышедших после него: Briar, Hwei, Smolder, Aurora, Ambessa, Mel, Yunara, Zaahen, Locke. У этих значок с тех пор перерисован, поэтому они могут не отслеживаться: Akshan, Jax, Leblanc, Rengar, Senna, Shyvana, Skarner, Syndra, Teemo, Viktor, XinZhao. Нераспознанные участники просто не показываются, за других модель их не принимает; остальные отслеживаются как обычно.</value></data>
   <data name="Settings.Experiment.Recognizer.RestartNotice" xml:space="preserve"><value>Выбор применяется после перезапуска TempoCue.</value></data>
+  <data name="Settings.Recognition.Threads.Title" xml:space="preserve"><value>Потоки распознавания карты</value></data>
+  <data name="Settings.Recognition.Threads.Description" xml:space="preserve"><value>Сколько участков карты TempoCue разбирает одновременно. Больше потоков — быстрее разбор кадра и раньше уведомления, но меньше процессора остаётся игре. На точность распознавания не влияет: меняется только скорость.</value></data>
+  <data name="Settings.Recognition.Threads.Automatic" xml:space="preserve"><value>Автоматически ({0})</value></data>
+  <data name="Settings.Recognition.Threads.Hint" xml:space="preserve"><value>Автоматический выбор берёт половину логических процессоров, оставляя вторую половину игре. Уменьшите значение, если игра стала идти хуже; увеличьте, если уведомления приходят с опозданием.</value></data>
+  <data name="Settings.Recognition.Threads.RestartNotice" xml:space="preserve"><value>Выбор применяется после перезапуска TempoCue.</value></data>
   <data name="Settings.Overlay.Preview.Button" xml:space="preserve"><value>Показать следующее уведомление</value></data>
   <data name="Settings.Overlay.Preview.Warning.Label" xml:space="preserve"><value>Осторожно</value></data>
   <data name="Settings.Overlay.Preview.Warning.Title" xml:space="preserve"><value>Соперник пропал с линии</value></data>

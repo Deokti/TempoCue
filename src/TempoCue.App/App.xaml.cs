@@ -140,7 +140,7 @@ public partial class App : System.Windows.Application
             overlaySettings,
             LocalizationService.Instance);
         _windowCaptureSession = new WindowsGraphicsCaptureSession(
-            CreateExperimentalFrameAnalyzer(settings));
+            CreateFrameAnalyzer(settings));
         _championPortraitReferenceLoader = new ChampionPortraitReferenceLoader();
         _activeMatchVisionCoordinator = new ActiveMatchVisionCoordinator(
             _activeMatchMonitor,
@@ -351,11 +351,15 @@ public partial class App : System.Windows.Application
     /// файлы лежат рядом с приложением. Отсутствие файлов не является ошибкой:
     /// сборка без них просто работает на штатном конвейере.
     /// </summary>
-    private static IMinimapFrameAnalyzer? CreateExperimentalFrameAnalyzer(AppSettings settings)
+    private static IMinimapFrameAnalyzer? CreateFrameAnalyzer(AppSettings settings)
     {
         if (!settings.UseExperimentalMinimapRecognizer)
         {
-            return null;
+            // Число потоков задаёт только штатный конвейер: у модели один вызов
+            // на кадр, и делить его между потоками нечего.
+            return settings.MinimapRecognitionThreads <= 0
+                ? null
+                : new DefaultMinimapFrameAnalyzer(settings.MinimapRecognitionThreads);
         }
 
         var modelDirectory = DeeperLeagueFrameAnalyzer.FindModelDirectory();

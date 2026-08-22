@@ -63,6 +63,71 @@ public sealed class SettingsViewModelTests
     }
 
     [Fact]
+    public void RecognitionThreads_DefaultToAutomaticAndPersistWithRestartNotice()
+    {
+        using var settingsContext = new TemporarySettingsContext();
+        var service = settingsContext.Service;
+        using var viewModel = new SettingsViewModel(
+            LocalizationService.Instance,
+            service,
+            static () => { });
+
+        Assert.Equal(
+            MinimapRecognitionThreadOptionViewModel.AutomaticThreads,
+            viewModel.MinimapRecognitionThreads);
+        Assert.False(viewModel.HasRecognitionThreadsRestartNotice);
+
+        var manualOption = viewModel.MinimapRecognitionThreadOptions
+            .First(option =>
+                option.Threads != MinimapRecognitionThreadOptionViewModel.AutomaticThreads);
+        viewModel.MinimapRecognitionThreads = manualOption.Threads;
+
+        Assert.Equal(manualOption.Threads, service.Load().MinimapRecognitionThreads);
+        Assert.True(viewModel.HasRecognitionThreadsRestartNotice);
+    }
+
+    [Fact]
+    public void RecognitionThreads_FallBackToAutomaticWhenMachineCannotOfferStoredValue()
+    {
+        using var settingsContext = new TemporarySettingsContext();
+        var service = settingsContext.Service;
+        // Настройки могли переехать с машины, где ядер было больше. Предлагать
+        // отсутствующее значение нельзя: список строится по текущей машине.
+        service.SaveMinimapRecognitionThreads(Environment.ProcessorCount * 4);
+
+        using var viewModel = new SettingsViewModel(
+            LocalizationService.Instance,
+            service,
+            static () => { });
+
+        Assert.Equal(
+            MinimapRecognitionThreadOptionViewModel.AutomaticThreads,
+            viewModel.MinimapRecognitionThreads);
+        Assert.False(viewModel.HasRecognitionThreadsRestartNotice);
+    }
+
+    [Fact]
+    public void RecognitionThreadOptions_StayWithinTheProcessorsOfThisMachine()
+    {
+        using var settingsContext = new TemporarySettingsContext();
+        using var viewModel = new SettingsViewModel(
+            LocalizationService.Instance,
+            settingsContext.Service,
+            static () => { });
+
+        var options = viewModel.MinimapRecognitionThreadOptions;
+
+        Assert.Equal(
+            MinimapRecognitionThreadOptionViewModel.AutomaticThreads,
+            options[0].Threads);
+        Assert.All(
+            options.Skip(1),
+            option => Assert.InRange(option.Threads, 1, Environment.ProcessorCount));
+        Assert.Contains(options, option => option.Threads == Environment.ProcessorCount);
+        Assert.Equal(options.Select(option => option.Threads).Distinct().Count(), options.Count);
+    }
+
+    [Fact]
     public void SaveOverlaySettings_PersistsDraftAndAppliesRuntimeState()
     {
         using var settingsContext = new TemporarySettingsContext();

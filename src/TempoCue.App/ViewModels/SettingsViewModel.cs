@@ -27,6 +27,8 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
     private bool _isApplyingDraft;
     private bool _isExperimentalMinimapRecognizerEnabled;
     private readonly bool _initialExperimentalMinimapRecognizer;
+    private int _minimapRecognitionThreads;
+    private readonly int _initialMinimapRecognitionThreads;
     private bool _isDisposed;
 
     public SettingsViewModel(
@@ -43,9 +45,17 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
         _overlaySettings = overlaySettings ?? new OverlaySettingsState(settings.Load().Overlay);
         _overlaySetupSession = overlaySetupSession;
         CaptureDiagnostics = captureDiagnostics;
+        var storedSettings = settings.Load();
         _initialExperimentalMinimapRecognizer =
-            settings.Load().UseExperimentalMinimapRecognizer;
+            storedSettings.UseExperimentalMinimapRecognizer;
         _isExperimentalMinimapRecognizerEnabled = _initialExperimentalMinimapRecognizer;
+        MinimapRecognitionThreadOptions =
+            MinimapRecognitionThreadOptionViewModel.CreateForCurrentMachine(localization);
+        _initialMinimapRecognitionThreads = MinimapRecognitionThreadOptions
+            .Any(option => option.Threads == storedSettings.MinimapRecognitionThreads)
+            ? storedSettings.MinimapRecognitionThreads
+            : MinimapRecognitionThreadOptionViewModel.AutomaticThreads;
+        _minimapRecognitionThreads = _initialMinimapRecognitionThreads;
         _selectedLanguageCode = localization.CurrentLanguageCode;
         var overlay = _overlaySettings.Current;
         _isOverlayEnabled = overlay.IsEnabled;
@@ -96,6 +106,34 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
     /// <summary>Показывает напоминание о перезапуске только после фактической смены.</summary>
     public bool HasExperimentalRecognizerRestartNotice =>
         _isExperimentalMinimapRecognizerEnabled != _initialExperimentalMinimapRecognizer;
+
+    /// <summary>Варианты числа потоков, доступные на этой машине.</summary>
+    public IReadOnlyList<MinimapRecognitionThreadOptionViewModel> MinimapRecognitionThreadOptions
+    {
+        get;
+    }
+
+    /// <summary>
+    /// Сколько областей кадра сравнивается одновременно. Ноль — выбрать по машине.
+    /// На результат распознавания не влияет: меняется только время разбора кадра.
+    /// </summary>
+    public int MinimapRecognitionThreads
+    {
+        get => _minimapRecognitionThreads;
+        set
+        {
+            if (!SetProperty(ref _minimapRecognitionThreads, value))
+            {
+                return;
+            }
+
+            _settings.SaveMinimapRecognitionThreads(value);
+            OnPropertyChanged(nameof(HasRecognitionThreadsRestartNotice));
+        }
+    }
+
+    public bool HasRecognitionThreadsRestartNotice =>
+        _minimapRecognitionThreads != _initialMinimapRecognitionThreads;
 
     public bool IsOverlayEnabled
     {
@@ -288,6 +326,11 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
         _isDisposed = true;
         CaptureDiagnostics?.Dispose();
         _localization.PropertyChanged -= Localization_PropertyChanged;
+        foreach (var option in MinimapRecognitionThreadOptions)
+        {
+            option.Dispose();
+        }
+
         if (_overlaySetupSession is not null)
         {
             _overlaySetupSession.Dismissed -= OverlaySetupSession_Dismissed;
