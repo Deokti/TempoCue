@@ -2,6 +2,7 @@ using System.Globalization;
 using System.IO;
 using System.Windows.Media.Imaging;
 using TempoCue.App.Localization;
+using TempoCue.Application;
 using TempoCue.App.ViewModels;
 using TempoCue.Vision;
 
@@ -181,6 +182,19 @@ public sealed class CaptureDiagnosticsViewModelTests
                     5.4.ToString("N1", CultureInfo.CurrentCulture),
                     viewModel.RecognitionFramesPerSecondText);
                 Assert.Equal("184 мс", viewModel.RecognitionDurationText);
+                Assert.False(viewModel.IsRecognitionTooSlowForConfirmation);
+
+                // Признак берётся из замера, а не из числа потоков: закреплённый за
+                // одним ядром процесс всё равно рапортует полную машину.
+                session.SetSnapshot(TestCaptureDiagnosticsSnapshot.Create(
+                    state: CaptureSessionState.Capturing,
+                    recognitionFrameRateLimit: 8,
+                    recognitionFramesPerSecond: 2.1,
+                    recognitionDurationMilliseconds:
+                        ParticipantVisibilityTracker.DefaultMaximumDetectionGap.TotalMilliseconds));
+                viewModel.Refresh();
+
+                Assert.True(viewModel.IsRecognitionTooSlowForConfirmation);
             }
             finally
             {

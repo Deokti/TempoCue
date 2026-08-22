@@ -56,8 +56,14 @@ public sealed class MinimapRecognitionThreadOptionViewModel : ObservableObject, 
     /// Предупреждение о выборе, при котором подтверждение видимости может не
     /// успевать. Разбор кадра на одном потоке длится дольше окна подтверждения,
     /// поэтому участник рискует не показаться вовсе, а не просто с опозданием.
+    /// Проверяется итоговое число потоков: на машине с одним процессором к
+    /// единице приводит и автоматический выбор, и молчать о нём нельзя.
     /// </summary>
-    public bool IsRiskyForNotifications => Threads == 1;
+    public bool IsRiskyForNotifications => EffectiveThreads == 1;
+
+    private int EffectiveThreads => Threads == AutomaticThreads
+        ? DefaultMinimapFrameAnalyzer.DefaultDegreeOfParallelism
+        : Threads;
 
     private static int ProcessorCount => Math.Max(1, Environment.ProcessorCount);
 

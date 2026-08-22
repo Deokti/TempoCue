@@ -850,7 +850,7 @@
   <data name="Settings.Recognition.Threads.Hint.Balanced" xml:space="preserve"><value>Room on both sides: notifications keep up and the game keeps most of the processor.</value></data>
   <data name="Settings.Recognition.Threads.Hint.Fast" xml:space="preserve"><value>Notifications arrive sooner, but TempoCue takes a noticeable share of the processor. Pick this when analysis cannot keep up with the limit.</value></data>
   <data name="Settings.Recognition.Threads.Hint.Maximum" xml:space="preserve"><value>Every processor. It will not get faster, and the game may suffer — pick this only if it visibly helps.</value></data>
-  <data name="Settings.Recognition.Threads.RiskNotice" xml:space="preserve"><value>A single thread cannot confirm a participant: analysing a frame takes longer than the confirmation window, so an appearance may never show at all.</value></data>
+  <data name="Settings.Recognition.Threads.RiskNotice" xml:space="preserve"><value>A single thread is not enough: analysing a frame takes about as long as the appearance confirmation window, so the chain of observations keeps breaking. Brief appearances will be lost.</value></data>
   <data name="Settings.Recognition.Threads.Guidance" xml:space="preserve"><value>Check the diagnostics card above: if the actual analysis FPS is below the limit, add threads; if it matches, there is nothing to add.</value></data>
   <data name="Settings.Recognition.Threads.RestartNotice" xml:space="preserve"><value>The choice applies after TempoCue restarts.</value></data>
   <data name="Settings.Overlay.Preview.Button" xml:space="preserve"><value>Show next notification</value></data>
@@ -1048,6 +1048,7 @@
   <data name="Settings.Capture.Target.Label" xml:space="preserve"><value>Selected window</value></data>
   <data name="Settings.Capture.Resolution.Label" xml:space="preserve"><value>Frame size</value></data>
   <data name="Settings.Capture.Fps.Label" xml:space="preserve"><value>Capture FPS</value></data>
+  <data name="Settings.Capture.RecognitionTooSlow" xml:space="preserve"><value>Frame analysis is approaching the appearance confirmation window: some appearances will be lost. Add recognition threads in the setting below, or close other programs.</value></data>
   <data name="Settings.Capture.Frames.Label" xml:space="preserve"><value>Frames received</value></data>
   <data name="Settings.Capture.LastFrame.Label" xml:space="preserve"><value>Last frame</value></data>
   <data name="Settings.Capture.SelectionFps.Label" xml:space="preserve"><value>Selection FPS (limit {0})</value></data>

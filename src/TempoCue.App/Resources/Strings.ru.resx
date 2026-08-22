@@ -860,7 +860,7 @@
   <data name="Settings.Recognition.Threads.Hint.Balanced" xml:space="preserve"><value>Запас и по скорости, и по нагрузке: уведомления успевают, игре остаётся большая часть процессора.</value></data>
   <data name="Settings.Recognition.Threads.Hint.Fast" xml:space="preserve"><value>Уведомления приходят раньше, но TempoCue занимает заметную долю процессора. Берите, если разбор не поспевает за лимитом.</value></data>
   <data name="Settings.Recognition.Threads.Hint.Maximum" xml:space="preserve"><value>Все процессоры. Быстрее уже не станет, а игра может просесть — берите, только если это заметно помогает.</value></data>
-  <data name="Settings.Recognition.Threads.RiskNotice" xml:space="preserve"><value>Один поток не успевает подтвердить участника: разбор кадра длится дольше, чем окно подтверждения, и появление может не показаться вовсе.</value></data>
+  <data name="Settings.Recognition.Threads.RiskNotice" xml:space="preserve"><value>Одного потока не хватает: разбор кадра занимает столько же, сколько окно подтверждения появления, и цепочка наблюдений регулярно рвётся. Короткие появления будут теряться.</value></data>
   <data name="Settings.Recognition.Threads.Guidance" xml:space="preserve"><value>Сверяйтесь с карточкой диагностики выше: если фактический FPS разбора ниже лимита — добавьте потоков, если равен ему — добавлять нечего.</value></data>
   <data name="Settings.Recognition.Threads.RestartNotice" xml:space="preserve"><value>Выбор применяется после перезапуска TempoCue.</value></data>
   <data name="Settings.Overlay.Preview.Button" xml:space="preserve"><value>Показать следующее уведомление</value></data>
@@ -1058,6 +1058,7 @@
   <data name="Settings.Capture.Target.Label" xml:space="preserve"><value>Выбранное окно</value></data>
   <data name="Settings.Capture.Resolution.Label" xml:space="preserve"><value>Размер кадра</value></data>
   <data name="Settings.Capture.Fps.Label" xml:space="preserve"><value>FPS захвата</value></data>
+  <data name="Settings.Capture.RecognitionTooSlow" xml:space="preserve"><value>Разбор кадра подошёл к окну подтверждения появления: часть появлений будет теряться. Добавьте потоков распознавания в настройке ниже или закройте лишние программы.</value></data>
   <data name="Settings.Capture.Frames.Label" xml:space="preserve"><value>Получено кадров</value></data>
   <data name="Settings.Capture.LastFrame.Label" xml:space="preserve"><value>Последний кадр</value></data>
   <data name="Settings.Capture.SelectionFps.Label" xml:space="preserve"><value>FPS отбора (лимит {0})</value></data>

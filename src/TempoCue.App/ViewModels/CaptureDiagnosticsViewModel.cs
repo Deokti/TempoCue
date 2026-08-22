@@ -159,6 +159,19 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
             _snapshot.RecognitionDurationMilliseconds)
         : _localization.Get("Settings.Capture.Value.NotAvailable");
 
+    /// <summary>
+    /// Разбор кадра подошёл к окну подтверждения появления. Число потоков этого не
+    /// предскажет: та же беда случается на закреплённом за одним ядром процессе, в
+    /// виртуальной машине и просто под нагрузкой, а <c>ProcessorCount</c> во всех
+    /// этих случаях рапортует полную машину. Признак берётся из замера.
+    /// Порог — половина окна: затянувшиеся кадры идут примерно в полтора раза
+    /// дольше медианы, поэтому медиана выше половины уже роняет часть цепочек.
+    /// </summary>
+    public bool IsRecognitionTooSlowForConfirmation =>
+        _snapshot.RecognitionDurationMilliseconds > 0 &&
+        _snapshot.RecognitionDurationMilliseconds >
+            ParticipantVisibilityTracker.DefaultMaximumDetectionGap.TotalMilliseconds / 2;
+
     public string ReceivedFrameCountText =>
         _snapshot.ReceivedFrameCount.ToString("N0", CultureInfo.CurrentCulture);
 
@@ -415,6 +428,7 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(RecognitionFramesPerSecondLabelText));
         OnPropertyChanged(nameof(RecognitionFramesPerSecondText));
         OnPropertyChanged(nameof(RecognitionDurationText));
+        OnPropertyChanged(nameof(IsRecognitionTooSlowForConfirmation));
         OnPropertyChanged(nameof(ReceivedFrameCountText));
         OnPropertyChanged(nameof(SelectedFrameCountText));
         OnPropertyChanged(nameof(RateLimitedFrameCountText));
@@ -477,6 +491,7 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(RecognitionFramesPerSecondLabelText));
         OnPropertyChanged(nameof(RecognitionFramesPerSecondText));
         OnPropertyChanged(nameof(RecognitionDurationText));
+        OnPropertyChanged(nameof(IsRecognitionTooSlowForConfirmation));
         OnPropertyChanged(nameof(ReceivedFrameCountText));
         OnPropertyChanged(nameof(SelectedFrameCountText));
         OnPropertyChanged(nameof(RateLimitedFrameCountText));

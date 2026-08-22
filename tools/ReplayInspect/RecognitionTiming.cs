@@ -96,7 +96,9 @@ internal static class RecognitionTiming
 
         Console.WriteLine();
         Console.WriteLine($"=== ЗАВИСИМОСТЬ ОТ ЧИСЛА ПОТОКОВ ({Environment.ProcessorCount} логических) ===");
-        Console.WriteLine("потоков | медиана | ускорение");
+        // p90 важнее медианы: подтверждение видимости срывается на отдельном
+        // затянувшемся кадре, а не на среднем по матчу.
+        Console.WriteLine("потоков | медиана |    p90 | ускорение");
         var baseline = 0d;
         foreach (var degree in degrees)
         {
@@ -114,7 +116,9 @@ internal static class RecognitionTiming
                 baseline = median;
             }
 
-            Console.WriteLine($"{degree,7} | {median,6:F1} мс | {baseline / median,6:F2}x");
+            Console.WriteLine(
+                $"{degree,7} | {median,6:F1} мс | {Percentile(measured, 0.90),6:F1} | " +
+                $"{baseline / median,6:F2}x");
         }
     }
 

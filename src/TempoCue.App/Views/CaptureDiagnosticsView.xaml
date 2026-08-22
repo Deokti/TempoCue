@@ -230,6 +230,28 @@
                         </Border>
                     </UniformGrid>
 
+                    <!-- Замер, а не догадка: закреплённый за одним ядром процесс и
+                         нагруженная машина рапортуют полное число процессоров. -->
+                    <TextBlock x:Name="RecognitionTooSlowTextBlock"
+                               Text="{localization:Loc Settings.Capture.RecognitionTooSlow}"
+                               Foreground="#FF8A7A"
+                               FontSize="13"
+                               TextWrapping="Wrap"
+                               LineHeight="18"
+                               Margin="0,8,0,0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsRecognitionTooSlowForConfirmation}"
+                                                 Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
                     <!-- Предпросмотр получает найденную миникарту и её каноническую копию, а не полный кадр игры. -->
                     <Border x:Name="MinimapPreviewPanel"
                             Margin="0,12,0,0"
