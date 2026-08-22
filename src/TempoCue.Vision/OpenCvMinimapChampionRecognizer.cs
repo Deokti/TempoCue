@@ -25,10 +25,33 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
                 (double)MinimapChampionReference.ImageSide)))
         .ToArray();
 
+    private readonly int _maximumDegreeOfParallelism;
     private IReadOnlyList<MinimapChampionReference>? _preparedSource;
     private PreparedReference[] _preparedReferences = [];
     private Mat[][]? _preparedNegatives;
     private bool _isDisposed;
+
+    public OpenCvMinimapChampionRecognizer()
+        : this(DefaultDegreeOfParallelism)
+    {
+    }
+
+    /// <param name="maximumDegreeOfParallelism">
+    /// Сколько областей кадра сравнивается одновременно. Области независимы, и
+    /// результат от их числа не зависит — меняется только время разбора.
+    /// </param>
+    public OpenCvMinimapChampionRecognizer(int maximumDegreeOfParallelism)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maximumDegreeOfParallelism);
+        _maximumDegreeOfParallelism = maximumDegreeOfParallelism;
+    }
+
+    /// <summary>
+    /// Половина логических процессоров. Распознавание делит машину с игрой, а не
+    /// владеет ею, поэтому забирать все ядра по умолчанию нельзя.
+    /// </summary>
+    public static int DefaultDegreeOfParallelism =>
+        Math.Max(1, Environment.ProcessorCount / 2);
 
     public MinimapChampionRecognitionResult Recognize(
         ReadOnlyMemory<byte> pixels,
@@ -55,7 +78,8 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
             sourceBgr,
             candidates,
             GetPreparedReferences(references),
-            GetPreparedNegatives());
+            GetPreparedNegatives(),
+            _maximumDegreeOfParallelism);
     }
 
     public void Dispose()
@@ -160,6 +184,7 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
             candidates,
             GetPreparedReferences(references),
             GetPreparedNegatives(),
+            _maximumDegreeOfParallelism,
             out _).ToArray();
     }
 
@@ -167,13 +192,15 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
         Mat source,
         IReadOnlyList<MinimapChampionMarkerCandidate> candidates,
         IReadOnlyList<PreparedReference> references,
-        IReadOnlyList<Mat[]> negativeTemplates)
+        IReadOnlyList<Mat[]> negativeTemplates,
+        int maximumDegreeOfParallelism)
     {
         var candidateMatches = ComputeCandidateScores(
             source,
             candidates,
             references,
             negativeTemplates,
+            maximumDegreeOfParallelism,
             out var maximumObservedSimilarity);
         var selected = MinimapRosterAssignment.Select(candidateMatches);
         return new MinimapChampionRecognitionResult(
@@ -186,6 +213,7 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
         IReadOnlyList<MinimapChampionMarkerCandidate> candidates,
         IReadOnlyList<PreparedReference> references,
         IReadOnlyList<Mat[]> negativeTemplates,
+        int maximumDegreeOfParallelism,
         out double maximumObservedSimilarity)
     {
         var referenceGroups = references
@@ -196,54 +224,81 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
                 .OrderBy(static reference => reference.Reference.Affiliation)
                 .ToArray())
             .ToArray();
-        var candidateMatches = new List<MinimapRosterCandidateScore>(candidates.Count);
-        maximumObservedSimilarity = -1d;
-        for (var candidateIndex = 0; candidateIndex < candidates.Count; candidateIndex++)
-        {
-            var candidate = candidates[candidateIndex];
-            var referenceMatches = new List<MinimapRosterReferenceScore>(referenceGroups.Length);
-
-            foreach (var referenceGroup in referenceGroups)
+        // Области кадра независимы друг от друга, поэтому сравниваются одновременно,
+        // а результат складывается по индексу области. Порядок кандидатов обязан
+        // остаться прежним: назначение состава разрешает равные баллы по нему.
+        var scores = new MinimapRosterCandidateScore?[candidates.Count];
+        var bestSimilarities = new double[candidates.Count];
+        Parallel.For(
+            0,
+            candidates.Count,
+            new ParallelOptions { MaxDegreeOfParallelism = maximumDegreeOfParallelism },
+            MatchScratch.Create,
+            (candidateIndex, _, scratch) =>
             {
-                // Портрет определяет участника независимо от шумного цвета контура.
-                // При зеркальном чемпионе сторона контура выбирает один из двух
-                // одинаковых эталонов уже после определения личности.
-                var reference = referenceGroup.FirstOrDefault(reference =>
-                        reference.Reference.Affiliation == candidate.Affiliation) ??
-                    referenceGroup[0];
+                var candidate = candidates[candidateIndex];
+                var referenceMatches =
+                    new MinimapRosterReferenceScore[referenceGroups.Length];
+                for (var groupIndex = 0; groupIndex < referenceGroups.Length; groupIndex++)
+                {
+                    // Портрет определяет участника независимо от шумного цвета контура.
+                    // При зеркальном чемпионе сторона контура выбирает один из двух
+                    // одинаковых эталонов уже после определения личности.
+                    var referenceGroup = referenceGroups[groupIndex];
+                    var reference = referenceGroup.FirstOrDefault(reference =>
+                            reference.Reference.Affiliation == candidate.Affiliation) ??
+                        referenceGroup[0];
 
-                var similarity = FindBestSimilarity(
+                    referenceMatches[groupIndex] = new MinimapRosterReferenceScore(
+                        reference.Reference,
+                        FindBestSimilarity(
+                            source,
+                            candidate,
+                            reference.ScaledTemplates,
+                            scratch));
+                }
+
+                if (referenceMatches.Length == 0)
+                {
+                    return scratch;
+                }
+
+                bestSimilarities[candidateIndex] =
+                    referenceMatches.Max(static match => match.Similarity);
+                // Башни, строения базы, метки местности и миньоны статичны и проходят
+                // временную стабилизацию. Максимальное сходство с ними сохраняется,
+                // чтобы при выборе каждого доступного участника отрицательный эталон
+                // сравнивался именно с его баллом, а не только с первоначальным лидером.
+                var negativeSimilarity = FindBestNegativeSimilarity(
                     source,
                     candidate,
-                    reference.ScaledTemplates);
-                referenceMatches.Add(new MinimapRosterReferenceScore(
-                    reference.Reference,
-                    similarity));
-            }
+                    negativeTemplates,
+                    scratch);
+                scores[candidateIndex] = new MinimapRosterCandidateScore(
+                    candidateIndex,
+                    candidate,
+                    referenceMatches
+                        .OrderByDescending(static match => match.Similarity)
+                        .ThenBy(static match => match.Reference.ChampionId, StringComparer.Ordinal)
+                        .ToArray(),
+                    negativeSimilarity);
+                return scratch;
+            },
+            static scratch => scratch.Dispose());
 
-            if (referenceMatches.Count == 0)
+        maximumObservedSimilarity = -1d;
+        var candidateMatches = new List<MinimapRosterCandidateScore>(candidates.Count);
+        for (var candidateIndex = 0; candidateIndex < scores.Length; candidateIndex++)
+        {
+            if (scores[candidateIndex] is not { } score)
             {
                 continue;
             }
 
-            var bestSimilarity = referenceMatches.Max(static match => match.Similarity);
-            maximumObservedSimilarity = Math.Max(maximumObservedSimilarity, bestSimilarity);
-            // Башни, строения базы, метки местности и миньоны статичны и проходят
-            // временную стабилизацию. Максимальное сходство с ними сохраняется,
-            // чтобы при выборе каждого доступного участника отрицательный эталон
-            // сравнивался именно с его баллом, а не только с первоначальным лидером.
-            var negativeSimilarity = FindBestNegativeSimilarity(
-                source,
-                candidate,
-                negativeTemplates);
-            candidateMatches.Add(new MinimapRosterCandidateScore(
-                candidateIndex,
-                candidate,
-                referenceMatches
-                    .OrderByDescending(static match => match.Similarity)
-                    .ThenBy(static match => match.Reference.ChampionId, StringComparer.Ordinal)
-                    .ToArray(),
-                negativeSimilarity));
+            maximumObservedSimilarity = Math.Max(
+                maximumObservedSimilarity,
+                bestSimilarities[candidateIndex]);
+            candidateMatches.Add(score);
         }
 
         return candidateMatches;
@@ -252,14 +307,15 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
     private static double FindBestNegativeSimilarity(
         Mat source,
         MinimapChampionMarkerCandidate candidate,
-        IReadOnlyList<Mat[]> negativeTemplates)
+        IReadOnlyList<Mat[]> negativeTemplates,
+        MatchScratch scratch)
     {
         var bestSimilarity = -1d;
         foreach (var negative in negativeTemplates)
         {
             bestSimilarity = Math.Max(
                 bestSimilarity,
-                FindBestSimilarity(source, candidate, negative));
+                FindBestSimilarity(source, candidate, negative, scratch));
         }
 
         return bestSimilarity;
@@ -268,7 +324,8 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
     private static double FindBestSimilarity(
         Mat source,
         MinimapChampionMarkerCandidate candidate,
-        IReadOnlyList<Mat> scaledTemplates)
+        IReadOnlyList<Mat> scaledTemplates,
+        MatchScratch scratch)
     {
         var bestSimilarity = -1d;
         var centerX = candidate.X + ((candidate.Width - 1) / 2d);
@@ -299,13 +356,15 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
             using var searchRegion = new Mat(
                 source,
                 new Rect(searchX, searchY, searchWidth, searchHeight));
-            using var structureMap = new Mat();
+            // Карты совпадений переиспользуются по индексу масштаба: их размер при
+            // одном масштабе постоянен, поэтому буфер не перевыделяется.
+            var structureMap = scratch.StructureMap(scaleIndex);
             Cv2.MatchTemplate(
                 searchRegion,
                 template,
                 structureMap,
                 TemplateMatchModes.CCoeffNormed);
-            using var colorDifferenceMap = new Mat();
+            var colorDifferenceMap = scratch.ColorDifferenceMap(scaleIndex);
             Cv2.MatchTemplate(
                 searchRegion,
                 template,
@@ -323,6 +382,16 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
         Mat structureMap,
         Mat colorDifferenceMap)
     {
+        // Карты совпадений читаются одним куском. Обращение через Mat.At стоит
+        // вызова нативной библиотеки на каждый элемент, а таких элементов за кадр
+        // выходит больше двух миллионов — это была основная цена распознавания.
+        if (structureMap.IsContinuous() && colorDifferenceMap.IsContinuous())
+        {
+            return FindBestCombinedSimilarity(
+                structureMap.AsSpan<float>(),
+                colorDifferenceMap.AsSpan<float>());
+        }
+
         var bestSimilarity = -1d;
         var rows = structureMap.Rows;
         var columns = structureMap.Cols;
@@ -330,22 +399,43 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
         {
             for (var x = 0; x < columns; x++)
             {
-                // CCOEFF сравнивает рисунок, а SQDIFF сохраняет абсолютные
-                // различия цвета, которые отделяют портрет от похожей башни.
-                var structureSimilarity =
-                    (Math.Clamp(structureMap.At<float>(y, x), -1, 1) + 1) / 2;
-                var colorSimilarity = 1 - Math.Clamp(
-                    colorDifferenceMap.At<float>(y, x),
-                    0,
-                    1);
-                var combinedSimilarity =
-                    (structureSimilarity * StructureWeight) +
-                    (colorSimilarity * ColorWeight);
-                bestSimilarity = Math.Max(bestSimilarity, combinedSimilarity);
+                bestSimilarity = Math.Max(
+                    bestSimilarity,
+                    CombineSimilarity(
+                        structureMap.At<float>(y, x),
+                        colorDifferenceMap.At<float>(y, x)));
             }
         }
 
         return bestSimilarity;
+    }
+
+    private static double FindBestCombinedSimilarity(
+        ReadOnlySpan<float> structure,
+        ReadOnlySpan<float> colorDifference)
+    {
+        var bestSimilarity = -1d;
+        var length = Math.Min(structure.Length, colorDifference.Length);
+        for (var index = 0; index < length; index++)
+        {
+            bestSimilarity = Math.Max(
+                bestSimilarity,
+                CombineSimilarity(structure[index], colorDifference[index]));
+        }
+
+        return bestSimilarity;
+    }
+
+    /// <summary>
+    /// CCOEFF сравнивает рисунок, а SQDIFF сохраняет абсолютные различия цвета,
+    /// которые отделяют портрет от похожей башни.
+    /// </summary>
+    private static double CombineSimilarity(float structure, float colorDifference)
+    {
+        var structureSimilarity = (Math.Clamp(structure, -1, 1) + 1) / 2;
+        var colorSimilarity = 1 - Math.Clamp(colorDifference, 0, 1);
+        return (structureSimilarity * StructureWeight) +
+            (colorSimilarity * ColorWeight);
     }
 
     private static void ValidateImage(
@@ -417,6 +507,53 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
         }
 
         return scaledTemplates;
+    }
+
+    /// <summary>
+    /// Рабочие буферы одного потока сравнения. Карты совпадений живут по индексу
+    /// масштаба, потому что размер карты определяется только им.
+    /// </summary>
+    private sealed class MatchScratch : IDisposable
+    {
+        private readonly Mat[] _structureMaps;
+        private readonly Mat[] _colorDifferenceMaps;
+
+        private MatchScratch(Mat[] structureMaps, Mat[] colorDifferenceMaps)
+        {
+            _structureMaps = structureMaps;
+            _colorDifferenceMaps = colorDifferenceMaps;
+        }
+
+        public static MatchScratch Create() =>
+            new(CreateMaps(), CreateMaps());
+
+        public Mat StructureMap(int scaleIndex) => _structureMaps[scaleIndex];
+
+        public Mat ColorDifferenceMap(int scaleIndex) => _colorDifferenceMaps[scaleIndex];
+
+        public void Dispose()
+        {
+            foreach (var map in _structureMaps)
+            {
+                map.Dispose();
+            }
+
+            foreach (var map in _colorDifferenceMaps)
+            {
+                map.Dispose();
+            }
+        }
+
+        private static Mat[] CreateMaps()
+        {
+            var maps = new Mat[TemplateSides.Length];
+            for (var index = 0; index < maps.Length; index++)
+            {
+                maps[index] = new Mat();
+            }
+
+            return maps;
+        }
     }
 
     private sealed class PreparedReference : IDisposable

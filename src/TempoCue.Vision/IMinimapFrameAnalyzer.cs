@@ -38,6 +38,21 @@ public sealed class DefaultMinimapFrameAnalyzer : IMinimapFrameAnalyzer, IDispos
     {
     }
 
+    /// <param name="maximumDegreeOfParallelism">
+    /// Сколько областей кадра сравнивается одновременно. На результат не влияет,
+    /// только на время разбора одного кадра.
+    /// </param>
+    public DefaultMinimapFrameAnalyzer(int maximumDegreeOfParallelism)
+        : this(new OpenCvMinimapChampionRecognizer(maximumDegreeOfParallelism))
+    {
+    }
+
+    /// <summary>
+    /// Половина логических процессоров: распознавание делит машину с игрой.
+    /// </summary>
+    public static int DefaultDegreeOfParallelism =>
+        OpenCvMinimapChampionRecognizer.DefaultDegreeOfParallelism;
+
     internal DefaultMinimapFrameAnalyzer(IMinimapChampionRecognizer championRecognizer)
     {
         _championRecognizer = championRecognizer;

@@ -11,6 +11,15 @@ public sealed class MinimapReplayRunner
     {
     }
 
+    /// <param name="maximumDegreeOfParallelism">
+    /// Сколько областей кадра сравнивается одновременно. На результат не влияет,
+    /// только на время разбора одного кадра.
+    /// </param>
+    public MinimapReplayRunner(int maximumDegreeOfParallelism)
+        : this(new OpenCvMinimapChampionRecognizer(maximumDegreeOfParallelism))
+    {
+    }
+
     internal MinimapReplayRunner(IMinimapChampionRecognizer championRecognizer)
     {
         _championRecognizer = championRecognizer;
