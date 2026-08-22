@@ -47,11 +47,21 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
     }
 
     /// <summary>
-    /// Половина логических процессоров. Распознавание делит машину с игрой, а не
-    /// владеет ею, поэтому забирать все ядра по умолчанию нельзя.
+    /// Четверть логических процессоров, но не меньше двух. Значение выбрано по
+    /// замеру, а не по вкусу: подтверждение видимости требует двух наблюдений с
+    /// разрывом не более 600 мс, поэтому разбор кадра обязан укладываться в 300 мс.
+    /// На одном потоке кадр стоит около 415 мс — участник не подтверждается вовсе,
+    /// на двух около 230 мс, на четырёх около 145 мс. Четверть даёт запас и
+    /// оставляет игре большую часть машины.
     /// </summary>
-    public static int DefaultDegreeOfParallelism =>
-        Math.Max(1, Environment.ProcessorCount / 2);
+    public static int DefaultDegreeOfParallelism
+    {
+        get
+        {
+            var processorCount = Math.Max(1, Environment.ProcessorCount);
+            return Math.Min(processorCount, Math.Max(2, processorCount / 4));
+        }
+    }
 
     public MinimapChampionRecognitionResult Recognize(
         ReadOnlyMemory<byte> pixels,

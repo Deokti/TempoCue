@@ -118,15 +118,53 @@
                                     <TextBlock Text="{Binding DisplayName}" />
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
+                            <!-- Подсказка висит на самом варианте: она нужна при
+                                 выборе, то есть до того, как вариант применён. -->
+                            <ComboBox.ItemContainerStyle>
+                                <Style TargetType="ComboBoxItem">
+                                    <Setter Property="ToolTip" Value="{Binding HintText}" />
+                                    <Setter Property="ToolTipService.ShowDuration" Value="30000" />
+                                </Style>
+                            </ComboBox.ItemContainerStyle>
                         </ComboBox>
                     </Grid>
 
-                    <TextBlock Text="{localization:Loc Settings.Recognition.Threads.Hint}"
+                    <!-- Тот же текст показан и под списком: наведение находят не все,
+                         а выбор должен быть объяснён без охоты за подсказкой. -->
+                    <TextBlock x:Name="RecognitionThreadsHintTextBlock"
+                               Text="{Binding SelectedItem.HintText, ElementName=RecognitionThreadsSelector}"
                                Foreground="#9FB2CC"
                                FontSize="13"
                                TextWrapping="Wrap"
                                LineHeight="18"
                                Margin="0,12,0,0" />
+
+                    <TextBlock x:Name="RecognitionThreadsRiskTextBlock"
+                               Text="{localization:Loc Settings.Recognition.Threads.RiskNotice}"
+                               Foreground="#FF8A7A"
+                               FontSize="13"
+                               TextWrapping="Wrap"
+                               LineHeight="18"
+                               Margin="0,8,0,0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Value="True"
+                                                 Binding="{Binding SelectedItem.IsRiskyForNotifications, ElementName=RecognitionThreadsSelector}">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+                    <TextBlock Text="{localization:Loc Settings.Recognition.Threads.Guidance}"
+                               Foreground="#778BA7"
+                               FontSize="12"
+                               TextWrapping="Wrap"
+                               LineHeight="17"
+                               Margin="0,8,0,0" />
 
                     <TextBlock Text="{localization:Loc Settings.Recognition.Threads.RestartNotice}"
                                Foreground="#FFC955"

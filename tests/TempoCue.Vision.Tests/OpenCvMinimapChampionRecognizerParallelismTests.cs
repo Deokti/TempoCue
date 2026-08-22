@@ -13,6 +13,29 @@ public sealed class OpenCvMinimapChampionRecognizerParallelismTests
     private static readonly string CorpusDirectory =
         Path.Combine(AppContext.BaseDirectory, "ReplayCorpus");
 
+    /// <summary>
+    /// Умолчание обязано оставлять разбор кадра короче половины окна подтверждения
+    /// видимости: подтверждение требует двух наблюдений подряд. На одном потоке
+    /// кадр стоит дольше всего окна, поэтому по умолчанию один поток недопустим.
+    /// </summary>
+    [Fact]
+    public void DefaultDegreeOfParallelism_NeverFallsToASingleThreadOnRealMachines()
+    {
+        var degree = OpenCvMinimapChampionRecognizer.DefaultDegreeOfParallelism;
+
+        Assert.InRange(degree, 1, Environment.ProcessorCount);
+        if (Environment.ProcessorCount > 1)
+        {
+            Assert.True(degree >= 2);
+        }
+
+        // И при этом умолчание не забирает машину целиком: игра важнее разбора.
+        if (Environment.ProcessorCount >= 8)
+        {
+            Assert.True(degree <= Environment.ProcessorCount / 2);
+        }
+    }
+
     [Fact]
     public async Task DegreeOfParallelism_DoesNotChangeRecognition()
     {

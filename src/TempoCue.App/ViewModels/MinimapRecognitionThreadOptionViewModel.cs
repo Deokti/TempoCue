@@ -38,6 +38,29 @@ public sealed class MinimapRecognitionThreadOptionViewModel : ObservableObject, 
             DefaultMinimapFrameAnalyzer.DefaultDegreeOfParallelism)
         : Threads.ToString();
 
+    /// <summary>
+    /// Чего ждать от этого выбора. Числа в миллисекундах назвать нельзя — они
+    /// зависят от машины, — поэтому подсказка говорит о последствиях: успеют ли
+    /// уведомления и сколько процессора останется игре.
+    /// </summary>
+    public string HintText => _localization.Get(Threads switch
+    {
+        AutomaticThreads => "Settings.Recognition.Threads.Hint.Automatic",
+        _ when Threads * 4 <= ProcessorCount => "Settings.Recognition.Threads.Hint.Frugal",
+        _ when Threads * 2 <= ProcessorCount => "Settings.Recognition.Threads.Hint.Balanced",
+        _ when Threads < ProcessorCount => "Settings.Recognition.Threads.Hint.Fast",
+        _ => "Settings.Recognition.Threads.Hint.Maximum"
+    });
+
+    /// <summary>
+    /// Предупреждение о выборе, при котором подтверждение видимости может не
+    /// успевать. Разбор кадра на одном потоке длится дольше окна подтверждения,
+    /// поэтому участник рискует не показаться вовсе, а не просто с опозданием.
+    /// </summary>
+    public bool IsRiskyForNotifications => Threads == 1;
+
+    private static int ProcessorCount => Math.Max(1, Environment.ProcessorCount);
+
     public static IReadOnlyList<MinimapRecognitionThreadOptionViewModel> CreateForCurrentMachine(
         LocalizationService localization)
     {
@@ -77,6 +100,7 @@ public sealed class MinimapRecognitionThreadOptionViewModel : ObservableObject, 
         if (e.PropertyName is nameof(LocalizationService.CurrentLanguageCode))
         {
             OnPropertyChanged(nameof(DisplayName));
+            OnPropertyChanged(nameof(HintText));
         }
     }
 }

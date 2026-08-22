@@ -855,7 +855,13 @@
   <data name="Settings.Recognition.Threads.Title" xml:space="preserve"><value>Потоки распознавания карты</value></data>
   <data name="Settings.Recognition.Threads.Description" xml:space="preserve"><value>Сколько участков карты TempoCue разбирает одновременно. Больше потоков — быстрее разбор кадра и раньше уведомления, но меньше процессора остаётся игре. На точность распознавания не влияет: меняется только скорость.</value></data>
   <data name="Settings.Recognition.Threads.Automatic" xml:space="preserve"><value>Автоматически ({0})</value></data>
-  <data name="Settings.Recognition.Threads.Hint" xml:space="preserve"><value>Автоматический выбор берёт половину логических процессоров, оставляя вторую половину игре. Уменьшите значение, если игра стала идти хуже; увеличьте, если уведомления приходят с опозданием.</value></data>
+  <data name="Settings.Recognition.Threads.Hint.Automatic" xml:space="preserve"><value>Четверть процессоров, но не меньше двух. Уведомления приходят вовремя, а игре остаётся большая часть машины. Начните отсюда и меняйте, только если видите причину.</value></data>
+  <data name="Settings.Recognition.Threads.Hint.Frugal" xml:space="preserve"><value>Бережно к процессору, но разбор кадра долгий. Подходит слабым машинам; уведомления о появлении будут приходить позже.</value></data>
+  <data name="Settings.Recognition.Threads.Hint.Balanced" xml:space="preserve"><value>Запас и по скорости, и по нагрузке: уведомления успевают, игре остаётся большая часть процессора.</value></data>
+  <data name="Settings.Recognition.Threads.Hint.Fast" xml:space="preserve"><value>Уведомления приходят раньше, но TempoCue занимает заметную долю процессора. Берите, если разбор не поспевает за лимитом.</value></data>
+  <data name="Settings.Recognition.Threads.Hint.Maximum" xml:space="preserve"><value>Все процессоры. Быстрее уже не станет, а игра может просесть — берите, только если это заметно помогает.</value></data>
+  <data name="Settings.Recognition.Threads.RiskNotice" xml:space="preserve"><value>Один поток не успевает подтвердить участника: разбор кадра длится дольше, чем окно подтверждения, и появление может не показаться вовсе.</value></data>
+  <data name="Settings.Recognition.Threads.Guidance" xml:space="preserve"><value>Сверяйтесь с карточкой диагностики выше: если фактический FPS разбора ниже лимита — добавьте потоков, если равен ему — добавлять нечего.</value></data>
   <data name="Settings.Recognition.Threads.RestartNotice" xml:space="preserve"><value>Выбор применяется после перезапуска TempoCue.</value></data>
   <data name="Settings.Overlay.Preview.Button" xml:space="preserve"><value>Показать следующее уведомление</value></data>
   <data name="Settings.Overlay.Preview.Warning.Label" xml:space="preserve"><value>Осторожно</value></data>

@@ -845,7 +845,13 @@
   <data name="Settings.Recognition.Threads.Title" xml:space="preserve"><value>Map recognition threads</value></data>
   <data name="Settings.Recognition.Threads.Description" xml:space="preserve"><value>How many parts of the map TempoCue compares at once. More threads mean a faster frame and earlier notifications, but less processor left for the game. Recognition accuracy is unaffected — only speed changes.</value></data>
   <data name="Settings.Recognition.Threads.Automatic" xml:space="preserve"><value>Automatic ({0})</value></data>
-  <data name="Settings.Recognition.Threads.Hint" xml:space="preserve"><value>The automatic choice takes half of the logical processors and leaves the other half to the game. Lower it if the game runs worse; raise it if notifications arrive late.</value></data>
+  <data name="Settings.Recognition.Threads.Hint.Automatic" xml:space="preserve"><value>A quarter of the processors, never fewer than two. Notifications arrive on time and the game keeps most of the machine. Start here and change it only for a reason.</value></data>
+  <data name="Settings.Recognition.Threads.Hint.Frugal" xml:space="preserve"><value>Easy on the processor, but a frame takes long to analyse. Suits weak machines; appearance notifications will arrive later.</value></data>
+  <data name="Settings.Recognition.Threads.Hint.Balanced" xml:space="preserve"><value>Room on both sides: notifications keep up and the game keeps most of the processor.</value></data>
+  <data name="Settings.Recognition.Threads.Hint.Fast" xml:space="preserve"><value>Notifications arrive sooner, but TempoCue takes a noticeable share of the processor. Pick this when analysis cannot keep up with the limit.</value></data>
+  <data name="Settings.Recognition.Threads.Hint.Maximum" xml:space="preserve"><value>Every processor. It will not get faster, and the game may suffer — pick this only if it visibly helps.</value></data>
+  <data name="Settings.Recognition.Threads.RiskNotice" xml:space="preserve"><value>A single thread cannot confirm a participant: analysing a frame takes longer than the confirmation window, so an appearance may never show at all.</value></data>
+  <data name="Settings.Recognition.Threads.Guidance" xml:space="preserve"><value>Check the diagnostics card above: if the actual analysis FPS is below the limit, add threads; if it matches, there is nothing to add.</value></data>
   <data name="Settings.Recognition.Threads.RestartNotice" xml:space="preserve"><value>The choice applies after TempoCue restarts.</value></data>
   <data name="Settings.Overlay.Preview.Button" xml:space="preserve"><value>Show next notification</value></data>
   <data name="Settings.Overlay.Preview.Warning.Label" xml:space="preserve"><value>Caution</value></data>
