@@ -15,13 +15,22 @@ public sealed class WindowsGraphicsCaptureSession :
 {
     private const int FrameBufferCount = 2;
     private const int DefaultSelectionFrameRateLimit = 30;
-    private const int DiagnosticPreviewFrameRateLimit = 4;
+
+    /// <summary>
+    /// Частота разбора миникарты. Ограничение появилось для диагностического
+    /// предпросмотра, когда распознавания ещё не было, и с тех пор определяет
+    /// задержку игровых уведомлений: подтверждение видимости требует двух
+    /// наблюдений, поэтому каждый лишний интервал добавляется к ней дважды.
+    /// Восемь кадров в секунду сокращают задержку примерно на треть и остаются
+    /// выше стоимости самого тяжёлого распознавания.
+    /// </summary>
+    private const int MinimapAnalysisFrameRateLimit = 8;
     private readonly object _frameSync = new();
     private readonly object _stateSync = new();
     private readonly SemaphoreSlim _lifecycleGate = new(1, 1);
     private readonly CaptureFrameMetrics _frameMetrics = new(
         DefaultSelectionFrameRateLimit,
-        DiagnosticPreviewFrameRateLimit);
+        MinimapAnalysisFrameRateLimit);
     private readonly MinimapRecognitionWorker _recognitionWorker;
     private Direct3D11MinimapPreviewReader? _minimapPreviewReader;
     private Direct3D11CaptureFramePool? _framePool;
