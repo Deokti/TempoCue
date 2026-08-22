@@ -72,7 +72,50 @@ internal static class RecognitionTiming
             PrintAffordableRate("модель DeeperLeague", modelWarm);
         }
 
+        await PrintScalingAsync(corpusDirectory);
         return 0;
+    }
+
+    /// <summary>
+    /// Как стоимость кадра зависит от числа одновременно сравниваемых областей.
+    /// Кривая нужна, чтобы границы будущей настройки назначались по замеру, а не
+    /// по догадке: выигрыш прекращается на числе физических ядер, а не логических.
+    /// </summary>
+    private static async Task PrintScalingAsync(string corpusDirectory)
+    {
+        var samples = new List<MinimapReplaySample>();
+        foreach (var path in ReplaySampleFile.EnumerateCorpus(corpusDirectory))
+        {
+            samples.Add(await ReplaySampleFile.LoadAsync(path));
+        }
+
+        var degrees = new[] { 1, 2, 4, 8, Environment.ProcessorCount }
+            .Distinct()
+            .OrderBy(static degree => degree)
+            .ToArray();
+
+        Console.WriteLine();
+        Console.WriteLine($"=== ЗАВИСИМОСТЬ ОТ ЧИСЛА ПОТОКОВ ({Environment.ProcessorCount} логических) ===");
+        Console.WriteLine("потоков | медиана | ускорение");
+        var baseline = 0d;
+        foreach (var degree in degrees)
+        {
+            var runner = new MinimapReplayRunner(degree);
+            var measured = new List<double>();
+            foreach (var sample in samples)
+            {
+                Measure(() => runner.Run(sample), WarmupRuns);
+                measured.AddRange(Measure(() => runner.Run(sample), MeasuredRuns));
+            }
+
+            var median = Median(measured);
+            if (baseline == 0)
+            {
+                baseline = median;
+            }
+
+            Console.WriteLine($"{degree,7} | {median,6:F1} мс | {baseline / median,6:F2}x");
+        }
     }
 
     private static void Recognize(
