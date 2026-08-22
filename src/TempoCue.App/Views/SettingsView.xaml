@@ -110,6 +110,30 @@
                                       VerticalAlignment="Center"
                                       IsChecked="{Binding IsExperimentalMinimapRecognizerEnabled, Mode=TwoWay}" />
                     </Grid>
+                    <!-- Список неподдерживаемых чемпионов виден только при включённом
+                         режиме: в выключенном состоянии он лишний. -->
+                    <Border Background="#16233A"
+                            CornerRadius="8"
+                            Padding="12,10"
+                            Margin="0,12,0,0">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsExperimentalMinimapRecognizerEnabled}"
+                                                 Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <TextBlock Text="{localization:Loc Settings.Experiment.Recognizer.UnsupportedChampions}"
+                                   Foreground="#9FB2CC"
+                                   FontSize="13"
+                                   TextWrapping="Wrap"
+                                   LineHeight="18" />
+                    </Border>
+
                     <TextBlock Text="{localization:Loc Settings.Experiment.Recognizer.RestartNotice}"
                                Foreground="#FFC955"
                                FontSize="13"
