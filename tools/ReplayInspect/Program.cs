@@ -27,6 +27,13 @@ try
             await CorpusStatistics.PrintNegativeMarginsAsync(args[1]),
         "--compare" when args.Length == 2 =>
             await DeeperLeagueComparison.RunAsync(args[1]),
+        "--model" when args.Length >= 2 =>
+            await DeeperLeagueComparison.RunOnFramesAsync(args.Skip(1)),
+        "--model-raw" when args.Length >= 2 =>
+            await DeeperLeagueComparison.RunOnFramesAsync(
+                args.Skip(1),
+                minimumConfidence: 0.10,
+                rejectStaticObjects: false),
         _ when args[0].StartsWith("--", StringComparison.Ordinal) =>
             Fail($"Неизвестный или неполный режим: {args[0]}"),
         _ => await FrameInspector.PrintRecognitionAsync(args)

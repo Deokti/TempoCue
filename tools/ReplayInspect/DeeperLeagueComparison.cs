@@ -10,6 +10,81 @@ namespace TempoCue.Tools.ReplayInspect;
 /// </summary>
 internal static class DeeperLeagueComparison
 {
+    /// <summary>Прогон только сторонней модели по кадрам, ещё не имеющим разметки.</summary>
+    public static async Task<int> RunOnFramesAsync(
+        IEnumerable<string> paths,
+        double minimumConfidence = 0.25,
+        bool rejectStaticObjects = true)
+    {
+        if (FindModelDirectory() is not { } modelDirectory)
+        {
+            Console.Error.WriteLine("Не найден каталог models/deeperleague.");
+            return 1;
+        }
+
+        using var model = new DeeperLeagueMinimapRecognizer(
+            Path.Combine(modelDirectory, "best.onnx"),
+            Path.Combine(modelDirectory, "champMap.json"),
+            minimumConfidence,
+            rejectStaticObjects: rejectStaticObjects);
+        Console.WriteLine(
+            $"(порог {minimumConfidence:F2}, фильтр статики " +
+            $"{(rejectStaticObjects ? "включён" : "выключен")})");
+        var known = DeeperLeagueChampionMap.Load(
+            Path.Combine(modelDirectory, "champMap.json"));
+        var knownIds = Enumerable.Range(0, known.Count)
+            .Select(index => known[index])
+            .Where(static id => id is not null)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase)!;
+
+        foreach (var path in paths)
+        {
+            var sample = await ReplaySampleFile.LoadAsync(path);
+            Console.WriteLine($"=== {ReplaySampleFile.Name(path)} ===");
+            var unsupported = sample.ChampionReferences
+                .Select(static reference => reference.ChampionId)
+                .Where(id => !knownIds.Contains(id))
+                .ToArray();
+            if (unsupported.Length > 0)
+            {
+                Console.WriteLine($"  модель не знает: {string.Join(", ", unsupported)}");
+            }
+
+            var candidates = model.Recognize(
+                sample.BgraPixels.Span,
+                sample.ImageWidth,
+                sample.ImageHeight,
+                sample.ImageStride,
+                sample.ChampionReferences);
+            Console.WriteLine($"  найдено ({candidates.Length}):");
+            foreach (var candidate in candidates)
+            {
+                Console.WriteLine(
+                    $"    {candidate.ChampionId} [{candidate.Affiliation}] " +
+                    $"в ({candidate.X},{candidate.Y}) " +
+                    $"уверенность={candidate.IdentityConfidence:F3}");
+            }
+
+            var missing = sample.ChampionReferences
+                .Select(static reference => reference.ChampionId)
+                .Where(id => knownIds.Contains(id))
+                .Where(id => !candidates.Any(candidate => string.Equals(
+                    candidate.ChampionId,
+                    id,
+                    StringComparison.OrdinalIgnoreCase)))
+                .ToArray();
+            if (missing.Length > 0)
+            {
+                Console.WriteLine(
+                    $"  знает, но не нашла: {string.Join(", ", missing)}");
+            }
+
+            Console.WriteLine();
+        }
+
+        return 0;
+    }
+
     public static async Task<int> RunAsync(string corpusDirectory)
     {
         if (FindModelDirectory() is not { } modelDirectory)
