@@ -25,6 +25,11 @@ try
             await CorpusStatistics.PrintReferenceBaselinesAsync(args[1]),
         "--margin" when args.Length == 2 =>
             await CorpusStatistics.PrintNegativeMarginsAsync(args[1]),
+        "--soak" when args.Length is 2 or 3 or 4 =>
+            await RecognitionSoak.RunAsync(
+                args[1],
+                args.Length > 2 ? int.Parse(args[2]) : 10,
+                args.Length > 3 ? int.Parse(args[3]) : 8),
         "--timing" when args.Length is 2 or 3 =>
             await RecognitionTiming.RunAsync(args[1], args.Length == 3 ? args[2] : null),
         "--compare" when args.Length == 2 =>
