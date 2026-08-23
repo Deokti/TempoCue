@@ -20,6 +20,22 @@ public sealed class MinimapReplayRunner
     {
     }
 
+    /// <param name="sourceSides">
+    /// Набор масштабов сравнения. Существует ради замера: позволяет прогнать
+    /// корпус с сужённым перебором и сравнить отрыв лидера от второго.
+    /// </param>
+    public MinimapReplayRunner(int maximumDegreeOfParallelism, int[]? sourceSides)
+        : this(new OpenCvMinimapChampionRecognizer(maximumDegreeOfParallelism, sourceSides))
+    {
+    }
+
+    /// <summary>Штатный набор масштабов сравнения — для замеров и сравнений.</summary>
+    public static int[] DefaultSourceSides => OpenCvMinimapChampionRecognizer.DefaultSourceSides;
+
+    /// <summary>Умолчание числа потоков сравнения.</summary>
+    public static int DefaultDegreeOfParallelism =>
+        OpenCvMinimapChampionRecognizer.DefaultDegreeOfParallelism;
+
     internal MinimapReplayRunner(IMinimapChampionRecognizer championRecognizer)
     {
         _championRecognizer = championRecognizer;

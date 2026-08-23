@@ -17,5 +17,5 @@
       "championId": "Smolder", "affiliation": "Ally" }
   ],
   "allowedFalsePositives": 0,
-  "allowedMissedChampions": 4
+  "allowedMissedChampions": 2
 }

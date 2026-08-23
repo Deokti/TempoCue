@@ -22,6 +22,6 @@
     { "x": 58, "y": 270, "width": 22, "height": 16, "kind": "MinionWave",
       "affiliation": "Ally" }
   ],
-  "allowedFalsePositives": 1,
+  "allowedFalsePositives": 0,
   "allowedMissedChampions": 2
 }

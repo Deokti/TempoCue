@@ -16,14 +16,29 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
         (MinimapChampionReference.ImageSide - ReferenceCropSide) / 2;
     private const double StructureWeight = 0.4;
     private const double ColorWeight = 0.6;
-    private static readonly int[] SourceSides = [13, 15, 17, 19, 21];
-    private static readonly int[] TemplateSides = SourceSides
-        .Select(static sourceSide => Math.Max(
-            7,
-            (int)Math.Round(
-                sourceSide * ReferenceCropSide /
-                (double)MinimapChampionReference.ImageSide)))
-        .ToArray();
+    /// <summary>
+    /// Стороны области, из которых строятся шаблоны сравнения. Набор страхует не
+    /// от настроек игрока — размер значка на каноническом кадре постоянен, — а от
+    /// неточности определения границ миникарты.
+    ///
+    /// Было пять сторон от 13 до 21, стало две. Замер по корпусу
+    /// (`ReplayInspect --scale-sweep`) показал, что мелкие масштабы не помогали, а
+    /// мешали: лучший балл берётся максимумом по масштабам **отдельно для каждого
+    /// эталона**, а мелкий шаблон даёт более высокий максимум просто потому, что
+    /// сравнивает меньше пикселей. Он побеждал в трёх четвертях областей, но
+    /// поставленный в одиночку опознавал 14 чемпионов из 60 вместо 44 — то есть
+    /// побеждал шумом, а не совпадением. Этот шум прибавлялся всем эталонам и
+    /// сжимал разницу между ними.
+    ///
+    /// Две стороны против пяти: верных 45 вместо 44, ложных 0 вместо 1, отрыв
+    /// лидера от второго вырос с `0,0333` до `0,0389`, а кадр подешевел со 134 до
+    /// 58 мс. Набор остаётся настраиваемым, чтобы решение и дальше проверялось
+    /// замером.
+    /// </summary>
+    public static readonly int[] DefaultSourceSides = [17, 21];
+
+    private readonly int[] _sourceSides;
+    private readonly int[] _templateSides;
 
     private readonly int _maximumDegreeOfParallelism;
     private IReadOnlyList<MinimapChampionReference>? _preparedSource;
@@ -41,12 +56,32 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
     /// результат от их числа не зависит — меняется только время разбора.
     /// </param>
     public OpenCvMinimapChampionRecognizer(int maximumDegreeOfParallelism)
+        : this(maximumDegreeOfParallelism, null)
+    {
+    }
+
+    /// <param name="sourceSides">
+    /// Набор масштабов сравнения. Значение null означает штатный набор из пяти.
+    /// Параметр существует ради замера: он позволяет прогнать корпус с сужённым
+    /// перебором и сравнить не абсолютные баллы, а отрыв лидера от второго.
+    /// </param>
+    internal OpenCvMinimapChampionRecognizer(
+        int maximumDegreeOfParallelism,
+        int[]? sourceSides)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maximumDegreeOfParallelism);
         // Иначе число занятых ядер определяет не эта величина, а OpenCV, которая
         // распараллеливает каждый вызов внутри себя поверх наших потоков.
         OpenCvParallelism.EnsureSingleThreaded();
         _maximumDegreeOfParallelism = maximumDegreeOfParallelism;
+        _sourceSides = sourceSides is { Length: > 0 }
+            ? [.. sourceSides]
+            : [.. DefaultSourceSides];
+        _templateSides = [.. _sourceSides.Select(static sourceSide => Math.Max(
+            7,
+            (int)Math.Round(
+                sourceSide * ReferenceCropSide /
+                (double)MinimapChampionReference.ImageSide)))];
     }
 
     /// <summary>
@@ -92,7 +127,8 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
             candidates,
             GetPreparedReferences(references),
             GetPreparedNegatives(),
-            _maximumDegreeOfParallelism);
+            _maximumDegreeOfParallelism,
+            _templateSides);
     }
 
     public void Dispose()
@@ -146,7 +182,9 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
         DisposePreparedReferences();
         // Эталоны меняются только вместе с составом матча, поэтому конвертация и
         // масштабирование выполняются один раз, а не для каждой пары кадр × кандидат.
-        _preparedReferences = references.Select(PreparedReference.Create).ToArray();
+        _preparedReferences = [.. references.Select(reference => PreparedReference.Create(
+            reference,
+            _templateSides))];
         _preparedSource = references;
         return _preparedReferences;
     }
@@ -164,7 +202,7 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
 
     private Mat[][] GetPreparedNegatives() =>
         _preparedNegatives ??= MinimapNegativeReferenceCatalog.LoadBgraTemplates()
-            .Select(static template => CreateScaledTemplates(template))
+            .Select(template => CreateScaledTemplates(template, _templateSides))
             .ToArray();
 
     /// <summary>
@@ -198,6 +236,7 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
             GetPreparedReferences(references),
             GetPreparedNegatives(),
             _maximumDegreeOfParallelism,
+            _templateSides,
             out _).ToArray();
     }
 
@@ -206,7 +245,8 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
         IReadOnlyList<MinimapChampionMarkerCandidate> candidates,
         IReadOnlyList<PreparedReference> references,
         IReadOnlyList<Mat[]> negativeTemplates,
-        int maximumDegreeOfParallelism)
+        int maximumDegreeOfParallelism,
+        int[] templateSides)
     {
         var candidateMatches = ComputeCandidateScores(
             source,
@@ -214,6 +254,7 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
             references,
             negativeTemplates,
             maximumDegreeOfParallelism,
+            templateSides,
             out var maximumObservedSimilarity);
         var selected = MinimapRosterAssignment.Select(candidateMatches);
         return new MinimapChampionRecognitionResult(
@@ -227,6 +268,7 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
         IReadOnlyList<PreparedReference> references,
         IReadOnlyList<Mat[]> negativeTemplates,
         int maximumDegreeOfParallelism,
+        int[] templateSides,
         out double maximumObservedSimilarity)
     {
         var referenceGroups = references
@@ -246,7 +288,7 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
             0,
             candidates.Count,
             new ParallelOptions { MaxDegreeOfParallelism = maximumDegreeOfParallelism },
-            MatchScratch.Create,
+            () => MatchScratch.Create(templateSides.Length),
             (candidateIndex, _, scratch) =>
             {
                 var candidate = candidates[candidateIndex];
@@ -266,7 +308,8 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
                         source,
                         candidate,
                         reference.ScaledTemplates,
-                        scratch);
+                        scratch,
+                        templateSides);
                     referenceMatches[groupIndex] = new MinimapRosterReferenceScore(
                         reference.Reference,
                         scored.Similarity,
@@ -288,7 +331,8 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
                     source,
                     candidate,
                     negativeTemplates,
-                    scratch);
+                    scratch,
+                    templateSides);
                 scores[candidateIndex] = new MinimapRosterCandidateScore(
                     candidateIndex,
                     candidate,
@@ -323,14 +367,15 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
         Mat source,
         MinimapChampionMarkerCandidate candidate,
         IReadOnlyList<Mat[]> negativeTemplates,
-        MatchScratch scratch)
+        MatchScratch scratch,
+        int[] templateSides)
     {
         var bestSimilarity = -1d;
         foreach (var negative in negativeTemplates)
         {
             bestSimilarity = Math.Max(
                 bestSimilarity,
-                FindBestSimilarity(source, candidate, negative, scratch).Similarity);
+                FindBestSimilarity(source, candidate, negative, scratch, templateSides).Similarity);
         }
 
         return bestSimilarity;
@@ -348,16 +393,17 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
         Mat source,
         MinimapChampionMarkerCandidate candidate,
         IReadOnlyList<Mat> scaledTemplates,
-        MatchScratch scratch)
+        MatchScratch scratch,
+        int[] templateSides)
     {
         var bestSimilarity = -1d;
         var bestScaleIndex = -1;
         var centerX = candidate.X + ((candidate.Width - 1) / 2d);
         var centerY = candidate.Y + ((candidate.Height - 1) / 2d);
 
-        for (var scaleIndex = 0; scaleIndex < TemplateSides.Length; scaleIndex++)
+        for (var scaleIndex = 0; scaleIndex < templateSides.Length; scaleIndex++)
         {
-            var templateSide = TemplateSides[scaleIndex];
+            var templateSide = templateSides[scaleIndex];
             var halfSide = (templateSide - 1) / 2d;
             var expectedX = (int)Math.Round(centerX - halfSide);
             var expectedY = (int)Math.Round(centerY - halfSide);
@@ -486,9 +532,9 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
 
     /// <summary>
     /// Готовит шаблоны BGR всех масштабов, выровненные по индексам с
-    /// <see cref="TemplateSides"/>, из эталона 17 × 17 BGRA32.
+    /// переданным сторонам шаблонов, из эталона 17 × 17 BGRA32.
     /// </summary>
-    private static Mat[] CreateScaledTemplates(byte[] bgraPixels)
+    private static Mat[] CreateScaledTemplates(byte[] bgraPixels, int[] templateSides)
     {
         using var bgra = Mat.FromPixelData(
             MinimapChampionReference.ImageSide,
@@ -504,12 +550,12 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
                 ReferenceCropOffset,
                 ReferenceCropSide,
                 ReferenceCropSide));
-        var scaledTemplates = new Mat[TemplateSides.Length];
+        var scaledTemplates = new Mat[templateSides.Length];
         try
         {
-            for (var index = 0; index < TemplateSides.Length; index++)
+            for (var index = 0; index < templateSides.Length; index++)
             {
-                var templateSide = TemplateSides[index];
+                var templateSide = templateSides[index];
                 var scaled = new Mat();
                 Cv2.Resize(
                     center,
@@ -551,8 +597,8 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
             _colorDifferenceMaps = colorDifferenceMaps;
         }
 
-        public static MatchScratch Create() =>
-            new(CreateMaps(), CreateMaps());
+        public static MatchScratch Create(int scaleCount) =>
+            new(CreateMaps(scaleCount), CreateMaps(scaleCount));
 
         public Mat StructureMap(int scaleIndex) => _structureMaps[scaleIndex];
 
@@ -571,9 +617,9 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
             }
         }
 
-        private static Mat[] CreateMaps()
+        private static Mat[] CreateMaps(int scaleCount)
         {
-            var maps = new Mat[TemplateSides.Length];
+            var maps = new Mat[scaleCount];
             for (var index = 0; index < maps.Length; index++)
             {
                 maps[index] = new Mat();
@@ -593,11 +639,13 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
 
         public MinimapChampionReference Reference { get; }
 
-        /// <summary>Шаблоны BGR, выровненные по индексам с <see cref="TemplateSides"/>.</summary>
+        /// <summary>Шаблоны BGR, выровненные по индексам с набором масштабов.</summary>
         public IReadOnlyList<Mat> ScaledTemplates { get; }
 
-        public static PreparedReference Create(MinimapChampionReference reference) =>
-            new(reference, CreateScaledTemplates(reference.BgraPixels.ToArray()));
+        public static PreparedReference Create(
+            MinimapChampionReference reference,
+            int[] templateSides) =>
+            new(reference, CreateScaledTemplates(reference.BgraPixels.ToArray(), templateSides));
 
         public void Dispose()
         {
