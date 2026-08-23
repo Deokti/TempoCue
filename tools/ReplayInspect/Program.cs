@@ -25,6 +25,8 @@ try
             await CorpusStatistics.PrintReferenceBaselinesAsync(args[1]),
         "--margin" when args.Length == 2 =>
             await CorpusStatistics.PrintNegativeMarginsAsync(args[1]),
+        "--sequence" when args.Length is 2 or 3 =>
+            await SequenceListing.RunAsync(args[1], args.Length == 3 ? args[2] : null),
         "--stability" when args.Length is 2 or 3 =>
             await SequenceStability.RunAsync(args[1], args.Length == 3 ? args[2] : null),
         "--visibility" when args.Length == 2 =>
