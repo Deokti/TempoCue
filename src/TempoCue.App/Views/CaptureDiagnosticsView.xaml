@@ -323,6 +323,32 @@
                                             Style="{StaticResource SecondaryButton}"
                                             IsEnabled="{Binding CanSaveReplaySample}"
                                             Click="SaveReplaySampleButton_Click" />
+                                    <!-- Одиночный кадр не показывает, держится ли отметка
+                                         на участнике между кадрами. Запись показывает. -->
+                                    <Button x:Name="RecordSequenceButton"
+                                            Content="{localization:Loc Settings.Capture.Sequence.Record}"
+                                            Style="{StaticResource SecondaryButton}"
+                                            Margin="8,0,0,0"
+                                            IsEnabled="{Binding CanRecordSequence}"
+                                            ToolTip="{localization:Loc Settings.Capture.Sequence.Hint}"
+                                            Click="RecordSequenceButton_Click" />
+                                    <TextBlock x:Name="SequenceProgressTextBlock"
+                                               Text="{Binding SequenceRecordingStatusText}"
+                                               Foreground="#FFC955"
+                                               VerticalAlignment="Center"
+                                               Margin="12,0,0,0">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsRecordingSequence}"
+                                                                 Value="True">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
                                     <TextBlock Text="{Binding ReplaySampleExportStatusText}"
                                                Foreground="#8EA8C9"
                                                VerticalAlignment="Center"

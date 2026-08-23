@@ -44,6 +44,30 @@ public partial class CaptureDiagnosticsView : UserControl
         }
     }
 
+    /// <summary>
+    /// Запускает запись и, когда кадры набраны, предлагает сохранить её. Ожидание
+    /// идёт здесь, а не в модели представления: диалог сохранения — дело вида.
+    /// </summary>
+    private async void RecordSequenceButton_Click(
+        object sender,
+        System.Windows.RoutedEventArgs e)
+    {
+        if (DataContext is not SettingsViewModel { CaptureDiagnostics: { } diagnostics })
+        {
+            return;
+        }
+
+        diagnostics.StartSequenceRecording();
+        while (diagnostics.IsRecordingSequence)
+        {
+            await Task.Delay(TimeSpan.FromMilliseconds(200));
+        }
+
+        await MinimapReplaySequenceFileDialog.ShowAsync(
+            System.Windows.Window.GetWindow(this),
+            diagnostics);
+    }
+
     private async void SaveReplaySampleButton_Click(
         object sender,
         System.Windows.RoutedEventArgs e)

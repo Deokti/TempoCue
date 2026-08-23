@@ -1058,6 +1058,10 @@
   <data name="Settings.Capture.Target.Label" xml:space="preserve"><value>Выбранное окно</value></data>
   <data name="Settings.Capture.Resolution.Label" xml:space="preserve"><value>Размер кадра</value></data>
   <data name="Settings.Capture.Fps.Label" xml:space="preserve"><value>FPS захвата</value></data>
+  <data name="Settings.Capture.Sequence.Record" xml:space="preserve"><value>Записать 3 секунды</value></data>
+  <data name="Settings.Capture.Sequence.Progress" xml:space="preserve"><value>Записано {0} из {1} кадров</value></data>
+  <data name="Settings.Capture.Sequence.Filter" xml:space="preserve"><value>Запись миникарты TempoCue (*.tempocue-sequence)|*.tempocue-sequence</value></data>
+  <data name="Settings.Capture.Sequence.Hint" xml:space="preserve"><value>Несколько кадров подряд показывают, держится ли отметка на участнике или прыгает. Одиночный кадр этого не показывает.</value></data>
   <data name="Settings.Capture.RecognitionTooSlow" xml:space="preserve"><value>Разбор кадра подошёл к окну подтверждения появления: часть появлений будет теряться. Добавьте потоков распознавания в настройке ниже или закройте лишние программы.</value></data>
   <data name="Settings.Capture.Frames.Label" xml:space="preserve"><value>Получено кадров</value></data>
   <data name="Settings.Capture.LastFrame.Label" xml:space="preserve"><value>Последний кадр</value></data>

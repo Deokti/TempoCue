@@ -25,6 +25,8 @@ try
             await CorpusStatistics.PrintReferenceBaselinesAsync(args[1]),
         "--margin" when args.Length == 2 =>
             await CorpusStatistics.PrintNegativeMarginsAsync(args[1]),
+        "--stability" when args.Length is 2 or 3 =>
+            await SequenceStability.RunAsync(args[1], args.Length == 3 ? args[2] : null),
         "--visibility" when args.Length == 2 =>
             await VisibilityRules.RunAsync(args[1]),
         "--scale-sweep" when args.Length == 2 =>
@@ -100,6 +102,10 @@ static void PrintUsage()
 
           ReplayInspect --margin <каталог корпуса>
               запас лучшего балла над отрицательными эталонами
+
+          ReplayInspect --stability <запись.tempocue-sequence> [<каталог модели>]
+              устойчивость между кадрами: на какой доле кадров участник
+              подтверждён, пока он виден всю запись
 
           ReplayInspect --ceiling <каталог корпуса>
               потолок детектора: сколько пропусков осталось без области сравнения

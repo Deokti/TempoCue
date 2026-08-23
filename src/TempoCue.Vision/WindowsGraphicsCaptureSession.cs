@@ -41,6 +41,9 @@ public sealed class WindowsGraphicsCaptureSession :
     private string? _targetName;
     private MinimapPreviewSnapshot? _minimapPreview;
     private MinimapChampionReference[] _minimapPreviewReferences = [];
+    private readonly List<MinimapReplaySequenceFrame> _sequenceFrames = [];
+    private MinimapChampionReference[]? _sequenceReferences;
+    private int _sequenceTarget;
     private string? _minimapPreviewErrorMessage;
     private string? _errorMessage;
     private MinimapChampionReference[] _championReferences = [];
@@ -125,6 +128,88 @@ public sealed class WindowsGraphicsCaptureSession :
             {
                 return _minimapPreview is not null;
             }
+        }
+    }
+
+    public bool IsRecordingSequence
+    {
+        get
+        {
+            lock (_stateSync)
+            {
+                return _sequenceTarget > 0 && _sequenceFrames.Count < _sequenceTarget;
+            }
+        }
+    }
+
+    public int RecordedFrameCount
+    {
+        get
+        {
+            lock (_stateSync)
+            {
+                return _sequenceFrames.Count;
+            }
+        }
+    }
+
+    public void StartSequenceRecording(int frameCount)
+    {
+        ObjectDisposedException.ThrowIf(Volatile.Read(ref _disposeState) != 0, this);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(frameCount);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(
+            frameCount,
+            MinimapReplaySequenceStore.MaximumFrameCount);
+
+        lock (_stateSync)
+        {
+            _sequenceFrames.Clear();
+            _sequenceReferences = null;
+            _sequenceTarget = frameCount;
+        }
+    }
+
+    public MinimapReplaySequence? TakeRecordedSequence()
+    {
+        ObjectDisposedException.ThrowIf(Volatile.Read(ref _disposeState) != 0, this);
+        lock (_stateSync)
+        {
+            if (_sequenceFrames.Count == 0 || _sequenceReferences is null)
+            {
+                return null;
+            }
+
+            var sequence = new MinimapReplaySequence(
+                MinimapFrameNormalizer.CanonicalSize,
+                MinimapFrameNormalizer.CanonicalSize,
+                checked(MinimapFrameNormalizer.CanonicalSize * 4),
+                _sequenceFrames,
+                _sequenceReferences);
+            _sequenceFrames.Clear();
+            _sequenceReferences = null;
+            _sequenceTarget = 0;
+            return sequence;
+        }
+    }
+
+    /// <summary>
+    /// Складывает разобранный кадр в запись, пока она не набрана. Вызывается из
+    /// завершения распознавания, поэтому частота записи совпадает с частотой
+    /// разбора — именно её устойчивость и требуется измерить.
+    /// </summary>
+    private void CollectSequenceFrame(MinimapPreviewSnapshot preview, MinimapChampionReference[] references)
+    {
+        lock (_stateSync)
+        {
+            if (_sequenceTarget <= 0 || _sequenceFrames.Count >= _sequenceTarget)
+            {
+                return;
+            }
+
+            _sequenceReferences ??= references;
+            _sequenceFrames.Add(new MinimapReplaySequenceFrame(
+                preview.CapturedAt,
+                preview.BgraPixels.ToArray()));
         }
     }
 
@@ -645,6 +730,8 @@ public sealed class WindowsGraphicsCaptureSession :
             _minimapPreviewReferences = result.ChampionReferences;
             _minimapPreviewErrorMessage = null;
         }
+
+        CollectSequenceFrame(result.Preview, result.ChampionReferences);
 
         PublishObservation(new MinimapChampionObservationEventArgs(
             result.Preview.CapturedAt,

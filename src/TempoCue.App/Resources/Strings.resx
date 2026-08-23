@@ -1048,6 +1048,10 @@
   <data name="Settings.Capture.Target.Label" xml:space="preserve"><value>Selected window</value></data>
   <data name="Settings.Capture.Resolution.Label" xml:space="preserve"><value>Frame size</value></data>
   <data name="Settings.Capture.Fps.Label" xml:space="preserve"><value>Capture FPS</value></data>
+  <data name="Settings.Capture.Sequence.Record" xml:space="preserve"><value>Record 3 seconds</value></data>
+  <data name="Settings.Capture.Sequence.Progress" xml:space="preserve"><value>Recorded {0} of {1} frames</value></data>
+  <data name="Settings.Capture.Sequence.Filter" xml:space="preserve"><value>TempoCue minimap recording (*.tempocue-sequence)|*.tempocue-sequence</value></data>
+  <data name="Settings.Capture.Sequence.Hint" xml:space="preserve"><value>Consecutive frames show whether the marker stays on a participant or jumps. A single frame cannot show that.</value></data>
   <data name="Settings.Capture.RecognitionTooSlow" xml:space="preserve"><value>Frame analysis is approaching the appearance confirmation window: some appearances will be lost. Add recognition threads in the setting below, or close other programs.</value></data>
   <data name="Settings.Capture.Frames.Label" xml:space="preserve"><value>Frames received</value></data>
   <data name="Settings.Capture.LastFrame.Label" xml:space="preserve"><value>Last frame</value></data>

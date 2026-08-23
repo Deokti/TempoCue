@@ -49,4 +49,35 @@ internal sealed class TestWindowCaptureSession :
         ReplaySample = sample ?? throw new ArgumentNullException(nameof(sample));
 
     public MinimapReplaySample? CreateReplaySample() => ReplaySample;
+
+    public bool IsRecordingSequence => RecordedFrameCount < RequestedSequenceFrames;
+
+    public int RecordedFrameCount { get; private set; }
+
+    /// <summary>Сколько кадров запросили последним вызовом: проверяется в тестах.</summary>
+    public int RequestedSequenceFrames { get; private set; }
+
+    public MinimapReplaySequence? RecordedSequence { get; set; }
+
+    public void StartSequenceRecording(int frameCount)
+    {
+        RequestedSequenceFrames = frameCount;
+        RecordedFrameCount = 0;
+    }
+
+    /// <summary>Имитирует набор кадров записью без настоящего захвата.</summary>
+    public void CompleteSequenceRecording(MinimapReplaySequence sequence)
+    {
+        RecordedSequence = sequence;
+        RecordedFrameCount = sequence.Frames.Count;
+    }
+
+    public MinimapReplaySequence? TakeRecordedSequence()
+    {
+        var sequence = RecordedSequence;
+        RecordedSequence = null;
+        RecordedFrameCount = 0;
+        RequestedSequenceFrames = 0;
+        return sequence;
+    }
 }

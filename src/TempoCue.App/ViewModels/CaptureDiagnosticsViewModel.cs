@@ -103,6 +103,9 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
     public string ReplaySampleDialogFilter =>
         _localization.Get("Settings.Capture.Replay.Filter");
 
+    public string SequenceDialogFilter =>
+        _localization.Get("Settings.Capture.Sequence.Filter");
+
     public string StateText => _localization.Get(IsUnsupported
         ? "Settings.Capture.State.Unsupported"
         : State switch
@@ -371,6 +374,97 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
     public void ReportReplaySampleExportFailure() =>
         SetReplaySampleExportState(ReplaySampleExportState.Failed);
 
+    /// <summary>
+    /// Три секунды при восьми разборах в секунду. Этого хватает, чтобы увидеть,
+    /// держится ли отметка на участнике или прыгает, и мало, чтобы игрок успел
+    /// нажать в нужный момент и не отвлечься от матча.
+    /// </summary>
+    public const int SequenceFrameCount = 24;
+
+    public bool CanRecordSequence =>
+        !_isOperationRunning &&
+        !_isDisposed &&
+        IsCapturing &&
+        _captureSession is IMinimapReplaySampleSource { IsRecordingSequence: false };
+
+    public bool IsRecordingSequence =>
+        _captureSession is IMinimapReplaySampleSource { IsRecordingSequence: true };
+
+    public string SequenceRecordingStatusText => _captureSession is IMinimapReplaySampleSource source
+        ? string.Format(
+            CultureInfo.CurrentCulture,
+            _localization.Get("Settings.Capture.Sequence.Progress"),
+            source.RecordedFrameCount,
+            SequenceFrameCount)
+        : string.Empty;
+
+    /// <summary>
+    /// Начинает запись подряд идущих кадров. Одиночный кадр отвечает на вопрос
+    /// «нашли ли участника», но не отвечает на вопрос «находим ли его на каждом
+    /// кадре», а игроку видна именно вторая величина.
+    /// </summary>
+    public void StartSequenceRecording()
+    {
+        if (!CanRecordSequence ||
+            _captureSession is not IMinimapReplaySampleSource replaySource)
+        {
+            return;
+        }
+
+        replaySource.StartSequenceRecording(SequenceFrameCount);
+        OnPropertyChanged(nameof(CanRecordSequence));
+        OnPropertyChanged(nameof(IsRecordingSequence));
+        OnPropertyChanged(nameof(SequenceRecordingStatusText));
+    }
+
+    public bool HasRecordedSequence =>
+        _captureSession is IMinimapReplaySampleSource source &&
+        !source.IsRecordingSequence &&
+        source.RecordedFrameCount > 0;
+
+    public async Task<bool> SaveRecordedSequenceAsync(Stream destination)
+    {
+        ArgumentNullException.ThrowIfNull(destination);
+        if (_captureSession is not IMinimapReplaySampleSource replaySource)
+        {
+            return false;
+        }
+
+        var sequence = replaySource.TakeRecordedSequence();
+        if (sequence is null)
+        {
+            SetReplaySampleExportState(ReplaySampleExportState.Failed);
+            return false;
+        }
+
+        SetOperationRunning(true);
+        try
+        {
+            await MinimapReplaySequenceStore.SaveAsync(
+                destination,
+                sequence,
+                _lifetimeCancellation.Token);
+            SetReplaySampleExportState(ReplaySampleExportState.Saved);
+            return true;
+        }
+        catch (OperationCanceledException) when (_lifetimeCancellation.IsCancellationRequested)
+        {
+            return false;
+        }
+        catch (Exception)
+        {
+            SetReplaySampleExportState(ReplaySampleExportState.Failed);
+            return false;
+        }
+        finally
+        {
+            if (!_isDisposed)
+            {
+                SetOperationRunning(false);
+            }
+        }
+    }
+
     /// <summary>Считывает очередной неизменяемый снимок без доступа к самому кадру.</summary>
     public void Refresh()
     {
@@ -456,6 +550,10 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(CanSelectWindow));
         OnPropertyChanged(nameof(CanStop));
         OnPropertyChanged(nameof(CanSaveReplaySample));
+        OnPropertyChanged(nameof(CanRecordSequence));
+        OnPropertyChanged(nameof(IsRecordingSequence));
+        OnPropertyChanged(nameof(HasRecordedSequence));
+        OnPropertyChanged(nameof(SequenceRecordingStatusText));
     }
 
     private void SetReplaySampleExportState(ReplaySampleExportState state)
@@ -481,6 +579,10 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(CanSelectWindow));
         OnPropertyChanged(nameof(CanStop));
         OnPropertyChanged(nameof(CanSaveReplaySample));
+        OnPropertyChanged(nameof(CanRecordSequence));
+        OnPropertyChanged(nameof(IsRecordingSequence));
+        OnPropertyChanged(nameof(HasRecordedSequence));
+        OnPropertyChanged(nameof(SequenceRecordingStatusText));
         OnPropertyChanged(nameof(StateText));
         OnPropertyChanged(nameof(SelectButtonText));
         OnPropertyChanged(nameof(SelectedWindowText));
