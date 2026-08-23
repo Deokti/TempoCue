@@ -11,11 +11,22 @@ public sealed class DeeperLeagueFrameAnalyzer : IMinimapFrameAnalyzer, IDisposab
     private bool _isDisposed;
 
     public DeeperLeagueFrameAnalyzer(string modelDirectory)
+        : this(modelDirectory, null)
+    {
+    }
+
+    /// <param name="maximumDegreeOfParallelism">
+    /// Настройка числа потоков распознавания. Она обязана управлять и моделью:
+    /// ONNX Runtime иначе создаёт собственный пул по числу ядер, и расход
+    /// процессора перестаёт зависеть от выбора пользователя.
+    /// </param>
+    public DeeperLeagueFrameAnalyzer(string modelDirectory, int? maximumDegreeOfParallelism)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(modelDirectory);
         _recognizer = new DeeperLeagueMinimapRecognizer(
             Path.Combine(modelDirectory, "best.onnx"),
-            Path.Combine(modelDirectory, "champMap.json"));
+            Path.Combine(modelDirectory, "champMap.json"),
+            maximumDegreeOfParallelism: maximumDegreeOfParallelism);
     }
 
     /// <summary>

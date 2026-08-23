@@ -24,6 +24,13 @@ public sealed class DeeperLeagueMinimapRecognizer : IDisposable
     /// </summary>
     private const double StaticObjectRejectionSimilarity = 0.86;
 
+    /// <summary>
+    /// Столько же, сколько берёт штатный конвейер: четверть логических
+    /// процессоров, но не меньше двух.
+    /// </summary>
+    private static int DefaultInferenceThreads =>
+        DefaultMinimapFrameAnalyzer.DefaultDegreeOfParallelism;
+
     private readonly InferenceSession _session;
     private readonly DeeperLeagueChampionMap _championMap;
     private readonly StaticObjectFilter? _staticObjectFilter;
@@ -34,12 +41,18 @@ public sealed class DeeperLeagueMinimapRecognizer : IDisposable
     private readonly DenseTensor<float> _input;
     private bool _isDisposed;
 
+    /// <param name="maximumDegreeOfParallelism">
+    /// Сколько потоков разрешено инференсу. По умолчанию ONNX Runtime создаёт
+    /// собственный пул по числу ядер и о настройке приложения не знает, поэтому
+    /// без явного ограничения обещание оставить процессор игре не выполняется.
+    /// </param>
     public DeeperLeagueMinimapRecognizer(
         string modelPath,
         string championMapPath,
         double minimumConfidence = DefaultMinimumConfidence,
         double maximumOverlap = DefaultMaximumOverlap,
-        bool rejectStaticObjects = true)
+        bool rejectStaticObjects = true,
+        int? maximumDegreeOfParallelism = null)
     {
         _staticObjectFilter = rejectStaticObjects ? new StaticObjectFilter() : null;
         if (!File.Exists(modelPath))
@@ -49,7 +62,14 @@ public sealed class DeeperLeagueMinimapRecognizer : IDisposable
 
         _championMap = DeeperLeagueChampionMap.Load(championMapPath);
         // Одна сессия на весь прогон: создание сессии стоит дороже самого инференса.
-        _session = new InferenceSession(modelPath);
+        using var sessionOptions = new SessionOptions
+        {
+            IntraOpNumThreads = maximumDegreeOfParallelism ?? DefaultInferenceThreads,
+            // Кадр обрабатывается по одному, параллелить нечего между собой.
+            InterOpNumThreads = 1,
+            ExecutionMode = ExecutionMode.ORT_SEQUENTIAL
+        };
+        _session = new InferenceSession(modelPath, sessionOptions);
         _inputName = _session.InputMetadata.Keys.First();
         _minimumConfidence = minimumConfidence;
         _maximumOverlap = maximumOverlap;

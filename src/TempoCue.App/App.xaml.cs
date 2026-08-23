@@ -353,13 +353,17 @@ public partial class App : System.Windows.Application
     /// </summary>
     private static IMinimapFrameAnalyzer? CreateFrameAnalyzer(AppSettings settings)
     {
+        // Ноль означает «выбрать по машине», и такой выбор оба распознавателя
+        // делают сами. Число потоков задаётся обоим: у модели один вызов на кадр,
+        // но ONNX Runtime разворачивает внутри него собственный пул по числу ядер.
+        var threads = settings.MinimapRecognitionThreads <= 0
+            ? (int?)null
+            : settings.MinimapRecognitionThreads;
         if (!settings.UseExperimentalMinimapRecognizer)
         {
-            // Число потоков задаёт только штатный конвейер: у модели один вызов
-            // на кадр, и делить его между потоками нечего.
-            return settings.MinimapRecognitionThreads <= 0
+            return threads is null
                 ? null
-                : new DefaultMinimapFrameAnalyzer(settings.MinimapRecognitionThreads);
+                : new DefaultMinimapFrameAnalyzer(threads.Value);
         }
 
         var modelDirectory = DeeperLeagueFrameAnalyzer.FindModelDirectory();
@@ -372,7 +376,7 @@ public partial class App : System.Windows.Application
 
         try
         {
-            return new DeeperLeagueFrameAnalyzer(modelDirectory);
+            return new DeeperLeagueFrameAnalyzer(modelDirectory, threads);
         }
         catch (Exception exception)
         {
