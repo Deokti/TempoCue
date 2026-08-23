@@ -31,6 +31,7 @@ internal static class FrameInspector
                     $"  {candidate.ChampionId} [{candidate.Affiliation}] " +
                     $"в ({candidate.X},{candidate.Y}) " +
                     $"сходство={candidate.IdentityConfidence:F3} " +
+                    $"уверенность={candidate.Confidence:F3} " +
                     $"контур={candidate.ContourAffiliation}");
             }
 

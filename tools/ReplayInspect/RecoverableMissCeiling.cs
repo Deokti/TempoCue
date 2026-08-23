@@ -22,6 +22,10 @@ internal static class RecoverableMissCeiling
         var missingRegion = new List<string>();
         var wrongIdentity = new List<string>();
         var confirmed = 0;
+        var strongConfirmations = 0;
+        var weakConfirmations = new List<string>();
+        var visibilityThreshold = TempoCue.Application.ParticipantVisibilityTracker
+            .DefaultMinimumObservationConfidence;
 
         foreach (var samplePath in ReplaySampleFile.EnumerateCorpus(corpusDirectory))
         {
@@ -37,6 +41,20 @@ internal static class RecoverableMissCeiling
             confirmed += evaluation.ConfirmedChampions.Count;
 
             var name = ReplaySampleFile.Name(samplePath);
+            foreach (var champion in evaluation.ConfirmedChampions)
+            {
+                if (champion.Candidate.Confidence >= visibilityThreshold)
+                {
+                    strongConfirmations++;
+                    continue;
+                }
+
+                weakConfirmations.Add(
+                    $"{name}: {champion.Candidate.ChampionId} — сходство " +
+                    $"{champion.Candidate.IdentityConfidence:F3}, уверенность " +
+                    $"{champion.Candidate.Confidence:F3}");
+            }
+
             foreach (var missed in evaluation.MissedChampions)
             {
                 var nearest = FindNearestProposal(diagnostics, missed);
@@ -87,6 +105,23 @@ internal static class RecoverableMissCeiling
         Console.WriteLine(
             $"  вне досягаемости детектора: {wrongIdentity.Count} " +
             $"({(total == 0 ? 0 : wrongIdentity.Count * 100d / total):F1} % от всех)");
+
+        // Корпус проверяет распознавание, но не проверяет, доходит ли найденный
+        // участник до состояния «виден». Между ними стоит порог уверенности
+        // наблюдения, и подтверждённый чемпион с баллом ниже него игроку не
+        // показывается вовсе.
+        Console.WriteLine();
+        Console.WriteLine("=== ДОХОДЯТ ЛИ ПОДТВЕРЖДЁННЫЕ ДО ВИДИМОСТИ ===");
+        Console.WriteLine($"  порог уверенности наблюдения: {visibilityThreshold:F2}");
+        Console.WriteLine(
+            $"  проходят порог: {strongConfirmations} из {confirmed}");
+        Console.WriteLine(
+            $"  найдены, но не показываются: {confirmed - strongConfirmations}");
+        foreach (var line in weakConfirmations)
+        {
+            Console.WriteLine($"    {line}");
+        }
+
         return 0;
     }
 

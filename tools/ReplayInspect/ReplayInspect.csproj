@@ -10,6 +10,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- Порог видимости живёт в прикладном слое, а замер обязан проверять всю
+         цепочку: корпус подтверждает распознавание, но не показ участника. -->
+    <ProjectReference Include="..\..\src\TempoCue.Application\TempoCue.Application.csproj" />
     <ProjectReference Include="..\..\src\TempoCue.Vision\TempoCue.Vision.csproj" />
     <ProjectReference Include="..\..\src\TempoCue.Vision.DeeperLeague\TempoCue.Vision.DeeperLeague.csproj" />
   </ItemGroup>
