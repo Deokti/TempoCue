@@ -25,6 +25,8 @@ try
             await CorpusStatistics.PrintReferenceBaselinesAsync(args[1]),
         "--margin" when args.Length == 2 =>
             await CorpusStatistics.PrintNegativeMarginsAsync(args[1]),
+        "--ceiling" when args.Length == 2 =>
+            await RecoverableMissCeiling.RunAsync(args[1]),
         "--soak" when args.Length is 2 or 3 or 4 =>
             await RecognitionSoak.RunAsync(
                 args[1],
@@ -92,6 +94,13 @@ static void PrintUsage()
 
           ReplayInspect --margin <каталог корпуса>
               запас лучшего балла над отрицательными эталонами
+
+          ReplayInspect --ceiling <каталог корпуса>
+              потолок детектора: сколько пропусков осталось без области сравнения
+              и сколько с областью, но без подтверждения личности
+
+          ReplayInspect --soak <кадр> [минут] [кадр/с]
+              долгий прогон одного кадра: растёт ли стоимость или память со временем
 
           ReplayInspect --timing <каталог корпуса> [<каталог модели>]
               стоимость одного кадра в установившемся режиме и частота, которую
