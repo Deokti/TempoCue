@@ -69,6 +69,12 @@ public sealed class DeeperLeagueMinimapRecognizer : IDisposable
             InterOpNumThreads = 1,
             ExecutionMode = ExecutionMode.ORT_SEQUENTIAL
         };
+        // Между кадрами рабочие потоки по умолчанию крутятся в ожидании вместо
+        // того, чтобы уснуть: так они просыпаются быстрее, но всё это время жгут
+        // процессор. Нам обмен невыгоден — кадры приходят раз в 125 мс, а рядом
+        // работает игра, для которой несколько миллисекунд задержки распознавания
+        // дешевле отнятого ядра.
+        sessionOptions.AddSessionConfigEntry("session.intra_op.allow_spinning", "0");
         _session = new InferenceSession(modelPath, sessionOptions);
         _inputName = _session.InputMetadata.Keys.First();
         _minimumConfidence = minimumConfidence;
