@@ -67,7 +67,8 @@ public sealed class MinimapReplayRunner
                     .Select(static reference => new MinimapReferenceSimilarity(
                         reference.Reference.ChampionId,
                         reference.Reference.Affiliation,
-                        reference.Similarity))
+                        reference.Similarity,
+                        reference.ScaleIndex))
                     .ToArray(),
                 score.NegativeSimilarity,
                 MinimapIconRingSampler.Sample(
@@ -115,7 +116,8 @@ public sealed class MinimapReplayRunner
                 .Select(static reference => new MinimapReferenceSimilarity(
                     reference.Reference.ChampionId,
                     reference.Reference.Affiliation,
-                    reference.Similarity))
+                    reference.Similarity,
+                    reference.ScaleIndex))
                 .ToArray(),
             score.NegativeSimilarity,
             MinimapIconRingSampler.Sample(
@@ -200,4 +202,5 @@ public sealed record MinimapRegionDiagnostics(
 public sealed record MinimapReferenceSimilarity(
     string ChampionId,
     MinimapMarkerAffiliation Affiliation,
-    double Similarity);
+    double Similarity,
+    int ScaleIndex);

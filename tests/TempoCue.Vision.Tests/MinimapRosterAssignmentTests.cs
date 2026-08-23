@@ -81,9 +81,11 @@ public sealed class MinimapRosterAssignmentTests
             new MinimapChampionMarkerCandidate(x, y, 25, 25, affiliation, 0.70),
             scores
                 .OrderByDescending(static score => score.Similarity)
+                // Масштаб на назначение состава не влияет: он записан для замера.
                 .Select(static score => new MinimapRosterReferenceScore(
                     score.Reference,
-                    score.Similarity))
+                    score.Similarity,
+                    ScaleIndex: 0))
                 .ToArray(),
             negativeSimilarity);
 

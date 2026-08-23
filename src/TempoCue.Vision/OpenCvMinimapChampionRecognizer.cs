@@ -262,13 +262,15 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
                             reference.Reference.Affiliation == candidate.Affiliation) ??
                         referenceGroup[0];
 
+                    var scored = FindBestSimilarity(
+                        source,
+                        candidate,
+                        reference.ScaledTemplates,
+                        scratch);
                     referenceMatches[groupIndex] = new MinimapRosterReferenceScore(
                         reference.Reference,
-                        FindBestSimilarity(
-                            source,
-                            candidate,
-                            reference.ScaledTemplates,
-                            scratch));
+                        scored.Similarity,
+                        scored.ScaleIndex);
                 }
 
                 if (referenceMatches.Length == 0)
@@ -328,19 +330,28 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
         {
             bestSimilarity = Math.Max(
                 bestSimilarity,
-                FindBestSimilarity(source, candidate, negative, scratch));
+                FindBestSimilarity(source, candidate, negative, scratch).Similarity);
         }
 
         return bestSimilarity;
     }
 
-    private static double FindBestSimilarity(
+    /// <summary>
+    /// Лучший балл и масштаб, на котором он взят. Масштаб сам по себе на решение
+    /// не влияет, но его распределение отвечает на вопрос, нужен ли перебор всех
+    /// пяти: при каноническом кадре размер значка постоянен, и масштабы страхуют
+    /// только от неточности определения границ миникарты.
+    /// </summary>
+    private readonly record struct ScaledSimilarity(double Similarity, int ScaleIndex);
+
+    private static ScaledSimilarity FindBestSimilarity(
         Mat source,
         MinimapChampionMarkerCandidate candidate,
         IReadOnlyList<Mat> scaledTemplates,
         MatchScratch scratch)
     {
         var bestSimilarity = -1d;
+        var bestScaleIndex = -1;
         var centerX = candidate.X + ((candidate.Width - 1) / 2d);
         var centerY = candidate.Y + ((candidate.Height - 1) / 2d);
 
@@ -383,12 +394,15 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
                 template,
                 colorDifferenceMap,
                 TemplateMatchModes.SqDiffNormed);
-            bestSimilarity = Math.Max(
-                bestSimilarity,
-                FindBestCombinedSimilarity(structureMap, colorDifferenceMap));
+            var similarity = FindBestCombinedSimilarity(structureMap, colorDifferenceMap);
+            if (similarity > bestSimilarity)
+            {
+                bestSimilarity = similarity;
+                bestScaleIndex = scaleIndex;
+            }
         }
 
-        return bestSimilarity;
+        return new ScaledSimilarity(bestSimilarity, bestScaleIndex);
     }
 
     private static double FindBestCombinedSimilarity(

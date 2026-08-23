@@ -182,9 +182,15 @@ internal static class MinimapRosterAssignment
         double Similarity);
 }
 
+/// <param name="ScaleIndex">
+/// Масштаб шаблона, на котором взят лучший балл. Нужен для замера: если побеждает
+/// почти всегда один и тот же, перебор пяти масштабов можно сузить и потратить
+/// освободившееся на более подробное сравнение.
+/// </param>
 internal sealed record MinimapRosterReferenceScore(
     MinimapChampionReference Reference,
-    double Similarity);
+    double Similarity,
+    int ScaleIndex);
 
 internal sealed record MinimapRosterCandidateScore(
     int CandidateIndex,

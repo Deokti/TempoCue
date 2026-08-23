@@ -25,6 +25,8 @@ try
             await CorpusStatistics.PrintReferenceBaselinesAsync(args[1]),
         "--margin" when args.Length == 2 =>
             await CorpusStatistics.PrintNegativeMarginsAsync(args[1]),
+        "--scales" when args.Length == 2 =>
+            await ScaleDistribution.RunAsync(args[1]),
         "--ceiling" when args.Length == 2 =>
             await RecoverableMissCeiling.RunAsync(args[1]),
         "--soak" when args.Length is 2 or 3 or 4 =>
