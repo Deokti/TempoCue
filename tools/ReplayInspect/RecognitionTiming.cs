@@ -17,6 +17,10 @@ internal static class RecognitionTiming
 
     public static async Task<int> RunAsync(string corpusDirectory, string? modelDirectory)
     {
+        Console.WriteLine(
+            $"OpenCV сообщает о {OpenCvSharp.Cv2.GetNumThreads()} собственных потоках " +
+            $"при {Environment.ProcessorCount} логических процессорах.");
+
         var runner = new MinimapReplayRunner();
         using var model = modelDirectory is null
             ? null
@@ -94,32 +98,44 @@ internal static class RecognitionTiming
             .OrderBy(static degree => degree)
             .ToArray();
 
-        Console.WriteLine();
-        Console.WriteLine($"=== ЗАВИСИМОСТЬ ОТ ЧИСЛА ПОТОКОВ ({Environment.ProcessorCount} логических) ===");
-        // p90 важнее медианы: подтверждение видимости срывается на отдельном
-        // затянувшемся кадре, а не на среднем по матчу.
-        Console.WriteLine("потоков | медиана |    p90 | ускорение");
-        var baseline = 0d;
-        foreach (var degree in degrees)
+        // OpenCV распараллеливает каждый вызов сам, поверх наших потоков. Пока это
+        // не измерено, настройка числа потоков не ограничивает расход процессора:
+        // она задаёт лишь внешний множитель, а внутренний остаётся своим.
+        var openCvThreads = OpenCvSharp.Cv2.GetNumThreads();
+        foreach (var openCvLimit in new[] { openCvThreads, 1 })
         {
-            var runner = new MinimapReplayRunner(degree);
-            var measured = new List<double>();
-            foreach (var sample in samples)
-            {
-                Measure(() => runner.Run(sample), WarmupRuns);
-                measured.AddRange(Measure(() => runner.Run(sample), MeasuredRuns));
-            }
-
-            var median = Median(measured);
-            if (baseline == 0)
-            {
-                baseline = median;
-            }
-
+            OpenCvSharp.Cv2.SetNumThreads(openCvLimit);
+            Console.WriteLine();
             Console.WriteLine(
-                $"{degree,7} | {median,6:F1} мс | {Percentile(measured, 0.90),6:F1} | " +
-                $"{baseline / median,6:F2}x");
+                $"=== ЧИСЛО ПОТОКОВ ПРИ {openCvLimit} ВНУТРЕННИХ ПОТОКАХ OpenCV " +
+                $"({Environment.ProcessorCount} логических) ===");
+            // p90 важнее медианы: подтверждение видимости срывается на отдельном
+            // затянувшемся кадре, а не на среднем по матчу.
+            Console.WriteLine("потоков | медиана |    p90 | ускорение");
+            var baseline = 0d;
+            foreach (var degree in degrees)
+            {
+                var runner = new MinimapReplayRunner(degree);
+                var measured = new List<double>();
+                foreach (var sample in samples)
+                {
+                    Measure(() => runner.Run(sample), WarmupRuns);
+                    measured.AddRange(Measure(() => runner.Run(sample), MeasuredRuns));
+                }
+
+                var median = Median(measured);
+                if (baseline == 0)
+                {
+                    baseline = median;
+                }
+
+                Console.WriteLine(
+                    $"{degree,7} | {median,6:F1} мс | {Percentile(measured, 0.90),6:F1} | " +
+                    $"{baseline / median,6:F2}x");
+            }
         }
+
+        OpenCvSharp.Cv2.SetNumThreads(openCvThreads);
     }
 
     private static void Recognize(

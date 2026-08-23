@@ -43,6 +43,9 @@ internal sealed class OpenCvMinimapChampionRecognizer : IMinimapChampionRecogniz
     public OpenCvMinimapChampionRecognizer(int maximumDegreeOfParallelism)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maximumDegreeOfParallelism);
+        // Иначе число занятых ядер определяет не эта величина, а OpenCV, которая
+        // распараллеливает каждый вызов внутри себя поверх наших потоков.
+        OpenCvParallelism.EnsureSingleThreaded();
         _maximumDegreeOfParallelism = maximumDegreeOfParallelism;
     }
 
