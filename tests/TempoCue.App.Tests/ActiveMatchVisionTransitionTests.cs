@@ -35,7 +35,8 @@ public sealed class ActiveMatchVisionTransitionTests
         var appeared = Assert.Single(transitions);
         Assert.Equal(ParticipantVisibilityTransitionKind.Appeared, appeared.Kind);
         Assert.Equal("enemy-player", appeared.ParticipantId);
-        Assert.Equal(0.90, appeared.Confidence);
+        // В переход попадает сходство с портретом, а не итоговая оценка (TC-008).
+        Assert.Equal(0.86, appeared.Confidence);
 
         // Ошибка чтения кадра — не доказательство отсутствия и не рождает переход.
         observations.PublishFailed(capturedAt.AddMilliseconds(1300));

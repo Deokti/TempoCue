@@ -6,7 +6,19 @@ namespace TempoCue.Application;
 public sealed class ParticipantVisibilityTracker
 {
     public const int DefaultRequiredConsecutiveDetections = 2;
-    public const double DefaultMinimumObservationConfidence = 0.77;
+    /// <summary>
+    /// Совпадает с порогом, по которому распознавание вообще соглашается назвать
+    /// участника (`MinimapRosterAssignment.MinimumIdentityConfidence`). Значения
+    /// расходились — распознавание принимало от `0,75`, а видимость требовала
+    /// `0,77`, — и полоса между ними была мёртвой: участник опознавался и никогда
+    /// не показывался. Пример из живого матча — Nasus со сходством `0,751` при
+    /// отрыве от второго `0,094`, то есть опознанный уверенно.
+    ///
+    /// Слой видимости отвечает за устойчивость во времени, а не за повторное
+    /// решение о личности: личность уже проверена сходством, отрывом от второго и
+    /// сравнением с отрицательными эталонами.
+    /// </summary>
+    public const double DefaultMinimumObservationConfidence = 0.75;
     public static readonly TimeSpan DefaultMaximumDetectionGap =
         TimeSpan.FromMilliseconds(600);
     public static readonly TimeSpan DefaultDisappearanceGracePeriod =
