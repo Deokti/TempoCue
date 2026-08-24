@@ -9,7 +9,7 @@
       "championId": "Renata", "affiliation": "Enemy" },
     { "x": 264, "y": 254, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Lulu", "affiliation": "Ally" },
-    { "x": 246, "y": 271, "width": 25, "height": 25, "kind": "Champion",
+    { "x": 247, "y": 267, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Jinx", "affiliation": "Ally" },
     { "x": 235, "y": 250, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Fiddlesticks", "affiliation": "Ally" },

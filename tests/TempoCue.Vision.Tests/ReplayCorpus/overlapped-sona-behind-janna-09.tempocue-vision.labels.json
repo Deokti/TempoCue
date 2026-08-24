@@ -5,7 +5,7 @@
       "championId": "Ambessa", "affiliation": "Ally" },
     { "x": 113, "y": 179, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Sivir", "affiliation": "Ally" },
-    { "x": 118, "y": 266, "width": 25, "height": 25, "kind": "Champion",
+    { "x": 118, "y": 262, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Janna", "affiliation": "Enemy" },
     { "x": 101, "y": 268, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Sona", "affiliation": "Ally" },

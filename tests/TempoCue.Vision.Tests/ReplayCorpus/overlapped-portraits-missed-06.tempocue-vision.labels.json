@@ -9,9 +9,9 @@
       "championId": "MonkeyKing", "affiliation": "Ally" },
     { "x": 163, "y": 131, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Ekko", "affiliation": "Ally" },
-    { "x": 224, "y": 270, "width": 25, "height": 25, "kind": "Champion",
+    { "x": 222, "y": 271, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Rakan", "affiliation": "Ally" },
-    { "x": 256, "y": 228, "width": 25, "height": 25, "kind": "Champion",
+    { "x": 259, "y": 226, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Caitlyn", "affiliation": "Enemy" },
     { "x": 243, "y": 245, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Smolder", "affiliation": "Ally" }

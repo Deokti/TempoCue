@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
   "regions": [
-    { "x": 23, "y": 77, "width": 25, "height": 25, "kind": "Champion",
+    { "x": 21, "y": 77, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Teemo", "affiliation": "Ally" },
     { "x": 91, "y": 194, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Ambessa", "affiliation": "Ally" },
     { "x": 128, "y": 159, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Anivia", "affiliation": "Enemy" },
-    { "x": 155, "y": 216, "width": 25, "height": 25, "kind": "Champion",
+    { "x": 154, "y": 215, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Poppy", "affiliation": "Ally" },
     { "x": 264, "y": 231, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Blitzcrank", "affiliation": "Enemy" },

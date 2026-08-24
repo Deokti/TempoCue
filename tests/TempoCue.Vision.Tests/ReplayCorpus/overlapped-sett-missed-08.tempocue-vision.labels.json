@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "regions": [
     {
-      "x": 90,
-      "y": 26,
+      "x": 89,
+      "y": 25,
       "width": 25,
       "height": 25,
       "kind": "Champion",
@@ -11,8 +11,8 @@
       "affiliation": "Enemy"
     },
     {
-      "x": 142,
-      "y": 162,
+      "x": 144,
+      "y": 161,
       "width": 25,
       "height": 25,
       "kind": "Champion",
@@ -20,8 +20,8 @@
       "affiliation": "Ally"
     },
     {
-      "x": 126,
-      "y": 206,
+      "x": 124,
+      "y": 205,
       "width": 25,
       "height": 25,
       "kind": "Champion",

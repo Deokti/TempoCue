@@ -3,10 +3,12 @@
   "regions": [
     { "x": 144, "y": 150, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Sona", "affiliation": "Ally" },
-    { "x": 154, "y": 248, "width": 25, "height": 25, "kind": "Champion",
+    { "x": 155, "y": 245, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Caitlyn", "affiliation": "Enemy" },
     { "x": 88, "y": 196, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Zaahen", "affiliation": "Ally" },
+    { "x": 12, "y": 283, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Ambessa", "affiliation": "Ally" },
     { "x": 83, "y": 222, "width": 16, "height": 16, "kind": "Tower",
       "affiliation": "Ally" },
     { "x": 142, "y": 260, "width": 16, "height": 16, "kind": "Tower",

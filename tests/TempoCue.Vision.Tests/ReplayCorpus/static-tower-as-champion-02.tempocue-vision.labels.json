@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "regions": [
-    { "x": 55, "y": 35, "width": 25, "height": 25, "kind": "Champion",
+    { "x": 57, "y": 33, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Shen", "affiliation": "Enemy" },
     { "x": 48, "y": 41, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Sett", "affiliation": "Ally" },
@@ -9,6 +9,8 @@
       "championId": "Ziggs", "affiliation": "Ally" },
     { "x": 221, "y": 259, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Morgana", "affiliation": "Ally" },
+    { "x": 4, "y": 277, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Malzahar", "affiliation": "Ally" },
     { "x": 23, "y": 91, "width": 16, "height": 16, "kind": "Tower",
       "affiliation": "Ally" },
     { "x": 34, "y": 74, "width": 14, "height": 18, "kind": "MinionWave",
