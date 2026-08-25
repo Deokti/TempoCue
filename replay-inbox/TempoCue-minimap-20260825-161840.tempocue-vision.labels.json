@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "regions": [
+    { "x": 244, "y": 206, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Vayne", "affiliation": "Ally" },
+    { "x": 147, "y": 159, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Ekko", "affiliation": "Enemy" }
+  ],
+  "allowedFalsePositives": 0,
+  "allowedMissedChampions": 0
+}

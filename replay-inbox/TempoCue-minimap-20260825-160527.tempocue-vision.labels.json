@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "regions": [
+    { "x": 140, "y": 194, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Trundle", "affiliation": "Ally" },
+    { "x": 11, "y": 283, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Swain", "affiliation": "Ally" },
+    { "x": 263, "y": 222, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Ashe", "affiliation": "Ally" }
+  ],
+  "allowedFalsePositives": 0,
+  "allowedMissedChampions": 0
+}

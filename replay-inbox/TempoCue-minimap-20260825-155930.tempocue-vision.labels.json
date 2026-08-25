@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "regions": [
+    { "x": 31, "y": 70, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Singed", "affiliation": "Ally" },
+    { "x": 211, "y": 230, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Cassiopeia", "affiliation": "Ally" },
+    { "x": 169, "y": 192, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Nautilus", "affiliation": "Ally" },
+    { "x": 202, "y": 190, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Sejuani", "affiliation": "Enemy" },
+    { "x": 135, "y": 107, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Rakan", "affiliation": "Enemy" }
+  ],
+  "allowedFalsePositives": 0,
+  "allowedMissedChampions": 0
+}

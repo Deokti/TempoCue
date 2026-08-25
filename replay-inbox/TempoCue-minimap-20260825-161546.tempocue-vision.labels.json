@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "regions": [
+    { "x": 217, "y": 256, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Sona", "affiliation": "Ally" },
+    { "x": 52, "y": 30, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Shen", "affiliation": "Enemy" },
+    { "x": 157, "y": 134, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Ekko", "affiliation": "Enemy" }
+  ],
+  "allowedFalsePositives": 0,
+  "allowedMissedChampions": 0
+}

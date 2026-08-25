@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "regions": [
+    { "x": 113, "y": 168, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Cassiopeia", "affiliation": "Ally" },
+    { "x": 133, "y": 139, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Heimerdinger", "affiliation": "Enemy" },
+    { "x": 200, "y": 154, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Rakan", "affiliation": "Enemy" },
+    { "x": 210, "y": 98, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Varus", "affiliation": "Enemy" }
+  ],
+  "allowedFalsePositives": 0,
+  "allowedMissedChampions": 0
+}

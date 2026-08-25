@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "regions": [
+    { "x": 237, "y": 254, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Trundle", "affiliation": "Ally" },
+    { "x": 86, "y": 56, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Volibear", "affiliation": "Ally" },
+    { "x": 225, "y": 225, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Ashe", "affiliation": "Ally" },
+    { "x": 178, "y": 156, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Malzahar", "affiliation": "Ally" },
+    { "x": 164, "y": 130, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Darius", "affiliation": "Enemy" },
+    { "x": 249, "y": 203, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Jhin", "affiliation": "Enemy" }
+  ],
+  "allowedFalsePositives": 0,
+  "allowedMissedChampions": 0
+}

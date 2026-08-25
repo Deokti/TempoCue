@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "regions": [
+    { "x": 209, "y": 169, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Maokai", "affiliation": "Ally" },
+    { "x": 16, "y": 126, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Poppy", "affiliation": "Ally" },
+    { "x": 104, "y": 259, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Sona", "affiliation": "Ally" },
+    { "x": 271, "y": 211, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Milio", "affiliation": "Enemy" },
+    { "x": 257, "y": 212, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Xayah", "affiliation": "Enemy" }
+  ],
+  "allowedFalsePositives": 0,
+  "allowedMissedChampions": 0
+}

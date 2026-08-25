@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "regions": [
+    { "x": 55, "y": 34, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Singed", "affiliation": "Ally" },
+    { "x": 134, "y": 193, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Karthus", "affiliation": "Ally" },
+    { "x": 271, "y": 214, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Nautilus", "affiliation": "Ally" },
+    { "x": 133, "y": 157, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Diana", "affiliation": "Ally" }
+  ],
+  "allowedFalsePositives": 0,
+  "allowedMissedChampions": 0
+}
