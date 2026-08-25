@@ -5,7 +5,7 @@
       "championId": "Tryndamere", "affiliation": "Enemy" },
     { "x": 27, "y": 48, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Darius", "affiliation": "Ally" },
-    { "x": 56, "y": 136, "width": 25, "height": 25, "kind": "Champion",
+    { "x": 49, "y": 128, "width": 25, "height": 25, "kind": "Champion",
       "championId": "MonkeyKing", "affiliation": "Ally" },
     { "x": 163, "y": 131, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Ekko", "affiliation": "Ally" },

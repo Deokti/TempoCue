@@ -9,7 +9,7 @@
       "championId": "Morgana", "affiliation": "Ally" },
     { "x": 232, "y": 264, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Ziggs", "affiliation": "Ally" },
-    { "x": 4, "y": 283, "width": 25, "height": 25, "kind": "Champion",
+    { "x": 4, "y": 286, "width": 25, "height": 25, "kind": "Champion",
       "championId": "MasterYi", "affiliation": "Ally" },
     { "x": 23, "y": 91, "width": 16, "height": 16, "kind": "Tower",
       "affiliation": "Ally" },
