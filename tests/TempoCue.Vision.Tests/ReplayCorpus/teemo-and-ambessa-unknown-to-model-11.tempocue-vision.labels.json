@@ -13,7 +13,7 @@
       "championId": "Blitzcrank", "affiliation": "Enemy" },
     { "x": 250, "y": 252, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Tristana", "affiliation": "Ally" },
-    { "x": 228, "y": 262, "width": 25, "height": 25, "kind": "Champion",
+    { "x": 226, "y": 262, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Janna", "affiliation": "Ally" },
     { "x": 38, "y": 254, "width": 22, "height": 24, "kind": "Tower",
       "affiliation": "Ally" }

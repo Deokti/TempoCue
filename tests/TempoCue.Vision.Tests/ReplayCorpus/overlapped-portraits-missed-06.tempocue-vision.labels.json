@@ -3,7 +3,7 @@
   "regions": [
     { "x": 34, "y": 60, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Tryndamere", "affiliation": "Enemy" },
-    { "x": 27, "y": 48, "width": 25, "height": 25, "kind": "Champion",
+    { "x": 28, "y": 52, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Darius", "affiliation": "Ally" },
     { "x": 49, "y": 128, "width": 25, "height": 25, "kind": "Champion",
       "championId": "MonkeyKing", "affiliation": "Ally" },

@@ -5,7 +5,7 @@
       "championId": "Garen", "affiliation": "Enemy" },
     { "x": 151, "y": 146, "width": 25, "height": 25, "kind": "Champion",
       "championId": "TwistedFate", "affiliation": "Enemy" },
-    { "x": 266, "y": 226, "width": 25, "height": 25, "kind": "Champion",
+    { "x": 268, "y": 226, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Renata", "affiliation": "Enemy" },
     { "x": 264, "y": 254, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Lulu", "affiliation": "Ally" },
