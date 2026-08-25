@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "regions": [
+    { "x": 172, "y": 270, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Katarina", "affiliation": "Enemy" },
+    { "x": 159, "y": 107, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Elise", "affiliation": "Ally" },
+    { "x": 281, "y": 13, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Vex", "affiliation": "Ally" },
+    { "x": 243, "y": 59, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Teemo", "affiliation": "Ally" },
+    { "x": 187, "y": 117, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Twitch", "affiliation": "Ally" },
+    { "x": 141, "y": 79, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "MasterYi", "affiliation": "Ally" }
+  ],
+  "allowedFalsePositives": 0,
+  "allowedMissedChampions": 0
+}

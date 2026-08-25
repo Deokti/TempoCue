@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "regions": [
+    { "x": 186, "y": 268, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "DrMundo", "affiliation": "Ally" },
+    { "x": 139, "y": 149, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Kayle", "affiliation": "Enemy" },
+    { "x": 238, "y": 246, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Karma", "affiliation": "Enemy" },
+    { "x": 255, "y": 236, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "MissFortune", "affiliation": "Enemy" },
+    { "x": 36, "y": 47, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Malphite", "affiliation": "Enemy" },
+    { "x": 74, "y": 131, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Nasus", "affiliation": "Ally" },
+    { "x": 232, "y": 255, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Sivir", "affiliation": "Ally" }
+  ],
+  "allowedFalsePositives": 0,
+  "allowedMissedChampions": 0
+}

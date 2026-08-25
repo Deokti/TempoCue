@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "regions": [
+    { "x": 66, "y": 255, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Yone", "affiliation": "Ally" },
+    { "x": 79, "y": 207, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Kennen", "affiliation": "Ally" },
+    { "x": 254, "y": 242, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Urgot", "affiliation": "Ally" },
+    { "x": 259, "y": 220, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Nasus", "affiliation": "Enemy" },
+    { "x": 189, "y": 180, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "DrMundo", "affiliation": "Enemy" }
+  ],
+  "allowedFalsePositives": 0,
+  "allowedMissedChampions": 0
+}

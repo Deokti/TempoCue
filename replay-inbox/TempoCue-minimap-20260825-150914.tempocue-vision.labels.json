@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "regions": [
+    { "x": 59, "y": 30, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Volibear", "affiliation": "Ally" },
+    { "x": 154, "y": 212, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Amumu", "affiliation": "Ally" },
+    { "x": 182, "y": 163, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Ekko", "affiliation": "Ally" },
+    { "x": 128, "y": 265, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Taric", "affiliation": "Ally" },
+    { "x": 236, "y": 249, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Braum", "affiliation": "Enemy" },
+    { "x": 226, "y": 262, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Smolder", "affiliation": "Ally" },
+    { "x": 132, "y": 210, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Cassiopeia", "affiliation": "Enemy" }
+  ],
+  "allowedFalsePositives": 0,
+  "allowedMissedChampions": 0
+}

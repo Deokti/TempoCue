@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "regions": [
+    { "x": 259, "y": 39, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "MissFortune", "affiliation": "Enemy" },
+    { "x": 274, "y": 18, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Yasuo", "affiliation": "Ally" },
+    { "x": 255, "y": 28, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Yorick", "affiliation": "Enemy" },
+    { "x": 279, "y": 38, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Veigar", "affiliation": "Enemy" },
+    { "x": 279, "y": 28, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Morgana", "affiliation": "Enemy" }
+  ],
+  "allowedFalsePositives": 0,
+  "allowedMissedChampions": 0
+}

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "regions": [
+    { "x": 16, "y": 283, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Yone", "affiliation": "Ally" },
+    { "x": 152, "y": 214, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Warwick", "affiliation": "Ally" },
+    { "x": 133, "y": 121, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Kennen", "affiliation": "Ally" },
+    { "x": 63, "y": 23, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Urgot", "affiliation": "Ally" },
+    { "x": 214, "y": 260, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Cassiopeia", "affiliation": "Ally" },
+    { "x": 81, "y": 17, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Nasus", "affiliation": "Enemy" },
+    { "x": 271, "y": 204, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Brand", "affiliation": "Enemy" },
+    { "x": 236, "y": 208, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Seraphine", "affiliation": "Enemy" }
+  ],
+  "allowedFalsePositives": 0,
+  "allowedMissedChampions": 0
+}
