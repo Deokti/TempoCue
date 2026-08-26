@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <!--
     Своя модель распознавания: детектор «где значки» плюс опознание «кто это».
@@ -23,6 +23,17 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TempoCue.Vision\TempoCue.Vision.csproj" />
+  </ItemGroup>
+
+  <!--
+    Веса едут в вывод сборки рядом с приложением: распознаватель ищет каталог
+    own-model от папки приложения и вверх по дереву, и так он находится сразу.
+    README рядом с весами в вывод не копируется — он для читателя репозитория.
+  -->
+  <ItemGroup>
+    <Content Include="own-model\detector.onnx;own-model\identity.onnx;own-model\model.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
