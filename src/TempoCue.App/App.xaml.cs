@@ -228,9 +228,12 @@ public partial class App : System.Windows.Application
             _settingsViewModel,
             _coachingViewModel);
         MainWindow.Show();
-        _windowCaptureSession.EnableAutomaticLeagueWindowCapture(
-            _lifetimeCancellation.Token);
+        // Монитор матча запускается раньше захвата: захват спрашивает у него,
+        // началась ли игра, и до первого опроса ответ был бы «нет» дольше нужного.
         _activeMatchMonitor.Start();
+        _windowCaptureSession.EnableAutomaticLeagueWindowCapture(
+            IsMatchRunning,
+            _lifetimeCancellation.Token);
         _ = InitializeScreenDataAsync(
             coachingLibraryViewModel,
             currentMatchViewModel,
@@ -353,6 +356,14 @@ public partial class App : System.Windows.Application
     /// файлы лежат рядом с приложением. Отсутствие файлов не является ошибкой:
     /// сборка без них просто работает на штатном конвейере.
     /// </summary>
+    /// <summary>
+    /// Идёт ли матч. Ответ Live Client Data приходит, когда игровой мир загружен,
+    /// то есть примерно тогда же, когда на экране появляется миникарта. Окно игры
+    /// для этого не годится: оно существует с начала загрузки.
+    /// </summary>
+    private bool IsMatchRunning() =>
+        _activeMatchMonitor?.CurrentUpdate?.Status is MatchSnapshotReadStatus.Success;
+
     private static IMinimapFrameAnalyzer? CreateFrameAnalyzer(AppSettings settings)
     {
         // Ноль означает «выбрать по машине», и такой выбор оба распознавателя

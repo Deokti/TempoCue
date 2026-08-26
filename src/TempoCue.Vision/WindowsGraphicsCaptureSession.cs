@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Windows.Graphics.Capture;
 using Windows.Graphics.DirectX;
 using Windows.Graphics.DirectX.Direct3D11;
@@ -100,6 +100,7 @@ public sealed class WindowsGraphicsCaptureSession :
     }
 
     public void EnableAutomaticLeagueWindowCapture(
+        Func<bool>? isMatchRunning = null,
         CancellationToken cancellationToken = default)
     {
         ObjectDisposedException.ThrowIf(Volatile.Read(ref _disposeState) != 0, this);
@@ -114,8 +115,9 @@ public sealed class WindowsGraphicsCaptureSession :
             _automaticCaptureCancellation = CancellationTokenSource.CreateLinkedTokenSource(
                 cancellationToken);
             var automaticCaptureToken = _automaticCaptureCancellation.Token;
+            var gate = isMatchRunning ?? (static () => true);
             _automaticCaptureTask = Task.Run(
-                () => MonitorLeagueWindowAsync(automaticCaptureToken),
+                () => MonitorLeagueWindowAsync(gate, automaticCaptureToken),
                 automaticCaptureToken);
         }
     }
@@ -305,7 +307,9 @@ public sealed class WindowsGraphicsCaptureSession :
         await _recognitionWorker.DisposeAsync().ConfigureAwait(false);
     }
 
-    private async Task MonitorLeagueWindowAsync(CancellationToken cancellationToken)
+    private async Task MonitorLeagueWindowAsync(
+        Func<bool> isMatchRunning,
+        CancellationToken cancellationToken)
     {
         using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
         do
@@ -318,9 +322,10 @@ public sealed class WindowsGraphicsCaptureSession :
                 frameMetrics.CaptureStartedAt,
                 snapshot.LastFrameAt,
                 DateTimeOffset.UtcNow);
-            if (shouldRestart ||
-                snapshot.State is not CaptureSessionState.Capturing and
-                    not CaptureSessionState.SelectingTarget)
+            if (AutomaticCaptureRecoveryPolicy.ShouldAttach(
+                    snapshot.State,
+                    isMatchRunning(),
+                    shouldRestart))
             {
                 await TryStartLeagueWindowAsync(cancellationToken).ConfigureAwait(false);
             }

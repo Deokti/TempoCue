@@ -1,4 +1,4 @@
-using TempoCue.Vision;
+﻿using TempoCue.Vision;
 
 namespace TempoCue.Vision.Tests;
 
@@ -76,5 +76,66 @@ public sealed class AutomaticCaptureRecoveryPolicyTests
         // Остановку пользователем, ожидание окна и выбор цели трогать нельзя:
         // отсутствие окна для них является нормальным состоянием, а не событием.
         Assert.False(AutomaticCaptureRecoveryPolicy.ShouldReleaseMissingTarget(state));
+    }
+
+    [Theory]
+    [InlineData(CaptureSessionState.Idle)]
+    [InlineData(CaptureSessionState.Stopped)]
+    [InlineData(CaptureSessionState.Failed)]
+    [InlineData(CaptureSessionState.Capturing)]
+    public void ShouldAttach_WaitsForTheMatchToStart(CaptureSessionState state)
+    {
+        // Окно игры существует с начала загрузки, а миникарты на экране ещё нет.
+        // Разбирать в это время нечего, а процессор нужен самой игре.
+        Assert.False(AutomaticCaptureRecoveryPolicy.ShouldAttach(
+            state,
+            isMatchRunning: false,
+            needsRestart: false));
+    }
+
+    [Fact]
+    public void ShouldAttach_IgnoresStalledFramesUntilTheMatchStarts()
+    {
+        // Переподключение при вставших кадрах важнее прочих условий, но не
+        // важнее самого матча: цепляться на загрузке незачем в любом случае.
+        Assert.False(AutomaticCaptureRecoveryPolicy.ShouldAttach(
+            CaptureSessionState.Capturing,
+            isMatchRunning: false,
+            needsRestart: true));
+    }
+
+    [Theory]
+    [InlineData(CaptureSessionState.Idle)]
+    [InlineData(CaptureSessionState.Stopped)]
+    [InlineData(CaptureSessionState.Failed)]
+    public void ShouldAttach_StartsAsSoonAsTheMatchIsRunning(CaptureSessionState state)
+    {
+        // Этот же путь покрывает перезапуск TempoCue внутри идущего матча:
+        // признак истинен с первого опроса, и ждать следующего матча не нужно.
+        Assert.True(AutomaticCaptureRecoveryPolicy.ShouldAttach(
+            state,
+            isMatchRunning: true,
+            needsRestart: false));
+    }
+
+    [Theory]
+    [InlineData(CaptureSessionState.Capturing)]
+    [InlineData(CaptureSessionState.SelectingTarget)]
+    public void ShouldAttach_LeavesWorkingCaptureAlone(CaptureSessionState state)
+    {
+        // Захват идёт или окно выбирается — вмешиваться не во что.
+        Assert.False(AutomaticCaptureRecoveryPolicy.ShouldAttach(
+            state,
+            isMatchRunning: true,
+            needsRestart: false));
+    }
+
+    [Fact]
+    public void ShouldAttach_ReconnectsStalledCaptureDuringMatch()
+    {
+        Assert.True(AutomaticCaptureRecoveryPolicy.ShouldAttach(
+            CaptureSessionState.Capturing,
+            isMatchRunning: true,
+            needsRestart: true));
     }
 }

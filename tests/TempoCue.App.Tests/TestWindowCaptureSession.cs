@@ -1,4 +1,4 @@
-using TempoCue.Vision;
+﻿using TempoCue.Vision;
 
 namespace TempoCue.App.Tests;
 
@@ -21,6 +21,7 @@ internal sealed class TestWindowCaptureSession :
     public bool HasReplaySample => ReplaySample is not null;
 
     public void EnableAutomaticLeagueWindowCapture(
+        Func<bool>? isMatchRunning = null,
         CancellationToken cancellationToken = default)
     {
     }
