@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <!--
     Экспериментальный распознаватель на сторонней модели. Отдельный проект нужен,
@@ -6,7 +6,15 @@
     эксперимент не дал результата и не принято решение о лицензии.
   -->
   <PropertyGroup>
-    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <TargetFramework>net10.0-windows10.0.22621.0</TargetFramework>
+    <!--
+      Собираемся против SDK Windows 11: там появились GraphicsCaptureAccess и
+      GraphicsCaptureSession.IsBorderRequired, которыми снимается жёлтая рамка
+      захвата. Минимальная поддерживаемая система при этом остаётся прежней —
+      SupportedOSPlatformVersion её и задаёт, — а сами вызовы закрыты проверкой
+      версии во время работы.
+    -->
+    <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>

@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Windows.Media;
@@ -174,6 +174,20 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         _snapshot.RecognitionDurationMilliseconds > 0 &&
         _snapshot.RecognitionDurationMilliseconds >
             ParticipantVisibilityTracker.DefaultMaximumDetectionGap.TotalMilliseconds / 2;
+
+    /// <summary>
+    /// Чем закончился запрос на захват без жёлтой рамки. Строка нужна затем, что
+    /// иначе исчезнувшую или оставшуюся рамку не с чем связать: разрешено,
+    /// отказано и «система не умеет» выглядят на экране одинаково.
+    /// </summary>
+    public string BorderlessCaptureText => _localization.Get(
+        BorderlessCaptureAccess.State switch
+        {
+            BorderlessCaptureState.Allowed => "Settings.Capture.Borderless.Allowed",
+            BorderlessCaptureState.Denied => "Settings.Capture.Borderless.Denied",
+            BorderlessCaptureState.NotSupported => "Settings.Capture.Borderless.NotSupported",
+            _ => "Settings.Capture.Borderless.Unknown"
+        });
 
     public string ReceivedFrameCountText =>
         _snapshot.ReceivedFrameCount.ToString("N0", CultureInfo.CurrentCulture);
@@ -522,6 +536,7 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(RecognitionFramesPerSecondLabelText));
         OnPropertyChanged(nameof(RecognitionFramesPerSecondText));
         OnPropertyChanged(nameof(RecognitionDurationText));
+        OnPropertyChanged(nameof(BorderlessCaptureText));
         OnPropertyChanged(nameof(IsRecognitionTooSlowForConfirmation));
         OnPropertyChanged(nameof(ReceivedFrameCountText));
         OnPropertyChanged(nameof(SelectedFrameCountText));
@@ -593,6 +608,7 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(RecognitionFramesPerSecondLabelText));
         OnPropertyChanged(nameof(RecognitionFramesPerSecondText));
         OnPropertyChanged(nameof(RecognitionDurationText));
+        OnPropertyChanged(nameof(BorderlessCaptureText));
         OnPropertyChanged(nameof(IsRecognitionTooSlowForConfirmation));
         OnPropertyChanged(nameof(ReceivedFrameCountText));
         OnPropertyChanged(nameof(SelectedFrameCountText));

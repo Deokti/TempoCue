@@ -1053,6 +1053,21 @@
   <data name="Coaching.MapControl.Details.Persistent.Title" xml:space="preserve"><value>Persistent tips</value></data>
   <data name="Coaching.MapControl.Details.Persistent.Empty" xml:space="preserve"><value>This pack does not contain persistent tips.</value></data>
   <data name="Coaching.MapControl.Details.ReadOnly" xml:space="preserve"><value>Read-only. Open the pack editor to change its content.</value></data>
+  <data name="Settings.Capture.Borderless.Label" xml:space="preserve">
+    <value>Yellow capture border</value>
+  </data>
+  <data name="Settings.Capture.Borderless.Allowed" xml:space="preserve">
+    <value>removed with your permission</value>
+  </data>
+  <data name="Settings.Capture.Borderless.Denied" xml:space="preserve">
+    <value>kept: permission not granted. Windows draws it around any captured window and only you can allow its removal.</value>
+  </data>
+  <data name="Settings.Capture.Borderless.NotSupported" xml:space="preserve">
+    <value>kept: removing it needs Windows 11</value>
+  </data>
+  <data name="Settings.Capture.Borderless.Unknown" xml:space="preserve">
+    <value>asking for permission</value>
+  </data>
   <data name="Settings.Capture.Section" xml:space="preserve"><value>Map monitoring</value></data>
   <data name="Settings.Capture.Title" xml:space="preserve"><value>Game window capture</value></data>
   <data name="Settings.Capture.Description" xml:space="preserve"><value>TempoCue automatically connects to the running League of Legends match window. Manual selection remains available as a fallback.</value></data>

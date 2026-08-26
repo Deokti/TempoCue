@@ -1063,6 +1063,21 @@
   <data name="Coaching.MapControl.Details.Persistent.Title" xml:space="preserve"><value>Постоянные подсказки</value></data>
   <data name="Coaching.MapControl.Details.Persistent.Empty" xml:space="preserve"><value>В наборе нет постоянных подсказок.</value></data>
   <data name="Coaching.MapControl.Details.ReadOnly" xml:space="preserve"><value>Только для чтения. Чтобы изменить содержимое, откройте редактор набора.</value></data>
+  <data name="Settings.Capture.Borderless.Label" xml:space="preserve">
+    <value>Жёлтая рамка захвата</value>
+  </data>
+  <data name="Settings.Capture.Borderless.Allowed" xml:space="preserve">
+    <value>снята с вашего разрешения</value>
+  </data>
+  <data name="Settings.Capture.Borderless.Denied" xml:space="preserve">
+    <value>осталась: разрешение не выдано. Windows рисует её вокруг любого захватываемого окна, и снять её можете разрешить только вы.</value>
+  </data>
+  <data name="Settings.Capture.Borderless.NotSupported" xml:space="preserve">
+    <value>осталась: для снятия нужна Windows 11</value>
+  </data>
+  <data name="Settings.Capture.Borderless.Unknown" xml:space="preserve">
+    <value>спрашиваем разрешение</value>
+  </data>
   <data name="Settings.Capture.Section" xml:space="preserve"><value>Мониторинг карты</value></data>
   <data name="Settings.Capture.Title" xml:space="preserve"><value>Захват окна игры</value></data>
   <data name="Settings.Capture.Description" xml:space="preserve"><value>TempoCue автоматически подключается к запущенному окну матча League of Legends. Ручной выбор остаётся запасным вариантом.</value></data>

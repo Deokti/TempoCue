@@ -413,6 +413,9 @@ public sealed class WindowsGraphicsCaptureSession :
                 item.Size);
             captureSession = framePool.CreateCaptureSession(item);
             captureSession.IsCursorCaptureEnabled = false;
+            // Жёлтую рамку вокруг окна рисует система. Убрать её можно только с
+            // разрешения пользователя, и оно спрашивается один раз при запуске.
+            BorderlessCaptureAccess.TryHideBorder(captureSession);
 
             await _lifecycleGate.WaitAsync(cancellationToken).ConfigureAwait(false);
             try

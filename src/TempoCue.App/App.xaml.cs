@@ -228,6 +228,11 @@ public partial class App : System.Windows.Application
             _settingsViewModel,
             _coachingViewModel);
         MainWindow.Show();
+        // Разрешение на захват без жёлтой рамки спрашивается один раз и здесь, а
+        // не перед первым кадром: там уже идёт матч, и системное окно согласия
+        // посреди игры — худшее, что можно предложить. Ответ Windows запоминает.
+        _ = BorderlessCaptureAccess.RequestAsync();
+
         // Монитор матча запускается раньше захвата: захват спрашивает у него,
         // началась ли игра, и до первого опроса ответ был бы «нет» дольше нужного.
         _activeMatchMonitor.Start();
