@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Своя модель распознавания: детектор «где значки» плюс опознание «кто это».
+    Отдельный проект по той же причине, что и у DeeperLeague: ONNX Runtime и веса
+    не должны попадать в продуктовый TempoCue.Vision, пока модель не прошла
+    приёмку по договору из docs/own-model-plan.md.
+
+    Версия ONNX Runtime обязана совпадать с той, которой сверялся экспорт в
+    модельном репозитории (tools/export_onnx.py). Расхождение между рантаймами
+    ловится только на живых кадрах и выглядит как ухудшение модели.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.20.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TempoCue.Vision\TempoCue.Vision.csproj" />
+  </ItemGroup>
+
+</Project>

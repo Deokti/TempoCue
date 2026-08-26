@@ -1,4 +1,4 @@
-using TempoCue.Tools.ReplayInspect;
+﻿using TempoCue.Tools.ReplayInspect;
 
 // Служебный инструмент разбора сохранённых кадров миникарты. Он не входит в
 // поставку приложения и существует, чтобы решения по распознаванию принимались
@@ -46,6 +46,8 @@ try
             await RecognitionTiming.RunAsync(args[1], args.Length == 3 ? args[2] : null),
         "--compare" when args.Length == 2 =>
             await DeeperLeagueComparison.RunAsync(args[1]),
+        "--own-model" when args.Length == 2 =>
+            await OwnModelComparison.RunAsync(args[1]),
         "--model" when args.Length >= 2 =>
             await DeeperLeagueComparison.RunOnFramesAsync(args.Skip(1)),
         "--icons" when args.Length == 3 =>
@@ -123,6 +125,12 @@ static void PrintUsage()
           ReplayInspect --compare <каталог корпуса>
               сравнение основного распознавателя и модели DeeperLeague на одной
               разметке; требует models/deeperleague с best.onnx и champMap.json
+
+          ReplayInspect --own-model <каталог корпуса>
+              сравнение основного распознавателя и своей модели на одной
+              разметке; требует models/own-model с model.json, detector.onnx
+              и identity.onnx — их отдаёт tools/export_onnx.py модельного
+              репозитория
 
         Координаты точек задаются в канонической системе кадра 320 x 320.
         """);

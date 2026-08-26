@@ -1,5 +1,6 @@
-using TempoCue.Vision;
+﻿using TempoCue.Vision;
 using TempoCue.Vision.DeeperLeague;
+using TempoCue.Vision.OwnModel;
 
 namespace TempoCue.Tools.ReplayInspect;
 
@@ -75,6 +76,21 @@ internal static class SequenceStability
                 sample.ChampionReferences)));
         }
 
+        // Свою модель показываем всегда, когда веса лежат рядом: пункт 5
+        // договора о приёмке — устойчивость между кадрами — единственный,
+        // который нельзя подменить полнотой по корпусу.
+        OwnModelMinimapRecognizer? ownModel = null;
+        if (OwnModelFrameAnalyzer.FindModelDirectory() is { } ownModelDirectory)
+        {
+            ownModel = new OwnModelMinimapRecognizer(ownModelDirectory);
+            runners.Add(("своя модель", sample => ownModel.Recognize(
+                sample.BgraPixels.Span,
+                sample.ImageWidth,
+                sample.ImageHeight,
+                sample.ImageStride,
+                sample.ChampionReferences)));
+        }
+
         try
         {
             foreach (var (name, recognize) in runners)
@@ -134,6 +150,7 @@ internal static class SequenceStability
         finally
         {
             model?.Dispose();
+            ownModel?.Dispose();
         }
 
         Console.WriteLine(

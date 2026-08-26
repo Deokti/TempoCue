@@ -1,5 +1,6 @@
-using TempoCue.Vision;
+﻿using TempoCue.Vision;
 using TempoCue.Vision.DeeperLeague;
+using TempoCue.Vision.OwnModel;
 
 namespace TempoCue.Tools.ReplayInspect;
 
@@ -48,6 +49,27 @@ internal static class SequenceListing
                 {
                     var sample = sequence.ToSample(index);
                     return model.Recognize(
+                        sample.BgraPixels.Span,
+                        sample.ImageWidth,
+                        sample.ImageHeight,
+                        sample.ImageStride,
+                        sample.ChampionReferences);
+                });
+        }
+
+        // Свою модель искать не просят: если веса лежат рядом, показываем её
+        // всегда. Пункт 6 договора о приёмке — разброс положений — иначе
+        // остаётся неизмеренным просто потому, что о ключе забыли.
+        if (OwnModelFrameAnalyzer.FindModelDirectory() is { } ownModelDirectory)
+        {
+            using var ownModel = new OwnModelMinimapRecognizer(ownModelDirectory);
+            PrintTable(
+                "своя модель",
+                sequence,
+                index =>
+                {
+                    var sample = sequence.ToSample(index);
+                    return ownModel.Recognize(
                         sample.BgraPixels.Span,
                         sample.ImageWidth,
                         sample.ImageHeight,
