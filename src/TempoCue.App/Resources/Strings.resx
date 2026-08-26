@@ -838,6 +838,9 @@
   <data name="Settings.Overlay.Unsaved" xml:space="preserve"><value>There are unsaved changes</value></data>
   <data name="Settings.Overlay.Preview.Label" xml:space="preserve"><value>Overlay preview</value></data>
   <data name="Settings.Overlay.Description" xml:space="preserve"><value>Shows Coach Pack advice over the game. Text and the accent rail stay fully opaque.</value></data>
+  <data name="Settings.Restart.Button" xml:space="preserve">
+    <value>Restart now</value>
+  </data>
   <data name="Settings.Recognizer.Default" xml:space="preserve">
     <value>Built-in pipeline</value>
   </data>

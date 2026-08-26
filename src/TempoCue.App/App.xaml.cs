@@ -167,7 +167,8 @@ public partial class App : System.Windows.Application
             ShowOverlayPreview,
             overlaySettings,
             _overlaySetupSession,
-            captureDiagnostics);
+            captureDiagnostics,
+            new ApplicationRestarter());
         var coachingLibraryViewModel = new CoachingLibraryViewModel(
             builtInPacks,
             LocalizationService.Instance,

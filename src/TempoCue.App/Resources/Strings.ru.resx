@@ -848,6 +848,9 @@
   <data name="Settings.Overlay.Unsaved" xml:space="preserve"><value>Есть несохранённые изменения</value></data>
   <data name="Settings.Overlay.Preview.Label" xml:space="preserve"><value>Предпросмотр оверлея</value></data>
   <data name="Settings.Overlay.Description" xml:space="preserve"><value>Показывает советы Coach Pack поверх игры. Текст и цветовая полоса остаются полностью непрозрачными.</value></data>
+  <data name="Settings.Restart.Button" xml:space="preserve">
+    <value>Перезапустить сейчас</value>
+  </data>
   <data name="Settings.Recognizer.Default" xml:space="preserve">
     <value>Штатный конвейер</value>
   </data>

@@ -170,13 +170,9 @@
                                LineHeight="17"
                                Margin="0,8,0,0" />
 
-                    <TextBlock Text="{localization:Loc Settings.Recognition.Threads.RestartNotice}"
-                               Foreground="#FFC955"
-                               FontSize="13"
-                               TextWrapping="Wrap"
-                               Margin="0,10,0,0">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
+                    <Grid Margin="0,10,0,0">
+                        <Grid.Style>
+                            <Style TargetType="Grid">
                                 <Setter Property="Visibility" Value="Collapsed" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding HasRecognitionThreadsRestartNotice}"
@@ -185,8 +181,39 @@
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
+                        </Grid.Style>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{localization:Loc Settings.Recognition.Threads.RestartNotice}"
+                                   Foreground="#FFC955"
+                                   FontSize="13"
+                                   TextWrapping="Wrap"
+                                   VerticalAlignment="Center" />
+                        <!-- Перезапуск делает приложение само: настройка уже сохранена, и
+                             заставлять человека закрывать и открывать окно руками незачем. -->
+                        <Button x:Name="RestartForThreadsButton"
+                                Grid.Column="1"
+                                Content="{localization:Loc Settings.Restart.Button}"
+                                MinWidth="170"
+                                Margin="14,0,0,0"
+                                VerticalAlignment="Center"
+                                Click="RestartToApplyButton_Click">
+                            <Button.Style>
+                                <Style TargetType="Button"
+                                       BasedOn="{StaticResource SecondaryButton}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding CanRestartToApply}"
+                                                     Value="True">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </Grid>
                 </StackPanel>
             </Border>
 
@@ -260,13 +287,9 @@
                                    LineHeight="18" />
                     </Border>
 
-                    <TextBlock Text="{localization:Loc Settings.Experiment.Recognizer.RestartNotice}"
-                               Foreground="#FFC955"
-                               FontSize="13"
-                               TextWrapping="Wrap"
-                               Margin="0,10,0,0">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
+                    <Grid Margin="0,10,0,0">
+                        <Grid.Style>
+                            <Style TargetType="Grid">
                                 <Setter Property="Visibility" Value="Collapsed" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding HasExperimentalRecognizerRestartNotice}"
@@ -275,8 +298,39 @@
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
+                        </Grid.Style>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{localization:Loc Settings.Experiment.Recognizer.RestartNotice}"
+                                   Foreground="#FFC955"
+                                   FontSize="13"
+                                   TextWrapping="Wrap"
+                                   VerticalAlignment="Center" />
+                        <!-- Перезапуск делает приложение само: настройка уже сохранена, и
+                             заставлять человека закрывать и открывать окно руками незачем. -->
+                        <Button x:Name="RestartForRecognizerButton"
+                                Grid.Column="1"
+                                Content="{localization:Loc Settings.Restart.Button}"
+                                MinWidth="170"
+                                Margin="14,0,0,0"
+                                VerticalAlignment="Center"
+                                Click="RestartToApplyButton_Click">
+                            <Button.Style>
+                                <Style TargetType="Button"
+                                       BasedOn="{StaticResource SecondaryButton}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding CanRestartToApply}"
+                                                     Value="True">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </Grid>
                 </StackPanel>
             </Border>
 

@@ -1,4 +1,4 @@
-namespace TempoCue.App.Settings;
+﻿namespace TempoCue.App.Settings;
 
 /// <summary>
 /// Каким распознавателем разбирать миникарту. Выбор применяется при следующем

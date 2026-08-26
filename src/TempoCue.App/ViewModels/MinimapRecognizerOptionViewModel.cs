@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using TempoCue.App.Localization;
 using TempoCue.App.Settings;
 

@@ -29,6 +29,7 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
     private readonly MinimapRecognizerChoice _initialMinimapRecognizer;
     private int _minimapRecognitionThreads;
     private readonly int _initialMinimapRecognitionThreads;
+    private readonly IApplicationRestarter? _restarter;
     private bool _isDisposed;
 
     public SettingsViewModel(
@@ -37,10 +38,12 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
         Action showOverlayPreview,
         OverlaySettingsState? overlaySettings = null,
         IOverlaySetupSession? overlaySetupSession = null,
-        CaptureDiagnosticsViewModel? captureDiagnostics = null)
+        CaptureDiagnosticsViewModel? captureDiagnostics = null,
+        IApplicationRestarter? restarter = null)
     {
         _localization = localization;
         _settings = settings;
+        _restarter = restarter;
         _showOverlayPreview = showOverlayPreview ?? throw new ArgumentNullException(nameof(showOverlayPreview));
         _overlaySettings = overlaySettings ?? new OverlaySettingsState(settings.Load().Overlay);
         _overlaySetupSession = overlaySetupSession;
@@ -101,6 +104,7 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
             _settings.SaveMinimapRecognizer(value);
             OnPropertyChanged(nameof(HasExperimentalRecognizerRestartNotice));
             OnPropertyChanged(nameof(HasUnsupportedChampionsNotice));
+            OnPropertyChanged(nameof(CanRestartToApply));
         }
     }
 
@@ -110,6 +114,21 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
     /// <summary>Показывает напоминание о перезапуске только после фактической смены.</summary>
     public bool HasExperimentalRecognizerRestartNotice =>
         _minimapRecognizer != _initialMinimapRecognizer;
+
+    /// <summary>
+    /// Есть ли настройка, ждущая перезапуска, и есть ли кому его выполнить.
+    /// Без перезапускателя кнопка не показывается вовсе: обещать действие,
+    /// которое некому сделать, хуже, чем не обещать.
+    /// </summary>
+    public bool CanRestartToApply =>
+        _restarter is not null
+        && (HasExperimentalRecognizerRestartNotice || HasRecognitionThreadsRestartNotice);
+
+    /// <summary>
+    /// Перезапускает приложение, чтобы новая настройка вступила в силу. Сами
+    /// настройки уже сохранены — перезапуск ничего не теряет.
+    /// </summary>
+    public void RestartToApply() => _restarter?.Restart();
 
     /// <summary>
     /// Предупреждение о неизвестных чемпионах: у сторонней модели ростер патча
@@ -140,6 +159,7 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
 
             _settings.SaveMinimapRecognitionThreads(value);
             OnPropertyChanged(nameof(HasRecognitionThreadsRestartNotice));
+            OnPropertyChanged(nameof(CanRestartToApply));
         }
     }
 

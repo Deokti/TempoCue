@@ -70,6 +70,51 @@ public sealed class SettingsViewModelTests
     }
 
     [Fact]
+    public void RestartButton_AppearsOnlyAfterChangeAndRestartsApplication()
+    {
+        using var settingsContext = new TemporarySettingsContext();
+        var restarter = new CountingRestarter();
+        using var viewModel = new SettingsViewModel(
+            LocalizationService.Instance,
+            settingsContext.Service,
+            static () => { },
+            restarter: restarter);
+
+        // Пока настройка не менялась, перезапускать нечего.
+        Assert.False(viewModel.CanRestartToApply);
+
+        viewModel.MinimapRecognizer = MinimapRecognizerChoice.OwnModel;
+
+        Assert.True(viewModel.CanRestartToApply);
+
+        viewModel.RestartToApply();
+
+        Assert.Equal(1, restarter.Calls);
+    }
+
+    [Fact]
+    public void RestartButton_StaysHiddenWithoutRestarter()
+    {
+        using var settingsContext = new TemporarySettingsContext();
+        using var viewModel = new SettingsViewModel(
+            LocalizationService.Instance,
+            settingsContext.Service,
+            static () => { });
+
+        viewModel.MinimapRecognizer = MinimapRecognizerChoice.OwnModel;
+
+        // Обещать действие, которое некому выполнить, хуже, чем не обещать.
+        Assert.True(viewModel.HasExperimentalRecognizerRestartNotice);
+        Assert.False(viewModel.CanRestartToApply);
+    }
+
+    private sealed class CountingRestarter : IApplicationRestarter
+    {
+        public int Calls { get; private set; }
+
+        public void Restart() => Calls++;
+    }
+    [Fact]
     public void RecognitionThreads_DefaultToAutomaticAndPersistWithRestartNotice()
     {
         using var settingsContext = new TemporarySettingsContext();
