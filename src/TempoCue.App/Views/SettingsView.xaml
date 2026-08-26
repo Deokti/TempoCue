@@ -1,4 +1,4 @@
-<UserControl x:Class="TempoCue.App.Views.SettingsView"
+﻿<UserControl x:Class="TempoCue.App.Views.SettingsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:TempoCue.App.Controls"
@@ -211,14 +211,33 @@
                                        LineHeight="18"
                                        Margin="0,4,0,0" />
                         </StackPanel>
-                        <ToggleButton x:Name="ExperimentalRecognizerSwitch"
-                                      Grid.Column="1"
-                                      Style="{StaticResource TempoSwitch}"
-                                      VerticalAlignment="Center"
-                                      IsChecked="{Binding IsExperimentalMinimapRecognizerEnabled, Mode=TwoWay}" />
+                        <ComboBox x:Name="MinimapRecognizerSelect"
+                                  Grid.Column="1"
+                                  Style="{StaticResource SettingsLanguageComboBox}"
+                                  Width="240"
+                                  VerticalAlignment="Center"
+                                  Margin="16,0,0,0"
+                                  ItemsSource="{Binding MinimapRecognizerOptions}"
+                                  SelectedValuePath="Choice"
+                                  SelectedValue="{Binding MinimapRecognizer, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding DisplayName}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                            <!-- Подсказка висит на самом варианте: она нужна при
+                                 выборе, то есть до того, как вариант применён. -->
+                            <ComboBox.ItemContainerStyle>
+                                <Style TargetType="ComboBoxItem"
+                                       BasedOn="{StaticResource SettingsLanguageComboBoxItem}">
+                                    <Setter Property="ToolTip" Value="{Binding HintText}" />
+                                    <Setter Property="ToolTipService.ShowDuration" Value="30000" />
+                                </Style>
+                            </ComboBox.ItemContainerStyle>
+                        </ComboBox>
                     </Grid>
-                    <!-- Список неподдерживаемых чемпионов виден только при включённом
-                         режиме: в выключенном состоянии он лишний. -->
+                    <!-- Список неподдерживаемых чемпионов виден только у сторонней
+                         модели: её ростер остановился на патче 13.14. -->
                     <Border Background="#16233A"
                             CornerRadius="8"
                             Padding="12,10"
@@ -227,7 +246,7 @@
                             <Style TargetType="Border">
                                 <Setter Property="Visibility" Value="Collapsed" />
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsExperimentalMinimapRecognizerEnabled}"
+                                    <DataTrigger Binding="{Binding HasUnsupportedChampionsNotice}"
                                                  Value="True">
                                         <Setter Property="Visibility" Value="Visible" />
                                     </DataTrigger>

@@ -9,6 +9,7 @@
     <ProjectReference Include="..\TempoCue.Vision\TempoCue.Vision.csproj" />
     <!-- Экспериментальный распознаватель; включается только переключателем в настройках. -->
     <ProjectReference Include="..\TempoCue.Vision.DeeperLeague\TempoCue.Vision.DeeperLeague.csproj" />
+    <ProjectReference Include="..\TempoCue.Vision.OwnModel\TempoCue.Vision.OwnModel.csproj" />
   </ItemGroup>
 
   <!--

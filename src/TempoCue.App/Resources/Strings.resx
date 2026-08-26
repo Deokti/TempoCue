@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
   <resheader name="version"><value>2.0</value></resheader>
@@ -838,6 +838,24 @@
   <data name="Settings.Overlay.Unsaved" xml:space="preserve"><value>There are unsaved changes</value></data>
   <data name="Settings.Overlay.Preview.Label" xml:space="preserve"><value>Overlay preview</value></data>
   <data name="Settings.Overlay.Description" xml:space="preserve"><value>Shows Coach Pack advice over the game. Text and the accent rail stay fully opaque.</value></data>
+  <data name="Settings.Recognizer.Default" xml:space="preserve">
+    <value>Built-in pipeline</value>
+  </data>
+  <data name="Settings.Recognizer.Default.Hint" xml:space="preserve">
+    <value>Colour contours and portrait matching. Confirms 45 of 67 champions on the test corpus with no false confirmations, about 40 ms per frame.</value>
+  </data>
+  <data name="Settings.Recognizer.OwnModel" xml:space="preserve">
+    <value>TempoCue model</value>
+  </data>
+  <data name="Settings.Recognizer.OwnModel.Hint" xml:space="preserve">
+    <value>Our own neural model. Confirms 64 of 67 on the test corpus with one or two false confirmations, about 8 ms per frame, and holds a moving champion on every frame. Knows every champion of the current patch.</value>
+  </data>
+  <data name="Settings.Recognizer.DeeperLeague" xml:space="preserve">
+    <value>DeeperLeague model</value>
+  </data>
+  <data name="Settings.Recognizer.DeeperLeague.Hint" xml:space="preserve">
+    <value>Third-party model. Confirms 48 of 60 with five false confirmations and does not know champions released after patch 13.14.</value>
+  </data>
   <data name="Settings.Experiment.Recognizer.Title" xml:space="preserve"><value>Experimental minimap recognition</value></data>
   <data name="Settings.Experiment.Recognizer.Description" xml:space="preserve"><value>Uses a third-party neural model instead of the built-in recognizer. It finds overlapping and recalling champions more often, but may confirm base icons by mistake. Without the model files TempoCue keeps using the built-in recognizer.</value></data>
   <data name="Settings.Experiment.Recognizer.UnsupportedChampions" xml:space="preserve"><value>The model was trained on patch 13.14. It does not know champions released after it: Briar, Hwei, Smolder, Aurora, Ambessa, Mel, Yunara, Zaahen, Locke. These have had their icon redrawn since then and may go untracked: Akshan, Jax, Leblanc, Rengar, Senna, Shyvana, Skarner, Syndra, Teemo, Viktor, XinZhao. Unrecognised participants are simply never reported; the model does not mistake them for someone else, and everyone else is tracked as usual.</value></data>

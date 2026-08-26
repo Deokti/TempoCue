@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using TempoCue.App.Localization;
 using TempoCue.App.Settings;
 using TempoCue.Overlay;
@@ -25,8 +25,8 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
     private OverlayUserSettings _savedOverlaySettings;
     private bool _overlaySetupWasOpened;
     private bool _isApplyingDraft;
-    private bool _isExperimentalMinimapRecognizerEnabled;
-    private readonly bool _initialExperimentalMinimapRecognizer;
+    private MinimapRecognizerChoice _minimapRecognizer;
+    private readonly MinimapRecognizerChoice _initialMinimapRecognizer;
     private int _minimapRecognitionThreads;
     private readonly int _initialMinimapRecognitionThreads;
     private bool _isDisposed;
@@ -46,9 +46,9 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
         _overlaySetupSession = overlaySetupSession;
         CaptureDiagnostics = captureDiagnostics;
         var storedSettings = settings.Load();
-        _initialExperimentalMinimapRecognizer =
-            storedSettings.UseExperimentalMinimapRecognizer;
-        _isExperimentalMinimapRecognizerEnabled = _initialExperimentalMinimapRecognizer;
+        MinimapRecognizerOptions = MinimapRecognizerOptionViewModel.Create(localization);
+        _initialMinimapRecognizer = storedSettings.MinimapRecognizer;
+        _minimapRecognizer = _initialMinimapRecognizer;
         MinimapRecognitionThreadOptions =
             MinimapRecognitionThreadOptionViewModel.CreateForCurrentMachine(localization);
         _initialMinimapRecognitionThreads = MinimapRecognitionThreadOptions
@@ -85,27 +85,38 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
     public CaptureDiagnosticsViewModel? CaptureDiagnostics { get; }
 
     /// <summary>
-    /// Включает экспериментальное распознавание миникарты сторонней моделью.
-    /// Значение сохраняется сразу, но применяется при следующем запуске.
+    /// Каким распознавателем разбирать миникарту. Сохраняется сразу, применяется
+    /// при следующем запуске.
     /// </summary>
-    public bool IsExperimentalMinimapRecognizerEnabled
+    public MinimapRecognizerChoice MinimapRecognizer
     {
-        get => _isExperimentalMinimapRecognizerEnabled;
+        get => _minimapRecognizer;
         set
         {
-            if (!SetProperty(ref _isExperimentalMinimapRecognizerEnabled, value))
+            if (!SetProperty(ref _minimapRecognizer, value))
             {
                 return;
             }
 
-            _settings.SaveExperimentalMinimapRecognizer(value);
+            _settings.SaveMinimapRecognizer(value);
             OnPropertyChanged(nameof(HasExperimentalRecognizerRestartNotice));
+            OnPropertyChanged(nameof(HasUnsupportedChampionsNotice));
         }
     }
 
+    /// <summary>Варианты распознавателя.</summary>
+    public IReadOnlyList<MinimapRecognizerOptionViewModel> MinimapRecognizerOptions { get; }
+
     /// <summary>Показывает напоминание о перезапуске только после фактической смены.</summary>
     public bool HasExperimentalRecognizerRestartNotice =>
-        _isExperimentalMinimapRecognizerEnabled != _initialExperimentalMinimapRecognizer;
+        _minimapRecognizer != _initialMinimapRecognizer;
+
+    /// <summary>
+    /// Предупреждение о неизвестных чемпионах: у сторонней модели ростер патча
+    /// 13.14. Своей модели и штатного конвейера это не касается.
+    /// </summary>
+    public bool HasUnsupportedChampionsNotice =>
+        _minimapRecognizer is MinimapRecognizerChoice.DeeperLeague;
 
     /// <summary>Варианты числа потоков, доступные на этой машине.</summary>
     public IReadOnlyList<MinimapRecognitionThreadOptionViewModel> MinimapRecognitionThreadOptions
@@ -327,6 +338,11 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
         CaptureDiagnostics?.Dispose();
         _localization.PropertyChanged -= Localization_PropertyChanged;
         foreach (var option in MinimapRecognitionThreadOptions)
+        {
+            option.Dispose();
+        }
+
+        foreach (var option in MinimapRecognizerOptions)
         {
             option.Dispose();
         }

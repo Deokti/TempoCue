@@ -1,4 +1,4 @@
-namespace TempoCue.App.Settings;
+﻿namespace TempoCue.App.Settings;
 
 /// <summary>Настройки, которые сохраняются между запусками TempoCue.</summary>
 public sealed record AppSettings
@@ -8,9 +8,16 @@ public sealed record AppSettings
     public OverlayUserSettings Overlay { get; init; } = new();
 
     /// <summary>
-    /// Включает экспериментальное распознавание миникарты сторонней моделью.
-    /// Работает только при наличии её файлов рядом с приложением; иначе TempoCue
-    /// молча остаётся на штатном распознавателе.
+    /// Каким распознавателем разбирать миникарту. Работает только при наличии
+    /// файлов выбранной модели рядом с приложением; иначе TempoCue молча
+    /// остаётся на штатном распознавателе.
+    /// </summary>
+    public MinimapRecognizerChoice MinimapRecognizer { get; init; }
+
+    /// <summary>
+    /// Прежняя галочка «экспериментальное распознавание». Оставлена только для
+    /// переноса сохранённых настроек: в файлах пользователей она уже лежит, и
+    /// молча потерять их выбор нельзя. Читается при загрузке, не пишется.
     /// </summary>
     public bool UseExperimentalMinimapRecognizer { get; init; }
 

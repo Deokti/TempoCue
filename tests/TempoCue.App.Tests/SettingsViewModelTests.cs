@@ -1,4 +1,4 @@
-using TempoCue.App.Localization;
+﻿using TempoCue.App.Localization;
 using TempoCue.App.ViewModels;
 using TempoCue.App.Settings;
 using TempoCue.Overlay;
@@ -46,19 +46,26 @@ public sealed class SettingsViewModelTests
             service,
             static () => { });
 
-        Assert.False(viewModel.IsExperimentalMinimapRecognizerEnabled);
+        Assert.Equal(MinimapRecognizerChoice.Default, viewModel.MinimapRecognizer);
         Assert.False(viewModel.HasExperimentalRecognizerRestartNotice);
+        Assert.False(viewModel.HasUnsupportedChampionsNotice);
 
-        viewModel.IsExperimentalMinimapRecognizerEnabled = true;
+        viewModel.MinimapRecognizer = MinimapRecognizerChoice.OwnModel;
 
         // Выбор сохраняется сразу, но применяется только при следующем запуске,
         // поэтому пользователю показывается напоминание о перезапуске.
-        Assert.True(service.Load().UseExperimentalMinimapRecognizer);
+        Assert.Equal(MinimapRecognizerChoice.OwnModel, service.Load().MinimapRecognizer);
         Assert.True(viewModel.HasExperimentalRecognizerRestartNotice);
+        // Предупреждение о неизвестных чемпионах относится только к чужой модели.
+        Assert.False(viewModel.HasUnsupportedChampionsNotice);
 
-        viewModel.IsExperimentalMinimapRecognizerEnabled = false;
+        viewModel.MinimapRecognizer = MinimapRecognizerChoice.DeeperLeague;
 
-        Assert.False(service.Load().UseExperimentalMinimapRecognizer);
+        Assert.True(viewModel.HasUnsupportedChampionsNotice);
+
+        viewModel.MinimapRecognizer = MinimapRecognizerChoice.Default;
+
+        Assert.Equal(MinimapRecognizerChoice.Default, service.Load().MinimapRecognizer);
         Assert.False(viewModel.HasExperimentalRecognizerRestartNotice);
     }
 

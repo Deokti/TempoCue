@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
   <resheader name="version"><value>2.0</value></resheader>
@@ -848,6 +848,24 @@
   <data name="Settings.Overlay.Unsaved" xml:space="preserve"><value>Есть несохранённые изменения</value></data>
   <data name="Settings.Overlay.Preview.Label" xml:space="preserve"><value>Предпросмотр оверлея</value></data>
   <data name="Settings.Overlay.Description" xml:space="preserve"><value>Показывает советы Coach Pack поверх игры. Текст и цветовая полоса остаются полностью непрозрачными.</value></data>
+  <data name="Settings.Recognizer.Default" xml:space="preserve">
+    <value>Штатный конвейер</value>
+  </data>
+  <data name="Settings.Recognizer.Default.Hint" xml:space="preserve">
+    <value>Цветные контуры и сравнение портретов. Берёт 45 чемпионов из 67 на корпусе проверки при нуле ложных подтверждений, около 40 мс на кадр.</value>
+  </data>
+  <data name="Settings.Recognizer.OwnModel" xml:space="preserve">
+    <value>Модель TempoCue</value>
+  </data>
+  <data name="Settings.Recognizer.OwnModel.Hint" xml:space="preserve">
+    <value>Своя нейросеть. Берёт 64 из 67 на корпусе проверки при одном-двух ложных подтверждениях, около 8 мс на кадр, и держит движущегося чемпиона на каждом кадре. Знает всех чемпионов нынешнего патча.</value>
+  </data>
+  <data name="Settings.Recognizer.DeeperLeague" xml:space="preserve">
+    <value>Модель DeeperLeague</value>
+  </data>
+  <data name="Settings.Recognizer.DeeperLeague.Hint" xml:space="preserve">
+    <value>Сторонняя модель. Берёт 48 из 60 при пяти ложных подтверждениях и не знает чемпионов, вышедших после патча 13.14.</value>
+  </data>
   <data name="Settings.Experiment.Recognizer.Title" xml:space="preserve"><value>Экспериментальное распознавание миникарты</value></data>
   <data name="Settings.Experiment.Recognizer.Description" xml:space="preserve"><value>Использует стороннюю нейросетевую модель вместо встроенного распознавателя. Она чаще находит перекрытых и отзывающихся чемпионов, но иногда принимает значки базы за чемпионов. Без файлов модели TempoCue продолжает работать на встроенном распознавателе.</value></data>
   <data name="Settings.Experiment.Recognizer.UnsupportedChampions" xml:space="preserve"><value>Модель обучена на патче 13.14. Она не знает вышедших после него: Briar, Hwei, Smolder, Aurora, Ambessa, Mel, Yunara, Zaahen, Locke. У этих значок с тех пор перерисован, поэтому они могут не отслеживаться: Akshan, Jax, Leblanc, Rengar, Senna, Shyvana, Skarner, Syndra, Teemo, Viktor, XinZhao. Нераспознанные участники просто не показываются, за других модель их не принимает; остальные отслеживаются как обычно.</value></data>

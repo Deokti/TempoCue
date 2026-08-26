@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Text.Json;
 using TempoCue.App.Localization;
 
@@ -49,7 +49,8 @@ public sealed class AppSettingsService
                         // Отрицательное число потоков в подправленном вручную файле
                         // не должно ронять запуск: оно означает «выбрать по машине».
                         MinimapRecognitionThreads =
-                            Math.Max(0, settings.MinimapRecognitionThreads)
+                            Math.Max(0, settings.MinimapRecognitionThreads),
+                        MinimapRecognizer = Migrate(settings)
                     };
                 }
             }
@@ -93,14 +94,35 @@ public sealed class AppSettingsService
     }
 
     /// <summary>
+    /// Переносит выбор из прежней галочки. Настройка не выбрана, а галочка
+    /// стоит — значит человек включал стороннюю модель, и это его выбор.
+    /// </summary>
+    private static MinimapRecognizerChoice Migrate(AppSettings settings) =>
+        settings.MinimapRecognizer is MinimapRecognizerChoice.Default
+        && settings.UseExperimentalMinimapRecognizer
+            ? MinimapRecognizerChoice.DeeperLeague
+            : settings.MinimapRecognizer;
+
+    /// <summary>
     /// Сохраняет выбор распознавателя миникарты. Он применяется при следующем
     /// запуске: способ распознавания выбирается один раз при создании сессии
     /// захвата, и подмена на ходу усложнила бы её жизненный цикл без пользы.
     /// </summary>
-    public void SaveExperimentalMinimapRecognizer(bool isEnabled)
+    public void SaveMinimapRecognizer(MinimapRecognizerChoice choice)
     {
+        if (!Enum.IsDefined(choice))
+        {
+            throw new ArgumentOutOfRangeException(nameof(choice));
+        }
+
         var current = Load();
-        Save(current with { UseExperimentalMinimapRecognizer = isEnabled });
+        // Прежняя галочка гасится: иначе перенос при следующей загрузке снова
+        // подставил бы стороннюю модель поверх нового выбора.
+        Save(current with
+        {
+            MinimapRecognizer = choice,
+            UseExperimentalMinimapRecognizer = false
+        });
     }
 
     /// <summary>

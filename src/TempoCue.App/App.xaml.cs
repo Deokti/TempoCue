@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using TempoCue.App.Coordinators;
@@ -12,6 +12,7 @@ using TempoCue.Overlay;
 using TempoCue.Riot;
 using TempoCue.Vision;
 using TempoCue.Vision.DeeperLeague;
+using TempoCue.Vision.OwnModel;
 
 namespace TempoCue.App;
 
@@ -359,29 +360,38 @@ public partial class App : System.Windows.Application
         var threads = settings.MinimapRecognitionThreads <= 0
             ? (int?)null
             : settings.MinimapRecognitionThreads;
-        if (!settings.UseExperimentalMinimapRecognizer)
+        if (settings.MinimapRecognizer is MinimapRecognizerChoice.Default)
         {
             return threads is null
                 ? null
                 : new DefaultMinimapFrameAnalyzer(threads.Value);
         }
 
-        var modelDirectory = DeeperLeagueFrameAnalyzer.FindModelDirectory();
+        var modelDirectory = settings.MinimapRecognizer switch
+        {
+            MinimapRecognizerChoice.OwnModel => OwnModelFrameAnalyzer.FindModelDirectory(),
+            _ => DeeperLeagueFrameAnalyzer.FindModelDirectory()
+        };
         if (modelDirectory is null)
         {
             Debug.WriteLine(
-                "Экспериментальное распознавание включено, но файлы модели не найдены.");
+                $"Выбран распознаватель {settings.MinimapRecognizer}, но файлы модели не найдены.");
             return null;
         }
 
         try
         {
-            return new DeeperLeagueFrameAnalyzer(modelDirectory, threads);
+            return settings.MinimapRecognizer switch
+            {
+                MinimapRecognizerChoice.OwnModel =>
+                    new OwnModelFrameAnalyzer(modelDirectory, threads),
+                _ => new DeeperLeagueFrameAnalyzer(modelDirectory, threads)
+            };
         }
         catch (Exception exception)
         {
             // Неудачная загрузка модели не должна лишать пользователя распознавания.
-            Debug.WriteLine($"Не удалось загрузить экспериментальную модель: {exception}");
+            Debug.WriteLine($"Не удалось загрузить модель: {exception}");
             return null;
         }
     }
