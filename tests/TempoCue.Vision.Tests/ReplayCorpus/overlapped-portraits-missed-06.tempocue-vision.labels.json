@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "regions": [
-    { "x": 34, "y": 60, "width": 25, "height": 25, "kind": "Champion",
+    { "x": 34, "y": 64, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Tryndamere", "affiliation": "Enemy" },
     { "x": 28, "y": 52, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Darius", "affiliation": "Ally" },
