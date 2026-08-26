@@ -10,7 +10,9 @@
     { "x": 202, "y": 190, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Sejuani", "affiliation": "Enemy" },
     { "x": 135, "y": 107, "width": 25, "height": 25, "kind": "Champion",
-      "championId": "Rakan", "affiliation": "Enemy" }
+      "championId": "Rakan", "affiliation": "Enemy" },
+    { "x": 188, "y": 185, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Karthus", "affiliation": "Ally" }
   ],
   "allowedFalsePositives": 0,
   "allowedMissedChampions": 0

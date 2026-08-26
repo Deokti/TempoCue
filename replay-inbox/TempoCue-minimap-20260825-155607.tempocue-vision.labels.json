@@ -10,7 +10,9 @@
     { "x": 58, "y": 220, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Diana", "affiliation": "Ally" },
     { "x": 235, "y": 251, "width": 25, "height": 25, "kind": "Champion",
-      "championId": "Varus", "affiliation": "Enemy" }
+      "championId": "Varus", "affiliation": "Enemy" },
+    { "x": 6, "y": 288, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Sejuani", "affiliation": "Enemy" }
   ],
   "allowedFalsePositives": 0,
   "allowedMissedChampions": 0

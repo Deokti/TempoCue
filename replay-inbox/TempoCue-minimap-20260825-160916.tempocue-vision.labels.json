@@ -12,7 +12,9 @@
     { "x": 164, "y": 130, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Darius", "affiliation": "Enemy" },
     { "x": 249, "y": 203, "width": 25, "height": 25, "kind": "Champion",
-      "championId": "Jhin", "affiliation": "Enemy" }
+      "championId": "Jhin", "affiliation": "Enemy" },
+    { "x": 235, "y": 212, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Swain", "affiliation": "Ally" }
   ],
   "allowedFalsePositives": 0,
   "allowedMissedChampions": 0

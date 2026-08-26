@@ -6,7 +6,9 @@
     { "x": 210, "y": 269, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Sona", "affiliation": "Ally" },
     { "x": 233, "y": 250, "width": 25, "height": 25, "kind": "Champion",
-      "championId": "Xayah", "affiliation": "Enemy" }
+      "championId": "Xayah", "affiliation": "Enemy" },
+    { "x": 227, "y": 258, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Milio", "affiliation": "Enemy" }
   ],
   "allowedFalsePositives": 0,
   "allowedMissedChampions": 0

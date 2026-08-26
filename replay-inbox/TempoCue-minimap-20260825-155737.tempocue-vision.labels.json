@@ -12,7 +12,9 @@
     { "x": 136, "y": 155, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Heimerdinger", "affiliation": "Enemy" },
     { "x": 254, "y": 247, "width": 25, "height": 25, "kind": "Champion",
-      "championId": "Varus", "affiliation": "Enemy" }
+      "championId": "Varus", "affiliation": "Enemy" },
+    { "x": 240, "y": 254, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Nautilus", "affiliation": "Ally" }
   ],
   "allowedFalsePositives": 0,
   "allowedMissedChampions": 0

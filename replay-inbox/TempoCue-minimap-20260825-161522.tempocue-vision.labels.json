@@ -8,7 +8,11 @@
     { "x": 236, "y": 248, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Xayah", "affiliation": "Enemy" },
     { "x": 165, "y": 133, "width": 25, "height": 25, "kind": "Champion",
-      "championId": "Ekko", "affiliation": "Enemy" }
+      "championId": "Ekko", "affiliation": "Enemy" },
+    { "x": 228, "y": 255, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Sona", "affiliation": "Ally" },
+    { "x": 216, "y": 254, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Vayne", "affiliation": "Ally" }
   ],
   "allowedFalsePositives": 0,
   "allowedMissedChampions": 0

@@ -10,7 +10,9 @@
     { "x": 122, "y": 104, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Darius", "affiliation": "Enemy" },
     { "x": 135, "y": 152, "width": 25, "height": 25, "kind": "Champion",
-      "championId": "Kayle", "affiliation": "Enemy" }
+      "championId": "Kayle", "affiliation": "Enemy" },
+    { "x": 138, "y": 158, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Malzahar", "affiliation": "Ally" }
   ],
   "allowedFalsePositives": 0,
   "allowedMissedChampions": 0

@@ -8,7 +8,9 @@
     { "x": 110, "y": 262, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Ashe", "affiliation": "Ally" },
     { "x": 262, "y": 96, "width": 25, "height": 25, "kind": "Champion",
-      "championId": "Nami", "affiliation": "Enemy" }
+      "championId": "Nami", "affiliation": "Enemy" },
+    { "x": 248, "y": 106, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Malzahar", "affiliation": "Ally" }
   ],
   "allowedFalsePositives": 0,
   "allowedMissedChampions": 0

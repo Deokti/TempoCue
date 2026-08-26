@@ -12,7 +12,9 @@
     { "x": 178, "y": 118, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Kayle", "affiliation": "Enemy" },
     { "x": 272, "y": 214, "width": 25, "height": 25, "kind": "Champion",
-      "championId": "Jhin", "affiliation": "Enemy" }
+      "championId": "Jhin", "affiliation": "Enemy" },
+    { "x": 172, "y": 126, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Malzahar", "affiliation": "Ally" }
   ],
   "allowedFalsePositives": 0,
   "allowedMissedChampions": 0

@@ -6,7 +6,11 @@
     { "x": 191, "y": 39, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Poppy", "affiliation": "Ally" },
     { "x": 268, "y": 162, "width": 25, "height": 25, "kind": "Champion",
-      "championId": "Fizz", "affiliation": "Enemy" }
+      "championId": "Fizz", "affiliation": "Enemy" },
+    { "x": 148, "y": 149, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Chogath", "affiliation": "Ally" },
+    { "x": 261, "y": 172, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Sona", "affiliation": "Ally" }
   ],
   "allowedFalsePositives": 0,
   "allowedMissedChampions": 0

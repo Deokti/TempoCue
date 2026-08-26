@@ -10,7 +10,15 @@
     { "x": 151, "y": 149, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Kayle", "affiliation": "Enemy" },
     { "x": 244, "y": 244, "width": 25, "height": 25, "kind": "Champion",
-      "championId": "Jhin", "affiliation": "Enemy" }
+      "championId": "Jhin", "affiliation": "Enemy" },
+    { "x": 253, "y": 243, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Swain", "affiliation": "Ally" },
+    { "x": 50, "y": 30, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Volibear", "affiliation": "Ally" },
+    { "x": 231, "y": 258, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Ashe", "affiliation": "Ally" },
+    { "x": 45, "y": 24, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Darius", "affiliation": "Enemy" }
   ],
   "allowedFalsePositives": 0,
   "allowedMissedChampions": 0

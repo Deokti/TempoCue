@@ -8,7 +8,13 @@
     { "x": 168, "y": 126, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Diana", "affiliation": "Ally" },
     { "x": 260, "y": 205, "width": 25, "height": 25, "kind": "Champion",
-      "championId": "Varus", "affiliation": "Enemy" }
+      "championId": "Varus", "affiliation": "Enemy" },
+    { "x": 170, "y": 197, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Nautilus", "affiliation": "Ally" },
+    { "x": 166, "y": 47, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Singed", "affiliation": "Ally" },
+    { "x": 248, "y": 206, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Rakan", "affiliation": "Enemy" }
   ],
   "allowedFalsePositives": 0,
   "allowedMissedChampions": 0

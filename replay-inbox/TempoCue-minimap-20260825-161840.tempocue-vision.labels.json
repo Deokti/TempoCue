@@ -4,7 +4,13 @@
     { "x": 244, "y": 206, "width": 25, "height": 25, "kind": "Champion",
       "championId": "Vayne", "affiliation": "Ally" },
     { "x": 147, "y": 159, "width": 25, "height": 25, "kind": "Champion",
-      "championId": "Ekko", "affiliation": "Enemy" }
+      "championId": "Ekko", "affiliation": "Enemy" },
+    { "x": 25, "y": 98, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Chogath", "affiliation": "Ally" },
+    { "x": 154, "y": 155, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Milio", "affiliation": "Enemy" },
+    { "x": 241, "y": 211, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Sona", "affiliation": "Ally" }
   ],
   "allowedFalsePositives": 0,
   "allowedMissedChampions": 0
