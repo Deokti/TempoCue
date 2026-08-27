@@ -140,8 +140,11 @@ public partial class App : System.Windows.Application
             _overlayPresenter,
             overlaySettings,
             LocalizationService.Instance);
+        // Распознаватель создаётся при первом кадре: до начала матча и без
+        // включённых правил наблюдения кадров не будет, а веса модели — это
+        // мегабайты памяти и рабочие потоки ONNX Runtime. ADR 0017.
         _windowCaptureSession = new WindowsGraphicsCaptureSession(
-            CreateFrameAnalyzer(settings));
+            () => CreateFrameAnalyzer(settings) ?? new DefaultMinimapFrameAnalyzer());
         _championPortraitReferenceLoader = new ChampionPortraitReferenceLoader();
         _activeMatchVisionCoordinator = new ActiveMatchVisionCoordinator(
             _activeMatchMonitor,

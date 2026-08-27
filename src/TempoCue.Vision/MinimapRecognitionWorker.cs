@@ -10,22 +10,46 @@ namespace TempoCue.Vision;
 internal sealed class MinimapRecognitionWorker : IAsyncDisposable
 {
     private readonly Channel<RecognitionWorkItem> _pendingFrames;
-    private readonly IMinimapFrameAnalyzer _analyzer;
+    private readonly Func<IMinimapFrameAnalyzer> _analyzerFactory;
     private readonly Action<RecognitionWorkResult> _completed;
     private readonly CancellationTokenSource _stopping = new();
     private readonly Task _processingTask;
+
+    /// <summary>
+    /// Создаётся при первом кадре, а не при запуске приложения. Читается и
+    /// пишется только в <see cref="ProcessAsync"/> — читатель у очереди один.
+    /// </summary>
+    private IMinimapFrameAnalyzer? _analyzer;
     private int _disposeState;
 
     public MinimapRecognitionWorker(Action<RecognitionWorkResult> completed)
-        : this(new DefaultMinimapFrameAnalyzer(), completed)
+        : this(static () => new DefaultMinimapFrameAnalyzer(), completed)
     {
     }
 
     public MinimapRecognitionWorker(
         IMinimapFrameAnalyzer analyzer,
         Action<RecognitionWorkResult> completed)
+        : this(
+            analyzer is null
+                ? throw new ArgumentNullException(nameof(analyzer))
+                : () => analyzer,
+            completed)
     {
-        _analyzer = analyzer ?? throw new ArgumentNullException(nameof(analyzer));
+    }
+
+    /// <param name="analyzerFactory">
+    /// Откладывает создание распознавателя до первого кадра. Веса модели — это
+    /// мегабайты памяти и рабочие потоки ONNX Runtime, и держать их с запуска
+    /// приложения незачем: пока наблюдение за картой выключено или матч не
+    /// начался, кадров не будет вовсе. ADR 0017.
+    /// </param>
+    public MinimapRecognitionWorker(
+        Func<IMinimapFrameAnalyzer> analyzerFactory,
+        Action<RecognitionWorkResult> completed)
+    {
+        _analyzerFactory = analyzerFactory
+            ?? throw new ArgumentNullException(nameof(analyzerFactory));
         _completed = completed ?? throw new ArgumentNullException(nameof(completed));
         _pendingFrames = Channel.CreateBounded<RecognitionWorkItem>(
             new BoundedChannelOptions(1)
@@ -80,10 +104,15 @@ internal sealed class MinimapRecognitionWorker : IAsyncDisposable
             .ConfigureAwait(false))
         {
             RecognitionWorkResult result;
-            var stopwatch = Stopwatch.StartNew();
+            // Секундомер запускается после создания распознавателя: однократная
+            // загрузка весов не должна попасть в метрику времени разбора кадра
+            // и выглядеть там медленным распознаванием.
+            var stopwatch = new Stopwatch();
             try
             {
-                var recognition = _analyzer.Analyze(
+                var analyzer = _analyzer ??= _analyzerFactory();
+                stopwatch.Start();
+                var recognition = analyzer.Analyze(
                     item.Preview.BgraPixels,
                     item.Preview.ImageWidth,
                     item.Preview.ImageHeight,

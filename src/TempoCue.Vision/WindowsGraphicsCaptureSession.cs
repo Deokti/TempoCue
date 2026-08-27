@@ -61,7 +61,7 @@ public sealed class WindowsGraphicsCaptureSession :
     public event EventHandler<MinimapChampionObservationEventArgs>? ObservationAvailable;
 
     public WindowsGraphicsCaptureSession()
-        : this(null)
+        : this((IMinimapFrameAnalyzer?)null)
     {
     }
 
@@ -73,6 +73,18 @@ public sealed class WindowsGraphicsCaptureSession :
     {
         _recognitionWorker = new MinimapRecognitionWorker(
             analyzer ?? new DefaultMinimapFrameAnalyzer(),
+            CompleteMinimapRecognition);
+    }
+
+    /// <summary>
+    /// То же, но распознаватель создаётся при первом кадре. Веса модели стоят
+    /// памяти и рабочих потоков, а кадров не будет, пока наблюдение за картой
+    /// выключено или матч не начался. ADR 0017.
+    /// </summary>
+    public WindowsGraphicsCaptureSession(Func<IMinimapFrameAnalyzer> analyzerFactory)
+    {
+        _recognitionWorker = new MinimapRecognitionWorker(
+            analyzerFactory,
             CompleteMinimapRecognition);
     }
 
