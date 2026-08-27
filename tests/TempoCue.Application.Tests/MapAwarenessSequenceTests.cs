@@ -1,4 +1,5 @@
-using TempoCue.Application;
+﻿using TempoCue.Application;
+using TempoCue.Coaching;
 using TempoCue.Core;
 
 namespace TempoCue.Application.Tests;
@@ -62,7 +63,8 @@ public sealed class MapAwarenessSequenceTests
         }
 
         var signal = Assert.Single(harness.Signals);
-        Assert.Equal(MapAwarenessSignalKind.EnemyMidDisappeared, signal.Kind);
+        Assert.Equal(PlayerPosition.Middle, signal.Rule.Position);
+        Assert.Equal(MapVisionTransition.Disappeared, signal.Rule.Transition);
         var delay = signal.OccurredAt - lastSeenAt;
         Assert.InRange(
             delay,
@@ -135,7 +137,8 @@ public sealed class MapAwarenessSequenceTests
             new SequenceObservation("enemy-jungle", 0.9));
 
         var signal = Assert.Single(harness.Signals);
-        Assert.Equal(MapAwarenessSignalKind.EnemyJunglerAppeared, signal.Kind);
+        Assert.Equal(PlayerPosition.Jungle, signal.Rule.Position);
+        Assert.Equal(MapVisionTransition.Appeared, signal.Rule.Transition);
         // Задержка появления не деградировала: сигнал на втором сильном кадре.
         Assert.Equal(firstSightingAt.AddMilliseconds(250), signal.OccurredAt);
     }
@@ -203,7 +206,7 @@ public sealed class MapAwarenessSequenceTests
                     .ToArray());
             foreach (var transition in _detector.Update(capturedAt, states))
             {
-                if (MapAwarenessSignalPolicy.Evaluate(transition, Match) is { } signal)
+                if (MapAwarenessSignalPolicy.Evaluate(transition, Match, Rules) is { } signal)
                 {
                     Signals.Add(signal);
                 }
@@ -222,12 +225,34 @@ public sealed class MapAwarenessSequenceTests
                 .ToArray();
             foreach (var transition in _detector.Update(at, unknownStates))
             {
-                if (MapAwarenessSignalPolicy.Evaluate(transition, Match) is { } signal)
+                if (MapAwarenessSignalPolicy.Evaluate(transition, Match, Rules) is { } signal)
                 {
                     Signals.Add(signal);
                 }
             }
         }
+
+        /// <summary>
+        /// Те же два правила, что поставляются встроенными наборами. Вся матрица
+        /// здесь была бы неверной меркой: эти проверки о цепочке наблюдений, и
+        /// лишние роли добавили бы к ним сигналы, к сценарию не относящиеся.
+        /// </summary>
+        private static readonly IReadOnlyList<MapVisionRule> Rules =
+        [
+            CreateRule(PlayerPosition.Jungle, MapVisionTransition.Appeared),
+            CreateRule(PlayerPosition.Middle, MapVisionTransition.Disappeared)
+        ];
+
+        private static MapVisionRule CreateRule(
+            PlayerPosition position,
+            MapVisionTransition transition) => new(
+                $"{position}-{transition}",
+                position,
+                transition,
+                MapObjectiveReminderPriority.Caution,
+                "Сообщение",
+                "Почему сейчас",
+                "Что дальше");
 
         private string[] ExpectedParticipants() => Match.Players
             .Where(static player => !player.IsDead)

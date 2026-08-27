@@ -1,7 +1,8 @@
-using TempoCue.App.Coordinators;
+﻿using TempoCue.App.Coordinators;
 using TempoCue.App.Localization;
 using TempoCue.App.Settings;
 using TempoCue.Application;
+using TempoCue.Coaching;
 using TempoCue.Core;
 using TempoCue.Overlay;
 
@@ -14,16 +15,16 @@ public sealed class ActiveMatchMapAwarenessCoordinatorTests
     [InlineData(
         "enemy-jungle",
         ParticipantVisibilityTransitionKind.Appeared,
-        "map-awareness:jungle:enemy-jungle:appeared",
+        "map-awareness:jungle-appeared:enemy-jungle",
         OverlayNotificationTone.Danger,
-        "Вражеский лесник появился")]
+        "Amumu")]
     [InlineData(
         "enemy-mid",
         ParticipantVisibilityTransitionKind.Disappeared,
-        "map-awareness:middle:enemy-mid:disappeared",
+        "map-awareness:mid-disappeared:enemy-mid",
         OverlayNotificationTone.Caution,
-        "Вражеский мидер исчез")]
-    public void TransitionAvailable_ShowsLocalizedOperationalNotification(
+        "Anivia")]
+    public void TransitionAvailable_ShowsNotificationFromTheMatchedRule(
         string participantId,
         ParticipantVisibilityTransitionKind kind,
         string expectedKey,
@@ -105,10 +106,35 @@ public sealed class ActiveMatchMapAwarenessCoordinatorTests
             ]
         };
 
+        // Правила приходят из включённых наборов, а не из кода координатора.
+        var plan = new ActiveMapControlPlan(
+            [],
+            ["Проверочный набор"],
+            [],
+            [
+                new MapVisionRule(
+                    "jungle-appeared",
+                    PlayerPosition.Jungle,
+                    MapVisionTransition.Appeared,
+                    MapObjectiveReminderPriority.Important,
+                    "Лесник виден на карте.",
+                    "Положение лесника быстро устаревает.",
+                    "Реши, даёт ли это окно."),
+                new MapVisionRule(
+                    "mid-disappeared",
+                    PlayerPosition.Middle,
+                    MapVisionTransition.Disappeared,
+                    MapObjectiveReminderPriority.Caution,
+                    "Мидер пропал с карты.",
+                    "Мидер доходит до боковой линии быстрее всех.",
+                    "Отойди к башне или поставь обзор.")
+            ]);
+
         return new ActiveMatchUpdate(
             MatchSnapshotReadStatus.Success,
             new MatchSnapshot(match, [], DateTimeOffset.UtcNow),
-            ActiveCoachPackSelection.NotFound());
+            ActiveCoachPackSelection.NotFound(),
+            plan);
     }
 
     private static PlayerState CreatePlayer(

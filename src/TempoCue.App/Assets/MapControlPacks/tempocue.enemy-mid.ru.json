@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "packType": "mapControl",
+  "id": "tempocue.map-control.enemy-mid.ru",
+  "name": "Вражеский мидер: пропажа с линии",
+  "patch": "16.16",
+  "description": "Уведомление, когда вражеский мидер пропал из поля зрения. Пропажа мидера — самый частый предвестник ганка на боковой линии.",
+  "author": "TempoCue",
+  "contentLanguage": "ru_RU",
+  "verifiedOn": "2026-08-27",
+  "source": {
+    "kind": "personalExperience",
+    "title": "Наблюдение за миникартой средствами TempoCue",
+    "url": "",
+    "author": "TempoCue",
+    "permission": "notRequired"
+  },
+  "applicability": {
+    "roles": [
+      "top",
+      "jungle",
+      "mid",
+      "adc",
+      "support"
+    ],
+    "teamSide": "any"
+  },
+  "rules": [],
+  "visionRules": [
+    {
+      "id": "enemy-mid-disappeared",
+      "position": "middle",
+      "transition": "disappeared",
+      "priority": "caution",
+      "message": "Вражеский мидер пропал с карты. Считай, что он может оказаться на любой из боковых линий.",
+      "whyNow": "Мидер доходит до боковой линии быстрее всех остальных, и его пропажа обычно опережает ганк, а не следует за ним.",
+      "nextGoal": "Отойди к башне или поставь обзор до того, как он появится. Возвращаться к линии стоит после того, как он снова замечен.",
+      "isEnabled": true
+    }
+  ],
+  "timedReminders": [],
+  "persistentTips": []
+}

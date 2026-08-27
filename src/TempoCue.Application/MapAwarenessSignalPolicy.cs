@@ -1,11 +1,22 @@
+﻿using TempoCue.Coaching;
 using TempoCue.Core;
 
 namespace TempoCue.Application;
 
 /// <summary>
-/// Преобразует нейтральное изменение видимости в безопасный игровой сигнал.
-/// Неоднозначные команды, роли и состояние смерти намеренно не угадываются.
+/// Преобразует нейтральное изменение видимости в игровой сигнал по правилам
+/// включённых наборов контроля карты.
 /// </summary>
+/// <remarks>
+/// Раньше набор сигналов был зашит здесь: появление вражеского лесника и пропажа
+/// мидера, два случая в <c>switch</c>. Теперь приложение не знает наперёд, какие
+/// сигналы существуют, — это решают наборы. ADR 0016.
+///
+/// Что осталось в коде намеренно: безопасность. Неоднозначные команды, роли и
+/// состояние смерти не угадываются, а порог уверенности наблюдения — свойство
+/// распознавания, а не пожелание автора набора. Отдать его в JSON значило бы
+/// позволить набору включить заведомо ненадёжные наблюдения.
+/// </remarks>
 public static class MapAwarenessSignalPolicy
 {
     /// <summary>
@@ -19,12 +30,14 @@ public static class MapAwarenessSignalPolicy
 
     public static MapAwarenessSignal? Evaluate(
         ParticipantVisibilityTransition transition,
-        MatchState match)
+        MatchState match,
+        IReadOnlyList<MapVisionRule> rules)
     {
         ArgumentNullException.ThrowIfNull(transition);
         ArgumentNullException.ThrowIfNull(match);
+        ArgumentNullException.ThrowIfNull(rules);
 
-        if (transition.Confidence < MinimumOperationalConfidence)
+        if (rules.Count == 0 || transition.Confidence < MinimumOperationalConfidence)
         {
             return null;
         }
@@ -43,29 +56,41 @@ public static class MapAwarenessSignalPolicy
         if (participant is null
             || participant.Team == TeamSide.Unknown
             || participant.Team == activePlayer.Team
-            || participant.IsDead)
+            || participant.IsDead
+            || participant.Position == PlayerPosition.Unknown)
         {
             return null;
         }
 
-        var kind = (participant.Position, transition.Kind) switch
+        if (ToTransition(transition.Kind) is not { } visionTransition)
         {
-            (PlayerPosition.Jungle, ParticipantVisibilityTransitionKind.Appeared) =>
-                MapAwarenessSignalKind.EnemyJunglerAppeared,
-            (PlayerPosition.Middle, ParticipantVisibilityTransitionKind.Disappeared) =>
-                MapAwarenessSignalKind.EnemyMidDisappeared,
-            _ => (MapAwarenessSignalKind?)null
-        };
+            return null;
+        }
 
-        return kind is { } signalKind
-            ? new MapAwarenessSignal(
-                signalKind,
+        // Первое подошедшее правило в авторском порядке. Два набора могут описать
+        // одно и то же событие, и показывать два уведомления об одном наблюдении
+        // незачем.
+        var rule = rules.FirstOrDefault(candidate =>
+            candidate.Position == participant.Position
+            && candidate.Transition == visionTransition);
+
+        return rule is null
+            ? null
+            : new MapAwarenessSignal(
+                rule,
                 participant.ParticipantId,
                 participant.ChampionName,
                 transition.OccurredAt,
                 transition.Confidence,
                 transition.MapX,
-                transition.MapY)
-            : null;
+                transition.MapY);
     }
+
+    private static MapVisionTransition? ToTransition(
+        ParticipantVisibilityTransitionKind kind) => kind switch
+        {
+            ParticipantVisibilityTransitionKind.Appeared => MapVisionTransition.Appeared,
+            ParticipantVisibilityTransitionKind.Disappeared => MapVisionTransition.Disappeared,
+            _ => null
+        };
 }

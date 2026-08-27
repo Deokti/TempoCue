@@ -1,8 +1,14 @@
+﻿using TempoCue.Coaching;
+
 namespace TempoCue.Application;
 
-/// <summary>Семантический сигнал карты, готовый для представления или дальнейшего планирования.</summary>
+/// <summary>Сигнал карты, готовый для представления.</summary>
+/// <remarks>
+/// Несёт сработавшее правило, а не вид сигнала: текст уведомления принадлежит
+/// набору, и приложение только показывает его. ADR 0016.
+/// </remarks>
 public sealed record MapAwarenessSignal(
-    MapAwarenessSignalKind Kind,
+    MapVisionRule Rule,
     string ParticipantId,
     string ChampionName,
     DateTimeOffset OccurredAt,

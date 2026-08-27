@@ -1,4 +1,6 @@
-using TempoCue.App.Localization;
+﻿using TempoCue.App.Localization;
+using TempoCue.Coaching;
+using TempoCue.Core;
 using TempoCue.App.Settings;
 using TempoCue.Application;
 using TempoCue.Overlay;
@@ -57,7 +59,10 @@ public sealed class ActiveMatchMapAwarenessCoordinator : IDisposable
             return;
         }
 
-        var signal = MapAwarenessSignalPolicy.Evaluate(transition, snapshot.Match);
+        // Правила берутся из плана включённых наборов: приложение не знает
+        // наперёд, о каких ролях и событиях уведомлять. ADR 0016.
+        var rules = _monitor.CurrentUpdate?.MapControlPlan?.AvailableVisionRules ?? [];
+        var signal = MapAwarenessSignalPolicy.Evaluate(transition, snapshot.Match, rules);
         if (signal is null)
         {
             return;
@@ -68,28 +73,39 @@ public sealed class ActiveMatchMapAwarenessCoordinator : IDisposable
         _presenter.Show(CreateNotification(signal));
     }
 
-    private OverlayNotification CreateNotification(MapAwarenessSignal signal) => signal.Kind switch
+    /// <summary>
+    /// Уведомление по сработавшему правилу. Текст принадлежит набору, а не
+    /// приложению: локализованными остаются только оформление окна и название
+    /// роли — то, что относится к самому TempoCue, а не к содержанию совета.
+    /// </summary>
+    private OverlayNotification CreateNotification(MapAwarenessSignal signal)
     {
-        MapAwarenessSignalKind.EnemyJunglerAppeared => new OverlayNotification(
-            $"map-awareness:jungle:{signal.ParticipantId}:appeared",
+        var rule = signal.Rule;
+        return new OverlayNotification(
+            $"map-awareness:{rule.Id}:{signal.ParticipantId}",
             _localization.Get("Overlay.MapAwareness.Status"),
-            _localization.Get("Overlay.MapAwareness.JunglerAppeared.Title"),
-            _localization.Format(
-                "Overlay.MapAwareness.JunglerAppeared.Message",
-                signal.ChampionName),
+            signal.ChampionName,
+            rule.Message,
             _localization.Get("Overlay.MapAwareness.Dismiss"),
-            OverlayNotificationTone.Danger,
-            badge: _localization.Get("Position.Jungle")),
-        MapAwarenessSignalKind.EnemyMidDisappeared => new OverlayNotification(
-            $"map-awareness:middle:{signal.ParticipantId}:disappeared",
-            _localization.Get("Overlay.MapAwareness.Status"),
-            _localization.Get("Overlay.MapAwareness.MidDisappeared.Title"),
-            _localization.Format(
-                "Overlay.MapAwareness.MidDisappeared.Message",
-                signal.ChampionName),
-            _localization.Get("Overlay.MapAwareness.Dismiss"),
-            OverlayNotificationTone.Caution,
-            badge: _localization.Get("Position.Middle")),
-        _ => throw new ArgumentOutOfRangeException(nameof(signal), signal.Kind, null)
+            ToTone(rule.Priority),
+            badge: _localization.Get(ToPositionKey(rule.Position)));
+    }
+
+    private static OverlayNotificationTone ToTone(MapObjectiveReminderPriority priority) =>
+        priority switch
+        {
+            MapObjectiveReminderPriority.Important => OverlayNotificationTone.Danger,
+            MapObjectiveReminderPriority.Caution => OverlayNotificationTone.Caution,
+            _ => OverlayNotificationTone.Coach
+        };
+
+    private static string ToPositionKey(PlayerPosition position) => position switch
+    {
+        PlayerPosition.Top => "Position.Top",
+        PlayerPosition.Jungle => "Position.Jungle",
+        PlayerPosition.Middle => "Position.Middle",
+        PlayerPosition.Bottom => "Position.Bottom",
+        PlayerPosition.Support => "Position.Support",
+        _ => "Position.Unknown"
     };
 }

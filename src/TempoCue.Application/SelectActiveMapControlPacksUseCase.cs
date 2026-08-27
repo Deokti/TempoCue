@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using TempoCue.Core;
 
 namespace TempoCue.Application;
@@ -117,8 +117,21 @@ public sealed class SelectActiveMapControlPacksUseCase : IMapControlPlanSelector
             new ActiveMapControlPlan(
                 advice,
                 activePacks.Select(static pack => pack.Pack.Name).ToArray(),
-                persistentAdvice));
+                persistentAdvice,
+                CollectVisionRules(activePacks)));
     }
+
+    /// <summary>
+    /// Включённые правила наблюдения всех подходящих наборов в авторском порядке.
+    /// Выключенные отбрасываются здесь, а не при сопоставлении: дальше по цепочке
+    /// правило уже считается разрешённым.
+    /// </summary>
+    private static IReadOnlyList<MapVisionRule> CollectVisionRules(
+        IEnumerable<PlannedPack> packs) =>
+        packs
+            .SelectMany(static pack => pack.Pack.VisionRules)
+            .Where(static rule => rule.IsEnabled)
+            .ToArray();
 
     /// <summary>Помечает кеш устаревшим после изменения библиотеки.</summary>
     public void Invalidate()

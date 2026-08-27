@@ -1,4 +1,5 @@
-using TempoCue.Application;
+﻿using TempoCue.Application;
+using TempoCue.Coaching;
 using TempoCue.Core;
 
 namespace TempoCue.Application.Tests;
@@ -6,30 +7,58 @@ namespace TempoCue.Application.Tests;
 public sealed class MapAwarenessSignalPolicyTests
 {
     [Theory]
-    [InlineData(
-        PlayerPosition.Jungle,
-        ParticipantVisibilityTransitionKind.Appeared,
-        MapAwarenessSignalKind.EnemyJunglerAppeared)]
-    [InlineData(
-        PlayerPosition.Middle,
-        ParticipantVisibilityTransitionKind.Disappeared,
-        MapAwarenessSignalKind.EnemyMidDisappeared)]
-    public void Evaluate_ReturnsExpectedEnemySignal(
+    [InlineData(PlayerPosition.Jungle, ParticipantVisibilityTransitionKind.Appeared)]
+    [InlineData(PlayerPosition.Middle, ParticipantVisibilityTransitionKind.Disappeared)]
+    [InlineData(PlayerPosition.Support, ParticipantVisibilityTransitionKind.Disappeared)]
+    public void Evaluate_ReturnsTheMatchingRule(
         PlayerPosition position,
-        ParticipantVisibilityTransitionKind transitionKind,
-        MapAwarenessSignalKind expectedKind)
+        ParticipantVisibilityTransitionKind transitionKind)
     {
+        // Третий случай важнее первых двух: саппорта в коде нет и не было, он
+        // работает только потому, что сигналы больше не зашиты. ADR 0016.
         var occurredAt = DateTimeOffset.Parse("2026-08-21T12:00:00Z");
         var transition = CreateTransition("enemy", transitionKind, occurredAt);
         var match = CreateMatch(CreatePlayer("enemy", TeamSide.Chaos, position));
+        var rule = CreateRule(position, ToVisionTransition(transitionKind));
 
-        var signal = MapAwarenessSignalPolicy.Evaluate(transition, match);
+        var signal = MapAwarenessSignalPolicy.Evaluate(transition, match, [rule]);
 
         Assert.NotNull(signal);
-        Assert.Equal(expectedKind, signal.Kind);
+        Assert.Same(rule, signal.Rule);
         Assert.Equal("Enemy champion", signal.ChampionName);
         Assert.Equal(occurredAt, signal.OccurredAt);
         Assert.Equal(0.92, signal.Confidence);
+    }
+
+    [Fact]
+    public void Evaluate_ReturnsNothingWhenNoPackDescribesTheEvent()
+    {
+        var transition = CreateTransition(
+            "enemy",
+            ParticipantVisibilityTransitionKind.Appeared,
+            DateTimeOffset.UtcNow);
+        var match = CreateMatch(CreatePlayer("enemy", TeamSide.Chaos, PlayerPosition.Jungle));
+
+        // Игрок выключил все наборы — уведомлять не о чем.
+        Assert.Null(MapAwarenessSignalPolicy.Evaluate(transition, match, []));
+    }
+
+    [Fact]
+    public void Evaluate_TakesTheFirstMatchingRuleInAuthorOrder()
+    {
+        var transition = CreateTransition(
+            "enemy",
+            ParticipantVisibilityTransitionKind.Appeared,
+            DateTimeOffset.UtcNow);
+        var match = CreateMatch(CreatePlayer("enemy", TeamSide.Chaos, PlayerPosition.Jungle));
+        var first = CreateRule(PlayerPosition.Jungle, MapVisionTransition.Appeared, "first");
+        var second = CreateRule(PlayerPosition.Jungle, MapVisionTransition.Appeared, "second");
+
+        var signal = MapAwarenessSignalPolicy.Evaluate(transition, match, [first, second]);
+
+        // Два набора могут описать одно событие; два уведомления об одном
+        // наблюдении игроку не нужны.
+        Assert.Same(first, signal?.Rule);
     }
 
     [Theory]
@@ -48,19 +77,22 @@ public sealed class MapAwarenessSignalPolicyTests
             DateTimeOffset.UtcNow);
         var match = CreateMatch(CreatePlayer("target", team, position, isDead));
 
-        Assert.Null(MapAwarenessSignalPolicy.Evaluate(transition, match));
+        Assert.Null(MapAwarenessSignalPolicy.Evaluate(transition, match, AllRules));
     }
 
     [Fact]
-    public void Evaluate_IgnoresTransitionThatDoesNotMatchRolePolicy()
+    public void Evaluate_IgnoresEventNoRuleDescribes()
     {
         var transition = CreateTransition(
             "enemy",
             ParticipantVisibilityTransitionKind.Disappeared,
             DateTimeOffset.UtcNow);
         var match = CreateMatch(CreatePlayer("enemy", TeamSide.Chaos, PlayerPosition.Jungle));
+        var onlyAppearance = CreateRule(PlayerPosition.Jungle, MapVisionTransition.Appeared);
 
-        Assert.Null(MapAwarenessSignalPolicy.Evaluate(transition, match));
+        // Набор описывает появление лесника, но не его пропажу. Уведомлять не о чем:
+        // раньше это решал зашитый switch, теперь — содержание набора.
+        Assert.Null(MapAwarenessSignalPolicy.Evaluate(transition, match, [onlyAppearance]));
     }
 
     [Theory]
@@ -78,7 +110,7 @@ public sealed class MapAwarenessSignalPolicyTests
             TeamSide.Chaos,
             PlayerPosition.Jungle));
 
-        Assert.Null(MapAwarenessSignalPolicy.Evaluate(transition, match));
+        Assert.Null(MapAwarenessSignalPolicy.Evaluate(transition, match, AllRules));
     }
 
     [Fact]
@@ -94,8 +126,35 @@ public sealed class MapAwarenessSignalPolicyTests
             TeamSide.Chaos,
             PlayerPosition.Jungle));
 
-        Assert.NotNull(MapAwarenessSignalPolicy.Evaluate(transition, match));
+        Assert.NotNull(MapAwarenessSignalPolicy.Evaluate(transition, match, AllRules));
     }
+
+    /// <summary>Правила на все роли и оба события: проверяем политику, а не набор.</summary>
+    private static readonly IReadOnlyList<MapVisionRule> AllRules =
+    [
+        .. Enum.GetValues<PlayerPosition>()
+            .Where(static position => position is not PlayerPosition.Unknown)
+            .SelectMany(static position => Enum.GetValues<MapVisionTransition>()
+                .Select(transition => CreateRule(position, transition)))
+    ];
+
+    private static MapVisionRule CreateRule(
+        PlayerPosition position,
+        MapVisionTransition transition,
+        string? id = null) => new(
+            id ?? $"{position}-{transition}",
+            position,
+            transition,
+            MapObjectiveReminderPriority.Caution,
+            "Сообщение",
+            "Почему сейчас",
+            "Что дальше");
+
+    private static MapVisionTransition ToVisionTransition(
+        ParticipantVisibilityTransitionKind kind) =>
+        kind is ParticipantVisibilityTransitionKind.Appeared
+            ? MapVisionTransition.Appeared
+            : MapVisionTransition.Disappeared;
 
     private static ParticipantVisibilityTransition CreateTransition(
         string participantId,
