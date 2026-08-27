@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using TempoCue.App.Localization;
@@ -141,7 +141,10 @@ public sealed class LocalizationServiceTests
             Assert.Equal(
                 "Rosters, levels, K/D/A, and approximate CS come from Live Client Data. Riot ID is shown when the client provides it.",
                 localization.Get("Current.Rosters.RiotFact.Description"));
-            Assert.Equal("v0.5.0", AppVersion.Display);
+            // Номер версии не зашит: он берётся из сборки и меняется каждым
+            // выпуском. Проверяется формат — то, что относится к языку, — а не
+            // конкретное число, из-за которого тест падал бы при каждом повышении.
+            Assert.Matches(@"^v\d+\.\d+\.\d+$", AppVersion.Display);
             Assert.Equal("1 player", localization.Plural("Count.Player", 1));
             Assert.Equal("10 players", localization.Plural("Count.Player", 10));
 

@@ -1,4 +1,4 @@
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using Windows.Graphics.DirectX.Direct3D11;
 
 namespace TempoCue.Vision;
@@ -33,6 +33,9 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
     private PixelRegion? _detectedRegion;
     private MinimapScreenCorner _detectedCorner;
     private double _detectionConfidence;
+
+    /// <summary>Непринятая находка прошлого пересчёта: ждёт подтверждения.</summary>
+    private PixelRegion? _candidateRegion;
     private DateTimeOffset? _lastDetectionAt;
     private int _frameWidth;
     private int _frameHeight;
@@ -154,6 +157,23 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
             return;
         }
 
+        // Одиночная неверная находка не имеет права сменить установленную
+        // область: TC-012, кусок карты прошёл нижнюю границу размера и на две
+        // секунды стал рабочей областью.
+        switch (MinimapRegionStabilityPolicy.Decide(
+            _detectedRegion,
+            _candidateRegion,
+            detection.Region))
+        {
+            case MinimapRegionStabilityPolicy.Decision.Hold:
+                _candidateRegion = detection.Region;
+                return;
+            case MinimapRegionStabilityPolicy.Decision.Reject:
+                _candidateRegion = null;
+                return;
+        }
+
+        _candidateRegion = null;
         _detectedRegion = detection.Region;
         _detectedCorner = detection.Corner;
         _detectionConfidence = detection.Confidence;
@@ -169,6 +189,7 @@ internal sealed class Direct3D11MinimapPreviewReader : IDisposable
         _frameWidth = frameWidth;
         _frameHeight = frameHeight;
         _detectedRegion = null;
+        _candidateRegion = null;
         _lastDetectionAt = null;
     }
 
