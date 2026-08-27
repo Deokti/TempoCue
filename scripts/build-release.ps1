@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
     [string] $InnoCompilerPath,
 
@@ -6,7 +6,12 @@ param(
     # Выпуск, который куда-то передаётся, — это распространение, поэтому по
     # умолчанию веса в него не попадают. Ключ нужен только для сборки, которая
     # останется на своих машинах.
-    [switch] $IncludeExperimentalModel
+    [switch] $IncludeExperimentalModel,
+
+    # Только переносимый ZIP, без установщика. Нужен для проверочных сборок
+    # на своей машине: установщику требуется Inno Setup, а проверить сборку
+    # перед игрой хочется и без него.
+    [switch] $SkipInstaller
 )
 
 $ErrorActionPreference = 'Stop'
@@ -68,6 +73,14 @@ Compress-Archive -Path (Join-Path $publishDirectory '*') -DestinationPath $zipPa
 # неполным. Отсутствие файла должно ломать сборку, а не обнаруживаться потом.
 if (-not (Test-Path -LiteralPath $zipPath)) {
     throw "Portable ZIP was not created at $zipPath."
+}
+
+if ($SkipInstaller) {
+    Write-Host ''
+    Write-Host "TempoCue $version portable build:"
+    Write-Host "  $zipPath"
+    Write-Host 'Installer skipped: -SkipInstaller.'
+    return
 }
 
 if ([string]::IsNullOrWhiteSpace($InnoCompilerPath)) {
