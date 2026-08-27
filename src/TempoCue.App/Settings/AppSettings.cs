@@ -7,12 +7,29 @@ public sealed record AppSettings
 
     public OverlayUserSettings Overlay { get; init; } = new();
 
+    /// <summary>Что применять, если человек ничего не выбирал.</summary>
+    /// <remarks>
+    /// Своя модель берёт 64 чемпиона из 67 против 45 у штатного конвейера при
+    /// вдвое меньшей доле процессора. Отступление от договора о приёмке и его
+    /// обоснование записаны в `docs/own-model-plan.md`.
+    /// </remarks>
+    public const MinimapRecognizerChoice DefaultMinimapRecognizer =
+        MinimapRecognizerChoice.OwnModel;
+
     /// <summary>
-    /// Каким распознавателем разбирать миникарту. Работает только при наличии
-    /// файлов выбранной модели рядом с приложением; иначе TempoCue молча
-    /// остаётся на штатном распознавателе.
+    /// Выбор человека. `null` означает «не выбирал»: тогда применяется
+    /// умолчание приложения. Различать выбор и его отсутствие обязательно —
+    /// иначе смена умолчания молча переписала бы уже сделанный выбор.
     /// </summary>
-    public MinimapRecognizerChoice MinimapRecognizer { get; init; }
+    public MinimapRecognizerChoice? MinimapRecognizer { get; init; }
+
+    /// <summary>
+    /// Каким распознавателем разбирать миникарту на самом деле. Работает только
+    /// при наличии файлов выбранной модели рядом с приложением; иначе TempoCue
+    /// молча остаётся на штатном распознавателе.
+    /// </summary>
+    public MinimapRecognizerChoice EffectiveMinimapRecognizer =>
+        MinimapRecognizer ?? DefaultMinimapRecognizer;
 
     /// <summary>
     /// Прежняя галочка «экспериментальное распознавание». Оставлена только для

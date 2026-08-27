@@ -94,14 +94,24 @@ public sealed class AppSettingsService
     }
 
     /// <summary>
-    /// Переносит выбор из прежней галочки. Настройка не выбрана, а галочка
-    /// стоит — значит человек включал стороннюю модель, и это его выбор.
+    /// Переносит выбор из прежней галочки. Выбора нет, а галочка стоит — значит
+    /// человек включал стороннюю модель, и это его выбор, а не умолчание.
     /// </summary>
-    private static MinimapRecognizerChoice Migrate(AppSettings settings) =>
-        settings.MinimapRecognizer is MinimapRecognizerChoice.Default
-        && settings.UseExperimentalMinimapRecognizer
+    /// <remarks>
+    /// Порядок важен: перенос идёт до подстановки умолчания. Иначе смена
+    /// умолчания приложения затёрла бы выбор, сделанный прежней галочкой.
+    /// </remarks>
+    private static MinimapRecognizerChoice? Migrate(AppSettings settings)
+    {
+        if (settings.MinimapRecognizer is { } chosen)
+        {
+            return chosen;
+        }
+
+        return settings.UseExperimentalMinimapRecognizer
             ? MinimapRecognizerChoice.DeeperLeague
-            : settings.MinimapRecognizer;
+            : null;
+    }
 
     /// <summary>
     /// Сохраняет выбор распознавателя миникарты. Он применяется при следующем

@@ -377,14 +377,13 @@ public partial class App : System.Windows.Application
         var threads = settings.MinimapRecognitionThreads <= 0
             ? (int?)null
             : settings.MinimapRecognitionThreads;
-        if (settings.MinimapRecognizer is MinimapRecognizerChoice.Default)
+        var choice = settings.EffectiveMinimapRecognizer;
+        if (choice is MinimapRecognizerChoice.Default)
         {
-            return threads is null
-                ? null
-                : new DefaultMinimapFrameAnalyzer(threads.Value);
+            return BuiltInAnalyzer(threads);
         }
 
-        var modelDirectory = settings.MinimapRecognizer switch
+        var modelDirectory = choice switch
         {
             MinimapRecognizerChoice.OwnModel => OwnModelFrameAnalyzer.FindModelDirectory(),
             _ => DeeperLeagueFrameAnalyzer.FindModelDirectory()
@@ -392,13 +391,13 @@ public partial class App : System.Windows.Application
         if (modelDirectory is null)
         {
             Debug.WriteLine(
-                $"Выбран распознаватель {settings.MinimapRecognizer}, но файлы модели не найдены.");
-            return null;
+                $"Выбран распознаватель {choice}, но файлы модели не найдены.");
+            return BuiltInAnalyzer(threads);
         }
 
         try
         {
-            return settings.MinimapRecognizer switch
+            return choice switch
             {
                 MinimapRecognizerChoice.OwnModel =>
                     new OwnModelFrameAnalyzer(modelDirectory, threads),
@@ -409,9 +408,18 @@ public partial class App : System.Windows.Application
         {
             // Неудачная загрузка модели не должна лишать пользователя распознавания.
             Debug.WriteLine($"Не удалось загрузить модель: {exception}");
-            return null;
+            return BuiltInAnalyzer(threads);
         }
     }
+
+    /// <summary>
+    /// Штатный конвейер. Он же — запасной вариант, когда файлов выбранной модели
+    /// рядом с приложением не оказалось: молча остаться без распознавания хуже,
+    /// чем разбирать кадры прежним способом. Настройка числа потоков при этом
+    /// сохраняется — иначе откат тихо менял бы ещё и расход процессора.
+    /// </summary>
+    private static IMinimapFrameAnalyzer? BuiltInAnalyzer(int? threads) =>
+        threads is null ? null : new DefaultMinimapFrameAnalyzer(threads.Value);
 
     // Освобождение выполняется в обратном порядке владения долгоживущими объектами.
     protected override void OnExit(ExitEventArgs e)

@@ -46,26 +46,27 @@ public sealed class SettingsViewModelTests
             service,
             static () => { });
 
-        Assert.Equal(MinimapRecognizerChoice.Default, viewModel.MinimapRecognizer);
+        // Умолчание приложения — своя модель; выбора человек ещё не делал.
+        Assert.Equal(MinimapRecognizerChoice.OwnModel, viewModel.MinimapRecognizer);
         Assert.False(viewModel.HasExperimentalRecognizerRestartNotice);
         Assert.False(viewModel.HasUnsupportedChampionsNotice);
 
-        viewModel.MinimapRecognizer = MinimapRecognizerChoice.OwnModel;
+        viewModel.MinimapRecognizer = MinimapRecognizerChoice.Default;
 
         // Выбор сохраняется сразу, но применяется только при следующем запуске,
         // поэтому пользователю показывается напоминание о перезапуске.
-        Assert.Equal(MinimapRecognizerChoice.OwnModel, service.Load().MinimapRecognizer);
+        Assert.Equal(MinimapRecognizerChoice.Default, service.Load().MinimapRecognizer);
         Assert.True(viewModel.HasExperimentalRecognizerRestartNotice);
-        // Предупреждение о неизвестных чемпионах относится только к чужой модели.
         Assert.False(viewModel.HasUnsupportedChampionsNotice);
 
         viewModel.MinimapRecognizer = MinimapRecognizerChoice.DeeperLeague;
 
+        // Предупреждение о неизвестных чемпионах относится только к чужой модели.
         Assert.True(viewModel.HasUnsupportedChampionsNotice);
 
-        viewModel.MinimapRecognizer = MinimapRecognizerChoice.Default;
+        viewModel.MinimapRecognizer = MinimapRecognizerChoice.OwnModel;
 
-        Assert.Equal(MinimapRecognizerChoice.Default, service.Load().MinimapRecognizer);
+        Assert.Equal(MinimapRecognizerChoice.OwnModel, service.Load().MinimapRecognizer);
         Assert.False(viewModel.HasExperimentalRecognizerRestartNotice);
     }
 
@@ -83,7 +84,7 @@ public sealed class SettingsViewModelTests
         // Пока настройка не менялась, перезапускать нечего.
         Assert.False(viewModel.CanRestartToApply);
 
-        viewModel.MinimapRecognizer = MinimapRecognizerChoice.OwnModel;
+        viewModel.MinimapRecognizer = MinimapRecognizerChoice.Default;
 
         Assert.True(viewModel.CanRestartToApply);
 
@@ -101,7 +102,7 @@ public sealed class SettingsViewModelTests
             settingsContext.Service,
             static () => { });
 
-        viewModel.MinimapRecognizer = MinimapRecognizerChoice.OwnModel;
+        viewModel.MinimapRecognizer = MinimapRecognizerChoice.Default;
 
         // Обещать действие, которое некому выполнить, хуже, чем не обещать.
         Assert.True(viewModel.HasExperimentalRecognizerRestartNotice);

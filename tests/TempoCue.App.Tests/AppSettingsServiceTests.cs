@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using TempoCue.App.Settings;
 using TempoCue.Overlay;
 
@@ -57,5 +57,52 @@ public sealed class AppSettingsServiceTests
             """{"language":"ru-RU","minimapRecognitionThreads":-8}""");
 
         Assert.Equal(0, context.Service.Load().MinimapRecognitionThreads);
+    }
+
+    [Fact]
+    public void MinimapRecognizer_DefaultsToOwnModelWhenNobodyChose()
+    {
+        using var context = new TemporarySettingsContext();
+
+        var settings = context.Service.Load();
+
+        // Выбора нет — применяется умолчание приложения.
+        Assert.Null(settings.MinimapRecognizer);
+        Assert.Equal(
+            MinimapRecognizerChoice.OwnModel,
+            settings.EffectiveMinimapRecognizer);
+    }
+
+    [Fact]
+    public void MinimapRecognizer_KeepsChoiceMadeByTheOldCheckbox()
+    {
+        using var context = new TemporarySettingsContext();
+        File.WriteAllText(
+            context.SettingsPath,
+            """{ "useExperimentalMinimapRecognizer": true }""");
+
+        var settings = context.Service.Load();
+
+        // Человек включал стороннюю модель галочкой. Смена умолчания приложения
+        // не имеет права затереть этот выбор.
+        Assert.Equal(
+            MinimapRecognizerChoice.DeeperLeague,
+            settings.EffectiveMinimapRecognizer);
+    }
+
+    [Fact]
+    public void MinimapRecognizer_KeepsDeliberateChoiceOfTheBuiltInPipeline()
+    {
+        using var context = new TemporarySettingsContext();
+        context.Service.SaveMinimapRecognizer(MinimapRecognizerChoice.Default);
+
+        var settings = context.Service.Load();
+
+        // Штатный конвейер, выбранный намеренно, — это выбор, а не отсутствие
+        // выбора. Умолчание его не перебивает.
+        Assert.Equal(MinimapRecognizerChoice.Default, settings.MinimapRecognizer);
+        Assert.Equal(
+            MinimapRecognizerChoice.Default,
+            settings.EffectiveMinimapRecognizer);
     }
 }

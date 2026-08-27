@@ -50,7 +50,9 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
         CaptureDiagnostics = captureDiagnostics;
         var storedSettings = settings.Load();
         MinimapRecognizerOptions = MinimapRecognizerOptionViewModel.Create(localization);
-        _initialMinimapRecognizer = storedSettings.MinimapRecognizer;
+        // Действующее значение, а не сохранённое: пока человек не выбирал,
+        // в списке должно стоять то, что приложение применяет на самом деле.
+        _initialMinimapRecognizer = storedSettings.EffectiveMinimapRecognizer;
         _minimapRecognizer = _initialMinimapRecognizer;
         MinimapRecognitionThreadOptions =
             MinimapRecognitionThreadOptionViewModel.CreateForCurrentMachine(localization);
