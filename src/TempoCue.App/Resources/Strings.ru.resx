@@ -1082,6 +1082,7 @@
   <data name="Settings.Capture.Title" xml:space="preserve"><value>Захват окна игры</value></data>
   <data name="Settings.Capture.Description" xml:space="preserve"><value>TempoCue автоматически подключается к запущенному окну матча League of Legends. Ручной выбор остаётся запасным вариантом.</value></data>
   <data name="Settings.Capture.State.Hint" xml:space="preserve"><value>Метрики и локальный предпросмотр миникарты обновляются до четырёх раз в секунду.</value></data>
+  <data name="Settings.Capture.State.Hint.ObservationOff" xml:space="preserve"><value>Наблюдение за картой выключено: в контроле карты нет ни одного включённого правила наблюдения. Захват не запускается, пока он никому не нужен.</value></data>
   <data name="Settings.Capture.State.Idle" xml:space="preserve"><value>Окно не выбрано</value></data>
   <data name="Settings.Capture.State.Selecting" xml:space="preserve"><value>Ожидаем выбор окна</value></data>
   <data name="Settings.Capture.State.Capturing" xml:space="preserve"><value>Кадры поступают</value></data>

@@ -160,7 +160,8 @@ public partial class App : System.Windows.Application
             _windowCaptureSession,
             new WindowsGraphicsCaptureSupport().IsSupported,
             LocalizationService.Instance,
-            _activeMatchVisionCoordinator);
+            _activeMatchVisionCoordinator,
+            IsMapObservationSwitchedOff);
         _settingsViewModel = new SettingsViewModel(
             LocalizationService.Instance,
             settingsService,
@@ -234,10 +235,10 @@ public partial class App : System.Windows.Application
         _ = BorderlessCaptureAccess.RequestAsync();
 
         // Монитор матча запускается раньше захвата: захват спрашивает у него,
-        // началась ли игра, и до первого опроса ответ был бы «нет» дольше нужного.
+        // нужно ли наблюдение, и до первого опроса ответ был бы «нет» дольше нужного.
         _activeMatchMonitor.Start();
         _windowCaptureSession.EnableAutomaticLeagueWindowCapture(
-            IsMatchRunning,
+            IsMapObservationWanted,
             _lifetimeCancellation.Token);
         _ = InitializeScreenDataAsync(
             coachingLibraryViewModel,
@@ -362,12 +363,18 @@ public partial class App : System.Windows.Application
     /// сборка без них просто работает на штатном конвейере.
     /// </summary>
     /// <summary>
-    /// Идёт ли матч. Ответ Live Client Data приходит, когда игровой мир загружен,
-    /// то есть примерно тогда же, когда на экране появляется миникарта. Окно игры
-    /// для этого не годится: оно существует с начала загрузки.
+    /// Нужно ли сейчас наблюдение за миникартой. Условий два: матч идёт и
+    /// включено хотя бы одно правило наблюдения. ADR 0017.
     /// </summary>
-    private bool IsMatchRunning() =>
-        _activeMatchMonitor?.CurrentUpdate?.Status is MatchSnapshotReadStatus.Success;
+    private bool IsMapObservationWanted() =>
+        MapObservationPolicy.IsWanted(_activeMatchMonitor?.CurrentUpdate);
+
+    /// <summary>
+    /// Идёт матч, а наблюдать не для кого. Диагностика захвата объясняет этим
+    /// пустой экран вместо того, чтобы выглядеть сломанной.
+    /// </summary>
+    private bool IsMapObservationSwitchedOff() =>
+        MapObservationPolicy.IsSwitchedOffDuringMatch(_activeMatchMonitor?.CurrentUpdate);
 
     private static IMinimapFrameAnalyzer? CreateFrameAnalyzer(AppSettings settings)
     {

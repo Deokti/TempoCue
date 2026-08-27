@@ -49,6 +49,12 @@ public sealed class WindowsGraphicsCaptureSession :
     private MinimapChampionReference[] _championReferences = [];
     private CancellationTokenSource? _automaticCaptureCancellation;
     private Task? _automaticCaptureTask;
+    /// <summary>
+    /// Затеян ли текущий захват автоматикой, а не игроком. Автоматика вправе
+    /// погасить свой захват, когда наблюдать стало не для кого; выбранное
+    /// вручную окно диагностики она не трогает.
+    /// </summary>
+    private int _startedAutomatically;
     private int _generation;
     private int _disposeState;
 
@@ -100,7 +106,7 @@ public sealed class WindowsGraphicsCaptureSession :
     }
 
     public void EnableAutomaticLeagueWindowCapture(
-        Func<bool>? isMatchRunning = null,
+        Func<bool>? isObservationWanted = null,
         CancellationToken cancellationToken = default)
     {
         ObjectDisposedException.ThrowIf(Volatile.Read(ref _disposeState) != 0, this);
@@ -115,7 +121,7 @@ public sealed class WindowsGraphicsCaptureSession :
             _automaticCaptureCancellation = CancellationTokenSource.CreateLinkedTokenSource(
                 cancellationToken);
             var automaticCaptureToken = _automaticCaptureCancellation.Token;
-            var gate = isMatchRunning ?? (static () => true);
+            var gate = isObservationWanted ?? (static () => true);
             _automaticCaptureTask = Task.Run(
                 () => MonitorLeagueWindowAsync(gate, automaticCaptureToken),
                 automaticCaptureToken);
@@ -219,6 +225,7 @@ public sealed class WindowsGraphicsCaptureSession :
     {
         ObjectDisposedException.ThrowIf(Volatile.Read(ref _disposeState) != 0, this);
         ArgumentOutOfRangeException.ThrowIfZero(ownerWindow);
+        Volatile.Write(ref _startedAutomatically, 0);
         if (!GraphicsCaptureSession.IsSupported())
         {
             SetState(CaptureSessionState.Unsupported, null);
@@ -308,7 +315,7 @@ public sealed class WindowsGraphicsCaptureSession :
     }
 
     private async Task MonitorLeagueWindowAsync(
-        Func<bool> isMatchRunning,
+        Func<bool> isObservationWanted,
         CancellationToken cancellationToken)
     {
         using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
@@ -322,12 +329,20 @@ public sealed class WindowsGraphicsCaptureSession :
                 frameMetrics.CaptureStartedAt,
                 snapshot.LastFrameAt,
                 DateTimeOffset.UtcNow);
+            var wanted = isObservationWanted();
             if (AutomaticCaptureRecoveryPolicy.ShouldAttach(
                     snapshot.State,
-                    isMatchRunning(),
+                    wanted,
                     shouldRestart))
             {
                 await TryStartLeagueWindowAsync(cancellationToken).ConfigureAwait(false);
+            }
+            else if (AutomaticCaptureRecoveryPolicy.ShouldReleaseUnwantedCapture(
+                         snapshot.State,
+                         wanted,
+                         Volatile.Read(ref _startedAutomatically) != 0))
+            {
+                await ReleaseToIdleAsync().ConfigureAwait(false);
             }
         }
         while (await timer.WaitForNextTickAsync(cancellationToken).ConfigureAwait(false));
@@ -335,6 +350,7 @@ public sealed class WindowsGraphicsCaptureSession :
 
     private async Task<bool> TryStartLeagueWindowAsync(CancellationToken cancellationToken)
     {
+        Volatile.Write(ref _startedAutomatically, 1);
         if (!GraphicsCaptureSession.IsSupported())
         {
             SetState(CaptureSessionState.Unsupported, null);
@@ -472,17 +488,22 @@ public sealed class WindowsGraphicsCaptureSession :
     /// ресурсы захвата и обнуляет метрики, чтобы диагностика показывала «окно не
     /// выбрано», а не замершие цифры прошлого матча.
     /// </summary>
-    private async Task ReleaseMissingTargetAsync()
-    {
-        if (!AutomaticCaptureRecoveryPolicy.ShouldReleaseMissingTarget(Snapshot.State))
-        {
-            return;
-        }
+    private Task ReleaseMissingTargetAsync() =>
+        AutomaticCaptureRecoveryPolicy.ShouldReleaseMissingTarget(Snapshot.State)
+            ? ReleaseToIdleAsync()
+            : Task.CompletedTask;
 
+    /// <summary>
+    /// Освобождает ресурсы захвата и возвращает диагностику в «окно не выбрано».
+    /// Состояние перепроверяется под замком: пока ждали очереди, захват мог
+    /// смениться или прекратиться сам.
+    /// </summary>
+    private async Task ReleaseToIdleAsync()
+    {
         await _lifecycleGate.WaitAsync().ConfigureAwait(false);
         try
         {
-            if (!AutomaticCaptureRecoveryPolicy.ShouldReleaseMissingTarget(Snapshot.State))
+            if (Snapshot.State is not CaptureSessionState.Capturing)
             {
                 return;
             }

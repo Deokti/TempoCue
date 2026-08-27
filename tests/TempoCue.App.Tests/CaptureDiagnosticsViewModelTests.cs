@@ -13,6 +13,73 @@ namespace TempoCue.App.Tests;
 public sealed class CaptureDiagnosticsViewModelTests
 {
     [Fact]
+    public void StateHint_ExplainsThatObservationIsSwitchedOffByThePlayer()
+    {
+        WpfTestHost.Run(() =>
+        {
+            var localization = LocalizationService.Instance;
+            var initialLanguage = localization.CurrentLanguageCode;
+            var session = new TestWindowCaptureSession();
+
+            try
+            {
+                localization.SetLanguage("ru-RU");
+                using var viewModel = new CaptureDiagnosticsViewModel(
+                    session,
+                    isSupported: true,
+                    localization,
+                    visionDiagnostics: null,
+                    isMapObservationSwitchedOff: () => true);
+
+                // Матч идёт, а захвата нет: без объяснения это выглядит поломкой.
+                Assert.True(viewModel.IsMapObservationSwitchedOff);
+                Assert.Equal(
+                    localization.Get("Settings.Capture.State.Hint.ObservationOff"),
+                    viewModel.StateHintText);
+            }
+            finally
+            {
+                localization.SetLanguage(initialLanguage);
+            }
+        });
+    }
+
+    [Fact]
+    public void StateHint_KeepsUsualTextWhileCaptureWorks()
+    {
+        WpfTestHost.Run(() =>
+        {
+            var localization = LocalizationService.Instance;
+            var initialLanguage = localization.CurrentLanguageCode;
+            var session = new TestWindowCaptureSession();
+
+            try
+            {
+                localization.SetLanguage("ru-RU");
+                using var viewModel = new CaptureDiagnosticsViewModel(
+                    session,
+                    isSupported: true,
+                    localization,
+                    visionDiagnostics: null,
+                    isMapObservationSwitchedOff: () => true);
+                session.SetSnapshot(TestCaptureDiagnosticsSnapshot.Create(
+                    state: CaptureSessionState.Capturing));
+                viewModel.Refresh();
+
+                // Захват выбран вручную в диагностике: он идёт, и объяснять нечего.
+                Assert.False(viewModel.IsMapObservationSwitchedOff);
+                Assert.Equal(
+                    localization.Get("Settings.Capture.State.Hint"),
+                    viewModel.StateHintText);
+            }
+            finally
+            {
+                localization.SetLanguage(initialLanguage);
+            }
+        });
+    }
+
+    [Fact]
     public void Refresh_ProjectsCapturingSnapshotIntoLocalizedDiagnostics()
     {
         WpfTestHost.Run(() =>

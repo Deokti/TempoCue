@@ -1072,6 +1072,7 @@
   <data name="Settings.Capture.Title" xml:space="preserve"><value>Game window capture</value></data>
   <data name="Settings.Capture.Description" xml:space="preserve"><value>TempoCue automatically connects to the running League of Legends match window. Manual selection remains available as a fallback.</value></data>
   <data name="Settings.Capture.State.Hint" xml:space="preserve"><value>Metrics and the local minimap preview are refreshed up to four times per second.</value></data>
+  <data name="Settings.Capture.State.Hint.ObservationOff" xml:space="preserve"><value>Map observation is off: no vision rules are enabled in Map Control. Capture does not start until at least one is needed.</value></data>
   <data name="Settings.Capture.State.Idle" xml:space="preserve"><value>Window not selected</value></data>
   <data name="Settings.Capture.State.Selecting" xml:space="preserve"><value>Waiting for window selection</value></data>
   <data name="Settings.Capture.State.Capturing" xml:space="preserve"><value>Frames are being received</value></data>

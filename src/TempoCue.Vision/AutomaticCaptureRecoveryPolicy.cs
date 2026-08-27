@@ -15,7 +15,8 @@ internal static class AutomaticCaptureRecoveryPolicy
     /// он нужнее всего игре, и показывает в диагностике ошибку поиска области
     /// там, где ошибки нет.
     ///
-    /// Поэтому решает не окно, а состояние матча. Признак начала — ответ
+    /// Поэтому решает не окно, а нужда в наблюдении: идёт ли матч и включено ли
+    /// хотя бы одно правило наблюдения. Признак начала матча — ответ
     /// Live Client Data: он приходит, когда игровой мир загружен, то есть
     /// примерно тогда же, когда на экране появляется миникарта.
     ///
@@ -24,10 +25,10 @@ internal static class AutomaticCaptureRecoveryPolicy
     /// </remarks>
     public static bool ShouldAttach(
         CaptureSessionState state,
-        bool isMatchRunning,
+        bool isObservationWanted,
         bool needsRestart)
     {
-        if (!isMatchRunning)
+        if (!isObservationWanted)
         {
             return false;
         }
@@ -37,6 +38,28 @@ internal static class AutomaticCaptureRecoveryPolicy
             || state is not CaptureSessionState.Capturing
                 and not CaptureSessionState.SelectingTarget;
     }
+
+    /// <summary>
+    /// Нужно ли прекратить захват, ставший ненужным.
+    /// </summary>
+    /// <remarks>
+    /// Нужда в наблюдении пропадает не только с концом матча: игрок может
+    /// выключить последний набор наблюдения посреди игры. Без этой проверки
+    /// захват продолжал бы работать до конца матча, разбирая кадры, результат
+    /// которых некому слушать.
+    ///
+    /// Захват, выбранный игроком вручную в диагностике, не трогается: он
+    /// затеян ради самого наблюдения за работой захвата, и гасить его на том
+    /// основании, что уведомления выключены, значило бы отнимать инструмент
+    /// проверки ровно тогда, когда он нужен.
+    /// </remarks>
+    public static bool ShouldReleaseUnwantedCapture(
+        CaptureSessionState state,
+        bool isObservationWanted,
+        bool startedAutomatically) =>
+        !isObservationWanted
+        && startedAutomatically
+        && state is CaptureSessionState.Capturing;
 
     public static bool ShouldRestart(
         CaptureSessionState state,

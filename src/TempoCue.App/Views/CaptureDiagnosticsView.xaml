@@ -99,7 +99,7 @@
                                 <TextBlock Text="{Binding StateText}"
                                            Foreground="#F4F7FB"
                                            FontWeight="SemiBold" />
-                                <TextBlock Text="{localization:Loc Settings.Capture.State.Hint}"
+                                <TextBlock Text="{Binding StateHintText}"
                                            Style="{StaticResource SettingsCaption}"
                                            TextWrapping="Wrap"
                                            Margin="0,3,0,0" />

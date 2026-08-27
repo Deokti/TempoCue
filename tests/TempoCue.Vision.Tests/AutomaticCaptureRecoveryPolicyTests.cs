@@ -89,7 +89,7 @@ public sealed class AutomaticCaptureRecoveryPolicyTests
         // Разбирать в это время нечего, а процессор нужен самой игре.
         Assert.False(AutomaticCaptureRecoveryPolicy.ShouldAttach(
             state,
-            isMatchRunning: false,
+            isObservationWanted: false,
             needsRestart: false));
     }
 
@@ -100,7 +100,7 @@ public sealed class AutomaticCaptureRecoveryPolicyTests
         // важнее самого матча: цепляться на загрузке незачем в любом случае.
         Assert.False(AutomaticCaptureRecoveryPolicy.ShouldAttach(
             CaptureSessionState.Capturing,
-            isMatchRunning: false,
+            isObservationWanted: false,
             needsRestart: true));
     }
 
@@ -114,7 +114,7 @@ public sealed class AutomaticCaptureRecoveryPolicyTests
         // признак истинен с первого опроса, и ждать следующего матча не нужно.
         Assert.True(AutomaticCaptureRecoveryPolicy.ShouldAttach(
             state,
-            isMatchRunning: true,
+            isObservationWanted: true,
             needsRestart: false));
     }
 
@@ -126,7 +126,7 @@ public sealed class AutomaticCaptureRecoveryPolicyTests
         // Захват идёт или окно выбирается — вмешиваться не во что.
         Assert.False(AutomaticCaptureRecoveryPolicy.ShouldAttach(
             state,
-            isMatchRunning: true,
+            isObservationWanted: true,
             needsRestart: false));
     }
 
@@ -135,7 +135,53 @@ public sealed class AutomaticCaptureRecoveryPolicyTests
     {
         Assert.True(AutomaticCaptureRecoveryPolicy.ShouldAttach(
             CaptureSessionState.Capturing,
-            isMatchRunning: true,
+            isObservationWanted: true,
             needsRestart: true));
+    }
+
+    [Fact]
+    public void ShouldReleaseUnwantedCapture_StopsCaptureWhenTheLastVisionRuleGoesOff()
+    {
+        // Наблюдение можно выключить посреди матча. Без этого захват дожил бы
+        // до конца игры, разбирая кадры, результат которых некому слушать.
+        Assert.True(AutomaticCaptureRecoveryPolicy.ShouldReleaseUnwantedCapture(
+            CaptureSessionState.Capturing,
+            isObservationWanted: false,
+            startedAutomatically: true));
+    }
+
+    [Fact]
+    public void ShouldReleaseUnwantedCapture_KeepsWindowChosenByThePlayer()
+    {
+        // Окно, выбранное вручную в диагностике, затеяно ради самой проверки
+        // захвата. Гасить его за выключенные уведомления — отнимать инструмент.
+        Assert.False(AutomaticCaptureRecoveryPolicy.ShouldReleaseUnwantedCapture(
+            CaptureSessionState.Capturing,
+            isObservationWanted: false,
+            startedAutomatically: false));
+    }
+
+    [Fact]
+    public void ShouldReleaseUnwantedCapture_LeavesWantedCaptureAlone()
+    {
+        Assert.False(AutomaticCaptureRecoveryPolicy.ShouldReleaseUnwantedCapture(
+            CaptureSessionState.Capturing,
+            isObservationWanted: true,
+            startedAutomatically: true));
+    }
+
+    [Theory]
+    [InlineData(CaptureSessionState.Idle)]
+    [InlineData(CaptureSessionState.Stopped)]
+    [InlineData(CaptureSessionState.Failed)]
+    [InlineData(CaptureSessionState.SelectingTarget)]
+    [InlineData(CaptureSessionState.Unsupported)]
+    public void ShouldReleaseUnwantedCapture_HasNothingToReleaseOutsideCapture(
+        CaptureSessionState state)
+    {
+        Assert.False(AutomaticCaptureRecoveryPolicy.ShouldReleaseUnwantedCapture(
+            state,
+            isObservationWanted: false,
+            startedAutomatically: true));
     }
 }

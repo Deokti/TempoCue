@@ -17,6 +17,7 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
     private static readonly TimeSpan RefreshInterval = TimeSpan.FromMilliseconds(250);
     private readonly IWindowCaptureSession _captureSession;
     private readonly IActiveMatchVisionDiagnosticsSource? _visionDiagnostics;
+    private readonly Func<bool>? _isMapObservationSwitchedOff;
     private readonly LocalizationService _localization;
     private readonly VisionParticipantStatusPresenter _participantStatusPresenter;
     private readonly DispatcherTimer _refreshTimer;
@@ -44,14 +45,21 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
     {
     }
 
+    /// <param name="isMapObservationSwitchedOff">
+    /// Идёт ли матч, в котором наблюдать не для кого. Нужно только для
+    /// подсказки: пустая диагностика во время игры выглядит поломкой, если не
+    /// сказать, что это выключенные наборы наблюдения. ADR 0017.
+    /// </param>
     internal CaptureDiagnosticsViewModel(
         IWindowCaptureSession captureSession,
         bool isSupported,
         LocalizationService localization,
-        IActiveMatchVisionDiagnosticsSource? visionDiagnostics)
+        IActiveMatchVisionDiagnosticsSource? visionDiagnostics,
+        Func<bool>? isMapObservationSwitchedOff = null)
     {
         _captureSession = captureSession ?? throw new ArgumentNullException(nameof(captureSession));
         _visionDiagnostics = visionDiagnostics;
+        _isMapObservationSwitchedOff = isMapObservationSwitchedOff;
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _participantStatusPresenter = new VisionParticipantStatusPresenter(_localization);
         IsSupported = isSupported;
@@ -116,6 +124,21 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
             CaptureSessionState.Failed => "Settings.Capture.State.Failed",
             _ => "Settings.Capture.State.Idle"
         });
+
+    /// <summary>
+    /// Наблюдение выключено самим игроком: все наборы наблюдения сняты, и
+    /// захват намеренно не запускается.
+    /// </summary>
+    public bool IsMapObservationSwitchedOff =>
+        !IsCapturing && _isMapObservationSwitchedOff?.Invoke() == true;
+
+    /// <summary>
+    /// Подпись под состоянием захвата. Обычно объясняет частоту обновления, но
+    /// в матче без наборов наблюдения — почему захвата нет вовсе.
+    /// </summary>
+    public string StateHintText => _localization.Get(IsMapObservationSwitchedOff
+        ? "Settings.Capture.State.Hint.ObservationOff"
+        : "Settings.Capture.State.Hint");
 
     public string SelectButtonText => _localization.Get(IsCapturing
         ? "Settings.Capture.Change.Button"
@@ -527,6 +550,8 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         }
 
         OnPropertyChanged(nameof(StateText));
+        OnPropertyChanged(nameof(IsMapObservationSwitchedOff));
+        OnPropertyChanged(nameof(StateHintText));
         OnPropertyChanged(nameof(SelectButtonText));
         OnPropertyChanged(nameof(SelectedWindowText));
         OnPropertyChanged(nameof(ResolutionText));
@@ -599,6 +624,8 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(HasRecordedSequence));
         OnPropertyChanged(nameof(SequenceRecordingStatusText));
         OnPropertyChanged(nameof(StateText));
+        OnPropertyChanged(nameof(IsMapObservationSwitchedOff));
+        OnPropertyChanged(nameof(StateHintText));
         OnPropertyChanged(nameof(SelectButtonText));
         OnPropertyChanged(nameof(SelectedWindowText));
         OnPropertyChanged(nameof(ResolutionText));
