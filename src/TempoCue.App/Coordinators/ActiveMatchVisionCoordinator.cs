@@ -39,6 +39,14 @@ internal sealed class ActiveMatchVisionCoordinator :
     private IReadOnlyDictionary<string, ParticipantVisibilitySnapshot> _visibilityStates =
         new Dictionary<string, ParticipantVisibilitySnapshot>(
             StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Игровое время последнего наблюдения каждого участника. Хранится рядом с
+    /// часами, а не вместо них: часы нужны для устаревания потока кадров, а
+    /// игроку важно игровое время — на паузе они расходятся.
+    /// </summary>
+    private readonly Dictionary<string, TimeSpan> _lastSeenGameTimes =
+        new(StringComparer.OrdinalIgnoreCase);
     private ActiveMatchVisionParticipantContext? _currentContext;
     private string? _participantSignature;
     private int _generation;
@@ -91,6 +99,7 @@ internal sealed class ActiveMatchVisionCoordinator :
             _loadCancellation = null;
             _visibilityTracker.Reset();
             _transitionDetector.Reset();
+            _lastSeenGameTimes.Clear();
             _visibilityStates = new Dictionary<string, ParticipantVisibilitySnapshot>(
                 StringComparer.OrdinalIgnoreCase);
             _currentContext = null;
@@ -101,6 +110,33 @@ internal sealed class ActiveMatchVisionCoordinator :
         if (_observationSource is not null)
         {
             _observationSource.ObservationAvailable -= OnObservationAvailable;
+        }
+    }
+
+    /// <summary>
+    /// Запоминает игровое время, когда участника видели в последний раз.
+    /// </summary>
+    /// <remarks>
+    /// Трекер видимости работает по часам: ему нужно устаревание потока кадров,
+    /// а не игровой таймер. Игроку же нужно именно игровое время — по нему он
+    /// считает и возрождение, и подход соперника. На паузе часы и таймер
+    /// расходятся, поэтому пересчитывать одно из другого нельзя.
+    /// </remarks>
+    private void RememberLastSeenGameTimes(
+        IReadOnlyList<ParticipantVisibilitySnapshot> states)
+    {
+        if (_monitor.CurrentUpdate?.Snapshot?.Match is not { } match)
+        {
+            return;
+        }
+
+        var gameTime = TimeSpan.FromSeconds(Math.Max(0, match.GameTimeSeconds));
+        foreach (var state in states)
+        {
+            if (state.Status == ParticipantVisibilityStatus.Visible)
+            {
+                _lastSeenGameTimes[state.ParticipantId] = gameTime;
+            }
         }
     }
 
@@ -131,7 +167,8 @@ internal sealed class ActiveMatchVisionCoordinator :
                     context.CreateDiagnosticsSnapshot(
                         _resolutions,
                         _visibilityStates,
-                        ObservationsAreStaleLocked()));
+                        ObservationsAreStaleLocked(),
+                        _lastSeenGameTimes));
                 return;
             }
 
@@ -152,13 +189,15 @@ internal sealed class ActiveMatchVisionCoordinator :
             _visibilityStates = states.ToDictionary(
                 static state => state.ParticipantId,
                 StringComparer.OrdinalIgnoreCase);
+            RememberLastSeenGameTimes(states);
             transitions = _transitionDetector.Update(e.CapturedAt, states);
             Volatile.Write(
                 ref _diagnosticsSnapshot,
                 context.CreateDiagnosticsSnapshot(
                     _resolutions,
                     _visibilityStates,
-                    observationsAreStale: false));
+                    observationsAreStale: false,
+                    _lastSeenGameTimes));
         }
 
         foreach (var transition in transitions)
@@ -208,7 +247,8 @@ internal sealed class ActiveMatchVisionCoordinator :
                     context.CreateDiagnosticsSnapshot(
                         _resolutions,
                         _visibilityStates,
-                        ObservationsAreStaleLocked()));
+                        ObservationsAreStaleLocked(),
+                        _lastSeenGameTimes));
                 if (_referencesFailedAt is not { } failedAt ||
                     DateTimeOffset.UtcNow - failedAt < _referenceRetryInterval)
                 {
@@ -327,7 +367,8 @@ internal sealed class ActiveMatchVisionCoordinator :
                 (_currentContext ?? context).CreateDiagnosticsSnapshot(
                     resolutions,
                     _visibilityStates,
-                    ObservationsAreStaleLocked()));
+                    ObservationsAreStaleLocked(),
+                    _lastSeenGameTimes));
         }
 
         _referenceSink.SetChampionReferences(references);

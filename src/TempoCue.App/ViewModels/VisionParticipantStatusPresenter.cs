@@ -11,6 +11,25 @@ namespace TempoCue.App.ViewModels;
 /// <summary>Форматирует диагностическое состояние Vision для двух колонок интерфейса.</summary>
 internal sealed class VisionParticipantStatusPresenter(LocalizationService localization)
 {
+    /// <summary>
+    /// Когда участника видели в последний раз.
+    /// </summary>
+    /// <remarks>
+    /// Игровое время, а не часы: игрок считает по нему возрождение и подход
+    /// соперника, и на паузе одно из другого не пересчитать. Часы остаются
+    /// запасным вариантом — до первого ответа Live Client Data игрового времени
+    /// ещё нет.
+    /// </remarks>
+    private string? LastSeenLabel(ActiveMatchVisionParticipantSnapshot participant) =>
+        participant.LastSeenGameTime is { } gameTime
+            ? string.Format(
+                CultureInfo.InvariantCulture,
+                "{0:mm\\:ss}",
+                gameTime)
+            : participant.LastSeenAt is { } wallClock
+                ? wallClock.ToLocalTime().ToString("HH:mm:ss", CultureInfo.CurrentCulture)
+                : null;
+
     private static readonly Brush VisibleStatusBrush = CreateFrozenBrush(87, 221, 179);
     private static readonly Brush MissingStatusBrush = CreateFrozenBrush(119, 139, 167);
     private static readonly Brush PendingStatusBrush = CreateFrozenBrush(255, 201, 85);
@@ -99,21 +118,21 @@ internal sealed class VisionParticipantStatusPresenter(LocalizationService local
         {
             // Потеря потока наблюдений не должна выглядеть как подтверждённое исчезновение.
             return (
-                participant.LastSeenAt is { } lastConfirmedAt
+                LastSeenLabel(participant) is { } lastConfirmed
                     ? string.Format(
                         CultureInfo.CurrentCulture,
                         _localization.Get("Settings.Capture.Participants.Status.NoData.LastSeen.Value"),
-                        lastConfirmedAt.ToLocalTime())
+                        lastConfirmed)
                     : _localization.Get("Settings.Capture.Participants.Status.NoData"),
                 MissingStatusBrush);
         }
 
-        return participant.LastSeenAt is { } lastSeenAt
+        return LastSeenLabel(participant) is { } lastSeen
             ? (
                 string.Format(
                     CultureInfo.CurrentCulture,
                     _localization.Get("Settings.Capture.Participants.Status.LastSeen.Value"),
-                    lastSeenAt.ToLocalTime()),
+                    lastSeen),
                 MissingStatusBrush)
             : (
                 _localization.Get("Settings.Capture.Participants.Status.NotVisible"),

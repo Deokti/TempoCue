@@ -29,6 +29,12 @@ internal sealed record ActiveMatchVisionParticipantSnapshot(
     ParticipantVisibilityStatus VisibilityStatus =
         ParticipantVisibilityStatus.Unknown,
     DateTimeOffset? LastSeenAt = null,
+    /// <summary>
+    /// Игровое время последнего наблюдения. Часы для этого не годятся: матч
+    /// можно поставить на паузу, и разница «сейчас минус тогда» перестанет
+    /// совпадать с тем, что видит игрок на своём таймере.
+    /// </summary>
+    TimeSpan? LastSeenGameTime = null,
     double VisibilityConfidence = 0,
     double? MapX = null,
     double? MapY = null);

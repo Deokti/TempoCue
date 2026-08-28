@@ -147,6 +147,64 @@ public sealed class CaptureDiagnosticsParticipantTests
         });
     }
 
+    [Fact]
+    public void Refresh_ShowsGameTimeOfTheLastSighting()
+    {
+        RunInRussian(localization =>
+        {
+            using var viewModel = CreateViewModel(
+                localization,
+                new ActiveMatchVisionParticipantSnapshot(
+                    "enemy-player",
+                    "Anivia",
+                    "Anivia",
+                    PlayerPosition.Middle,
+                    TeamSide.Chaos,
+                    MinimapMarkerAffiliation.Enemy,
+                    VisibilityStatus: ParticipantVisibilityStatus.NotVisible,
+                    LastSeenAt: new DateTimeOffset(2026, 8, 21, 10, 0, 0, TimeSpan.Zero),
+                    LastSeenGameTime: TimeSpan.FromSeconds(754)));
+
+            viewModel.Refresh();
+
+            // Игровое время, а не часы: по нему игрок считает и возрождение, и
+            // подход соперника, и на паузе одно из другого не пересчитать.
+            Assert.Equal(
+                "Не виден · последний раз в 12:34",
+                Assert.Single(viewModel.EnemyParticipantStatuses).StatusText);
+        });
+    }
+
+    [Fact]
+    public void Refresh_FallsBackToTheClockBeforeTheFirstGameTime()
+    {
+        RunInRussian(localization =>
+        {
+            var lastSeenAt = new DateTimeOffset(2026, 8, 21, 10, 0, 0, TimeSpan.Zero);
+            using var viewModel = CreateViewModel(
+                localization,
+                new ActiveMatchVisionParticipantSnapshot(
+                    "enemy-player",
+                    "Anivia",
+                    "Anivia",
+                    PlayerPosition.Middle,
+                    TeamSide.Chaos,
+                    MinimapMarkerAffiliation.Enemy,
+                    VisibilityStatus: ParticipantVisibilityStatus.NotVisible,
+                    LastSeenAt: lastSeenAt));
+
+            viewModel.Refresh();
+
+            // До первого ответа Live Client Data игрового времени ещё нет.
+            Assert.Equal(
+                string.Format(
+                    System.Globalization.CultureInfo.CurrentCulture,
+                    "Не виден · последний раз в {0:HH:mm:ss}",
+                    lastSeenAt.ToLocalTime()),
+                Assert.Single(viewModel.EnemyParticipantStatuses).StatusText);
+        });
+    }
+
     private static ActiveMatchVisionDiagnosticsSnapshot CreateVisionSnapshot() => new(
         TeamSide.Chaos,
         [

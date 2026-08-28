@@ -65,7 +65,8 @@ internal sealed record ActiveMatchVisionParticipantContext(
     public ActiveMatchVisionDiagnosticsSnapshot CreateDiagnosticsSnapshot(
         IReadOnlyDictionary<string, ActiveMatchVisionReferenceResolution>? resolutions = null,
         IReadOnlyDictionary<string, ParticipantVisibilitySnapshot>? visibilityStates = null,
-        bool observationsAreStale = false) =>
+        bool observationsAreStale = false,
+        IReadOnlyDictionary<string, TimeSpan>? lastSeenGameTimes = null) =>
         new(
             ActivePlayerTeam,
             Players.Select(player =>
@@ -95,10 +96,19 @@ internal sealed record ActiveMatchVisionParticipantContext(
                     player.IsDead,
                     visibilityStatus,
                     visibility?.LastSeenAt,
+                    LastSeenGameTime(lastSeenGameTimes, player.ParticipantId),
                     visibility?.Confidence ?? 0,
                     visibility?.MapX,
                     visibility?.MapY);
             }).ToArray());
+
+    private static TimeSpan? LastSeenGameTime(
+        IReadOnlyDictionary<string, TimeSpan>? lastSeenGameTimes,
+        string participantId) =>
+        lastSeenGameTimes is not null
+        && lastSeenGameTimes.TryGetValue(participantId, out var gameTime)
+            ? gameTime
+            : null;
 }
 
 internal sealed record ActiveMatchVisionParticipant(
