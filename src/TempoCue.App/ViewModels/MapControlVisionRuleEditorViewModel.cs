@@ -131,7 +131,7 @@ public sealed class MapControlVisionRuleEditorViewModel : ObservableObject
     /// </summary>
     public string PreviewText => _localization.Format(
         "Coaching.MapControlEditor.Content.Vision.Preview",
-        MapControlContentText.VisionPositionName(SelectedPosition, _localization),
+        MapControlContentText.VisionPositionName(SelectedPosition),
         MapControlContentText.VisionTransitionName(SelectedTransition, _localization));
 
     public string Message
@@ -254,7 +254,7 @@ public sealed class MapControlVisionRuleEditorViewModel : ObservableObject
         PositionOptions = SelectablePositions
             .Select(position => new MapControlVisionPositionOptionViewModel(
                 position,
-                MapControlContentText.VisionPositionName(position, _localization)))
+                MapControlContentText.VisionPositionName(position)))
             .ToArray();
         TransitionOptions = Enum.GetValues<MapVisionTransition>()
             .Select(transition => new MapControlVisionTransitionOptionViewModel(

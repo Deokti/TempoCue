@@ -17,11 +17,11 @@ public sealed class MapControlScopeViewModel : ObservableObject
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         RoleOptions =
         [
-            new(MapControlRole.Top, "TOP"),
-            new(MapControlRole.Jungle, "JUNGLE"),
-            new(MapControlRole.Mid, "MID"),
-            new(MapControlRole.Adc, "ADC"),
-            new(MapControlRole.Support, "SUPPORT")
+            new(MapControlRole.Top, MapControlContentText.RoleName(MapControlRole.Top)),
+            new(MapControlRole.Jungle, MapControlContentText.RoleName(MapControlRole.Jungle)),
+            new(MapControlRole.Mid, MapControlContentText.RoleName(MapControlRole.Mid)),
+            new(MapControlRole.Adc, MapControlContentText.RoleName(MapControlRole.Adc)),
+            new(MapControlRole.Support, MapControlContentText.RoleName(MapControlRole.Support))
         ];
 
         foreach (var option in RoleOptions)

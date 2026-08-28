@@ -16,18 +16,36 @@ internal static class MapControlContentText
             _ => throw new ArgumentOutOfRangeException(nameof(objective), objective, null)
         });
 
-    public static string VisionPositionName(
-        PlayerPosition position,
-        LocalizationService localization) =>
-        localization.Get(position switch
-        {
-            PlayerPosition.Top => "Coaching.MapControlEditor.Content.Vision.Position.Top",
-            PlayerPosition.Jungle => "Coaching.MapControlEditor.Content.Vision.Position.Jungle",
-            PlayerPosition.Middle => "Coaching.MapControlEditor.Content.Vision.Position.Middle",
-            PlayerPosition.Bottom => "Coaching.MapControlEditor.Content.Vision.Position.Bottom",
-            PlayerPosition.Support => "Coaching.MapControlEditor.Content.Vision.Position.Support",
-            _ => throw new ArgumentOutOfRangeException(nameof(position), position, null)
-        });
+    /// <summary>
+    /// Роль в области применения набора. Не переводится: TOP, JUNGLE, MID, ADC и
+    /// SUPPORT — это имена самой игры, и игрок знает их именно такими.
+    /// </summary>
+    public static string RoleName(MapControlRole role) => role switch
+    {
+        MapControlRole.Top => "TOP",
+        MapControlRole.Jungle => "JUNGLE",
+        MapControlRole.Mid => "MID",
+        MapControlRole.Adc => "ADC",
+        MapControlRole.Support => "SUPPORT",
+        _ => throw new ArgumentOutOfRangeException(nameof(role), role, null)
+    };
+
+    /// <summary>
+    /// Роль соперника в правиле наблюдения. Обязана совпадать с
+    /// <see cref="RoleName"/>: игрок выбирает одни и те же пять ролей на двух
+    /// шагах подряд, и разные названия читались бы как разные вещи. Перечисления
+    /// при этом разные — область применения живёт в наборах, а наблюдение в
+    /// составе матча, — поэтому имена стоят рядом, чтобы расхождение было видно.
+    /// </summary>
+    public static string VisionPositionName(PlayerPosition position) => position switch
+    {
+        PlayerPosition.Top => "TOP",
+        PlayerPosition.Jungle => "JUNGLE",
+        PlayerPosition.Middle => "MID",
+        PlayerPosition.Bottom => "ADC",
+        PlayerPosition.Support => "SUPPORT",
+        _ => throw new ArgumentOutOfRangeException(nameof(position), position, null)
+    };
 
     public static string VisionTransitionName(
         MapVisionTransition transition,
@@ -44,7 +62,7 @@ internal static class MapControlContentText
         PlayerPosition position,
         MapVisionTransition transition,
         LocalizationService localization) =>
-        $"{VisionPositionName(position, localization)} · {VisionTransitionName(transition, localization)}";
+        $"{VisionPositionName(position)} · {VisionTransitionName(transition, localization)}";
 
     public static string PriorityName(
         MapObjectiveReminderPriority priority,

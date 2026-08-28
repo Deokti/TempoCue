@@ -905,11 +905,6 @@
   <data name="Coaching.MapControlEditor.Content.Tab.Timed" xml:space="preserve"><value>Напоминания по времени · {0}</value></data>
   <data name="Coaching.MapControlEditor.Content.Tab.Persistent" xml:space="preserve"><value>Постоянные подсказки · {0}</value></data>
   <data name="Coaching.MapControlEditor.Content.Tab.Vision" xml:space="preserve"><value>Наблюдение {0}</value></data>
-  <data name="Coaching.MapControlEditor.Content.Vision.Position.Top" xml:space="preserve"><value>Топ</value></data>
-  <data name="Coaching.MapControlEditor.Content.Vision.Position.Jungle" xml:space="preserve"><value>Лес</value></data>
-  <data name="Coaching.MapControlEditor.Content.Vision.Position.Middle" xml:space="preserve"><value>Мид</value></data>
-  <data name="Coaching.MapControlEditor.Content.Vision.Position.Bottom" xml:space="preserve"><value>Стрелок</value></data>
-  <data name="Coaching.MapControlEditor.Content.Vision.Position.Support" xml:space="preserve"><value>Поддержка</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.Transition.Appeared" xml:space="preserve"><value>появился на карте</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.Transition.Disappeared" xml:space="preserve"><value>пропал из вида</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.Editor.Progress" xml:space="preserve"><value>Правило {0} из {1}</value></data>
@@ -927,7 +922,7 @@
   <data name="Coaching.MapControlEditor.Content.Vision.Add" xml:space="preserve"><value>+ Добавить правило наблюдения</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.Empty" xml:space="preserve"><value>Пока ни одного правила наблюдения.</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.Blind.Title" xml:space="preserve"><value>Что наблюдение не видит</value></data>
-  <data name="Coaching.MapControlEditor.Content.Vision.Blind.Description" xml:space="preserve"><value>Наблюдение знает только видимость соперника на карте. Этих сведений в нём не появится — следите за ними сами.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Blind.Description" xml:space="preserve"><value>Наблюдение знает только видимость соперника на карте. Этих сведений в нём не появится.</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.Blind.Items" xml:space="preserve"><value>Чужие варды · Скопления и построения команды · Точное положение под чужой башней</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.MoveUp" xml:space="preserve"><value>Выше</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.MoveDown" xml:space="preserve"><value>Ниже</value></data>

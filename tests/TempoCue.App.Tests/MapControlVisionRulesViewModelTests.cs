@@ -19,7 +19,7 @@ public sealed class MapControlVisionRulesViewModelTests
         var rule = Assert.Single(rules.Rules);
         Assert.Equal(PlayerPosition.Middle, rule.Position);
         Assert.Equal(MapVisionTransition.Disappeared, rule.Transition);
-        Assert.Equal("Мид · пропал из вида", rule.PairLabel);
+        Assert.Equal("MID · пропал из вида", rule.PairLabel);
         Assert.Single(rules.Snapshot);
     }
 
@@ -53,7 +53,7 @@ public sealed class MapControlVisionRulesViewModelTests
         // Сработает только первое правило пары, остальные — молчаливо мёртвый
         // текст, и назвать их надо до сохранения, а не в бою.
         var duplicate = Assert.Single(rules.DuplicatePairLabels);
-        Assert.Equal("Лес · появился на карте", duplicate);
+        Assert.Equal("JUNGLE · появился на карте", duplicate);
     }
 
     [Fact]
@@ -111,8 +111,10 @@ public sealed class MapControlVisionRulesViewModelTests
         rules.Editor.SelectedPosition = PlayerPosition.Bottom;
         rules.Editor.SelectedTransition = MapVisionTransition.Disappeared;
 
+        // Роли называются так же, как в области применения: TOP, JUNGLE, MID,
+        // ADC, SUPPORT — это имена самой игры, и переводить их незачем.
         Assert.Equal(
-            "Сработает, когда наблюдение зафиксирует: Стрелок — пропал из вида",
+            "Сработает, когда наблюдение зафиксирует: ADC — пропал из вида",
             rules.Editor.PreviewText);
     }
 

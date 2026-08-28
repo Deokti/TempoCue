@@ -895,11 +895,6 @@
   <data name="Coaching.MapControlEditor.Content.Tab.Timed" xml:space="preserve"><value>Timed reminders · {0}</value></data>
   <data name="Coaching.MapControlEditor.Content.Tab.Persistent" xml:space="preserve"><value>Persistent tips · {0}</value></data>
   <data name="Coaching.MapControlEditor.Content.Tab.Vision" xml:space="preserve"><value>Observation {0}</value></data>
-  <data name="Coaching.MapControlEditor.Content.Vision.Position.Top" xml:space="preserve"><value>Top</value></data>
-  <data name="Coaching.MapControlEditor.Content.Vision.Position.Jungle" xml:space="preserve"><value>Jungle</value></data>
-  <data name="Coaching.MapControlEditor.Content.Vision.Position.Middle" xml:space="preserve"><value>Mid</value></data>
-  <data name="Coaching.MapControlEditor.Content.Vision.Position.Bottom" xml:space="preserve"><value>ADC</value></data>
-  <data name="Coaching.MapControlEditor.Content.Vision.Position.Support" xml:space="preserve"><value>Support</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.Transition.Appeared" xml:space="preserve"><value>appeared on the map</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.Transition.Disappeared" xml:space="preserve"><value>went out of sight</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.Editor.Progress" xml:space="preserve"><value>Rule {0} of {1}</value></data>
@@ -917,7 +912,7 @@
   <data name="Coaching.MapControlEditor.Content.Vision.Add" xml:space="preserve"><value>+ Add observation rule</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.Empty" xml:space="preserve"><value>No observation rules yet.</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.Blind.Title" xml:space="preserve"><value>What observation cannot see</value></data>
-  <data name="Coaching.MapControlEditor.Content.Vision.Blind.Description" xml:space="preserve"><value>Observation only knows whether an opponent is visible on the map. This information will not appear in it — keep an eye on it yourself.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Blind.Description" xml:space="preserve"><value>Observation only knows whether an opponent is visible on the map. This information will not appear in it.</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.Blind.Items" xml:space="preserve"><value>Enemy wards · Groupings and formations · Exact position under an enemy tower</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.MoveUp" xml:space="preserve"><value>Up</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.MoveDown" xml:space="preserve"><value>Down</value></data>
