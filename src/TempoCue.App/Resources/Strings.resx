@@ -904,6 +904,23 @@
   <data name="Coaching.MapControlEditor.Content.Vision.Transition.Disappeared" xml:space="preserve"><value>went out of sight</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.Editor.Progress" xml:space="preserve"><value>Rule {0} of {1}</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.Preview" xml:space="preserve"><value>Fires when observation records: {0} — {1}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Editor.Title" xml:space="preserve"><value>Observation rule</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Position" xml:space="preserve"><value>Opponent role</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Position.Hint" xml:space="preserve"><value>The role comes from Live Client Data, not from the minimap. If Riot did not report it, the rule simply never fires — the app does not guess which of the five is the mid laner.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Transition" xml:space="preserve"><value>Event</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Preview.Title" xml:space="preserve"><value>How this fires</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Message" xml:space="preserve"><value>Main advice (the player sees it first)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.WhyNow" xml:space="preserve"><value>Why now (short explanation)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.NextGoal" xml:space="preserve"><value>Next goal (what to do next)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.ListTitle" xml:space="preserve"><value>Observation rules</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Description" xml:space="preserve"><value>These fire on opponent visibility on the minimap. The event has already happened, so there is no lead time and no repetition here.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Add" xml:space="preserve"><value>+ Add observation rule</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Empty" xml:space="preserve"><value>No observation rules yet.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Blind.Title" xml:space="preserve"><value>What observation cannot see</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Blind.Description" xml:space="preserve"><value>Observation only knows whether an opponent is visible on the map. This information will not appear in it — keep an eye on it yourself.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Blind.Items" xml:space="preserve"><value>Enemy wards · Groupings and formations · Exact position under an enemy tower</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.MoveUp" xml:space="preserve"><value>Up</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.MoveDown" xml:space="preserve"><value>Down</value></data>
   <data name="Coaching.MapControlEditor.Content.CatalogTitle" xml:space="preserve"><value>TempoCue knows the objective schedule</value></data>
   <data name="Coaching.MapControlEditor.Content.CatalogUnavailable" xml:space="preserve"><value>Select a supported game patch on step one.</value></data>
   <data name="Coaching.MapControlEditor.Content.CatalogCurrentPatch" xml:space="preserve"><value>Timings are verified for patch {0}. You only choose when and what TempoCue should remind you about.</value></data>
@@ -976,9 +993,6 @@
   <data name="Coaching.MapControlEditor.Content.Timed.Message" xml:space="preserve"><value>Main advice (the player sees it first)</value></data>
   <data name="Coaching.MapControlEditor.Content.Timed.WhyNow" xml:space="preserve"><value>Why now (short explanation)</value></data>
   <data name="Coaching.MapControlEditor.Content.Timed.NextGoal" xml:space="preserve"><value>What to prepare for the objective (optional)</value></data>
-  <data name="Coaching.MapControlEditor.Content.Timed.Future.Title" xml:space="preserve"><value>Map observation rules</value></data>
-  <data name="Coaching.MapControlEditor.Content.Timed.Future.Description" xml:space="preserve"><value>TempoCue already reads the minimap and notices when an opponent appears or goes out of sight — two ready-made packs ship with it. Authoring such rules yourself is not possible yet; they will arrive as a separate section of this step.</value></data>
-  <data name="Coaching.MapControlEditor.Content.Timed.Future.Items" xml:space="preserve"><value>Opponent appeared on the map · Opponent went out of sight</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.ListTitle" xml:space="preserve"><value>Persistent tips</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.Description" xml:space="preserve"><value>Tips remain available in pack details and the overlay shows one on an eligible level-up. Urgent objective and timed reminders take priority.</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.Add" xml:space="preserve"><value>+ Add tip</value></data>

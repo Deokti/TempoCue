@@ -914,6 +914,23 @@
   <data name="Coaching.MapControlEditor.Content.Vision.Transition.Disappeared" xml:space="preserve"><value>пропал из вида</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.Editor.Progress" xml:space="preserve"><value>Правило {0} из {1}</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.Preview" xml:space="preserve"><value>Сработает, когда наблюдение зафиксирует: {0} — {1}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Editor.Title" xml:space="preserve"><value>Правило наблюдения</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Position" xml:space="preserve"><value>Роль соперника</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Position.Hint" xml:space="preserve"><value>Роль приходит из Live Client Data, а не с миникарты. Если Riot её не сообщил, правило просто не сработает — приложение не угадывает, кто из пятерых мидер.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Transition" xml:space="preserve"><value>Событие</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Preview.Title" xml:space="preserve"><value>Как это сработает</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Message" xml:space="preserve"><value>Главный совет (его видит игрок первым)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.WhyNow" xml:space="preserve"><value>Почему сейчас (короткое объяснение)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.NextGoal" xml:space="preserve"><value>Следующая цель (что сделать дальше)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.ListTitle" xml:space="preserve"><value>Правила наблюдения</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Description" xml:space="preserve"><value>Срабатывают по видимости соперника на миникарте. Событие уже случилось, поэтому упреждения и повторов здесь нет.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Add" xml:space="preserve"><value>+ Добавить правило наблюдения</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Empty" xml:space="preserve"><value>Пока ни одного правила наблюдения.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Blind.Title" xml:space="preserve"><value>Что наблюдение не видит</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Blind.Description" xml:space="preserve"><value>Наблюдение знает только видимость соперника на карте. Этих сведений в нём не появится — следите за ними сами.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Blind.Items" xml:space="preserve"><value>Чужие варды · Скопления и построения команды · Точное положение под чужой башней</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.MoveUp" xml:space="preserve"><value>Выше</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.MoveDown" xml:space="preserve"><value>Ниже</value></data>
   <data name="Coaching.MapControlEditor.Content.CatalogTitle" xml:space="preserve"><value>TempoCue знает расписание объектов</value></data>
   <data name="Coaching.MapControlEditor.Content.CatalogUnavailable" xml:space="preserve"><value>Выберите поддерживаемый игровой патч на первом шаге.</value></data>
   <data name="Coaching.MapControlEditor.Content.CatalogCurrentPatch" xml:space="preserve"><value>Тайминги проверены для патча {0}. Вы выбираете только момент и текст напоминания.</value></data>
@@ -986,9 +1003,6 @@
   <data name="Coaching.MapControlEditor.Content.Timed.Message" xml:space="preserve"><value>Главный совет (его игрок видит первым)</value></data>
   <data name="Coaching.MapControlEditor.Content.Timed.WhyNow" xml:space="preserve"><value>Почему сейчас (короткое объяснение)</value></data>
   <data name="Coaching.MapControlEditor.Content.Timed.NextGoal" xml:space="preserve"><value>Что подготовить к объекту (необязательно)</value></data>
-  <data name="Coaching.MapControlEditor.Content.Timed.Future.Title" xml:space="preserve"><value>Правила наблюдения за картой</value></data>
-  <data name="Coaching.MapControlEditor.Content.Timed.Future.Description" xml:space="preserve"><value>TempoCue уже разбирает миникарту и умеет замечать появление и исчезновение соперника — это два готовых набора. Создавать такие правила самому пока нельзя, они появятся отдельным разделом этого шага.</value></data>
-  <data name="Coaching.MapControlEditor.Content.Timed.Future.Items" xml:space="preserve"><value>Соперник появился на карте · Соперник пропал из вида</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.ListTitle" xml:space="preserve"><value>Постоянные подсказки</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.Description" xml:space="preserve"><value>Подсказки доступны в деталях набора и по одной показываются оверлеем при подходящем повышении уровня. Срочные напоминания объектов и времени имеют приоритет.</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.Add" xml:space="preserve"><value>+ Добавить подсказку</value></data>
