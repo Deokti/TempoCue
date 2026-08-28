@@ -892,8 +892,16 @@
   <data name="Overlay.Matchup.PersistentTip.Status" xml:space="preserve"><value>Подсказка по матчапу</value></data>
   <data name="Overlay.MapControl.Status" xml:space="preserve"><value>Контроль карты</value></data>
   <data name="Overlay.MapAwareness.Status" xml:space="preserve"><value>Контроль карты</value></data>
-  <data name="Overlay.MapAwareness.Event.Appeared" xml:space="preserve"><value>{0} появился на карте</value></data>
-  <data name="Overlay.MapAwareness.Event.Disappeared" xml:space="preserve"><value>{0} пропал из вида</value></data>
+  <data name="Overlay.MapAwareness.Headline.Top.Appeared" xml:space="preserve"><value>Вражеский топ появился</value></data>
+  <data name="Overlay.MapAwareness.Headline.Top.Disappeared" xml:space="preserve"><value>Вражеский топ пропал</value></data>
+  <data name="Overlay.MapAwareness.Headline.Jungle.Appeared" xml:space="preserve"><value>Вражеский лесник появился</value></data>
+  <data name="Overlay.MapAwareness.Headline.Jungle.Disappeared" xml:space="preserve"><value>Вражеский лесник пропал</value></data>
+  <data name="Overlay.MapAwareness.Headline.Middle.Appeared" xml:space="preserve"><value>Вражеский мидер появился</value></data>
+  <data name="Overlay.MapAwareness.Headline.Middle.Disappeared" xml:space="preserve"><value>Вражеский мидер исчез</value></data>
+  <data name="Overlay.MapAwareness.Headline.Bottom.Appeared" xml:space="preserve"><value>Вражеский стрелок появился</value></data>
+  <data name="Overlay.MapAwareness.Headline.Bottom.Disappeared" xml:space="preserve"><value>Вражеский стрелок пропал</value></data>
+  <data name="Overlay.MapAwareness.Headline.Support.Appeared" xml:space="preserve"><value>Вражеский саппорт появился</value></data>
+  <data name="Overlay.MapAwareness.Headline.Support.Disappeared" xml:space="preserve"><value>Вражеский саппорт пропал</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.NextGoal.Card" xml:space="preserve"><value>Что сделать дальше</value></data>
   <data name="Overlay.MapAwareness.Dismiss" xml:space="preserve"><value>Скрыть предупреждение</value></data>
   <data name="Overlay.MapControl.PersistentTip.Status" xml:space="preserve"><value>Подсказка по карте</value></data>
@@ -914,6 +922,9 @@
   <data name="Coaching.MapControlEditor.Content.Vision.Transition" xml:space="preserve"><value>Событие</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.Preview.Title" xml:space="preserve"><value>Как это сработает</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.Message" xml:space="preserve"><value>Главный совет (его видит игрок первым)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Message.Default.Appeared" xml:space="preserve"><value>{champion} виден на миникарте. Проверьте его позицию.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Message.Default.Disappeared" xml:space="preserve"><value>{champion} больше не виден на миникарте. Проверьте реку и соседние линии.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Message.Hint" xml:space="preserve"><value>Заголовок уведомления пишет TempoCue: он называет роль и событие. Здесь — совет под ним. Метка {champion} заменится именем чемпиона из состава матча.</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.WhyNow" xml:space="preserve"><value>Почему сейчас (короткое объяснение)</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.NextGoal" xml:space="preserve"><value>Следующая цель (что сделать дальше)</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.ListTitle" xml:space="preserve"><value>Правила наблюдения</value></data>

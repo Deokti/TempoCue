@@ -17,19 +17,22 @@ public sealed class ActiveMatchMapAwarenessCoordinatorTests
         ParticipantVisibilityTransitionKind.Appeared,
         "map-awareness:jungle-appeared:enemy-jungle",
         OverlayNotificationTone.Danger,
-        "Amumu появился на карте")]
+        "Вражеский лесник появился",
+        "Amumu виден на карте.")]
     [InlineData(
         "enemy-mid",
         ParticipantVisibilityTransitionKind.Disappeared,
         "map-awareness:mid-disappeared:enemy-mid",
         OverlayNotificationTone.Caution,
-        "Anivia пропал из вида")]
+        "Вражеский мидер исчез",
+        "Anivia пропал с карты.")]
     public void TransitionAvailable_ShowsNotificationFromTheMatchedRule(
         string participantId,
         ParticipantVisibilityTransitionKind kind,
         string expectedKey,
         OverlayNotificationTone expectedTone,
-        string expectedPhrase)
+        string expectedPhrase,
+        string expectedSource)
     {
         LocalizationService.Instance.SetLanguage("ru-RU");
         var monitor = new TestActiveMatchMonitor();
@@ -59,9 +62,12 @@ public sealed class ActiveMatchMapAwarenessCoordinatorTests
         var notification = Assert.Single(presenter.Notifications);
         Assert.Equal(expectedKey, notification.Key);
         Assert.Equal(expectedTone, notification.Tone);
-        // Главная фраза называет событие, а не только чемпиона: одного имени
-        // мало, чтобы понять, что случилось.
+        // Заголовок принадлежит приложению: он называет роль и событие — то,
+        // что TempoCue знает наверняка. Автор владеет советом под ним.
         Assert.Equal(expectedPhrase, notification.Phrase);
+
+        // Метка в совете заменяется именем чемпиона из состава матча.
+        Assert.Equal(expectedSource, notification.Source);
         Assert.Equal(OverlayNotificationPurpose.Operational, notification.Purpose);
         Assert.Equal(OverlayInteractionMode.Game, presenter.InteractionMode);
         Assert.Equal(0.7, presenter.Settings.BackgroundOpacity);
@@ -119,7 +125,7 @@ public sealed class ActiveMatchMapAwarenessCoordinatorTests
                     PlayerPosition.Jungle,
                     MapVisionTransition.Appeared,
                     MapObjectiveReminderPriority.Important,
-                    "Лесник виден на карте.",
+                    "{champion} виден на карте.",
                     "Положение лесника быстро устаревает.",
                     "Реши, даёт ли это окно."),
                 new MapVisionRule(
@@ -127,7 +133,7 @@ public sealed class ActiveMatchMapAwarenessCoordinatorTests
                     PlayerPosition.Middle,
                     MapVisionTransition.Disappeared,
                     MapObjectiveReminderPriority.Caution,
-                    "Мидер пропал с карты.",
+                    "{champion} пропал с карты.",
                     "Мидер доходит до боковой линии быстрее всех.",
                     "Отойди к башне или поставь обзор.")
             ]);

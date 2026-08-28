@@ -29,22 +29,48 @@ internal static class MapVisionNotificationFactory
         return new OverlayNotification(
             $"map-awareness:{rule.Id}:{idSuffix ?? championName}",
             localization.Get("Overlay.MapAwareness.Status"),
-            // Главной фразой стоит само событие: «Треш пропал из вида». Одного
-            // имени чемпиона мало — игрок видит, о ком речь, но не видит, что
-            // случилось, а текст правила пишет автор и назвать событие не обязан.
-            localization.Format(
-                ToEventKey(rule.Transition),
-                championName),
-            rule.Message,
+            // Заголовок принадлежит приложению и не редактируется: он называет
+            // роль и событие — то, что TempoCue знает наверняка. Автор набора
+            // владеет советом под ним, а не фактом.
+            localization.Get(ToHeadlineKey(rule.Position, rule.Transition)),
+            FillChampionName(rule.Message, championName),
             localization.Get("Overlay.MapAwareness.Dismiss"),
             ToTone(rule.Priority),
             badge: localization.Get(ToPositionKey(rule.Position)));
     }
 
-    private static string ToEventKey(MapVisionTransition transition) =>
-        transition == MapVisionTransition.Appeared
-            ? "Overlay.MapAwareness.Event.Appeared"
-            : "Overlay.MapAwareness.Event.Disappeared";
+    /// <summary>
+    /// Подставляет имя чемпиона в совет автора.
+    /// </summary>
+    /// <remarks>
+    /// Метка заменяется, а не форматируется: в авторском тексте могут оказаться
+    /// любые фигурные скобки, и string.Format на них падает. Совет без метки
+    /// остаётся как есть — она необязательна.
+    /// </remarks>
+    public static string FillChampionName(string message, string championName) =>
+        (message ?? string.Empty).Replace(
+            ChampionPlaceholder,
+            championName,
+            StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>Метка имени чемпиона в тексте совета.</summary>
+    public const string ChampionPlaceholder = "{champion}";
+
+    private static string ToHeadlineKey(
+        PlayerPosition position,
+        MapVisionTransition transition)
+    {
+        var role = position switch
+        {
+            PlayerPosition.Top => "Top",
+            PlayerPosition.Jungle => "Jungle",
+            PlayerPosition.Middle => "Middle",
+            PlayerPosition.Bottom => "Bottom",
+            _ => "Support"
+        };
+        var evt = transition == MapVisionTransition.Appeared ? "Appeared" : "Disappeared";
+        return $"Overlay.MapAwareness.Headline.{role}.{evt}";
+    }
 
     private static OverlayNotificationTone ToTone(MapObjectiveReminderPriority priority) =>
         priority switch

@@ -163,6 +163,10 @@
                          Style="{StaticResource FormTextBox}" MaxLength="240" />
                 <TextBlock DataContext="{Binding VisionRules.Editor.MessageLengthFeedback}"
                            Text="{Binding Text}" Style="{StaticResource FormLengthFeedback}" />
+                <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Content.Vision.Message.Hint}"
+                           Style="{StaticResource FormFieldHint}"
+                           TextWrapping="Wrap"
+                           Margin="0,4,0,0" />
 
                 <Grid Margin="0,12,0,0">
                     <Grid.ColumnDefinitions>

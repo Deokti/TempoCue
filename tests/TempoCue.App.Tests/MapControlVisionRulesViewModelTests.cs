@@ -24,14 +24,17 @@ public sealed class MapControlVisionRulesViewModelTests
     }
 
     [Fact]
-    public void Editor_RequiresOnlyTheAdviceItself()
+    public void NewRule_ComesWithAReadyAdviceAndNoOtherRequirements()
     {
         var rules = CreateRules();
         rules.BeginAdd();
 
-        Assert.False(rules.Editor.CanSave);
-
-        rules.Editor.Message = "Вражеский мидер пропал из вида.";
+        // Совет предписан заранее: чистое поле заставляло бы автора придумывать
+        // формулировку с нуля, а проверенная фраза сразу работает и правится.
+        Assert.Contains(
+            MapVisionNotificationFactory.ChampionPlaceholder,
+            rules.Editor.Message,
+            StringComparison.Ordinal);
 
         // «Почему сейчас» и «следующая цель» необязательны: в оверлей они не
         // попадают вовсе, и требовать их значило бы заставлять автора писать
@@ -42,6 +45,25 @@ public sealed class MapControlVisionRulesViewModelTests
         var saved = Assert.Single(rules.Snapshot);
         Assert.Equal(string.Empty, saved.WhyNow);
         Assert.Equal(string.Empty, saved.NextGoal);
+    }
+
+    [Fact]
+    public void ChangingTheEvent_RewritesOnlyAnUntouchedAdvice()
+    {
+        var rules = CreateRules();
+        rules.BeginAdd();
+        var prescribed = rules.Editor.Message;
+
+        rules.Editor.SelectedTransition = MapVisionTransition.Disappeared;
+
+        Assert.NotEqual(prescribed, rules.Editor.Message);
+
+        // Как только автор правит текст, он принадлежит ему, и приложение в
+        // него больше не лезет.
+        rules.Editor.Message = "Свой текст автора.";
+        rules.Editor.SelectedTransition = MapVisionTransition.Appeared;
+
+        Assert.Equal("Свой текст автора.", rules.Editor.Message);
     }
 
     [Fact]

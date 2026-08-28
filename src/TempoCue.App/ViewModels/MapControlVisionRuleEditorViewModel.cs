@@ -57,6 +57,7 @@ public sealed class MapControlVisionRuleEditorViewModel : ObservableObject
     private IReadOnlyList<MapControlVisionTransitionOptionViewModel> _transitionOptions = [];
     private IReadOnlyList<MapControlRulePriorityOptionViewModel> _priorityOptions = [];
     private bool _isOpen;
+    private MapVisionTransition _previousTransition = MapVisionTransition.Appeared;
 
     public MapControlVisionRuleEditorViewModel(LocalizationService localization)
     {
@@ -95,6 +96,14 @@ public sealed class MapControlVisionRuleEditorViewModel : ObservableObject
         {
             if (SetProperty(ref _selectedTransition, value))
             {
+                // Совет заранее написан за автора, но принадлежит ему: смена
+                // события переписывает только нетронутый текст.
+                if (Message == DefaultMessage(_previousTransition))
+                {
+                    Message = DefaultMessage(value);
+                }
+
+                _previousTransition = value;
                 OnPropertyChanged(nameof(PreviewText));
             }
         }
@@ -194,8 +203,11 @@ public sealed class MapControlVisionRuleEditorViewModel : ObservableObject
         EditingRuleId = null;
         SelectedPosition = PlayerPosition.Jungle;
         SelectedTransition = MapVisionTransition.Appeared;
+        _previousTransition = MapVisionTransition.Appeared;
         SelectedPriority = MapObjectiveReminderPriority.Caution;
-        Message = string.Empty;
+        // Совет предписан заранее: чистое поле заставляет автора придумывать
+        // формулировку с нуля, а проверенная фраза сразу работает и правится.
+        Message = DefaultMessage(MapVisionTransition.Appeared);
         WhyNow = string.Empty;
         NextGoal = string.Empty;
         _isEnabled = true;
@@ -210,6 +222,7 @@ public sealed class MapControlVisionRuleEditorViewModel : ObservableObject
         SelectedTransition = rule.Transition;
         SelectedPriority = rule.Priority;
         Message = rule.Message;
+        _previousTransition = rule.Transition;
         WhyNow = rule.WhyNow;
         NextGoal = rule.NextGoal;
         // Выключателя в редакторе нет, но и включать выключенное правило молча
@@ -249,6 +262,11 @@ public sealed class MapControlVisionRuleEditorViewModel : ObservableObject
         OnPropertyChanged(nameof(WhyNowLengthFeedback));
         OnPropertyChanged(nameof(NextGoalLengthFeedback));
     }
+
+    private string DefaultMessage(MapVisionTransition transition) => _localization.Get(
+        transition == MapVisionTransition.Appeared
+            ? "Coaching.MapControlEditor.Content.Vision.Message.Default.Appeared"
+            : "Coaching.MapControlEditor.Content.Vision.Message.Default.Disappeared");
 
     private void RebuildOptions()
     {
