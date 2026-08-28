@@ -308,6 +308,64 @@ public sealed class MapControlEditorViewModelTests
         Assert.True(editor.Verification.CanContinue);
     }
 
+    [Fact]
+    public async Task VisionCheck_AnswersWithTheRuleThatWouldFire()
+    {
+        var editor = CreateEditor();
+        await editor.BeginNewAsync();
+        CompleteMainInformation(editor);
+        Assert.True(editor.MoveNext());
+        Assert.True(editor.MoveNext());
+        AddVisionRule(editor.Content, PlayerPosition.Jungle, MapVisionTransition.Appeared);
+        Assert.True(editor.MoveNext());
+
+        var verification = editor.Verification;
+        verification.CheckPosition = PlayerPosition.Jungle;
+        verification.CheckTransition = MapVisionTransition.Appeared;
+
+        Assert.True(verification.HasVisionCheck);
+        Assert.Equal("Соперник изменил видимость на карте.", verification.CheckResult);
+
+        // Та же роль, но другое событие — правила нет, и проверка обязана это
+        // сказать, а не промолчать.
+        verification.CheckTransition = MapVisionTransition.Disappeared;
+        Assert.Contains("правила нет", verification.CheckResult, StringComparison.Ordinal);
+
+        // Без ролей от Riot не сработает ни одно правило наблюдения. Это не
+        // выдумка, а обычное состояние Live Client Data.
+        verification.CheckTransition = MapVisionTransition.Appeared;
+        verification.AreRolesReported = false;
+        Assert.Contains("Без ролей", verification.CheckResult, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task VisionCheck_ShowsOnlyTheFirstRuleOfADuplicatedPair()
+    {
+        var editor = CreateEditor();
+        await editor.BeginNewAsync();
+        CompleteMainInformation(editor);
+        Assert.True(editor.MoveNext());
+        Assert.True(editor.MoveNext());
+        AddVisionRule(editor.Content, PlayerPosition.Top, MapVisionTransition.Appeared);
+        editor.Content.VisionRules.BeginAdd();
+        editor.Content.VisionRules.Editor.SelectedPosition = PlayerPosition.Top;
+        editor.Content.VisionRules.Editor.SelectedTransition = MapVisionTransition.Appeared;
+        editor.Content.VisionRules.Editor.Message = "Второе правило той же пары.";
+        editor.Content.VisionRules.Editor.WhyNow = "Оно никогда не покажется.";
+        editor.Content.VisionRules.Editor.NextGoal = "Проверка обязана это назвать.";
+        Assert.True(editor.Content.VisionRules.SaveEditor());
+        Assert.True(editor.MoveNext());
+
+        editor.Verification.CheckPosition = PlayerPosition.Top;
+        editor.Verification.CheckTransition = MapVisionTransition.Appeared;
+
+        // Проверка показывает ровно то, что случится в бою: побеждает первое
+        // правило пары. Иначе автор поверил бы, что работает второе.
+        Assert.Equal(
+            "Соперник изменил видимость на карте.",
+            editor.Verification.CheckResult);
+    }
+
     private static void AddVisionRule(
         MapControlContentViewModel content,
         PlayerPosition position,

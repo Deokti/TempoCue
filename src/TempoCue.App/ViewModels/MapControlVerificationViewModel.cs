@@ -1,5 +1,7 @@
 using TempoCue.App.Localization;
+using TempoCue.Application;
 using TempoCue.Coaching;
+using TempoCue.Core;
 
 namespace TempoCue.App.ViewModels;
 
@@ -16,6 +18,9 @@ public sealed class MapControlVerificationViewModel : ObservableObject
     private int _errorCount;
     private int _warningCount;
     private string _catalogPatch = string.Empty;
+    private PlayerPosition _checkPosition = PlayerPosition.Jungle;
+    private MapVisionTransition _checkTransition = MapVisionTransition.Appeared;
+    private bool _areRolesReported = true;
     private string _rolesSummary = string.Empty;
     private string _teamSideSummary = string.Empty;
 
@@ -67,6 +72,84 @@ public sealed class MapControlVerificationViewModel : ObservableObject
     }
 
     public bool HasIssues => Issues.Count > 0;
+
+    /// <summary>
+    /// Показывать ли проверку наблюдения. Без правил наблюдения разыгрывать
+    /// нечего, и пустой блок только занимал бы место.
+    /// </summary>
+    public bool HasVisionCheck => VisionRuleCount > 0;
+
+    public IReadOnlyList<MapControlVisionPositionOptionViewModel> CheckPositionOptions =>
+        _content?.VisionRules.Editor.PositionOptions ?? [];
+
+    public IReadOnlyList<MapControlVisionTransitionOptionViewModel> CheckTransitionOptions =>
+        _content?.VisionRules.Editor.TransitionOptions ?? [];
+
+    public PlayerPosition CheckPosition
+    {
+        get => _checkPosition;
+        set
+        {
+            if (SetProperty(ref _checkPosition, value))
+            {
+                OnPropertyChanged(nameof(CheckResult));
+            }
+        }
+    }
+
+    public MapVisionTransition CheckTransition
+    {
+        get => _checkTransition;
+        set
+        {
+            if (SetProperty(ref _checkTransition, value))
+            {
+                OnPropertyChanged(nameof(CheckResult));
+            }
+        }
+    }
+
+    /// <summary>
+    /// Сообщил ли Riot роли соперников. Выключенное состояние — не выдумка, а
+    /// обычное дело: роль приходит из Live Client Data, и без неё ни одно
+    /// правило наблюдения не сработает.
+    /// </summary>
+    public bool AreRolesReported
+    {
+        get => _areRolesReported;
+        set
+        {
+            if (SetProperty(ref _areRolesReported, value))
+            {
+                OnPropertyChanged(nameof(CheckResult));
+            }
+        }
+    }
+
+    /// <summary>
+    /// Что случится при разыгранном наблюдении. Сопоставление берётся из той же
+    /// политики, что работает в матче: два одинаковых сопоставления в разных
+    /// местах рано или поздно разойдутся, и предпросмотр начнёт врать.
+    /// </summary>
+    public string CheckResult
+    {
+        get
+        {
+            if (!AreRolesReported)
+            {
+                return _localization.Get(
+                    "Coaching.MapControlEditor.Verification.Check.NoRoles");
+            }
+
+            var rule = MapAwarenessSignalPolicy.FindRule(
+                _content?.VisionRules.Snapshot ?? [],
+                CheckPosition,
+                CheckTransition);
+            return rule is null
+                ? _localization.Get("Coaching.MapControlEditor.Verification.Check.NoRule")
+                : rule.Message;
+        }
+    }
 
     public bool CanContinue => ErrorCount == 0;
 
@@ -311,6 +394,10 @@ public sealed class MapControlVerificationViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(RuleCount));
         OnPropertyChanged(nameof(VisionRuleCount));
+        OnPropertyChanged(nameof(HasVisionCheck));
+        OnPropertyChanged(nameof(CheckPositionOptions));
+        OnPropertyChanged(nameof(CheckTransitionOptions));
+        OnPropertyChanged(nameof(CheckResult));
         OnPropertyChanged(nameof(TimedReminderCount));
         OnPropertyChanged(nameof(PersistentTipCount));
     }

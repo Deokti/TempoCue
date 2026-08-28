@@ -67,12 +67,7 @@ public static class MapAwarenessSignalPolicy
             return null;
         }
 
-        // Первое подошедшее правило в авторском порядке. Два набора могут описать
-        // одно и то же событие, и показывать два уведомления об одном наблюдении
-        // незачем.
-        var rule = rules.FirstOrDefault(candidate =>
-            candidate.Position == participant.Position
-            && candidate.Transition == visionTransition);
+        var rule = FindRule(rules, participant.Position, visionTransition);
 
         return rule is null
             ? null
@@ -84,6 +79,30 @@ public static class MapAwarenessSignalPolicy
                 transition.Confidence,
                 transition.MapX,
                 transition.MapY);
+    }
+
+    /// <summary>
+    /// Первое подошедшее правило в авторском порядке.
+    /// </summary>
+    /// <remarks>
+    /// Два набора могут описать одно и то же событие, и показывать два
+    /// уведомления об одном наблюдении незачем. Поэтому побеждает первое, а
+    /// остальные молчат — проверка набора называет такие пары ошибкой.
+    ///
+    /// Отдельный метод существует ради предпросмотра в редакторе: он обязан
+    /// отвечать ровно то же, что случится в бою, а два одинаковых сопоставления
+    /// в разных местах рано или поздно разойдутся.
+    /// </remarks>
+    public static MapVisionRule? FindRule(
+        IReadOnlyList<MapVisionRule> rules,
+        PlayerPosition position,
+        MapVisionTransition transition)
+    {
+        ArgumentNullException.ThrowIfNull(rules);
+        return rules.FirstOrDefault(candidate =>
+            candidate.IsEnabled
+            && candidate.Position == position
+            && candidate.Transition == transition);
     }
 
     private static MapVisionTransition? ToTransition(
