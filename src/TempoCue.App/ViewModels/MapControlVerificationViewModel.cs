@@ -92,6 +92,8 @@ public sealed class MapControlVerificationViewModel : ObservableObject
 
     public int RuleCount => _content?.RuleCount ?? 0;
 
+    public int VisionRuleCount => _content?.VisionRules.Count ?? 0;
+
     public int TimedReminderCount => _content?.TimedReminders.Count ?? 0;
 
     public int PersistentTipCount => _content?.PersistentTips.Count ?? 0;
@@ -186,6 +188,19 @@ public sealed class MapControlVerificationViewModel : ObservableObject
                 _localization.Format(
                     "Coaching.MapControlEditor.Verification.Issue.DuplicateTimes",
                     string.Join(", ", duplicateTimes))));
+        }
+
+        // Два правила на одну пару «роль и событие» — ошибка, а не
+        // предупреждение: сработает только первое, второе останется молчаливо
+        // мёртвым текстом, и заметить это в бою нельзя.
+        var duplicateVisionPairs = _content.VisionRules.DuplicatePairLabels;
+        if (duplicateVisionPairs.Count > 0)
+        {
+            issues.Add(new MapControlVerificationIssueViewModel(
+                MapControlVerificationIssueSeverity.Error,
+                _localization.Format(
+                    "Coaching.MapControlEditor.Verification.Issue.DuplicateVisionPairs",
+                    string.Join(", ", duplicateVisionPairs))));
         }
 
         Issues = issues;
@@ -295,6 +310,7 @@ public sealed class MapControlVerificationViewModel : ObservableObject
     private void NotifySummaryChanged()
     {
         OnPropertyChanged(nameof(RuleCount));
+        OnPropertyChanged(nameof(VisionRuleCount));
         OnPropertyChanged(nameof(TimedReminderCount));
         OnPropertyChanged(nameof(PersistentTipCount));
     }

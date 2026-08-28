@@ -1019,6 +1019,8 @@
   <data name="Coaching.MapControlEditor.Verification.Summary" xml:space="preserve"><value>Pack summary</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Rules" xml:space="preserve"><value>Objective rules</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Timed" xml:space="preserve"><value>Timed reminders</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Vision" xml:space="preserve"><value>Observation rules</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Issue.DuplicateVisionPairs" xml:space="preserve"><value>One role and event pair is described twice: {0}. Only the first rule fires — the rest never appear.</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Persistent" xml:space="preserve"><value>Persistent tips</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Patch" xml:space="preserve"><value>Catalog patch</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Scope" xml:space="preserve"><value>Scope</value></data>

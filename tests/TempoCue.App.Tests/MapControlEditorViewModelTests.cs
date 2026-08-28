@@ -269,6 +269,60 @@ public sealed class MapControlEditorViewModelTests
         Assert.True(editor.CanNavigateToStep5);
     }
 
+    [Fact]
+    public async Task TwoVisionRulesOnOnePair_BlockVerification()
+    {
+        var editor = CreateEditor();
+        await editor.BeginNewAsync();
+        CompleteMainInformation(editor);
+        Assert.True(editor.MoveNext());
+        Assert.True(editor.MoveNext());
+        AddVisionRule(editor.Content, PlayerPosition.Jungle, MapVisionTransition.Appeared);
+        AddVisionRule(editor.Content, PlayerPosition.Jungle, MapVisionTransition.Appeared);
+
+        Assert.True(editor.MoveNext());
+
+        // Сработает только первое правило пары. Второе — молчаливо мёртвый текст,
+        // и узнать об этом в бою нельзя, поэтому это ошибка, а не предупреждение.
+        Assert.False(editor.Verification.CanContinue);
+        Assert.Contains(
+            editor.Verification.Issues,
+            issue => issue.Message.Contains("JUNGLE · появился на карте", StringComparison.Ordinal));
+        Assert.Equal(2, editor.Verification.VisionRuleCount);
+    }
+
+    [Fact]
+    public async Task DistinctVisionPairs_PassVerification()
+    {
+        var editor = CreateEditor();
+        await editor.BeginNewAsync();
+        CompleteMainInformation(editor);
+        Assert.True(editor.MoveNext());
+        Assert.True(editor.MoveNext());
+        AddVisionRule(editor.Content, PlayerPosition.Jungle, MapVisionTransition.Appeared);
+        AddVisionRule(editor.Content, PlayerPosition.Jungle, MapVisionTransition.Disappeared);
+
+        Assert.True(editor.MoveNext());
+
+        // Одна роль и два разных события — это два разных условия, а не двойник.
+        Assert.True(editor.Verification.CanContinue);
+    }
+
+    private static void AddVisionRule(
+        MapControlContentViewModel content,
+        PlayerPosition position,
+        MapVisionTransition transition)
+    {
+        content.VisionRules.BeginAdd();
+        var editor = content.VisionRules.Editor;
+        editor.SelectedPosition = position;
+        editor.SelectedTransition = transition;
+        editor.Message = "Соперник изменил видимость на карте.";
+        editor.WhyNow = "Это самая скоропортящаяся информация в игре.";
+        editor.NextGoal = "Решите, что делать с этим окном.";
+        Assert.True(content.VisionRules.SaveEditor());
+    }
+
     private static void CompleteMainInformation(MapControlEditorViewModel editor)
     {
         editor.MainInformation.PackName = "Контроль объектов";

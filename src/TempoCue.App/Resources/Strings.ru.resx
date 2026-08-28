@@ -1029,6 +1029,8 @@
   <data name="Coaching.MapControlEditor.Verification.Summary" xml:space="preserve"><value>Сводка набора</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Rules" xml:space="preserve"><value>Правила объектов</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Timed" xml:space="preserve"><value>Напоминания по времени</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Vision" xml:space="preserve"><value>Правила наблюдения</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Issue.DuplicateVisionPairs" xml:space="preserve"><value>Одна пара «роль и событие» описана дважды: {0}. Сработает только первое правило — остальные не покажутся никогда.</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Persistent" xml:space="preserve"><value>Постоянные подсказки</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Patch" xml:space="preserve"><value>Патч каталога</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Scope" xml:space="preserve"><value>Область</value></data>

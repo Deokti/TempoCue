@@ -221,19 +221,22 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="34" /><RowDefinition Height="34" /><RowDefinition Height="34" />
                         <RowDefinition Height="34" /><RowDefinition Height="34" /><RowDefinition Height="34" />
+                        <RowDefinition Height="34" />
                     </Grid.RowDefinitions>
                     <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Verification.Summary.Rules}" Style="{StaticResource ShellCaption}" />
                     <TextBlock Grid.Column="1" Text="{Binding RuleCount}" Style="{StaticResource VerificationSummaryValue}" />
-                    <TextBlock Grid.Row="1" Text="{localization:Loc Coaching.MapControlEditor.Verification.Summary.Timed}" Style="{StaticResource ShellCaption}" />
-                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TimedReminderCount}" Style="{StaticResource VerificationSummaryValue}" />
-                    <TextBlock Grid.Row="2" Text="{localization:Loc Coaching.MapControlEditor.Verification.Summary.Persistent}" Style="{StaticResource ShellCaption}" />
-                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding PersistentTipCount}" Style="{StaticResource VerificationSummaryValue}" />
-                    <TextBlock Grid.Row="3" Text="{localization:Loc Coaching.MapControlEditor.Verification.Summary.Patch}" Style="{StaticResource ShellCaption}" />
-                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding CatalogPatch}" Style="{StaticResource VerificationSummaryValue}" />
-                    <TextBlock Grid.Row="4" Text="{localization:Loc Coaching.MapControlEditor.Verification.Summary.Scope}" Style="{StaticResource ShellCaption}" />
-                    <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding RolesSummary}" Style="{StaticResource VerificationSummaryValue}" />
-                    <TextBlock Grid.Row="5" Text="{localization:Loc Coaching.MapControlEditor.Verification.Summary.Side}" Style="{StaticResource ShellCaption}" />
-                    <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding TeamSideSummary}" Style="{StaticResource VerificationSummaryValue}" />
+                    <TextBlock Grid.Row="1" Text="{localization:Loc Coaching.MapControlEditor.Verification.Summary.Vision}" Style="{StaticResource ShellCaption}" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding VisionRuleCount}" Style="{StaticResource VerificationSummaryValue}" />
+                    <TextBlock Grid.Row="2" Text="{localization:Loc Coaching.MapControlEditor.Verification.Summary.Timed}" Style="{StaticResource ShellCaption}" />
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding TimedReminderCount}" Style="{StaticResource VerificationSummaryValue}" />
+                    <TextBlock Grid.Row="3" Text="{localization:Loc Coaching.MapControlEditor.Verification.Summary.Persistent}" Style="{StaticResource ShellCaption}" />
+                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding PersistentTipCount}" Style="{StaticResource VerificationSummaryValue}" />
+                    <TextBlock Grid.Row="4" Text="{localization:Loc Coaching.MapControlEditor.Verification.Summary.Patch}" Style="{StaticResource ShellCaption}" />
+                    <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding CatalogPatch}" Style="{StaticResource VerificationSummaryValue}" />
+                    <TextBlock Grid.Row="5" Text="{localization:Loc Coaching.MapControlEditor.Verification.Summary.Scope}" Style="{StaticResource ShellCaption}" />
+                    <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding RolesSummary}" Style="{StaticResource VerificationSummaryValue}" />
+                    <TextBlock Grid.Row="6" Text="{localization:Loc Coaching.MapControlEditor.Verification.Summary.Side}" Style="{StaticResource ShellCaption}" />
+                    <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding TeamSideSummary}" Style="{StaticResource VerificationSummaryValue}" />
                 </Grid>
             </StackPanel>
         </Border>
