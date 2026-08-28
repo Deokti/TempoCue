@@ -23,10 +23,10 @@ public sealed class BuiltInMapControlPackAssetsTests
             })
             .ToArray();
 
-        // Восемь наборов про нейтральные объекты и два про наблюдение за
+        // Восемь наборов про нейтральные объекты и пять про наблюдение за
         // соперниками (ADR 0016).
-        Assert.Equal(10, packs.Length);
-        Assert.Equal(10, packs.Select(static pack => pack.Id).Distinct(
+        Assert.Equal(13, packs.Length);
+        Assert.Equal(13, packs.Select(static pack => pack.Id).Distinct(
             StringComparer.OrdinalIgnoreCase).Count());
         Assert.All(packs, static pack =>
         {
@@ -37,17 +37,32 @@ public sealed class BuiltInMapControlPackAssetsTests
                 .Concat(pack.VisionRules));
         });
 
-        // Наборы наблюдения поставляются на те же две роли, что были зашиты в
-        // коде до ADR 0016: лесник и мидер. Остальные восемь про объекты и
-        // правил наблюдения не содержат.
+        // Наблюдение поставляется на появление лесника и на пропажу каждой из
+        // четырёх остальных ролей. Остальные восемь наборов про объекты и правил
+        // наблюдения не содержат.
         var visionPacks = packs.Where(static pack => pack.VisionRules.Count > 0).ToArray();
-        Assert.Equal(2, visionPacks.Length);
+        Assert.Equal(5, visionPacks.Length);
         Assert.Single(visionPacks, static pack => pack.VisionRules.Any(
             static rule => rule.Position is PlayerPosition.Jungle
                 && rule.Transition is MapVisionTransition.Appeared));
-        Assert.Single(visionPacks, static pack => pack.VisionRules.Any(
-            static rule => rule.Position is PlayerPosition.Middle
-                && rule.Transition is MapVisionTransition.Disappeared));
+        foreach (var position in new[]
+                 {
+                     PlayerPosition.Top,
+                     PlayerPosition.Middle,
+                     PlayerPosition.Bottom,
+                     PlayerPosition.Support
+                 })
+        {
+            Assert.Single(visionPacks, pack => pack.VisionRules.Any(
+                rule => rule.Position == position
+                    && rule.Transition is MapVisionTransition.Disappeared));
+        }
+
+        // Каждое правило наблюдения подставляет имя чемпиона: без метки совет
+        // говорил бы «кто-то пропал», а игроку нужно знать кто.
+        Assert.All(
+            visionPacks.SelectMany(static pack => pack.VisionRules),
+            static rule => Assert.Contains("{champion}", rule.Message, StringComparison.Ordinal));
         var dragons = Assert.Single(packs, static pack =>
             pack.Id.EndsWith("dragons.ru", StringComparison.Ordinal));
         var voidGrubs = Assert.Single(packs, static pack =>
