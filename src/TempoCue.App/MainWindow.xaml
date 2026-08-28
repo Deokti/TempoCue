@@ -53,9 +53,12 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
+                        <!-- 26 px, а не 20: знак занимает лишь половину высоты
+                             своей сетки, поэтому в родном размере он выглядит
+                             мельче, чем стоящий рядом жирный заголовок. -->
                         <Image Source="{StaticResource Brand.Mark}"
-                               Width="16"
-                               Height="16"
+                               Width="26"
+                               Height="26"
                                VerticalAlignment="Center" />
                         <TextBlock Text="TEMPOCUE"
                                    Foreground="#DCEAF7"
