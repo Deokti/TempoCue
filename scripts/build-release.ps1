@@ -97,6 +97,7 @@ Write-Host 'Creating installer...'
     "/DAppVersion=$version" `
     "/DPublishDir=$publishDirectory" `
     "/DOutputDir=$versionOutputDirectory" `
+    "/DSourceDir=$repositoryRoot" `
     $installerScript
 if ($LASTEXITCODE -ne 0) {
     throw 'Installer build failed.'

@@ -53,11 +53,10 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
-                        <Path Width="16"
-                              Height="16"
-                              Data="{StaticResource Icon.MarkCoach}"
-                              Style="{StaticResource TempoIcon}"
-                              Stroke="{StaticResource Accent.Primary}" />
+                        <Image Source="{StaticResource Brand.Mark}"
+                               Width="16"
+                               Height="16"
+                               VerticalAlignment="Center" />
                         <TextBlock Text="TEMPOCUE"
                                    Foreground="#DCEAF7"
                                    FontSize="13"
