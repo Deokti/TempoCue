@@ -882,10 +882,6 @@
   <data name="Overlay.Matchup.PersistentTip.Status" xml:space="preserve"><value>Matchup tip</value></data>
   <data name="Overlay.MapControl.Status" xml:space="preserve"><value>Map control</value></data>
   <data name="Overlay.MapAwareness.Status" xml:space="preserve"><value>Map awareness</value></data>
-  <data name="Overlay.MapAwareness.JunglerAppeared.Title" xml:space="preserve"><value>Enemy jungler appeared</value></data>
-  <data name="Overlay.MapAwareness.JunglerAppeared.Message" xml:space="preserve"><value>{0} is visible on the minimap. Check their position.</value></data>
-  <data name="Overlay.MapAwareness.MidDisappeared.Title" xml:space="preserve"><value>Enemy mid laner disappeared</value></data>
-  <data name="Overlay.MapAwareness.MidDisappeared.Message" xml:space="preserve"><value>{0} is no longer visible on the minimap. Check the river and nearby lanes.</value></data>
   <data name="Overlay.MapAwareness.Dismiss" xml:space="preserve"><value>Hide alert</value></data>
   <data name="Overlay.MapControl.PersistentTip.Status" xml:space="preserve"><value>Map tip</value></data>
   <data name="Overlay.MapControl.Dismiss" xml:space="preserve"><value>Hide reminder</value></data>

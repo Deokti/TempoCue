@@ -892,10 +892,6 @@
   <data name="Overlay.Matchup.PersistentTip.Status" xml:space="preserve"><value>Подсказка по матчапу</value></data>
   <data name="Overlay.MapControl.Status" xml:space="preserve"><value>Контроль карты</value></data>
   <data name="Overlay.MapAwareness.Status" xml:space="preserve"><value>Контроль карты</value></data>
-  <data name="Overlay.MapAwareness.JunglerAppeared.Title" xml:space="preserve"><value>Вражеский лесник появился</value></data>
-  <data name="Overlay.MapAwareness.JunglerAppeared.Message" xml:space="preserve"><value>{0} виден на миникарте. Проверьте его позицию.</value></data>
-  <data name="Overlay.MapAwareness.MidDisappeared.Title" xml:space="preserve"><value>Вражеский мидер исчез</value></data>
-  <data name="Overlay.MapAwareness.MidDisappeared.Message" xml:space="preserve"><value>{0} больше не виден на миникарте. Проверьте реку и соседние линии.</value></data>
   <data name="Overlay.MapAwareness.Dismiss" xml:space="preserve"><value>Скрыть предупреждение</value></data>
   <data name="Overlay.MapControl.PersistentTip.Status" xml:space="preserve"><value>Подсказка по карте</value></data>
   <data name="Overlay.MapControl.Dismiss" xml:space="preserve"><value>Скрыть напоминание</value></data>
