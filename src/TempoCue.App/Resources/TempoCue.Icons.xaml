@@ -47,9 +47,12 @@
         что у него два цвета и залитый узел: шкала уходит в служебный тон, а
         акцент остаётся только на отметке — знак означает то же, что и продукт.
 
-        Узел залит намеренно. Контурное кольцо r=2 при обводке 1.5 оставляет
-        внутри половину единицы, и на 16 px отверстие затягивается сглаживанием
-        в мутное пятно.
+        Узел залит намеренно. Контурное кольцо оставляет внутри слишком мало
+        места, и отверстие затягивается сглаживанием в мутное пятно.
+
+        Обводка 2.4, а не 1.5 как у остальных значков набора: те стоят в рядах
+        и списках, где важна ровность строя, а этот — мастер-знак рядом с жирным
+        заголовком, и на общей толщине он выглядел бледной царапиной.
     -->
     <DrawingImage x:Key="Brand.Mark">
         <DrawingImage.Drawing>
@@ -61,7 +64,7 @@
                 <GeometryDrawing Geometry="M 3,6 L 17,6">
                     <GeometryDrawing.Pen>
                         <Pen Brush="#91A4BD"
-                             Thickness="1.5"
+                             Thickness="2.4"
                              StartLineCap="Round"
                              EndLineCap="Round" />
                     </GeometryDrawing.Pen>
@@ -69,13 +72,13 @@
                 <GeometryDrawing Geometry="M 10,6 L 10,16">
                     <GeometryDrawing.Pen>
                         <Pen Brush="#4FAAE8"
-                             Thickness="1.5"
+                             Thickness="2.4"
                              StartLineCap="Round"
                              EndLineCap="Round" />
                     </GeometryDrawing.Pen>
                 </GeometryDrawing>
                 <GeometryDrawing Brush="#4FAAE8"
-                                 Geometry="M 12,6 A 2,2 0 1 1 8,6 A 2,2 0 1 1 12,6 Z" />
+                                 Geometry="M 12.9,6 A 2.9,2.9 0 1 1 7.1,6 A 2.9,2.9 0 1 1 12.9,6 Z" />
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
