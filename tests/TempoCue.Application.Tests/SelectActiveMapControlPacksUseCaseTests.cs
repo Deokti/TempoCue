@@ -1,4 +1,4 @@
-using TempoCue.Core;
+﻿using TempoCue.Core;
 
 namespace TempoCue.Application.Tests;
 
@@ -243,6 +243,82 @@ public sealed class SelectActiveMapControlPacksUseCaseTests
             afterDragon.AvailablePersistentAdvice,
             advice => advice.Id.EndsWith(":dragon", StringComparison.Ordinal));
     }
+
+    [Fact]
+    public async Task SelectAsync_ReturnsVisionRulesOfEnabledPacks()
+    {
+        var store = new TestMapControlPackStore();
+        store.Add(CreateVisionPack("vision"), LocalCoachPackState.Enabled,
+            LocalCoachPackOrigin.CreatedByUser);
+        var useCase = new SelectActiveMapControlPacksUseCase(
+            new LoadMapControlPackLibraryUseCase(store));
+
+        var result = await useCase.SelectAsync(CreateSnapshot());
+
+        var rule = Assert.Single(result.AvailableVisionRules);
+        Assert.Equal(PlayerPosition.Jungle, rule.Position);
+    }
+
+    [Fact]
+    public async Task SelectAsync_DropsVisionRulesOfDisabledPacks()
+    {
+        var store = new TestMapControlPackStore();
+        store.Add(CreateVisionPack("vision"), LocalCoachPackState.Disabled,
+            LocalCoachPackOrigin.CreatedByUser);
+        var useCase = new SelectActiveMapControlPacksUseCase(
+            new LoadMapControlPackLibraryUseCase(store));
+
+        var result = await useCase.SelectAsync(CreateSnapshot());
+
+        // Выключенный набор — выключенные уведомления. Это то же самое действие,
+        // которым игрок отключает драконов.
+        Assert.Empty(result.AvailableVisionRules);
+    }
+
+    [Fact]
+    public async Task SelectAsync_DropsVisionRuleDisabledInsideAnEnabledPack()
+    {
+        var store = new TestMapControlPackStore();
+        var pack = CreateVisionPack("vision");
+        store.Add(
+            pack with
+            {
+                VisionRules = [pack.VisionRules[0] with { IsEnabled = false }]
+            },
+            LocalCoachPackState.Enabled,
+            LocalCoachPackOrigin.CreatedByUser);
+        var useCase = new SelectActiveMapControlPacksUseCase(
+            new LoadMapControlPackLibraryUseCase(store));
+
+        var result = await useCase.SelectAsync(CreateSnapshot());
+
+        // Отключить можно и одно правило, не трогая остальной набор.
+        Assert.Empty(result.AvailableVisionRules);
+    }
+
+    private static MapControlPack CreateVisionPack(string id) =>
+        TestMapControlPackFactory.Create(id) with
+        {
+            Name = id,
+            Applicability = new MapControlApplicability
+            {
+                Roles = MapControlRoleValues.All,
+                TeamSide = MapControlTeamSide.Any
+            },
+            Rules = [],
+            TimedReminders = [],
+            VisionRules =
+            [
+                new MapVisionRule(
+                    "enemy-jungler-appeared",
+                    PlayerPosition.Jungle,
+                    MapVisionTransition.Appeared,
+                    MapObjectiveReminderPriority.Important,
+                    "Сообщение",
+                    "Почему сейчас",
+                    "Что дальше")
+            ]
+        };
 
     private static MapControlPack CreateTimedPack(
         string id,

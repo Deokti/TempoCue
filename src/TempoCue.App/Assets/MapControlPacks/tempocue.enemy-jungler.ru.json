@@ -1,0 +1,43 @@
+﻿{
+  "schemaVersion": 1,
+  "packType": "mapControl",
+  "id": "tempocue.map-control.enemy-jungler.ru",
+  "name": "Вражеский лесник: появление на карте",
+  "patch": "16.16",
+  "description": "Уведомление в тот момент, когда вражеский лесник попал в поле зрения. Пока он виден, его нет в другом месте карты.",
+  "author": "TempoCue",
+  "contentLanguage": "ru_RU",
+  "verifiedOn": "2026-08-27",
+  "source": {
+    "kind": "personalExperience",
+    "title": "Наблюдение за миникартой средствами TempoCue",
+    "url": "",
+    "author": "TempoCue",
+    "permission": "notRequired"
+  },
+  "applicability": {
+    "roles": [
+      "top",
+      "jungle",
+      "mid",
+      "adc",
+      "support"
+    ],
+    "teamSide": "any"
+  },
+  "rules": [],
+  "visionRules": [
+    {
+      "id": "enemy-jungler-appeared",
+      "position": "jungle",
+      "transition": "appeared",
+      "priority": "important",
+      "message": "{champion} виден на миникарте. Проверьте его позицию.",
+      "whyNow": "Положение лесника — самая скоропортящаяся информация в игре: через несколько секунд она уже неверна.",
+      "nextGoal": "Реши, даёт ли это окно: пуш линии, объект на противоположной стороне или безопасный отход.",
+      "isEnabled": true
+    }
+  ],
+  "timedReminders": [],
+  "persistentTips": []
+}

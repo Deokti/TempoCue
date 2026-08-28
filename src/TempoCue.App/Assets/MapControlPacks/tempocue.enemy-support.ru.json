@@ -1,0 +1,43 @@
+﻿{
+  "schemaVersion": 1,
+  "packType": "mapControl",
+  "id": "tempocue.map-control.enemy-support.ru",
+  "name": "Вражеский саппорт: пропал из вида",
+  "patch": "16.16",
+  "description": "Уведомление в тот момент, когда вражеский саппорт пропал из поля зрения. Чаще всего это означает вард, ганк или подготовку объекта.",
+  "author": "TempoCue",
+  "contentLanguage": "ru_RU",
+  "verifiedOn": "2026-08-27",
+  "source": {
+    "kind": "personalExperience",
+    "title": "Наблюдение за миникартой средствами TempoCue",
+    "url": "",
+    "author": "TempoCue",
+    "permission": "notRequired"
+  },
+  "applicability": {
+    "roles": [
+      "top",
+      "jungle",
+      "mid",
+      "adc",
+      "support"
+    ],
+    "teamSide": "any"
+  },
+  "rules": [],
+  "visionRules": [
+    {
+      "id": "enemy-support-disappeared",
+      "position": "support",
+      "transition": "disappeared",
+      "priority": "caution",
+      "message": "{champion} больше не виден на миникарте. Проверьте свои кусты и подходы к объекту.",
+      "whyNow": "Саппорт уходит с линии раньше остальных: он ставит обзор и готовит ганк.",
+      "nextGoal": "Не заходите глубоко без обзора, пока он не найдётся.",
+      "isEnabled": true
+    }
+  ],
+  "timedReminders": [],
+  "persistentTips": []
+}

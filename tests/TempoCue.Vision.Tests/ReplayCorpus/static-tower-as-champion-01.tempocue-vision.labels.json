@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "regions": [
+    { "x": 71, "y": 26, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Shen", "affiliation": "Enemy" },
+    { "x": 55, "y": 28, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Sett", "affiliation": "Ally" },
+    { "x": 156, "y": 268, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Morgana", "affiliation": "Ally" },
+    { "x": 232, "y": 264, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Ziggs", "affiliation": "Ally" },
+    { "x": 4, "y": 286, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "MasterYi", "affiliation": "Ally" },
+    { "x": 23, "y": 91, "width": 16, "height": 16, "kind": "Tower",
+      "affiliation": "Ally" },
+    { "x": 34, "y": 74, "width": 14, "height": 18, "kind": "MinionWave",
+      "affiliation": "Ally" },
+    { "x": 80, "y": 168, "width": 16, "height": 16, "kind": "Other" },
+    { "x": 142, "y": 267, "width": 16, "height": 16, "kind": "Tower",
+      "affiliation": "Ally" },
+    { "x": 216, "y": 278, "width": 16, "height": 16, "kind": "Tower",
+      "affiliation": "Ally" },
+    { "x": 93, "y": 18, "width": 16, "height": 16, "kind": "Tower",
+      "affiliation": "Enemy" }
+  ],
+  "allowedFalsePositives": 0,
+  "allowedMissedChampions": 2
+}

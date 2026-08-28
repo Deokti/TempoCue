@@ -1,4 +1,4 @@
-namespace TempoCue.Coaching;
+﻿namespace TempoCue.Coaching;
 
 /// <summary>Переносимый набор напоминаний о нейтральных объектах карты.</summary>
 public sealed record MapControlPack
@@ -47,6 +47,13 @@ public sealed record MapControlPack
 
     /// <summary>Правила напоминаний в стабильном авторском порядке.</summary>
     public IReadOnlyList<MapObjectiveReminderRule> Rules { get; init; } = [];
+
+    /// <summary>
+    /// Правила уведомлений по наблюдению на миникарте: роль соперника и событие
+    /// появления или пропажи. Массив необязателен, и его отсутствие — обычное
+    /// состояние: у наборов про нейтральные объекты таких правил нет. ADR 0016.
+    /// </summary>
+    public IReadOnlyList<MapVisionRule> VisionRules { get; init; } = [];
 
     /// <summary>Одноразовые напоминания, привязанные к игровому времени.</summary>
     public IReadOnlyList<MapControlTimedReminder> TimedReminders { get; init; } = [];

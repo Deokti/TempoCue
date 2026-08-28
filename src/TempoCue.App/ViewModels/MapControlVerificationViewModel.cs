@@ -1,5 +1,8 @@
 using TempoCue.App.Localization;
+using TempoCue.Application;
 using TempoCue.Coaching;
+using TempoCue.Core;
+using TempoCue.Overlay;
 
 namespace TempoCue.App.ViewModels;
 
@@ -8,6 +11,7 @@ public sealed class MapControlVerificationViewModel : ObservableObject
 {
     private static readonly TimeSpan MinimumTimelineDuration = TimeSpan.FromMinutes(30);
     private readonly LocalizationService _localization;
+    private readonly Action<OverlayNotification>? _showPreview;
     private MapControlMainInformationViewModel? _mainInformation;
     private MapControlScopeViewModel? _scope;
     private MapControlContentViewModel? _content;
@@ -16,12 +20,17 @@ public sealed class MapControlVerificationViewModel : ObservableObject
     private int _errorCount;
     private int _warningCount;
     private string _catalogPatch = string.Empty;
+    private PlayerPosition _checkPosition = PlayerPosition.Jungle;
+    private MapVisionTransition _checkTransition = MapVisionTransition.Appeared;
     private string _rolesSummary = string.Empty;
     private string _teamSideSummary = string.Empty;
 
-    public MapControlVerificationViewModel(LocalizationService localization)
+    public MapControlVerificationViewModel(
+        LocalizationService localization,
+        Action<OverlayNotification>? showPreview = null)
     {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        _showPreview = showPreview;
     }
 
     public IReadOnlyList<MapControlVerificationIssueViewModel> Issues
@@ -68,6 +77,98 @@ public sealed class MapControlVerificationViewModel : ObservableObject
 
     public bool HasIssues => Issues.Count > 0;
 
+    /// <summary>
+    /// Показывать ли проверку наблюдения. Без правил наблюдения разыгрывать
+    /// нечего, и пустой блок только занимал бы место.
+    /// </summary>
+    public bool HasVisionCheck => VisionRuleCount > 0;
+
+    public IReadOnlyList<MapControlVisionPositionOptionViewModel> CheckPositionOptions =>
+        _content?.VisionRules.Editor.PositionOptions ?? [];
+
+    public IReadOnlyList<MapControlVisionTransitionOptionViewModel> CheckTransitionOptions =>
+        _content?.VisionRules.Editor.TransitionOptions ?? [];
+
+    public PlayerPosition CheckPosition
+    {
+        get => _checkPosition;
+        set
+        {
+            if (SetProperty(ref _checkPosition, value))
+            {
+                NotifyCheckChanged();
+            }
+        }
+    }
+
+    public MapVisionTransition CheckTransition
+    {
+        get => _checkTransition;
+        set
+        {
+            if (SetProperty(ref _checkTransition, value))
+            {
+                NotifyCheckChanged();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Правило, которое ответит на разыгранное наблюдение. Сопоставление берётся
+    /// из той же политики, что работает в матче: два одинаковых сопоставления в
+    /// разных местах рано или поздно разойдутся, и предпросмотр начнёт врать.
+    /// </summary>
+    public MapVisionRule? CheckedRule => MapAwarenessSignalPolicy.FindRule(
+        _content?.VisionRules.Snapshot ?? [],
+        CheckPosition,
+        CheckTransition);
+
+    public bool CanShowCheckedNotification => CheckedRule is not null && _showPreview is not null;
+
+    /// <summary>
+    /// Что случится при разыгранном наблюдении. Пару без правила проверка
+    /// называет прямо: событие произойдёт, но набор на него не ответит.
+    /// </summary>
+    public string CheckResult => CheckedRule is null
+        ? _localization.Get("Coaching.MapControlEditor.Verification.Check.NoRule")
+        : _localization.Get("Coaching.MapControlEditor.Verification.Check.Ready");
+
+    /// <summary>
+    /// Показывает уведомление так, как его увидит игрок. Имя чемпиона подставится
+    /// в матче, здесь на его месте стоит подпись роли.
+    /// </summary>
+    public void ShowCheckedNotification()
+    {
+        if (CheckedRule is not { } rule || _showPreview is null)
+        {
+            return;
+        }
+
+        _showPreview(MapVisionNotificationFactory.Create(
+            rule,
+            ExampleChampionName(rule.Position),
+            _localization,
+            idSuffix: "verification"));
+    }
+
+    /// <summary>
+    /// Имя чемпиона для примера. В матче заголовком уведомления стоит именно
+    /// имя — «Ли Син», а не «соперник», — и предпросмотр обязан выглядеть так же,
+    /// иначе он показывает не то, что увидит игрок.
+    ///
+    /// Имена подобраны по ролям и лежат в ресурсах: в русском наборе они русские,
+    /// как в русском клиенте игры.
+    /// </summary>
+    private string ExampleChampionName(PlayerPosition position) =>
+        _localization.Get(position switch
+        {
+            PlayerPosition.Top => "Coaching.MapControlEditor.Verification.Check.Champion.Top",
+            PlayerPosition.Jungle => "Coaching.MapControlEditor.Verification.Check.Champion.Jungle",
+            PlayerPosition.Middle => "Coaching.MapControlEditor.Verification.Check.Champion.Middle",
+            PlayerPosition.Bottom => "Coaching.MapControlEditor.Verification.Check.Champion.Bottom",
+            _ => "Coaching.MapControlEditor.Verification.Check.Champion.Support"
+        });
+
     public bool CanContinue => ErrorCount == 0;
 
     public bool HasErrors => ErrorCount > 0;
@@ -91,6 +192,8 @@ public sealed class MapControlVerificationViewModel : ObservableObject
         WarningCount);
 
     public int RuleCount => _content?.RuleCount ?? 0;
+
+    public int VisionRuleCount => _content?.VisionRules.Count ?? 0;
 
     public int TimedReminderCount => _content?.TimedReminders.Count ?? 0;
 
@@ -188,6 +291,19 @@ public sealed class MapControlVerificationViewModel : ObservableObject
                     string.Join(", ", duplicateTimes))));
         }
 
+        // Два правила на одну пару «роль и событие» — ошибка, а не
+        // предупреждение: сработает только первое, второе останется молчаливо
+        // мёртвым текстом, и заметить это в бою нельзя.
+        var duplicateVisionPairs = _content.VisionRules.DuplicatePairLabels;
+        if (duplicateVisionPairs.Count > 0)
+        {
+            issues.Add(new MapControlVerificationIssueViewModel(
+                MapControlVerificationIssueSeverity.Error,
+                _localization.Format(
+                    "Coaching.MapControlEditor.Verification.Issue.DuplicateVisionPairs",
+                    string.Join(", ", duplicateVisionPairs))));
+        }
+
         Issues = issues;
         ErrorCount = issues.Count(static issue =>
             issue.Severity == MapControlVerificationIssueSeverity.Error);
@@ -269,6 +385,13 @@ public sealed class MapControlVerificationViewModel : ObservableObject
         return markers;
     }
 
+    private void NotifyCheckChanged()
+    {
+        OnPropertyChanged(nameof(CheckedRule));
+        OnPropertyChanged(nameof(CheckResult));
+        OnPropertyChanged(nameof(CanShowCheckedNotification));
+    }
+
     private MapControlVerificationIssueViewModel CreateIssue(
         MapControlVerificationIssueSeverity severity,
         string resourceKey) =>
@@ -295,6 +418,11 @@ public sealed class MapControlVerificationViewModel : ObservableObject
     private void NotifySummaryChanged()
     {
         OnPropertyChanged(nameof(RuleCount));
+        OnPropertyChanged(nameof(VisionRuleCount));
+        OnPropertyChanged(nameof(HasVisionCheck));
+        OnPropertyChanged(nameof(CheckPositionOptions));
+        OnPropertyChanged(nameof(CheckTransitionOptions));
+        NotifyCheckChanged();
         OnPropertyChanged(nameof(TimedReminderCount));
         OnPropertyChanged(nameof(PersistentTipCount));
     }

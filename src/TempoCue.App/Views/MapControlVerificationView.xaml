@@ -10,6 +10,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Styles/ShellControls.xaml" />
+                <ResourceDictionary Source="../Styles/MapControlControls.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <converters:TimelinePositionConverter x:Key="TimelinePositionConverter" />
             <Style x:Key="VerificationSummaryValue" TargetType="TextBlock">
@@ -208,6 +209,91 @@
                     </StackPanel>
                 </StackPanel>
             </Border>
+            <!-- Разыгранное наблюдение: автор видит своё правило до матча. -->
+            <Border Margin="0,14,0,0">
+                <Border.Style>
+                    <Style TargetType="Border" BasedOn="{StaticResource ShellCard}">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding HasVisionCheck}" Value="True">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <StackPanel>
+                    <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Verification.Check.Title}"
+                               Foreground="#F4F7FB"
+                               FontSize="{StaticResource Typography.FontSize.SectionTitle}"
+                               FontWeight="SemiBold" />
+                    <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Verification.Check.Description}"
+                               Foreground="#7F93AF"
+                               FontSize="{StaticResource Typography.FontSize.Caption}"
+                               TextWrapping="Wrap"
+                               Margin="0,5,0,0" />
+
+                    <ListBox x:Name="VisionCheckPositionListBox"
+                             ItemsSource="{Binding CheckPositionOptions}"
+                             SelectedValuePath="Value"
+                             SelectedValue="{Binding CheckPosition, Mode=TwoWay}"
+                             ItemContainerStyle="{StaticResource MapChoiceOption}"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             Margin="0,14,0,0"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate><WrapPanel Orientation="Horizontal" /></ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DisplayName}" VerticalAlignment="Center" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <ListBox x:Name="VisionCheckTransitionListBox"
+                             ItemsSource="{Binding CheckTransitionOptions}"
+                             SelectedValuePath="Value"
+                             SelectedValue="{Binding CheckTransition, Mode=TwoWay}"
+                             ItemContainerStyle="{StaticResource MapChoiceOption}"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate><WrapPanel Orientation="Horizontal" /></ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DisplayName}" VerticalAlignment="Center" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <Border Background="#162238"
+                            BorderBrush="#263750"
+                            BorderThickness="1"
+                            CornerRadius="10"
+                            Padding="14"
+                            Margin="0,8,0,0">
+                        <StackPanel>
+                            <TextBlock x:Name="VisionCheckResultTextBlock"
+                                       Text="{Binding CheckResult}"
+                                       Foreground="#DCEAF7"
+                                       FontSize="{StaticResource Typography.FontSize.Body}"
+                                       TextWrapping="Wrap" />
+                            <Button x:Name="ShowVisionCheckNotificationButton"
+                                    Content="{localization:Loc Coaching.MapControlEditor.Verification.Check.Show}"
+                                    Style="{StaticResource SecondaryButton}"
+                                    HorizontalAlignment="Left"
+                                    Margin="0,12,0,0"
+                                    IsEnabled="{Binding CanShowCheckedNotification}"
+                                    Click="ShowVisionCheckNotificationButton_Click" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
         </StackPanel>
 
         <Border Grid.Column="2" Style="{StaticResource ShellCard}" VerticalAlignment="Top">
@@ -221,19 +307,22 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="34" /><RowDefinition Height="34" /><RowDefinition Height="34" />
                         <RowDefinition Height="34" /><RowDefinition Height="34" /><RowDefinition Height="34" />
+                        <RowDefinition Height="34" />
                     </Grid.RowDefinitions>
                     <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Verification.Summary.Rules}" Style="{StaticResource ShellCaption}" />
                     <TextBlock Grid.Column="1" Text="{Binding RuleCount}" Style="{StaticResource VerificationSummaryValue}" />
-                    <TextBlock Grid.Row="1" Text="{localization:Loc Coaching.MapControlEditor.Verification.Summary.Timed}" Style="{StaticResource ShellCaption}" />
-                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TimedReminderCount}" Style="{StaticResource VerificationSummaryValue}" />
-                    <TextBlock Grid.Row="2" Text="{localization:Loc Coaching.MapControlEditor.Verification.Summary.Persistent}" Style="{StaticResource ShellCaption}" />
-                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding PersistentTipCount}" Style="{StaticResource VerificationSummaryValue}" />
-                    <TextBlock Grid.Row="3" Text="{localization:Loc Coaching.MapControlEditor.Verification.Summary.Patch}" Style="{StaticResource ShellCaption}" />
-                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding CatalogPatch}" Style="{StaticResource VerificationSummaryValue}" />
-                    <TextBlock Grid.Row="4" Text="{localization:Loc Coaching.MapControlEditor.Verification.Summary.Scope}" Style="{StaticResource ShellCaption}" />
-                    <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding RolesSummary}" Style="{StaticResource VerificationSummaryValue}" />
-                    <TextBlock Grid.Row="5" Text="{localization:Loc Coaching.MapControlEditor.Verification.Summary.Side}" Style="{StaticResource ShellCaption}" />
-                    <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding TeamSideSummary}" Style="{StaticResource VerificationSummaryValue}" />
+                    <TextBlock Grid.Row="1" Text="{localization:Loc Coaching.MapControlEditor.Verification.Summary.Vision}" Style="{StaticResource ShellCaption}" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding VisionRuleCount}" Style="{StaticResource VerificationSummaryValue}" />
+                    <TextBlock Grid.Row="2" Text="{localization:Loc Coaching.MapControlEditor.Verification.Summary.Timed}" Style="{StaticResource ShellCaption}" />
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding TimedReminderCount}" Style="{StaticResource VerificationSummaryValue}" />
+                    <TextBlock Grid.Row="3" Text="{localization:Loc Coaching.MapControlEditor.Verification.Summary.Persistent}" Style="{StaticResource ShellCaption}" />
+                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding PersistentTipCount}" Style="{StaticResource VerificationSummaryValue}" />
+                    <TextBlock Grid.Row="4" Text="{localization:Loc Coaching.MapControlEditor.Verification.Summary.Patch}" Style="{StaticResource ShellCaption}" />
+                    <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding CatalogPatch}" Style="{StaticResource VerificationSummaryValue}" />
+                    <TextBlock Grid.Row="5" Text="{localization:Loc Coaching.MapControlEditor.Verification.Summary.Scope}" Style="{StaticResource ShellCaption}" />
+                    <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding RolesSummary}" Style="{StaticResource VerificationSummaryValue}" />
+                    <TextBlock Grid.Row="6" Text="{localization:Loc Coaching.MapControlEditor.Verification.Summary.Side}" Style="{StaticResource ShellCaption}" />
+                    <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding TeamSideSummary}" Style="{StaticResource VerificationSummaryValue}" />
                 </Grid>
             </StackPanel>
         </Border>

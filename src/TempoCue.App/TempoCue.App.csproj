@@ -6,6 +6,9 @@
     <ProjectReference Include="..\TempoCue.Core\TempoCue.Core.csproj" />
     <ProjectReference Include="..\TempoCue.Overlay\TempoCue.Overlay.csproj" />
     <ProjectReference Include="..\TempoCue.Riot\TempoCue.Riot.csproj" />
+    <ProjectReference Include="..\TempoCue.Vision\TempoCue.Vision.csproj" />
+    <!-- Экспериментальный распознаватель; включается только переключателем в настройках. -->
+    <ProjectReference Include="..\TempoCue.Vision.OwnModel\TempoCue.Vision.OwnModel.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -20,7 +23,15 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows10.0.22621.0</TargetFramework>
+    <!--
+      Собираемся против SDK Windows 11: там появились GraphicsCaptureAccess и
+      GraphicsCaptureSession.IsBorderRequired, которыми снимается жёлтая рамка
+      захвата. Минимальная поддерживаемая система при этом остаётся прежней —
+      SupportedOSPlatformVersion её и задаёт, — а сами вызовы закрыты проверкой
+      версии во время работы.
+    -->
+    <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>

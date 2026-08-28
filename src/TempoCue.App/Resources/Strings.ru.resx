@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
   <resheader name="version"><value>2.0</value></resheader>
@@ -298,7 +298,6 @@
   <data name="Coaching.MapControl.Library.Card.Details" xml:space="preserve"><value>{0} · {1}</value></data>
   <data name="Coaching.MapControl.Library.Author.You" xml:space="preserve"><value>вы</value></data>
   <data name="Coaching.MapControl.Library.Role.Selected" xml:space="preserve"><value>только {0}</value></data>
-  <data name="Coaching.MapControl.Library.OpenUnavailable" xml:space="preserve"><value>Просмотр набора появится в следующей итерации.</value></data>
   <data name="Coaching.Library.Matchup" xml:space="preserve"><value>{0} против {1}</value></data>
   <data name="Coaching.Library.Card.Details" xml:space="preserve"><value>{0} · {1}</value></data>
   <data name="Coaching.Library.State.Enabled" xml:space="preserve"><value>Включён</value></data>
@@ -321,7 +320,6 @@
   <data name="Coaching.Library.Language.Unknown" xml:space="preserve"><value>Язык не указан</value></data>
   <data name="Coaching.Library.Patch" xml:space="preserve"><value>Патч {0}</value></data>
   <data name="Coaching.Library.Open" xml:space="preserve"><value>Открыть</value></data>
-  <data name="Coaching.Library.Open.Planned" xml:space="preserve"><value>Экран подробностей набора появится в следующей итерации.</value></data>
   <data name="Coaching.Library.LoadFailed" xml:space="preserve"><value>Не удалось прочитать локально сохранённые наборы советов.</value></data>
   <data name="Coaching.Library.Empty.Matchups" xml:space="preserve"><value>Матчапы не найдены</value></data>
   <data name="Coaching.Library.Empty.SearchHint" xml:space="preserve"><value>Очистите поиск или создайте новый набор советов.</value></data>
@@ -380,7 +378,7 @@
   <data name="Coaching.MapControlEditor.Main.SummonersRift" xml:space="preserve"><value>Ущелье призывателей</value></data>
   <data name="Coaching.MapControlEditor.Main.FirstVersion" xml:space="preserve"><value>Первая версия</value></data>
   <data name="Coaching.MapControlEditor.Scope.Title" xml:space="preserve"><value>Область применения</value></data>
-  <data name="Coaching.MapControlEditor.Scope.Description" xml:space="preserve"><value>Набор не сработает, если роль или сторона игрока не совпадают. Эти же ограничения проверяет симулятор на четвёртом шаге.</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Description" xml:space="preserve"><value>Набор не сработает, если роль или сторона игрока не совпадают.</value></data>
   <data name="Coaching.MapControlEditor.Scope.Roles" xml:space="preserve"><value>Роли</value></data>
   <data name="Coaching.MapControlEditor.Scope.AllRoles" xml:space="preserve"><value>Все роли</value></data>
   <data name="Coaching.MapControlEditor.Scope.TeamSide" xml:space="preserve"><value>Сторона команды</value></data>
@@ -848,9 +846,38 @@
   <data name="Settings.Overlay.Unsaved" xml:space="preserve"><value>Есть несохранённые изменения</value></data>
   <data name="Settings.Overlay.Preview.Label" xml:space="preserve"><value>Предпросмотр оверлея</value></data>
   <data name="Settings.Overlay.Description" xml:space="preserve"><value>Показывает советы Coach Pack поверх игры. Текст и цветовая полоса остаются полностью непрозрачными.</value></data>
+  <data name="Settings.Restart.Button" xml:space="preserve">
+    <value>Перезапустить сейчас</value>
+  </data>
+  <data name="Settings.Recognizer.Default" xml:space="preserve">
+    <value>Штатный конвейер</value>
+  </data>
+  <data name="Settings.Recognizer.Default.Hint" xml:space="preserve">
+    <value>Цветные контуры и сравнение портретов. Берёт 45 чемпионов из 67 на корпусе проверки при нуле ложных подтверждений, около 40 мс на кадр.</value>
+  </data>
+  <data name="Settings.Recognizer.OwnModel" xml:space="preserve">
+    <value>Модель TempoCue</value>
+  </data>
+  <data name="Settings.Recognizer.OwnModel.Hint" xml:space="preserve">
+    <value>Своя нейросеть. Берёт 64 из 67 на корпусе проверки при одном-двух ложных подтверждениях, около 8 мс на кадр, и держит движущегося чемпиона на каждом кадре. Знает всех чемпионов нынешнего патча.</value>
+  </data>
+  <data name="Settings.Recognizer.Title" xml:space="preserve"><value>Распознавание миникарты</value></data>
+  <data name="Settings.Recognizer.Description" xml:space="preserve"><value>Чем TempoCue разбирает миникарту. Своя модель узнаёт больше чемпионов и вчетверо дешевле по времени кадра; штатный конвейер оставлен как запасной путь. Выбор применяется после перезапуска.</value></data>
+  <data name="Settings.Recognizer.RestartNotice" xml:space="preserve"><value>Выбор применяется после перезапуска TempoCue.</value></data>
+  <data name="Settings.Recognition.Threads.Title" xml:space="preserve"><value>Потоки распознавания карты</value></data>
+  <data name="Settings.Recognition.Threads.Description" xml:space="preserve"><value>Сколько участков карты TempoCue разбирает одновременно. Больше потоков — быстрее разбор кадра и раньше уведомления, но меньше процессора остаётся игре. На точность распознавания не влияет: меняется только скорость.</value></data>
+  <data name="Settings.Recognition.Threads.Automatic" xml:space="preserve"><value>Автоматически ({0})</value></data>
+  <data name="Settings.Recognition.Threads.Hint.Automatic" xml:space="preserve"><value>Четверть процессоров, но не меньше двух. Уведомления приходят вовремя, а игре остаётся большая часть машины. Начните отсюда и меняйте, только если видите причину.</value></data>
+  <data name="Settings.Recognition.Threads.Hint.Frugal" xml:space="preserve"><value>Бережно к процессору, но разбор кадра долгий. Подходит слабым машинам; уведомления о появлении будут приходить позже.</value></data>
+  <data name="Settings.Recognition.Threads.Hint.Balanced" xml:space="preserve"><value>Запас и по скорости, и по нагрузке: уведомления успевают, игре остаётся большая часть процессора.</value></data>
+  <data name="Settings.Recognition.Threads.Hint.Fast" xml:space="preserve"><value>Уведомления приходят раньше, но TempoCue занимает заметную долю процессора. Берите, если разбор не поспевает за лимитом.</value></data>
+  <data name="Settings.Recognition.Threads.Hint.Maximum" xml:space="preserve"><value>Все процессоры. Быстрее уже не станет, а игра может просесть — берите, только если это заметно помогает.</value></data>
+  <data name="Settings.Recognition.Threads.RiskNotice" xml:space="preserve"><value>Одного потока не хватает: разбор кадра занимает столько же, сколько окно подтверждения появления, и цепочка наблюдений регулярно рвётся. Короткие появления будут теряться.</value></data>
+  <data name="Settings.Recognition.Threads.Guidance" xml:space="preserve"><value>Сверяйтесь с карточкой диагностики выше: если фактический FPS разбора ниже лимита — добавьте потоков, если равен ему — добавлять нечего.</value></data>
+  <data name="Settings.Recognition.Threads.RestartNotice" xml:space="preserve"><value>Выбор применяется после перезапуска TempoCue.</value></data>
   <data name="Settings.Overlay.Preview.Button" xml:space="preserve"><value>Показать следующее уведомление</value></data>
   <data name="Settings.Overlay.Preview.Warning.Label" xml:space="preserve"><value>Осторожно</value></data>
-  <data name="Settings.Overlay.Preview.Warning.Title" xml:space="preserve"><value>Соперник пропал с линии</value></data>
+  <data name="Settings.Overlay.Preview.Warning.Title" xml:space="preserve"><value>Соперник пропал из вида</value></data>
   <data name="Settings.Overlay.Preview.Warning.Message" xml:space="preserve"><value>Первое уведомление · верхний слот</value></data>
   <data name="Settings.Overlay.Preview.Information.Label" xml:space="preserve"><value>Событие</value></data>
   <data name="Settings.Overlay.Preview.Information.Title" xml:space="preserve"><value>Дракон появится через 30 секунд</value></data>
@@ -862,6 +889,19 @@
   <data name="Overlay.Matchup.Dismiss" xml:space="preserve"><value>Скрыть совет</value></data>
   <data name="Overlay.Matchup.PersistentTip.Status" xml:space="preserve"><value>Подсказка по матчапу</value></data>
   <data name="Overlay.MapControl.Status" xml:space="preserve"><value>Контроль карты</value></data>
+  <data name="Overlay.MapAwareness.Status" xml:space="preserve"><value>Контроль карты</value></data>
+  <data name="Overlay.MapAwareness.Headline.Top.Appeared" xml:space="preserve"><value>Вражеский топ появился</value></data>
+  <data name="Overlay.MapAwareness.Headline.Top.Disappeared" xml:space="preserve"><value>Вражеский топ пропал</value></data>
+  <data name="Overlay.MapAwareness.Headline.Jungle.Appeared" xml:space="preserve"><value>Вражеский лесник появился</value></data>
+  <data name="Overlay.MapAwareness.Headline.Jungle.Disappeared" xml:space="preserve"><value>Вражеский лесник пропал</value></data>
+  <data name="Overlay.MapAwareness.Headline.Middle.Appeared" xml:space="preserve"><value>Вражеский мидер появился</value></data>
+  <data name="Overlay.MapAwareness.Headline.Middle.Disappeared" xml:space="preserve"><value>Вражеский мидер исчез</value></data>
+  <data name="Overlay.MapAwareness.Headline.Bottom.Appeared" xml:space="preserve"><value>Вражеский стрелок появился</value></data>
+  <data name="Overlay.MapAwareness.Headline.Bottom.Disappeared" xml:space="preserve"><value>Вражеский стрелок пропал</value></data>
+  <data name="Overlay.MapAwareness.Headline.Support.Appeared" xml:space="preserve"><value>Вражеский саппорт появился</value></data>
+  <data name="Overlay.MapAwareness.Headline.Support.Disappeared" xml:space="preserve"><value>Вражеский саппорт пропал</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.NextGoal.Card" xml:space="preserve"><value>Что сделать дальше</value></data>
+  <data name="Overlay.MapAwareness.Dismiss" xml:space="preserve"><value>Скрыть предупреждение</value></data>
   <data name="Overlay.MapControl.PersistentTip.Status" xml:space="preserve"><value>Подсказка по карте</value></data>
   <data name="Overlay.MapControl.Dismiss" xml:space="preserve"><value>Скрыть напоминание</value></data>
   <data name="Overlay.MapControl.TargetTime" xml:space="preserve"><value>К {0}</value></data>
@@ -869,6 +909,29 @@
   <data name="Coaching.MapControlEditor.Content.Tab.Objects" xml:space="preserve"><value>Объекты · {0}</value></data>
   <data name="Coaching.MapControlEditor.Content.Tab.Timed" xml:space="preserve"><value>Напоминания по времени · {0}</value></data>
   <data name="Coaching.MapControlEditor.Content.Tab.Persistent" xml:space="preserve"><value>Постоянные подсказки · {0}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Tab.Vision" xml:space="preserve"><value>Наблюдение {0}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Transition.Appeared" xml:space="preserve"><value>появился на карте</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Transition.Disappeared" xml:space="preserve"><value>пропал из вида</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Editor.Progress" xml:space="preserve"><value>Правило {0} из {1}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Preview" xml:space="preserve"><value>Сработает, когда наблюдение зафиксирует: {0} — {1}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Editor.Title" xml:space="preserve"><value>Правило наблюдения</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Position" xml:space="preserve"><value>Роль соперника</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Position.Hint" xml:space="preserve"><value>Роль приходит из Live Client Data, а не с миникарты. Если Riot её не сообщил, правило просто не сработает — приложение не угадывает, кто из пятерых мидер.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Transition" xml:space="preserve"><value>Событие</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Preview.Title" xml:space="preserve"><value>Как это сработает</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Message" xml:space="preserve"><value>Главный совет (его видит игрок первым)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Message.Default.Appeared" xml:space="preserve"><value>{champion} виден на миникарте. Проверьте его позицию.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Message.Default.Disappeared" xml:space="preserve"><value>{champion} больше не виден на миникарте. Проверьте реку и соседние линии.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Message.Hint" xml:space="preserve"><value>Заголовок уведомления пишет TempoCue: он называет роль и событие. Здесь — совет под ним. Метка {champion} заменится именем чемпиона из состава матча.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.WhyNow" xml:space="preserve"><value>Почему сейчас (короткое объяснение)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.NextGoal" xml:space="preserve"><value>Следующая цель (что сделать дальше)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.ListTitle" xml:space="preserve"><value>Правила наблюдения</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Description" xml:space="preserve"><value>Срабатывают по видимости соперника на миникарте. Событие уже случилось, поэтому упреждения и повторов здесь нет.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Add" xml:space="preserve"><value>+ Добавить правило наблюдения</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Empty" xml:space="preserve"><value>Пока ни одного правила наблюдения.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Blind.Title" xml:space="preserve"><value>Что наблюдение не видит</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Blind.Description" xml:space="preserve"><value>Наблюдение знает только видимость соперника на карте. Этих сведений в нём не появится.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Blind.Items" xml:space="preserve"><value>Чужие варды · Скопления и построения команды · Точное положение под чужой башней</value></data>
   <data name="Coaching.MapControlEditor.Content.CatalogTitle" xml:space="preserve"><value>TempoCue знает расписание объектов</value></data>
   <data name="Coaching.MapControlEditor.Content.CatalogUnavailable" xml:space="preserve"><value>Выберите поддерживаемый игровой патч на первом шаге.</value></data>
   <data name="Coaching.MapControlEditor.Content.CatalogCurrentPatch" xml:space="preserve"><value>Тайминги проверены для патча {0}. Вы выбираете только момент и текст напоминания.</value></data>
@@ -941,9 +1004,6 @@
   <data name="Coaching.MapControlEditor.Content.Timed.Message" xml:space="preserve"><value>Главный совет (его игрок видит первым)</value></data>
   <data name="Coaching.MapControlEditor.Content.Timed.WhyNow" xml:space="preserve"><value>Почему сейчас (короткое объяснение)</value></data>
   <data name="Coaching.MapControlEditor.Content.Timed.NextGoal" xml:space="preserve"><value>Что подготовить к объекту (необязательно)</value></data>
-  <data name="Coaching.MapControlEditor.Content.Timed.Future.Title" xml:space="preserve"><value>Появится после анализа мини-карты</value></data>
-  <data name="Coaching.MapControlEditor.Content.Timed.Future.Description" xml:space="preserve"><value>Первая версия не анализирует изображение мини-карты, поэтому такие условия пока нельзя выбрать.</value></data>
-  <data name="Coaching.MapControlEditor.Content.Timed.Future.Items" xml:space="preserve"><value>Вражеский лесник замечен · Противник пропал с линии · Поставлен вражеский вард · Команда собралась у объекта</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.ListTitle" xml:space="preserve"><value>Постоянные подсказки</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.Description" xml:space="preserve"><value>Подсказки доступны в деталях набора и по одной показываются оверлеем при подходящем повышении уровня. Срочные напоминания объектов и времени имеют приоритет.</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.Add" xml:space="preserve"><value>+ Добавить подсказку</value></data>
@@ -977,6 +1037,18 @@
   <data name="Coaching.MapControlEditor.Verification.Summary" xml:space="preserve"><value>Сводка набора</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Rules" xml:space="preserve"><value>Правила объектов</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Timed" xml:space="preserve"><value>Напоминания по времени</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Vision" xml:space="preserve"><value>Правила наблюдения</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Title" xml:space="preserve"><value>Проверка наблюдения</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Description" xml:space="preserve"><value>Разыграйте наблюдение и посмотрите уведомление таким, каким его увидит игрок. Матч для этого не нужен.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.NoRule" xml:space="preserve"><value>Для этой пары правила нет: событие произойдёт, но набор на него не ответит.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Ready" xml:space="preserve"><value>Правило найдено — покажите уведомление, чтобы увидеть его целиком.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Show" xml:space="preserve"><value>Показать уведомление</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Champion.Top" xml:space="preserve"><value>Дариус</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Champion.Jungle" xml:space="preserve"><value>Ли Син</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Champion.Middle" xml:space="preserve"><value>Ари</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Champion.Bottom" xml:space="preserve"><value>Джинкс</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Champion.Support" xml:space="preserve"><value>Треш</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Issue.DuplicateVisionPairs" xml:space="preserve"><value>Одна пара «роль и событие» описана дважды: {0}. Сработает только первое правило — остальные не покажутся никогда.</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Persistent" xml:space="preserve"><value>Постоянные подсказки</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Patch" xml:space="preserve"><value>Патч каталога</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Scope" xml:space="preserve"><value>Область</value></data>
@@ -1021,4 +1093,89 @@
   <data name="Coaching.MapControl.Details.Persistent.Title" xml:space="preserve"><value>Постоянные подсказки</value></data>
   <data name="Coaching.MapControl.Details.Persistent.Empty" xml:space="preserve"><value>В наборе нет постоянных подсказок.</value></data>
   <data name="Coaching.MapControl.Details.ReadOnly" xml:space="preserve"><value>Только для чтения. Чтобы изменить содержимое, откройте редактор набора.</value></data>
+  <data name="Settings.Capture.Borderless.Label" xml:space="preserve">
+    <value>Жёлтая рамка захвата</value>
+  </data>
+  <data name="Settings.Capture.Borderless.Allowed" xml:space="preserve">
+    <value>снята</value>
+  </data>
+  <data name="Settings.Capture.Borderless.Denied" xml:space="preserve">
+    <value>осталась: разрешение не выдано. Windows рисует её вокруг любого захватываемого окна, и снять её можете разрешить только вы.</value>
+  </data>
+  <data name="Settings.Capture.Borderless.NotSupported" xml:space="preserve">
+    <value>осталась: для снятия нужна Windows 11</value>
+  </data>
+  <data name="Settings.Capture.Borderless.Unknown" xml:space="preserve">
+    <value>выясняем</value>
+  </data>
+  <data name="Settings.Capture.Section" xml:space="preserve"><value>Мониторинг карты</value></data>
+  <data name="Settings.Capture.Title" xml:space="preserve"><value>Захват окна игры</value></data>
+  <data name="Settings.Capture.Description" xml:space="preserve"><value>TempoCue автоматически подключается к запущенному окну матча League of Legends. Ручной выбор остаётся запасным вариантом.</value></data>
+  <data name="Settings.Capture.State.Hint" xml:space="preserve"><value>Метрики и локальный предпросмотр миникарты обновляются до четырёх раз в секунду.</value></data>
+  <data name="Settings.Capture.State.Hint.ObservationOff" xml:space="preserve"><value>Наблюдение за картой выключено: в контроле карты нет ни одного включённого правила наблюдения. Захват не запускается, пока он никому не нужен.</value></data>
+  <data name="Settings.Capture.State.Idle" xml:space="preserve"><value>Окно не выбрано</value></data>
+  <data name="Settings.Capture.State.Selecting" xml:space="preserve"><value>Ожидаем выбор окна</value></data>
+  <data name="Settings.Capture.State.Capturing" xml:space="preserve"><value>Кадры поступают</value></data>
+  <data name="Settings.Capture.State.Stopped" xml:space="preserve"><value>Захват остановлен</value></data>
+  <data name="Settings.Capture.State.Failed" xml:space="preserve"><value>Ошибка захвата</value></data>
+  <data name="Settings.Capture.State.Unsupported" xml:space="preserve"><value>Захват не поддерживается</value></data>
+  <data name="Settings.Capture.Select.Button" xml:space="preserve"><value>Выбрать окно игры</value></data>
+  <data name="Settings.Capture.Change.Button" xml:space="preserve"><value>Сменить окно</value></data>
+  <data name="Settings.Capture.Stop.Button" xml:space="preserve"><value>Остановить</value></data>
+  <data name="Settings.Capture.Target.Label" xml:space="preserve"><value>Выбранное окно</value></data>
+  <data name="Settings.Capture.Resolution.Label" xml:space="preserve"><value>Размер кадра</value></data>
+  <data name="Settings.Capture.Fps.Label" xml:space="preserve"><value>FPS захвата</value></data>
+  <data name="Settings.Capture.Sequence.Record" xml:space="preserve"><value>Записать 3 секунды</value></data>
+  <data name="Settings.Capture.Sequence.Progress" xml:space="preserve"><value>Записано {0} из {1} кадров</value></data>
+  <data name="Settings.Capture.Sequence.Filter" xml:space="preserve"><value>Запись миникарты TempoCue (*.tempocue-sequence)|*.tempocue-sequence</value></data>
+  <data name="Settings.Capture.Sequence.Hint" xml:space="preserve"><value>Несколько кадров подряд показывают, держится ли отметка на участнике или прыгает. Одиночный кадр этого не показывает.</value></data>
+  <data name="Settings.Capture.RecognitionTooSlow" xml:space="preserve"><value>Разбор кадра подошёл к окну подтверждения появления: часть появлений будет теряться. Добавьте потоков распознавания в настройке ниже или закройте лишние программы.</value></data>
+  <data name="Settings.Capture.Frames.Label" xml:space="preserve"><value>Получено кадров</value></data>
+  <data name="Settings.Capture.LastFrame.Label" xml:space="preserve"><value>Последний кадр</value></data>
+  <data name="Settings.Capture.SelectionFps.Label" xml:space="preserve"><value>FPS отбора (лимит {0})</value></data>
+  <data name="Settings.Capture.RecognitionFps.Label" xml:space="preserve"><value>FPS разбора карты (лимит {0})</value></data>
+  <data name="Settings.Capture.RecognitionDuration.Label" xml:space="preserve"><value>Время разбора кадра</value></data>
+  <data name="Settings.Capture.RecognitionDuration.Value" xml:space="preserve"><value>{0:N0} мс</value></data>
+  <data name="Settings.Capture.SelectedFrames.Label" xml:space="preserve"><value>Отобрано кадров</value></data>
+  <data name="Settings.Capture.RateLimitedFrames.Label" xml:space="preserve"><value>Пропущено лимитером</value></data>
+  <data name="Settings.Capture.Minimap.Title" xml:space="preserve"><value>Обнаруженная миникарта</value></data>
+  <data name="Settings.Capture.Minimap.Description" xml:space="preserve"><value>TempoCue автоматически ищет границу миникарты в обоих нижних углах и копирует только найденную область.</value></data>
+  <data name="Settings.Capture.Minimap.Region.Label" xml:space="preserve"><value>Автоматически найденная область кадра</value></data>
+  <data name="Settings.Capture.Minimap.Region.Value" xml:space="preserve"><value>{0} × {1} пкс · x {2}, y {3}</value></data>
+  <data name="Settings.Capture.Minimap.Normalized.Label" xml:space="preserve"><value>Канонический кадр распознавания</value></data>
+  <data name="Settings.Capture.Minimap.Normalized.Value" xml:space="preserve"><value>{0} × {1} пкс · фиксированная геометрия</value></data>
+  <data name="Settings.Capture.Minimap.Detection.Value" xml:space="preserve"><value>{0} · уверенность {1:P0}</value></data>
+  <data name="Settings.Capture.Minimap.Corner.Left" xml:space="preserve"><value>слева внизу</value></data>
+  <data name="Settings.Capture.Minimap.Corner.Right" xml:space="preserve"><value>справа внизу</value></data>
+  <data name="Settings.Capture.Minimap.Markers.Label" xml:space="preserve"><value>Проверка портретов участников</value></data>
+  <data name="Settings.Capture.Minimap.Markers.Value" xml:space="preserve"><value>Цветовых объектов: {0} · областей сравнения: {4} · подтверждено портретами: {1} (союзных: {2}, вражеских: {3}) · эталонов: {5} · лучший балл: {6:P0}</value></data>
+  <data name="Settings.Capture.Minimap.Error.Label" xml:space="preserve"><value>Не удалось подготовить предпросмотр миникарты</value></data>
+  <data name="Settings.Capture.Replay.Save.Button" xml:space="preserve"><value>Сохранить кадр для replay</value></data>
+  <data name="Settings.Capture.Replay.Filter" xml:space="preserve"><value>Диагностический кадр TempoCue (*.tempocue-vision)|*.tempocue-vision</value></data>
+  <data name="Settings.Capture.Replay.Status.Saved" xml:space="preserve"><value>Кадр сохранён. Его можно повторно проверить без запущенной League.</value></data>
+  <data name="Settings.Capture.Replay.Status.Failed" xml:space="preserve"><value>Не удалось сохранить диагностический кадр.</value></data>
+  <data name="Settings.Capture.Participants.Title" xml:space="preserve"><value>Диагностика участников активного матча</value></data>
+  <data name="Settings.Capture.Participants.Description" xml:space="preserve"><value>Здесь показаны команда Riot, ожидаемая сторона TempoCue и результат распознавания в текущем кадре. Отсутствие метки — диагностическое наблюдение, а не доказательство того, что чемпион скрыт.</value></data>
+  <data name="Settings.Capture.Participants.ActiveTeam.Value" xml:space="preserve"><value>Команда активного игрока Riot: {0}</value></data>
+  <data name="Settings.Capture.Participants.Allies.Title" xml:space="preserve"><value>Союзники</value></data>
+  <data name="Settings.Capture.Participants.Enemies.Title" xml:space="preserve"><value>Противники</value></data>
+  <data name="Settings.Capture.Participants.RelativeTeam.Ally" xml:space="preserve"><value>союзник</value></data>
+  <data name="Settings.Capture.Participants.RelativeTeam.Enemy" xml:space="preserve"><value>противник</value></data>
+  <data name="Settings.Capture.Participants.TeamTrace.Value" xml:space="preserve"><value>Riot: {0} · ожидается: {1}</value></data>
+  <data name="Settings.Capture.Participants.TeamTrace.WithRing.Value" xml:space="preserve"><value>Riot: {0} · ожидается: {1} · распознанный контур: {2}</value></data>
+  <data name="Settings.Capture.Participants.Status.ReferencePending" xml:space="preserve"><value>Загружается эталон портрета</value></data>
+  <data name="Settings.Capture.Participants.Status.ReferenceUnavailable" xml:space="preserve"><value>Эталон портрета недоступен</value></data>
+  <data name="Settings.Capture.Participants.Status.NotDetected" xml:space="preserve"><value>Не распознан в текущем кадре</value></data>
+  <data name="Settings.Capture.Participants.Status.Visible.Value" xml:space="preserve"><value>Виден · уверенность {0:P0}</value></data>
+  <data name="Settings.Capture.Participants.Status.TeamMismatch.Value" xml:space="preserve"><value>Распознан с ошибочной стороной: {0} · уверенность {1:P0}</value></data>
+  <data name="Settings.Capture.Participants.Status.NotVisible" xml:space="preserve"><value>Не виден</value></data>
+  <data name="Settings.Capture.Participants.Status.Confirming.Value" xml:space="preserve"><value>Подтверждается · уверенность {0:P0}</value></data>
+  <data name="Settings.Capture.Participants.Status.LastSeen.Value" xml:space="preserve"><value>Не виден · последний раз в {0}</value></data>
+  <data name="Settings.Capture.Participants.Status.Dead" xml:space="preserve"><value>Мёртв · наблюдение приостановлено</value></data>
+  <data name="Settings.Capture.Participants.Status.NoData" xml:space="preserve"><value>Нет данных о видимости</value></data>
+  <data name="Settings.Capture.Participants.Status.NoData.LastSeen.Value" xml:space="preserve"><value>Нет данных · последнее подтверждение в {0}</value></data>
+  <data name="Settings.Capture.Value.NotAvailable" xml:space="preserve"><value>Нет данных</value></data>
+  <data name="Settings.Capture.Unsupported.Description" xml:space="preserve"><value>Для Windows Graphics Capture требуется Windows 10 версии 2004 или новее.</value></data>
+  <data name="Settings.Capture.Error.Label" xml:space="preserve"><value>Технические подробности</value></data>
+  <data name="Settings.Capture.Privacy.Hint" xml:space="preserve"><value>TempoCue захватывает только проверенное окно матча League of Legends, не читает память игры и не сохраняет кадры на диагностическом этапе.</value></data>
 </root>

@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Text.Json;
 using TempoCue.App.Localization;
 
@@ -45,7 +45,12 @@ public sealed class AppSettingsService
                     return settings with
                     {
                         Language = LocalizationService.NormalizeLanguageCode(settings.Language),
-                        Overlay = (settings.Overlay ?? new OverlayUserSettings()).Normalize()
+                        Overlay = (settings.Overlay ?? new OverlayUserSettings()).Normalize(),
+                        // Отрицательное число потоков в подправленном вручную файле
+                        // не должно ронять запуск: оно означает «выбрать по машине».
+                        MinimapRecognitionThreads =
+                            Math.Max(0, settings.MinimapRecognitionThreads),
+                        MinimapRecognizer = Migrate(settings)
                     };
                 }
             }
@@ -86,6 +91,50 @@ public sealed class AppSettingsService
         ArgumentNullException.ThrowIfNull(overlay);
         var current = Load();
         Save(current with { Overlay = overlay.Normalize() });
+    }
+
+    /// <summary>
+    /// Приводит сохранённый выбор к существующему варианту.
+    /// </summary>
+    /// <remarks>
+    /// Выбор хранится числом, и System.Text.Json не проверяет, есть ли такое
+    /// значение в перечислении. В файлах уже лежит двойка — удалённая сторонняя
+    /// модель DeeperLeague, — и её надо прочитать как «выбора нет», то есть
+    /// применить умолчание приложения. Прежняя галочка «экспериментальное
+    /// распознавание» указывала на ту же удалённую модель и теперь не значит
+    /// ничего: поле остаётся в старых файлах и просто не читается.
+    /// </remarks>
+    private static MinimapRecognizerChoice? Migrate(AppSettings settings) =>
+        settings.MinimapRecognizer is { } chosen && Enum.IsDefined(chosen)
+            ? chosen
+            : null;
+
+    /// <summary>
+    /// Сохраняет выбор распознавателя миникарты. Он применяется при следующем
+    /// запуске: способ распознавания выбирается один раз при создании сессии
+    /// захвата, и подмена на ходу усложнила бы её жизненный цикл без пользы.
+    /// </summary>
+    public void SaveMinimapRecognizer(MinimapRecognizerChoice choice)
+    {
+        if (!Enum.IsDefined(choice))
+        {
+            throw new ArgumentOutOfRangeException(nameof(choice));
+        }
+
+        var current = Load();
+        Save(current with { MinimapRecognizer = choice });
+    }
+
+    /// <summary>
+    /// Сохраняет число потоков распознавания. Применяется при следующем запуске по
+    /// той же причине, что и выбор распознавателя: он создаётся один раз вместе с
+    /// сессией захвата.
+    /// </summary>
+    public void SaveMinimapRecognitionThreads(int threads)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(threads);
+        var current = Load();
+        Save(current with { MinimapRecognitionThreads = threads });
     }
 
     private void Save(AppSettings settings)

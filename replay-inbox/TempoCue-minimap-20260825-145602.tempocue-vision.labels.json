@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "regions": [
+    { "x": 245, "y": 265, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Yone", "affiliation": "Ally" },
+    { "x": 138, "y": 188, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Warwick", "affiliation": "Ally" },
+    { "x": 82, "y": 30, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Urgot", "affiliation": "Ally" },
+    { "x": 267, "y": 214, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Cassiopeia", "affiliation": "Ally" },
+    { "x": 163, "y": 132, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "TwistedFate", "affiliation": "Enemy" },
+    { "x": 274, "y": 192, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Seraphine", "affiliation": "Enemy" },
+    { "x": 156, "y": 146, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Kennen", "affiliation": "Ally" },
+    { "x": 284, "y": 194, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "DrMundo", "affiliation": "Enemy" }
+  ],
+  "allowedFalsePositives": 0,
+  "allowedMissedChampions": 0
+}

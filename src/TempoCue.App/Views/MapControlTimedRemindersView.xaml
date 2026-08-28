@@ -347,29 +347,6 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
-                <!-- События мини-карты остаются видимыми как граница текущей версии. -->
-                <Border Background="#101B2B"
-                        BorderBrush="#263750"
-                        BorderThickness="1"
-                        CornerRadius="10"
-                        Padding="14"
-                        Margin="0,8,0,0">
-                    <StackPanel>
-                        <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Content.Timed.Future.Title}"
-                                   Foreground="#91A4BD"
-                                   FontSize="{StaticResource Typography.FontSize.Body}"
-                                   FontWeight="SemiBold" />
-                        <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Content.Timed.Future.Description}"
-                                   Foreground="#647994"
-                                   FontSize="{StaticResource Typography.FontSize.Caption}"
-                                   TextWrapping="Wrap"
-                                   Margin="0,5,0,8" />
-                        <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Content.Timed.Future.Items}"
-                                   Foreground="#647994"
-                                   FontSize="{StaticResource Typography.FontSize.Caption}"
-                                   TextWrapping="Wrap" />
-                    </StackPanel>
-                </Border>
             </StackPanel>
         </Border>
     </Grid>

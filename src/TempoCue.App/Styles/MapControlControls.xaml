@@ -62,6 +62,48 @@
         </Setter>
     </Style>
 
+    <!--
+        Нейтральный выбор одного значения: роль соперника и событие видимости.
+        Отличается от MapPriorityOption тем, что у выбранного значения нет своего
+        цвета — приоритет цветом кодирует опасность, а роль и событие ничего
+        подобного не означают.
+    -->
+    <Style x:Key="MapChoiceOption" TargetType="ListBoxItem">
+        <Setter Property="Height" Value="36" />
+        <Setter Property="Padding" Value="13,0" />
+        <Setter Property="Margin" Value="0,0,8,8" />
+        <Setter Property="Foreground" Value="#91A4BD" />
+        <Setter Property="Background" Value="#0C1420" />
+        <Setter Property="BorderBrush" Value="#263750" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <Border x:Name="ChoiceBorder"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="9"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ChoiceBorder" Property="BorderBrush" Value="#3A5878" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="ChoiceBorder" Property="Background" Value="#2968BFF2" />
+                            <Setter TargetName="ChoiceBorder" Property="BorderBrush" Value="#68BFF2" />
+                            <Setter Property="Foreground" Value="#68BFF2" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style x:Key="MapPriorityDot" TargetType="Ellipse">
         <Setter Property="Width" Value="7" />
         <Setter Property="Height" Value="7" />

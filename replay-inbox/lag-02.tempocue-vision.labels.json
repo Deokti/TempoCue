@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "regions": [
+    { "x": 55, "y": 175, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Shaco", "affiliation": "Enemy" },
+    { "x": 167, "y": 241, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Amumu", "affiliation": "Ally" },
+    { "x": 29, "y": 149, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Yasuo", "affiliation": "Ally" },
+    { "x": 283, "y": 7, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Teemo", "affiliation": "Ally" },
+    { "x": 35, "y": 141, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Morgana", "affiliation": "Enemy" },
+    { "x": 32, "y": 158, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Tryndamere", "affiliation": "Ally" },
+    { "x": 51, "y": 154, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Yorick", "affiliation": "Enemy" }
+  ],
+  "allowedFalsePositives": 0,
+  "allowedMissedChampions": 0
+}

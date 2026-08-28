@@ -1,0 +1,43 @@
+﻿{
+  "schemaVersion": 1,
+  "packType": "mapControl",
+  "id": "tempocue.map-control.enemy-top.ru",
+  "name": "Вражеский топ: пропал из вида",
+  "patch": "16.16",
+  "description": "Уведомление в тот момент, когда вражеский топ пропал из поля зрения. С верхней линии он приходит дольше всех, зато решает исход драки.",
+  "author": "TempoCue",
+  "contentLanguage": "ru_RU",
+  "verifiedOn": "2026-08-27",
+  "source": {
+    "kind": "personalExperience",
+    "title": "Наблюдение за миникартой средствами TempoCue",
+    "url": "",
+    "author": "TempoCue",
+    "permission": "notRequired"
+  },
+  "applicability": {
+    "roles": [
+      "top",
+      "jungle",
+      "mid",
+      "adc",
+      "support"
+    ],
+    "teamSide": "any"
+  },
+  "rules": [],
+  "visionRules": [
+    {
+      "id": "enemy-top-disappeared",
+      "position": "top",
+      "transition": "disappeared",
+      "priority": "information",
+      "message": "{champion} больше не виден на миникарте. Помните о нём при драке за объект.",
+      "whyNow": "Топ идёт через всю карту, и его появление в драке обычно решает её.",
+      "nextGoal": "Заложите время его прихода, прежде чем начинать бой.",
+      "isEnabled": true
+    }
+  ],
+  "timedReminders": [],
+  "persistentTips": []
+}

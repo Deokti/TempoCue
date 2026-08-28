@@ -16,6 +16,54 @@ internal static class MapControlContentText
             _ => throw new ArgumentOutOfRangeException(nameof(objective), objective, null)
         });
 
+    /// <summary>
+    /// Роль в области применения набора. Не переводится: TOP, JUNGLE, MID, ADC и
+    /// SUPPORT — это имена самой игры, и игрок знает их именно такими.
+    /// </summary>
+    public static string RoleName(MapControlRole role) => role switch
+    {
+        MapControlRole.Top => "TOP",
+        MapControlRole.Jungle => "JUNGLE",
+        MapControlRole.Mid => "MID",
+        MapControlRole.Adc => "ADC",
+        MapControlRole.Support => "SUPPORT",
+        _ => throw new ArgumentOutOfRangeException(nameof(role), role, null)
+    };
+
+    /// <summary>
+    /// Роль соперника в правиле наблюдения. Обязана совпадать с
+    /// <see cref="RoleName"/>: игрок выбирает одни и те же пять ролей на двух
+    /// шагах подряд, и разные названия читались бы как разные вещи. Перечисления
+    /// при этом разные — область применения живёт в наборах, а наблюдение в
+    /// составе матча, — поэтому имена стоят рядом, чтобы расхождение было видно.
+    /// </summary>
+    public static string VisionPositionName(PlayerPosition position) => position switch
+    {
+        PlayerPosition.Top => "TOP",
+        PlayerPosition.Jungle => "JUNGLE",
+        PlayerPosition.Middle => "MID",
+        PlayerPosition.Bottom => "ADC",
+        PlayerPosition.Support => "SUPPORT",
+        _ => throw new ArgumentOutOfRangeException(nameof(position), position, null)
+    };
+
+    public static string VisionTransitionName(
+        MapVisionTransition transition,
+        LocalizationService localization) =>
+        localization.Get(transition switch
+        {
+            MapVisionTransition.Appeared => "Coaching.MapControlEditor.Content.Vision.Transition.Appeared",
+            MapVisionTransition.Disappeared => "Coaching.MapControlEditor.Content.Vision.Transition.Disappeared",
+            _ => throw new ArgumentOutOfRangeException(nameof(transition), transition, null)
+        });
+
+    /// <summary>Подпись пары условия: «Мид · пропал из вида».</summary>
+    public static string VisionPair(
+        PlayerPosition position,
+        MapVisionTransition transition,
+        LocalizationService localization) =>
+        $"{VisionPositionName(position)} · {VisionTransitionName(transition, localization)}";
+
     public static string PriorityName(
         MapObjectiveReminderPriority priority,
         LocalizationService localization) =>

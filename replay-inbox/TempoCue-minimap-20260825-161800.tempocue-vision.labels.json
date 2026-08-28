@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "regions": [
+    { "x": 219, "y": 264, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Vayne", "affiliation": "Ally" },
+    { "x": 184, "y": 253, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Sona", "affiliation": "Ally" },
+    { "x": 224, "y": 78, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Fizz", "affiliation": "Enemy" }
+  ],
+  "allowedFalsePositives": 0,
+  "allowedMissedChampions": 0
+}

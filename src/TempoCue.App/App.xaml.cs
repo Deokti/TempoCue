@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using TempoCue.App.Coordinators;
@@ -10,6 +10,8 @@ using TempoCue.Application;
 using TempoCue.Core;
 using TempoCue.Overlay;
 using TempoCue.Riot;
+using TempoCue.Vision;
+using TempoCue.Vision.OwnModel;
 
 namespace TempoCue.App;
 
@@ -32,6 +34,10 @@ public partial class App : System.Windows.Application
     private IOverlayPresenter? _overlayPresenter;
     private OverlaySetupSession? _overlaySetupSession;
     private ActiveMatchOverlayCoordinator? _activeMatchOverlayCoordinator;
+    private ActiveMatchMapAwarenessCoordinator? _activeMatchMapAwarenessCoordinator;
+    private ActiveMatchVisionCoordinator? _activeMatchVisionCoordinator;
+    private ChampionPortraitReferenceLoader? _championPortraitReferenceLoader;
+    private WindowsGraphicsCaptureSession? _windowCaptureSession;
     private readonly CancellationTokenSource _lifetimeCancellation = new();
     private int _overlayPreviewStep;
 
@@ -133,12 +139,39 @@ public partial class App : System.Windows.Application
             _overlayPresenter,
             overlaySettings,
             LocalizationService.Instance);
+        // Распознаватель создаётся при первом кадре: до начала матча и без
+        // включённых правил наблюдения кадров не будет, а веса модели — это
+        // мегабайты памяти и рабочие потоки ONNX Runtime. ADR 0017.
+        _windowCaptureSession = new WindowsGraphicsCaptureSession(
+            () => CreateFrameAnalyzer(settings) ?? new DefaultMinimapFrameAnalyzer());
+        _championPortraitReferenceLoader = new ChampionPortraitReferenceLoader();
+        _activeMatchVisionCoordinator = new ActiveMatchVisionCoordinator(
+            _activeMatchMonitor,
+            _championCatalog,
+            _championPortraitReferenceLoader,
+            _windowCaptureSession,
+            LocalizationService.Instance,
+            _windowCaptureSession);
+        _activeMatchMapAwarenessCoordinator = new ActiveMatchMapAwarenessCoordinator(
+            _activeMatchMonitor,
+            _activeMatchVisionCoordinator,
+            _overlayPresenter,
+            LocalizationService.Instance,
+            overlaySettings);
+        var captureDiagnostics = new CaptureDiagnosticsViewModel(
+            _windowCaptureSession,
+            new WindowsGraphicsCaptureSupport().IsSupported,
+            LocalizationService.Instance,
+            _activeMatchVisionCoordinator,
+            IsMapObservationSwitchedOff);
         _settingsViewModel = new SettingsViewModel(
             LocalizationService.Instance,
             settingsService,
             ShowOverlayPreview,
             overlaySettings,
-            _overlaySetupSession);
+            _overlaySetupSession,
+            captureDiagnostics,
+            new ApplicationRestarter());
         var coachingLibraryViewModel = new CoachingLibraryViewModel(
             builtInPacks,
             LocalizationService.Instance,
@@ -176,7 +209,8 @@ public partial class App : System.Windows.Application
         var mapControlEditorViewModel = new MapControlEditorViewModel(
             LocalizationService.Instance,
             _gamePatchCatalog,
-            saveMapControlPack);
+            saveMapControlPack,
+            ShowMapVisionPreview);
         _coachingViewModel = new CoachingViewModel(
             LocalizationService.Instance,
             coachingLibraryViewModel,
@@ -198,7 +232,17 @@ public partial class App : System.Windows.Application
             _settingsViewModel,
             _coachingViewModel);
         MainWindow.Show();
+        // Разрешение на захват без жёлтой рамки спрашивается один раз и здесь, а
+        // не перед первым кадром: там уже идёт матч, и системное окно согласия
+        // посреди игры — худшее, что можно предложить. Ответ Windows запоминает.
+        _ = BorderlessCaptureAccess.RequestAsync();
+
+        // Монитор матча запускается раньше захвата: захват спрашивает у него,
+        // нужно ли наблюдение, и до первого опроса ответ был бы «нет» дольше нужного.
         _activeMatchMonitor.Start();
+        _windowCaptureSession.EnableAutomaticLeagueWindowCapture(
+            IsMapObservationWanted,
+            _lifetimeCancellation.Token);
         _ = InitializeScreenDataAsync(
             coachingLibraryViewModel,
             currentMatchViewModel,
@@ -272,6 +316,23 @@ public partial class App : System.Windows.Application
         return packs;
     }
 
+    /// <summary>
+    /// Показывает уведомление правила наблюдения из редактора — тем же оверлеем,
+    /// которым оно придёт в матче. Автор видит его целиком, не заходя в игру.
+    /// </summary>
+    private void ShowMapVisionPreview(OverlayNotification notification)
+    {
+        if (_overlayPresenter is null)
+        {
+            return;
+        }
+
+        // Настройки оверлея presenter уже держит: они применяются при запуске и
+        // заново при каждом изменении.
+        _overlayPresenter.SetInteractionMode(OverlayInteractionMode.Setup);
+        _overlayPresenter.ShowPreview([notification]);
+    }
+
     private void ShowOverlayPreview()
     {
         if (_overlayPresenter is null)
@@ -316,15 +377,81 @@ public partial class App : System.Windows.Application
         OverlayNotificationTone tone) =>
         OverlayPreviewNotificationFactory.Create(localization, resourceSuffix, tone);
 
+    /// <summary>
+    /// Создаёт экспериментальный распознаватель, если он включён в настройках и его
+    /// файлы лежат рядом с приложением. Отсутствие файлов не является ошибкой:
+    /// сборка без них просто работает на штатном конвейере.
+    /// </summary>
+    /// <summary>
+    /// Нужно ли сейчас наблюдение за миникартой. Условий два: матч идёт и
+    /// включено хотя бы одно правило наблюдения. ADR 0017.
+    /// </summary>
+    private bool IsMapObservationWanted() =>
+        MapObservationPolicy.IsWanted(_activeMatchMonitor?.CurrentUpdate);
+
+    /// <summary>
+    /// Идёт матч, а наблюдать не для кого. Диагностика захвата объясняет этим
+    /// пустой экран вместо того, чтобы выглядеть сломанной.
+    /// </summary>
+    private bool IsMapObservationSwitchedOff() =>
+        MapObservationPolicy.IsSwitchedOffDuringMatch(_activeMatchMonitor?.CurrentUpdate);
+
+    private static IMinimapFrameAnalyzer? CreateFrameAnalyzer(AppSettings settings)
+    {
+        // Ноль означает «выбрать по машине», и такой выбор оба распознавателя
+        // делают сами. Число потоков задаётся обоим: у модели один вызов на кадр,
+        // но ONNX Runtime разворачивает внутри него собственный пул по числу ядер.
+        var threads = settings.MinimapRecognitionThreads <= 0
+            ? (int?)null
+            : settings.MinimapRecognitionThreads;
+        var choice = settings.EffectiveMinimapRecognizer;
+        if (choice is MinimapRecognizerChoice.Default)
+        {
+            return BuiltInAnalyzer(threads);
+        }
+
+        var modelDirectory = OwnModelFrameAnalyzer.FindModelDirectory();
+        if (modelDirectory is null)
+        {
+            Debug.WriteLine(
+                $"Выбран распознаватель {choice}, но файлы модели не найдены.");
+            return BuiltInAnalyzer(threads);
+        }
+
+        try
+        {
+            return new OwnModelFrameAnalyzer(modelDirectory, threads);
+        }
+        catch (Exception exception)
+        {
+            // Неудачная загрузка модели не должна лишать пользователя распознавания.
+            Debug.WriteLine($"Не удалось загрузить модель: {exception}");
+            return BuiltInAnalyzer(threads);
+        }
+    }
+
+    /// <summary>
+    /// Штатный конвейер. Он же — запасной вариант, когда файлов выбранной модели
+    /// рядом с приложением не оказалось: молча остаться без распознавания хуже,
+    /// чем разбирать кадры прежним способом. Настройка числа потоков при этом
+    /// сохраняется — иначе откат тихо менял бы ещё и расход процессора.
+    /// </summary>
+    private static IMinimapFrameAnalyzer? BuiltInAnalyzer(int? threads) =>
+        threads is null ? null : new DefaultMinimapFrameAnalyzer(threads.Value);
+
     // Освобождение выполняется в обратном порядке владения долгоживущими объектами.
     protected override void OnExit(ExitEventArgs e)
     {
         _lifetimeCancellation.Cancel();
+        _activeMatchMapAwarenessCoordinator?.Dispose();
+        _activeMatchVisionCoordinator?.Dispose();
+        _championPortraitReferenceLoader?.Dispose();
         _activeMatchOverlayCoordinator?.Dispose();
         _overlaySetupSession?.Dispose();
         _overlayPresenter?.Dispose();
         _coachingViewModel?.Dispose();
         _settingsViewModel?.Dispose();
+        DisposeWindowCaptureSession();
         _homeViewModel?.Dispose();
         _currentMatchViewModel?.Dispose();
         _activeMatchMonitor?.Dispose();
@@ -332,5 +459,24 @@ public partial class App : System.Windows.Application
         _dataDragonClient?.Dispose();
         _liveClientDataClient?.Dispose();
         base.OnExit(e);
+    }
+
+    private void DisposeWindowCaptureSession()
+    {
+        var session = Interlocked.Exchange(ref _windowCaptureSession, null);
+        if (session is null)
+        {
+            return;
+        }
+
+        try
+        {
+            // WPF завершает Application синхронно; сессия не возвращается в UI-контекст.
+            session.DisposeAsync().AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+        catch (Exception exception)
+        {
+            Debug.WriteLine($"Не удалось штатно завершить захват окна: {exception}");
+        }
     }
 }

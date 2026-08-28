@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "regions": [
+    { "x": 28, "y": 98, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Yorick", "affiliation": "Enemy" },
+    { "x": 215, "y": 27, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Tryndamere", "affiliation": "Ally" },
+    { "x": 141, "y": 154, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Yasuo", "affiliation": "Ally" },
+    { "x": 285, "y": 11, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Teemo", "affiliation": "Ally" },
+    { "x": 200, "y": 241, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Amumu", "affiliation": "Ally" }
+  ],
+  "allowedFalsePositives": 0,
+  "allowedMissedChampions": 0
+}

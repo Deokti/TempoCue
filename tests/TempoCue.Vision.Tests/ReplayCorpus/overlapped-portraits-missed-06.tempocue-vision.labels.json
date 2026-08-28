@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "regions": [
+    { "x": 34, "y": 64, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Tryndamere", "affiliation": "Enemy" },
+    { "x": 28, "y": 52, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Darius", "affiliation": "Ally" },
+    { "x": 49, "y": 128, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "MonkeyKing", "affiliation": "Ally" },
+    { "x": 163, "y": 131, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Ekko", "affiliation": "Ally" },
+    { "x": 222, "y": 271, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Rakan", "affiliation": "Ally" },
+    { "x": 259, "y": 226, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Caitlyn", "affiliation": "Enemy" },
+    { "x": 243, "y": 245, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Smolder", "affiliation": "Ally" }
+  ],
+  "allowedFalsePositives": 0,
+  "allowedMissedChampions": 2
+}

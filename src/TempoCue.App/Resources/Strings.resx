@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
   <resheader name="version"><value>2.0</value></resheader>
@@ -290,7 +290,6 @@
   <data name="Coaching.MapControl.Library.Card.Details" xml:space="preserve"><value>{0} · {1}</value></data>
   <data name="Coaching.MapControl.Library.Author.You" xml:space="preserve"><value>you</value></data>
   <data name="Coaching.MapControl.Library.Role.Selected" xml:space="preserve"><value>only {0}</value></data>
-  <data name="Coaching.MapControl.Library.OpenUnavailable" xml:space="preserve"><value>Pack details will be available in the next iteration.</value></data>
   <data name="Coaching.Library.Matchup" xml:space="preserve"><value>{0} vs {1}</value></data>
   <data name="Coaching.Library.Card.Details" xml:space="preserve"><value>{0} · {1}</value></data>
   <data name="Coaching.Library.State.Enabled" xml:space="preserve"><value>Enabled</value></data>
@@ -313,7 +312,6 @@
   <data name="Coaching.Library.Language.Unknown" xml:space="preserve"><value>Language not specified</value></data>
   <data name="Coaching.Library.Patch" xml:space="preserve"><value>Patch {0}</value></data>
   <data name="Coaching.Library.Open" xml:space="preserve"><value>Open</value></data>
-  <data name="Coaching.Library.Open.Planned" xml:space="preserve"><value>The pack details screen will be added in the next iteration.</value></data>
   <data name="Coaching.Library.LoadFailed" xml:space="preserve"><value>Could not read locally saved advice packs.</value></data>
   <data name="Coaching.Library.Empty.Matchups" xml:space="preserve"><value>No matchups found</value></data>
   <data name="Coaching.Library.Empty.SearchHint" xml:space="preserve"><value>Clear the search or create a new advice pack.</value></data>
@@ -372,7 +370,7 @@
   <data name="Coaching.MapControlEditor.Main.SummonersRift" xml:space="preserve"><value>Summoner's Rift</value></data>
   <data name="Coaching.MapControlEditor.Main.FirstVersion" xml:space="preserve"><value>First version</value></data>
   <data name="Coaching.MapControlEditor.Scope.Title" xml:space="preserve"><value>Scope</value></data>
-  <data name="Coaching.MapControlEditor.Scope.Description" xml:space="preserve"><value>The pack will not activate when the player's role or team side does not match. The simulator verifies the same restrictions on step four.</value></data>
+  <data name="Coaching.MapControlEditor.Scope.Description" xml:space="preserve"><value>The pack will not activate when the player's role or team side does not match.</value></data>
   <data name="Coaching.MapControlEditor.Scope.Roles" xml:space="preserve"><value>Roles</value></data>
   <data name="Coaching.MapControlEditor.Scope.AllRoles" xml:space="preserve"><value>All roles</value></data>
   <data name="Coaching.MapControlEditor.Scope.TeamSide" xml:space="preserve"><value>Team side</value></data>
@@ -838,9 +836,38 @@
   <data name="Settings.Overlay.Unsaved" xml:space="preserve"><value>There are unsaved changes</value></data>
   <data name="Settings.Overlay.Preview.Label" xml:space="preserve"><value>Overlay preview</value></data>
   <data name="Settings.Overlay.Description" xml:space="preserve"><value>Shows Coach Pack advice over the game. Text and the accent rail stay fully opaque.</value></data>
+  <data name="Settings.Restart.Button" xml:space="preserve">
+    <value>Restart now</value>
+  </data>
+  <data name="Settings.Recognizer.Default" xml:space="preserve">
+    <value>Built-in pipeline</value>
+  </data>
+  <data name="Settings.Recognizer.Default.Hint" xml:space="preserve">
+    <value>Colour contours and portrait matching. Confirms 45 of 67 champions on the test corpus with no false confirmations, about 40 ms per frame.</value>
+  </data>
+  <data name="Settings.Recognizer.OwnModel" xml:space="preserve">
+    <value>TempoCue model</value>
+  </data>
+  <data name="Settings.Recognizer.OwnModel.Hint" xml:space="preserve">
+    <value>Our own neural model. Confirms 64 of 67 on the test corpus with one or two false confirmations, about 8 ms per frame, and holds a moving champion on every frame. Knows every champion of the current patch.</value>
+  </data>
+  <data name="Settings.Recognizer.Title" xml:space="preserve"><value>Minimap recognition</value></data>
+  <data name="Settings.Recognizer.Description" xml:space="preserve"><value>How TempoCue reads the minimap. The own model recognises more champions at a quarter of the frame cost; the built-in pipeline stays as a fallback. The choice applies after a restart.</value></data>
+  <data name="Settings.Recognizer.RestartNotice" xml:space="preserve"><value>The choice applies after TempoCue restarts.</value></data>
+  <data name="Settings.Recognition.Threads.Title" xml:space="preserve"><value>Map recognition threads</value></data>
+  <data name="Settings.Recognition.Threads.Description" xml:space="preserve"><value>How many parts of the map TempoCue compares at once. More threads mean a faster frame and earlier notifications, but less processor left for the game. Recognition accuracy is unaffected — only speed changes.</value></data>
+  <data name="Settings.Recognition.Threads.Automatic" xml:space="preserve"><value>Automatic ({0})</value></data>
+  <data name="Settings.Recognition.Threads.Hint.Automatic" xml:space="preserve"><value>A quarter of the processors, never fewer than two. Notifications arrive on time and the game keeps most of the machine. Start here and change it only for a reason.</value></data>
+  <data name="Settings.Recognition.Threads.Hint.Frugal" xml:space="preserve"><value>Easy on the processor, but a frame takes long to analyse. Suits weak machines; appearance notifications will arrive later.</value></data>
+  <data name="Settings.Recognition.Threads.Hint.Balanced" xml:space="preserve"><value>Room on both sides: notifications keep up and the game keeps most of the processor.</value></data>
+  <data name="Settings.Recognition.Threads.Hint.Fast" xml:space="preserve"><value>Notifications arrive sooner, but TempoCue takes a noticeable share of the processor. Pick this when analysis cannot keep up with the limit.</value></data>
+  <data name="Settings.Recognition.Threads.Hint.Maximum" xml:space="preserve"><value>Every processor. It will not get faster, and the game may suffer — pick this only if it visibly helps.</value></data>
+  <data name="Settings.Recognition.Threads.RiskNotice" xml:space="preserve"><value>A single thread is not enough: analysing a frame takes about as long as the appearance confirmation window, so the chain of observations keeps breaking. Brief appearances will be lost.</value></data>
+  <data name="Settings.Recognition.Threads.Guidance" xml:space="preserve"><value>Check the diagnostics card above: if the actual analysis FPS is below the limit, add threads; if it matches, there is nothing to add.</value></data>
+  <data name="Settings.Recognition.Threads.RestartNotice" xml:space="preserve"><value>The choice applies after TempoCue restarts.</value></data>
   <data name="Settings.Overlay.Preview.Button" xml:space="preserve"><value>Show next notification</value></data>
   <data name="Settings.Overlay.Preview.Warning.Label" xml:space="preserve"><value>Caution</value></data>
-  <data name="Settings.Overlay.Preview.Warning.Title" xml:space="preserve"><value>An opponent has left their lane</value></data>
+  <data name="Settings.Overlay.Preview.Warning.Title" xml:space="preserve"><value>An opponent is out of sight</value></data>
   <data name="Settings.Overlay.Preview.Warning.Message" xml:space="preserve"><value>First notification · top slot</value></data>
   <data name="Settings.Overlay.Preview.Information.Label" xml:space="preserve"><value>Event</value></data>
   <data name="Settings.Overlay.Preview.Information.Title" xml:space="preserve"><value>Dragon spawns in 30 seconds</value></data>
@@ -852,6 +879,19 @@
   <data name="Overlay.Matchup.Dismiss" xml:space="preserve"><value>Hide advice</value></data>
   <data name="Overlay.Matchup.PersistentTip.Status" xml:space="preserve"><value>Matchup tip</value></data>
   <data name="Overlay.MapControl.Status" xml:space="preserve"><value>Map control</value></data>
+  <data name="Overlay.MapAwareness.Status" xml:space="preserve"><value>Map awareness</value></data>
+  <data name="Overlay.MapAwareness.Headline.Top.Appeared" xml:space="preserve"><value>Enemy top laner appeared</value></data>
+  <data name="Overlay.MapAwareness.Headline.Top.Disappeared" xml:space="preserve"><value>Enemy top laner is missing</value></data>
+  <data name="Overlay.MapAwareness.Headline.Jungle.Appeared" xml:space="preserve"><value>Enemy jungler appeared</value></data>
+  <data name="Overlay.MapAwareness.Headline.Jungle.Disappeared" xml:space="preserve"><value>Enemy jungler is missing</value></data>
+  <data name="Overlay.MapAwareness.Headline.Middle.Appeared" xml:space="preserve"><value>Enemy mid laner appeared</value></data>
+  <data name="Overlay.MapAwareness.Headline.Middle.Disappeared" xml:space="preserve"><value>Enemy mid laner is missing</value></data>
+  <data name="Overlay.MapAwareness.Headline.Bottom.Appeared" xml:space="preserve"><value>Enemy bot laner appeared</value></data>
+  <data name="Overlay.MapAwareness.Headline.Bottom.Disappeared" xml:space="preserve"><value>Enemy bot laner is missing</value></data>
+  <data name="Overlay.MapAwareness.Headline.Support.Appeared" xml:space="preserve"><value>Enemy support appeared</value></data>
+  <data name="Overlay.MapAwareness.Headline.Support.Disappeared" xml:space="preserve"><value>Enemy support is missing</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.NextGoal.Card" xml:space="preserve"><value>What to do next</value></data>
+  <data name="Overlay.MapAwareness.Dismiss" xml:space="preserve"><value>Hide alert</value></data>
   <data name="Overlay.MapControl.PersistentTip.Status" xml:space="preserve"><value>Map tip</value></data>
   <data name="Overlay.MapControl.Dismiss" xml:space="preserve"><value>Hide reminder</value></data>
   <data name="Overlay.MapControl.TargetTime" xml:space="preserve"><value>By {0}</value></data>
@@ -859,6 +899,29 @@
   <data name="Coaching.MapControlEditor.Content.Tab.Objects" xml:space="preserve"><value>Objectives · {0}</value></data>
   <data name="Coaching.MapControlEditor.Content.Tab.Timed" xml:space="preserve"><value>Timed reminders · {0}</value></data>
   <data name="Coaching.MapControlEditor.Content.Tab.Persistent" xml:space="preserve"><value>Persistent tips · {0}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Tab.Vision" xml:space="preserve"><value>Observation {0}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Transition.Appeared" xml:space="preserve"><value>appeared on the map</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Transition.Disappeared" xml:space="preserve"><value>went out of sight</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Editor.Progress" xml:space="preserve"><value>Rule {0} of {1}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Preview" xml:space="preserve"><value>Fires when observation records: {0} — {1}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Editor.Title" xml:space="preserve"><value>Observation rule</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Position" xml:space="preserve"><value>Opponent role</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Position.Hint" xml:space="preserve"><value>The role comes from Live Client Data, not from the minimap. If Riot did not report it, the rule simply never fires — the app does not guess which of the five is the mid laner.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Transition" xml:space="preserve"><value>Event</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Preview.Title" xml:space="preserve"><value>How this fires</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Message" xml:space="preserve"><value>Main advice (the player sees it first)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Message.Default.Appeared" xml:space="preserve"><value>{champion} is visible on the minimap. Check their position.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Message.Default.Disappeared" xml:space="preserve"><value>{champion} is no longer visible on the minimap. Check the river and the neighbouring lanes.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Message.Hint" xml:space="preserve"><value>TempoCue writes the notification headline: it names the role and the event. This is the advice below it. The {champion} token is replaced with the champion name from the match roster.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.WhyNow" xml:space="preserve"><value>Why now (short explanation)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.NextGoal" xml:space="preserve"><value>Next goal (what to do next)</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.ListTitle" xml:space="preserve"><value>Observation rules</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Description" xml:space="preserve"><value>These fire on opponent visibility on the minimap. The event has already happened, so there is no lead time and no repetition here.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Add" xml:space="preserve"><value>+ Add observation rule</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Empty" xml:space="preserve"><value>No observation rules yet.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Blind.Title" xml:space="preserve"><value>What observation cannot see</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Blind.Description" xml:space="preserve"><value>Observation only knows whether an opponent is visible on the map. This information will not appear in it.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Blind.Items" xml:space="preserve"><value>Enemy wards · Groupings and formations · Exact position under an enemy tower</value></data>
   <data name="Coaching.MapControlEditor.Content.CatalogTitle" xml:space="preserve"><value>TempoCue knows the objective schedule</value></data>
   <data name="Coaching.MapControlEditor.Content.CatalogUnavailable" xml:space="preserve"><value>Select a supported game patch on step one.</value></data>
   <data name="Coaching.MapControlEditor.Content.CatalogCurrentPatch" xml:space="preserve"><value>Timings are verified for patch {0}. You only choose when and what TempoCue should remind you about.</value></data>
@@ -931,9 +994,6 @@
   <data name="Coaching.MapControlEditor.Content.Timed.Message" xml:space="preserve"><value>Main advice (the player sees it first)</value></data>
   <data name="Coaching.MapControlEditor.Content.Timed.WhyNow" xml:space="preserve"><value>Why now (short explanation)</value></data>
   <data name="Coaching.MapControlEditor.Content.Timed.NextGoal" xml:space="preserve"><value>What to prepare for the objective (optional)</value></data>
-  <data name="Coaching.MapControlEditor.Content.Timed.Future.Title" xml:space="preserve"><value>Available after mini-map analysis</value></data>
-  <data name="Coaching.MapControlEditor.Content.Timed.Future.Description" xml:space="preserve"><value>The first version does not analyze the mini-map image, so these conditions cannot be selected yet.</value></data>
-  <data name="Coaching.MapControlEditor.Content.Timed.Future.Items" xml:space="preserve"><value>Enemy jungler spotted · Opponent missing from lane · Enemy ward placed · Team grouped at an objective</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.ListTitle" xml:space="preserve"><value>Persistent tips</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.Description" xml:space="preserve"><value>Tips remain available in pack details and the overlay shows one on an eligible level-up. Urgent objective and timed reminders take priority.</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.Add" xml:space="preserve"><value>+ Add tip</value></data>
@@ -967,6 +1027,18 @@
   <data name="Coaching.MapControlEditor.Verification.Summary" xml:space="preserve"><value>Pack summary</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Rules" xml:space="preserve"><value>Objective rules</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Timed" xml:space="preserve"><value>Timed reminders</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Summary.Vision" xml:space="preserve"><value>Observation rules</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Title" xml:space="preserve"><value>Observation check</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Description" xml:space="preserve"><value>Play out an observation and see the notification exactly as the player will. No match required.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.NoRule" xml:space="preserve"><value>No rule for this pair: the event happens, but the pack does not answer it.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Ready" xml:space="preserve"><value>A rule matches — show the notification to see it in full.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Show" xml:space="preserve"><value>Show the notification</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Champion.Top" xml:space="preserve"><value>Darius</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Champion.Jungle" xml:space="preserve"><value>Lee Sin</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Champion.Middle" xml:space="preserve"><value>Ahri</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Champion.Bottom" xml:space="preserve"><value>Jinx</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Champion.Support" xml:space="preserve"><value>Thresh</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Issue.DuplicateVisionPairs" xml:space="preserve"><value>One role and event pair is described twice: {0}. Only the first rule fires — the rest never appear.</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Persistent" xml:space="preserve"><value>Persistent tips</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Patch" xml:space="preserve"><value>Catalog patch</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Scope" xml:space="preserve"><value>Scope</value></data>
@@ -1011,4 +1083,89 @@
   <data name="Coaching.MapControl.Details.Persistent.Title" xml:space="preserve"><value>Persistent tips</value></data>
   <data name="Coaching.MapControl.Details.Persistent.Empty" xml:space="preserve"><value>This pack does not contain persistent tips.</value></data>
   <data name="Coaching.MapControl.Details.ReadOnly" xml:space="preserve"><value>Read-only. Open the pack editor to change its content.</value></data>
+  <data name="Settings.Capture.Borderless.Label" xml:space="preserve">
+    <value>Yellow capture border</value>
+  </data>
+  <data name="Settings.Capture.Borderless.Allowed" xml:space="preserve">
+    <value>removed</value>
+  </data>
+  <data name="Settings.Capture.Borderless.Denied" xml:space="preserve">
+    <value>kept: permission not granted. Windows draws it around any captured window and only you can allow its removal.</value>
+  </data>
+  <data name="Settings.Capture.Borderless.NotSupported" xml:space="preserve">
+    <value>kept: removing it needs Windows 11</value>
+  </data>
+  <data name="Settings.Capture.Borderless.Unknown" xml:space="preserve">
+    <value>checking</value>
+  </data>
+  <data name="Settings.Capture.Section" xml:space="preserve"><value>Map monitoring</value></data>
+  <data name="Settings.Capture.Title" xml:space="preserve"><value>Game window capture</value></data>
+  <data name="Settings.Capture.Description" xml:space="preserve"><value>TempoCue automatically connects to the running League of Legends match window. Manual selection remains available as a fallback.</value></data>
+  <data name="Settings.Capture.State.Hint" xml:space="preserve"><value>Metrics and the local minimap preview are refreshed up to four times per second.</value></data>
+  <data name="Settings.Capture.State.Hint.ObservationOff" xml:space="preserve"><value>Map observation is off: no vision rules are enabled in Map Control. Capture does not start until at least one is needed.</value></data>
+  <data name="Settings.Capture.State.Idle" xml:space="preserve"><value>Window not selected</value></data>
+  <data name="Settings.Capture.State.Selecting" xml:space="preserve"><value>Waiting for window selection</value></data>
+  <data name="Settings.Capture.State.Capturing" xml:space="preserve"><value>Frames are being received</value></data>
+  <data name="Settings.Capture.State.Stopped" xml:space="preserve"><value>Capture stopped</value></data>
+  <data name="Settings.Capture.State.Failed" xml:space="preserve"><value>Capture error</value></data>
+  <data name="Settings.Capture.State.Unsupported" xml:space="preserve"><value>Capture is not supported</value></data>
+  <data name="Settings.Capture.Select.Button" xml:space="preserve"><value>Select game window</value></data>
+  <data name="Settings.Capture.Change.Button" xml:space="preserve"><value>Change window</value></data>
+  <data name="Settings.Capture.Stop.Button" xml:space="preserve"><value>Stop</value></data>
+  <data name="Settings.Capture.Target.Label" xml:space="preserve"><value>Selected window</value></data>
+  <data name="Settings.Capture.Resolution.Label" xml:space="preserve"><value>Frame size</value></data>
+  <data name="Settings.Capture.Fps.Label" xml:space="preserve"><value>Capture FPS</value></data>
+  <data name="Settings.Capture.Sequence.Record" xml:space="preserve"><value>Record 3 seconds</value></data>
+  <data name="Settings.Capture.Sequence.Progress" xml:space="preserve"><value>Recorded {0} of {1} frames</value></data>
+  <data name="Settings.Capture.Sequence.Filter" xml:space="preserve"><value>TempoCue minimap recording (*.tempocue-sequence)|*.tempocue-sequence</value></data>
+  <data name="Settings.Capture.Sequence.Hint" xml:space="preserve"><value>Consecutive frames show whether the marker stays on a participant or jumps. A single frame cannot show that.</value></data>
+  <data name="Settings.Capture.RecognitionTooSlow" xml:space="preserve"><value>Frame analysis is approaching the appearance confirmation window: some appearances will be lost. Add recognition threads in the setting below, or close other programs.</value></data>
+  <data name="Settings.Capture.Frames.Label" xml:space="preserve"><value>Frames received</value></data>
+  <data name="Settings.Capture.LastFrame.Label" xml:space="preserve"><value>Last frame</value></data>
+  <data name="Settings.Capture.SelectionFps.Label" xml:space="preserve"><value>Selection FPS (limit {0})</value></data>
+  <data name="Settings.Capture.RecognitionFps.Label" xml:space="preserve"><value>Map analysis FPS (limit {0})</value></data>
+  <data name="Settings.Capture.RecognitionDuration.Label" xml:space="preserve"><value>Frame analysis time</value></data>
+  <data name="Settings.Capture.RecognitionDuration.Value" xml:space="preserve"><value>{0:N0} ms</value></data>
+  <data name="Settings.Capture.SelectedFrames.Label" xml:space="preserve"><value>Frames selected</value></data>
+  <data name="Settings.Capture.RateLimitedFrames.Label" xml:space="preserve"><value>Skipped by limiter</value></data>
+  <data name="Settings.Capture.Minimap.Title" xml:space="preserve"><value>Detected minimap</value></data>
+  <data name="Settings.Capture.Minimap.Description" xml:space="preserve"><value>TempoCue automatically finds the minimap boundary in either bottom corner and copies only the detected region.</value></data>
+  <data name="Settings.Capture.Minimap.Region.Label" xml:space="preserve"><value>Automatically detected frame region</value></data>
+  <data name="Settings.Capture.Minimap.Region.Value" xml:space="preserve"><value>{0} × {1} px · x {2}, y {3}</value></data>
+  <data name="Settings.Capture.Minimap.Normalized.Label" xml:space="preserve"><value>Canonical recognition frame</value></data>
+  <data name="Settings.Capture.Minimap.Normalized.Value" xml:space="preserve"><value>{0} × {1} px · fixed geometry</value></data>
+  <data name="Settings.Capture.Minimap.Detection.Value" xml:space="preserve"><value>{0} · confidence {1:P0}</value></data>
+  <data name="Settings.Capture.Minimap.Corner.Left" xml:space="preserve"><value>bottom left</value></data>
+  <data name="Settings.Capture.Minimap.Corner.Right" xml:space="preserve"><value>bottom right</value></data>
+  <data name="Settings.Capture.Minimap.Markers.Label" xml:space="preserve"><value>Participant portrait verification</value></data>
+  <data name="Settings.Capture.Minimap.Markers.Value" xml:space="preserve"><value>Color objects: {0} · comparison regions: {4} · portrait-confirmed: {1} (allied: {2}, enemy: {3}) · references: {5} · best score: {6:P0}</value></data>
+  <data name="Settings.Capture.Minimap.Error.Label" xml:space="preserve"><value>Could not prepare the minimap preview</value></data>
+  <data name="Settings.Capture.Replay.Save.Button" xml:space="preserve"><value>Save frame for replay</value></data>
+  <data name="Settings.Capture.Replay.Filter" xml:space="preserve"><value>TempoCue diagnostic frame (*.tempocue-vision)|*.tempocue-vision</value></data>
+  <data name="Settings.Capture.Replay.Status.Saved" xml:space="preserve"><value>Frame saved. It can be checked again without running League.</value></data>
+  <data name="Settings.Capture.Replay.Status.Failed" xml:space="preserve"><value>Could not save the diagnostic frame.</value></data>
+  <data name="Settings.Capture.Participants.Title" xml:space="preserve"><value>Active-match participant diagnostics</value></data>
+  <data name="Settings.Capture.Participants.Description" xml:space="preserve"><value>This shows the Riot team, TempoCue's expected relative side, and recognition result for the current frame. A missing marker is a diagnostic observation, not proof that the champion is hidden.</value></data>
+  <data name="Settings.Capture.Participants.ActiveTeam.Value" xml:space="preserve"><value>Active player Riot team: {0}</value></data>
+  <data name="Settings.Capture.Participants.Allies.Title" xml:space="preserve"><value>Allies</value></data>
+  <data name="Settings.Capture.Participants.Enemies.Title" xml:space="preserve"><value>Enemies</value></data>
+  <data name="Settings.Capture.Participants.RelativeTeam.Ally" xml:space="preserve"><value>ally</value></data>
+  <data name="Settings.Capture.Participants.RelativeTeam.Enemy" xml:space="preserve"><value>enemy</value></data>
+  <data name="Settings.Capture.Participants.TeamTrace.Value" xml:space="preserve"><value>Riot: {0} · expected: {1}</value></data>
+  <data name="Settings.Capture.Participants.TeamTrace.WithRing.Value" xml:space="preserve"><value>Riot: {0} · expected: {1} · recognized ring: {2}</value></data>
+  <data name="Settings.Capture.Participants.Status.ReferencePending" xml:space="preserve"><value>Portrait reference is loading</value></data>
+  <data name="Settings.Capture.Participants.Status.ReferenceUnavailable" xml:space="preserve"><value>Portrait reference is unavailable</value></data>
+  <data name="Settings.Capture.Participants.Status.NotDetected" xml:space="preserve"><value>Not recognized in the current frame</value></data>
+  <data name="Settings.Capture.Participants.Status.Visible.Value" xml:space="preserve"><value>Visible · confidence {0:P0}</value></data>
+  <data name="Settings.Capture.Participants.Status.TeamMismatch.Value" xml:space="preserve"><value>Recognized with conflicting side: {0} · confidence {1:P0}</value></data>
+  <data name="Settings.Capture.Participants.Status.NotVisible" xml:space="preserve"><value>Not visible</value></data>
+  <data name="Settings.Capture.Participants.Status.Confirming.Value" xml:space="preserve"><value>Confirming · confidence {0:P0}</value></data>
+  <data name="Settings.Capture.Participants.Status.LastSeen.Value" xml:space="preserve"><value>Not visible · last seen at {0}</value></data>
+  <data name="Settings.Capture.Participants.Status.Dead" xml:space="preserve"><value>Dead · observation paused</value></data>
+  <data name="Settings.Capture.Participants.Status.NoData" xml:space="preserve"><value>No visibility data</value></data>
+  <data name="Settings.Capture.Participants.Status.NoData.LastSeen.Value" xml:space="preserve"><value>No data · last confirmed at {0}</value></data>
+  <data name="Settings.Capture.Value.NotAvailable" xml:space="preserve"><value>Not available</value></data>
+  <data name="Settings.Capture.Unsupported.Description" xml:space="preserve"><value>Windows Graphics Capture requires Windows 10 version 2004 or later.</value></data>
+  <data name="Settings.Capture.Error.Label" xml:space="preserve"><value>Technical details</value></data>
+  <data name="Settings.Capture.Privacy.Hint" xml:space="preserve"><value>TempoCue captures only the verified League of Legends match window. It does not read game memory and does not save captured frames during this diagnostic stage.</value></data>
 </root>

@@ -2,6 +2,7 @@ using TempoCue.App.Localization;
 using TempoCue.App.ViewModels;
 using TempoCue.Application;
 using TempoCue.Coaching;
+using TempoCue.Core;
 
 namespace TempoCue.App.Tests;
 
@@ -206,6 +207,174 @@ public sealed class MapControlEditorViewModelTests
         Assert.True(editor.NavigateToStep(5));
         Assert.True(await editor.Save.SaveAsync(LocalCoachPackState.Enabled));
         Assert.Equal(pack.Id, store.SavedPack?.Id);
+    }
+
+    [Fact]
+    public async Task LoadPackWithVisionRules_KeepsThemThroughSave()
+    {
+        var store = new TestMapControlPackStore();
+        var editor = CreateEditor(store);
+        var pack = TestMapControlPackFactory.Create("map-control.vision-test") with
+        {
+            VisionRules =
+            [
+                new MapVisionRule(
+                    "enemy-jungler-appeared",
+                    PlayerPosition.Jungle,
+                    MapVisionTransition.Appeared,
+                    MapObjectiveReminderPriority.Important,
+                    "Вражеский лесник виден на карте.",
+                    "Положение лесника — самая скоропортящаяся информация.",
+                    "Реши, даёт ли это окно.")
+            ]
+        };
+
+        await editor.LoadAsync(pack, LocalCoachPackState.Enabled, createCopy: false);
+        Assert.True(editor.NavigateToStep(5));
+        Assert.True(await editor.Save.SaveAsync(LocalCoachPackState.Enabled));
+
+        // Редактор правил наблюдения ещё не показывает, но обязан пронести их
+        // через себя: иначе правка копии набора про лесника молча стирала бы
+        // единственное, ради чего набор существует.
+        var saved = Assert.Single(store.SavedPack!.VisionRules);
+        Assert.Equal("enemy-jungler-appeared", saved.Id);
+        Assert.Equal(PlayerPosition.Jungle, saved.Position);
+    }
+
+    [Fact]
+    public async Task PackOfVisionRulesAlone_IsNotTreatedAsEmpty()
+    {
+        var editor = CreateEditor();
+        var pack = TestMapControlPackFactory.Create("map-control.vision-only") with
+        {
+            Rules = [],
+            VisionRules =
+            [
+                new MapVisionRule(
+                    "enemy-mid-disappeared",
+                    PlayerPosition.Middle,
+                    MapVisionTransition.Disappeared,
+                    MapObjectiveReminderPriority.Caution,
+                    "Вражеский мидер пропал из вида.",
+                    "Опасность создаёт незамеченный уход.",
+                    "Отойдите под обзор, пока он не найдётся.")
+            ]
+        };
+
+        await editor.LoadAsync(pack, LocalCoachPackState.Enabled, createCopy: false);
+
+        // Оба встроенных набора наблюдения устроены именно так: ни одного
+        // правила по объектам, ни одного напоминания — и это не пустой набор.
+        Assert.True(editor.Content.HasContent);
+        Assert.True(editor.CanNavigateToStep5);
+    }
+
+    [Fact]
+    public async Task TwoVisionRulesOnOnePair_BlockVerification()
+    {
+        var editor = CreateEditor();
+        await editor.BeginNewAsync();
+        CompleteMainInformation(editor);
+        Assert.True(editor.MoveNext());
+        Assert.True(editor.MoveNext());
+        AddVisionRule(editor.Content, PlayerPosition.Jungle, MapVisionTransition.Appeared);
+        AddVisionRule(editor.Content, PlayerPosition.Jungle, MapVisionTransition.Appeared);
+
+        Assert.True(editor.MoveNext());
+
+        // Сработает только первое правило пары. Второе — молчаливо мёртвый текст,
+        // и узнать об этом в бою нельзя, поэтому это ошибка, а не предупреждение.
+        Assert.False(editor.Verification.CanContinue);
+        Assert.Contains(
+            editor.Verification.Issues,
+            issue => issue.Message.Contains("JUNGLE · появился на карте", StringComparison.Ordinal));
+        Assert.Equal(2, editor.Verification.VisionRuleCount);
+    }
+
+    [Fact]
+    public async Task DistinctVisionPairs_PassVerification()
+    {
+        var editor = CreateEditor();
+        await editor.BeginNewAsync();
+        CompleteMainInformation(editor);
+        Assert.True(editor.MoveNext());
+        Assert.True(editor.MoveNext());
+        AddVisionRule(editor.Content, PlayerPosition.Jungle, MapVisionTransition.Appeared);
+        AddVisionRule(editor.Content, PlayerPosition.Jungle, MapVisionTransition.Disappeared);
+
+        Assert.True(editor.MoveNext());
+
+        // Одна роль и два разных события — это два разных условия, а не двойник.
+        Assert.True(editor.Verification.CanContinue);
+    }
+
+    [Fact]
+    public async Task VisionCheck_AnswersWithTheRuleThatWouldFire()
+    {
+        var editor = CreateEditor();
+        await editor.BeginNewAsync();
+        CompleteMainInformation(editor);
+        Assert.True(editor.MoveNext());
+        Assert.True(editor.MoveNext());
+        AddVisionRule(editor.Content, PlayerPosition.Jungle, MapVisionTransition.Appeared);
+        Assert.True(editor.MoveNext());
+
+        var verification = editor.Verification;
+        verification.CheckPosition = PlayerPosition.Jungle;
+        verification.CheckTransition = MapVisionTransition.Appeared;
+
+        Assert.True(verification.HasVisionCheck);
+        Assert.NotNull(verification.CheckedRule);
+        Assert.Equal(
+            "Соперник изменил видимость на карте.",
+            verification.CheckedRule!.Message);
+
+        // Та же роль, но другое событие — правила нет, и проверка обязана это
+        // сказать, а не промолчать. Показывать тогда нечего.
+        verification.CheckTransition = MapVisionTransition.Disappeared;
+        Assert.Null(verification.CheckedRule);
+        Assert.Contains("правила нет", verification.CheckResult, StringComparison.Ordinal);
+        Assert.False(verification.CanShowCheckedNotification);
+    }
+
+    [Fact]
+    public async Task VisionCheck_ShowsOnlyTheFirstRuleOfADuplicatedPair()
+    {
+        var editor = CreateEditor();
+        await editor.BeginNewAsync();
+        CompleteMainInformation(editor);
+        Assert.True(editor.MoveNext());
+        Assert.True(editor.MoveNext());
+        AddVisionRule(editor.Content, PlayerPosition.Top, MapVisionTransition.Appeared);
+        editor.Content.VisionRules.BeginAdd();
+        editor.Content.VisionRules.Editor.SelectedPosition = PlayerPosition.Top;
+        editor.Content.VisionRules.Editor.SelectedTransition = MapVisionTransition.Appeared;
+        editor.Content.VisionRules.Editor.Message = "Второе правило той же пары.";
+        Assert.True(editor.Content.VisionRules.SaveEditor());
+        Assert.True(editor.MoveNext());
+
+        editor.Verification.CheckPosition = PlayerPosition.Top;
+        editor.Verification.CheckTransition = MapVisionTransition.Appeared;
+
+        // Проверка показывает ровно то, что случится в бою: побеждает первое
+        // правило пары. Иначе автор поверил бы, что работает второе.
+        Assert.Equal(
+            "Соперник изменил видимость на карте.",
+            editor.Verification.CheckedRule!.Message);
+    }
+
+    private static void AddVisionRule(
+        MapControlContentViewModel content,
+        PlayerPosition position,
+        MapVisionTransition transition)
+    {
+        content.VisionRules.BeginAdd();
+        var editor = content.VisionRules.Editor;
+        editor.SelectedPosition = position;
+        editor.SelectedTransition = transition;
+        editor.Message = "Соперник изменил видимость на карте.";
+        editor.WhyNow = "Это самая скоропортящаяся информация в игре.";
+        Assert.True(content.VisionRules.SaveEditor());
     }
 
     private static void CompleteMainInformation(MapControlEditorViewModel editor)

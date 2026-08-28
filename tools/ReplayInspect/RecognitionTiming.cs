@@ -1,0 +1,167 @@
+using System.Diagnostics;
+using TempoCue.Vision;
+
+namespace TempoCue.Tools.ReplayInspect;
+
+/// <summary>
+/// Измеряет стоимость одного кадра в установившемся режиме. Первый прогон каждого
+/// кадра отбрасывается: в матче ростер не меняется, поэтому шаблоны эталонов
+/// готовятся один раз, и включать их подготовку в стоимость кадра неверно.
+/// Полученные числа определяют, какую частоту разбора имеет смысл разрешать.
+/// </summary>
+internal static class RecognitionTiming
+{
+    private const int WarmupRuns = 2;
+    private const int MeasuredRuns = 10;
+
+    public static async Task<int> RunAsync(string corpusDirectory)
+    {
+        Console.WriteLine(
+            $"OpenCV сообщает о {OpenCvSharp.Cv2.GetNumThreads()} собственных потоках " +
+            $"при {Environment.ProcessorCount} логических процессорах.");
+
+        var runner = new MinimapReplayRunner();
+        var ourCold = new List<double>();
+        var ourWarm = new List<double>();
+
+        Console.WriteLine(
+            $"Прогрев {WarmupRuns}, замер {MeasuredRuns} повторов на кадр.");
+        Console.WriteLine();
+        Console.WriteLine("кадр                                   | наш холод | наш тепл");
+
+        foreach (var path in ReplaySampleFile.EnumerateCorpus(corpusDirectory))
+        {
+            var sample = await ReplaySampleFile.LoadAsync(path);
+
+            var cold = Measure(() => runner.Run(sample), 1);
+            ourCold.Add(cold[0]);
+
+            Measure(() => runner.Run(sample), WarmupRuns);
+            var warm = Measure(() => runner.Run(sample), MeasuredRuns);
+            ourWarm.AddRange(warm);
+
+            Console.WriteLine(
+                $"{ReplaySampleFile.Name(path),-38} | {cold[0],9:F1} | {Median(warm),8:F1}");
+        }
+
+        Console.WriteLine();
+        Report("наш конвейер, первый кадр ростера", ourCold);
+        Report("наш конвейер, установившийся", ourWarm);
+
+        Console.WriteLine();
+        PrintAffordableRate("наш конвейер", ourWarm);
+
+        await PrintScalingAsync(corpusDirectory);
+        return 0;
+    }
+
+    /// <summary>
+    /// Как стоимость кадра зависит от числа одновременно сравниваемых областей.
+    /// Кривая нужна, чтобы границы будущей настройки назначались по замеру, а не
+    /// по догадке: выигрыш прекращается на числе физических ядер, а не логических.
+    /// </summary>
+    private static async Task PrintScalingAsync(string corpusDirectory)
+    {
+        var samples = new List<MinimapReplaySample>();
+        foreach (var path in ReplaySampleFile.EnumerateCorpus(corpusDirectory))
+        {
+            samples.Add(await ReplaySampleFile.LoadAsync(path));
+        }
+
+        var degrees = new[] { 1, 2, 4, 8, Environment.ProcessorCount }
+            .Distinct()
+            .OrderBy(static degree => degree)
+            .ToArray();
+
+        // OpenCV распараллеливает каждый вызов сам, поверх наших потоков. Пока это
+        // не измерено, настройка числа потоков не ограничивает расход процессора:
+        // она задаёт лишь внешний множитель, а внутренний остаётся своим.
+        var openCvThreads = OpenCvSharp.Cv2.GetNumThreads();
+        foreach (var openCvLimit in new[] { openCvThreads, 1 })
+        {
+            OpenCvSharp.Cv2.SetNumThreads(openCvLimit);
+            Console.WriteLine();
+            Console.WriteLine(
+                $"=== ЧИСЛО ПОТОКОВ ПРИ {openCvLimit} ВНУТРЕННИХ ПОТОКАХ OpenCV " +
+                $"({Environment.ProcessorCount} логических) ===");
+            // p90 важнее медианы: подтверждение видимости срывается на отдельном
+            // затянувшемся кадре, а не на среднем по матчу.
+            Console.WriteLine("потоков | медиана |    p90 | ускорение");
+            var baseline = 0d;
+            foreach (var degree in degrees)
+            {
+                var runner = new MinimapReplayRunner(degree);
+                var measured = new List<double>();
+                foreach (var sample in samples)
+                {
+                    Measure(() => runner.Run(sample), WarmupRuns);
+                    measured.AddRange(Measure(() => runner.Run(sample), MeasuredRuns));
+                }
+
+                var median = Median(measured);
+                if (baseline == 0)
+                {
+                    baseline = median;
+                }
+
+                Console.WriteLine(
+                    $"{degree,7} | {median,6:F1} мс | {Percentile(measured, 0.90),6:F1} | " +
+                    $"{baseline / median,6:F2}x");
+            }
+        }
+
+        OpenCvSharp.Cv2.SetNumThreads(openCvThreads);
+    }
+
+    private static double[] Measure(Action action, int runs)
+    {
+        var samples = new double[runs];
+        for (var index = 0; index < runs; index++)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            action();
+            stopwatch.Stop();
+            samples[index] = stopwatch.Elapsed.TotalMilliseconds;
+        }
+
+        return samples;
+    }
+
+    private static double Median(IReadOnlyList<double> samples)
+    {
+        var sorted = samples.OrderBy(static value => value).ToArray();
+        return sorted[sorted.Length / 2];
+    }
+
+    private static double Percentile(IReadOnlyList<double> samples, double fraction)
+    {
+        var sorted = samples.OrderBy(static value => value).ToArray();
+        var index = (int)Math.Min(sorted.Length - 1, Math.Floor(fraction * sorted.Length));
+        return sorted[index];
+    }
+
+    private static void Report(string label, IReadOnlyList<double> samples)
+    {
+        if (samples.Count == 0)
+        {
+            return;
+        }
+
+        Console.WriteLine(
+            $"{label}: медиана {Median(samples):F1} мс, " +
+            $"p90 {Percentile(samples, 0.90):F1} мс, " +
+            $"максимум {samples.Max():F1} мс");
+    }
+
+    /// <summary>
+    /// Частота, при которой разбор занимает не более половины одного ядра. Запас
+    /// нужен потому, что распознавание делит машину с игрой, а не владеет ею.
+    /// </summary>
+    private static void PrintAffordableRate(string label, IReadOnlyList<double> samples)
+    {
+        var p90 = Percentile(samples, 0.90);
+        Console.WriteLine(
+            $"{label}: по p90 {p90:F1} мс одно ядро тянет {1000 / p90:F0} кадр/с, " +
+            $"половина ядра — {500 / p90:F0} кадр/с");
+    }
+}

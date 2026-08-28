@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "regions": [
+    { "x": 97, "y": 50, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Yone", "affiliation": "Ally" },
+    { "x": 168, "y": 113, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Warwick", "affiliation": "Ally" },
+    { "x": 177, "y": 27, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Cassiopeia", "affiliation": "Ally" },
+    { "x": 197, "y": 18, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Nasus", "affiliation": "Enemy" },
+    { "x": 129, "y": 109, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "DrMundo", "affiliation": "Enemy" },
+    { "x": 130, "y": 123, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "Kennen", "affiliation": "Ally" },
+    { "x": 140, "y": 102, "width": 25, "height": 25, "kind": "Champion",
+      "championId": "TwistedFate", "affiliation": "Enemy" }
+  ],
+  "allowedFalsePositives": 0,
+  "allowedMissedChampions": 0
+}

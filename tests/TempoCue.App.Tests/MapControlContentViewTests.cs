@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Threading;
 using TempoCue.App.ViewModels;
 using TempoCue.App.Views;
+using TempoCue.Coaching;
 using TempoCue.Core;
 using static TempoCue.App.Tests.CoachingViewTestContext;
 
@@ -150,6 +151,73 @@ public sealed class MapControlContentViewTests
             SaveVisualSnapshotIfRequested(
                 context.Window,
                 "map-control-editor-timed-reminders.png");
+        });
+
+    [Fact]
+    public void ThirdStep_AddsVisionRuleFromDedicatedTab() =>
+        WpfTestHost.Run(() =>
+        {
+            using var context = new MainWindowTestContext();
+            var contentPage = OpenMapControlContent(context);
+            var content = context.Coaching.MapControlEditor.Content;
+
+            WpfTestHost.Click(WpfTestHost.Find<Button>(
+                contentPage,
+                "MapVisionRulesTabButton"));
+            Assert.True(content.IsVisionRulesSection);
+            var visionPage = WpfTestHost.Find<MapControlVisionRulesView>(
+                contentPage,
+                "MapControlVisionRulesPage");
+            Assert.Equal(Visibility.Visible, visionPage.Visibility);
+
+            WpfTestHost.Click(WpfTestHost.Find<Button>(visionPage, "AddMapVisionRuleButton"));
+            content.VisionRules.Editor.SelectedPosition = PlayerPosition.Middle;
+            content.VisionRules.Editor.SelectedTransition = MapVisionTransition.Disappeared;
+            content.VisionRules.Editor.Message = "Вражеский мидер пропал из вида.";
+            content.VisionRules.Editor.WhyNow =
+                "Решение принимается так, будто соперник всё ещё на месте.";
+            content.VisionRules.Editor.NextGoal =
+                "Отойдите под обзор, пока он не найдётся.";
+            WpfTestHost.Pump();
+            SaveVisualSnapshotIfRequested(
+                context.Window,
+                "map-control-editor-vision-rule-editor.png");
+
+            WpfTestHost.Click(WpfTestHost.Find<Button>(visionPage, "SaveMapVisionRuleButton"));
+
+            Assert.Single(content.VisionRules.Rules);
+            Assert.Contains("1", content.VisionRulesTabLabel, StringComparison.Ordinal);
+            SaveVisualSnapshotIfRequested(
+                context.Window,
+                "map-control-editor-vision-rules.png");
+        });
+
+    [Fact]
+    public void ContentTabs_WrapInsteadOfBeingCutOffInANarrowWindow() =>
+        WpfTestHost.Run(() =>
+        {
+            using var context = new MainWindowTestContext();
+            var contentPage = OpenMapControlContent(context);
+            var tabsPanel = WpfTestHost.Find<Border>(contentPage, "MapContentTabsPanel");
+            var tabs = (WrapPanel)tabsPanel.Child;
+
+            // Четыре русские подписи со счётчиками не помещаются в узком окне.
+            // Ряд обязан перенестись на вторую строку, а не обрезать закладки:
+            // скрытая часть выглядит как поломка, а не как продолжение.
+            tabsPanel.Measure(new Size(360, double.PositiveInfinity));
+            tabsPanel.Arrange(new Rect(new Size(360, tabsPanel.DesiredSize.Height)));
+            WpfTestHost.Pump();
+
+            var buttons = tabs.Children.OfType<Button>().ToArray();
+            Assert.Equal(4, buttons.Length);
+            Assert.True(
+                tabs.ActualHeight > buttons[0].ActualHeight + 1,
+                "Ряд закладок обязан занимать больше одной строки в узком окне.");
+            Assert.All(
+                buttons,
+                button => Assert.True(
+                    button.ActualWidth > 0 && button.ActualHeight > 0,
+                    "Каждая закладка обязана остаться отрисованной."));
         });
 
     private static MapControlContentView OpenMapControlContent(MainWindowTestContext context)

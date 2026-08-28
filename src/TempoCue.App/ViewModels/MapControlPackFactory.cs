@@ -40,7 +40,8 @@ internal sealed class MapControlPackFactory
             },
             Rules = content.Rules.Select(static rule => rule.Rule).ToArray(),
             TimedReminders = content.TimedReminders.Snapshot,
-            PersistentTips = content.PersistentTips.Snapshot
+            PersistentTips = content.PersistentTips.Snapshot,
+            VisionRules = content.VisionRules.Snapshot
         };
     }
 

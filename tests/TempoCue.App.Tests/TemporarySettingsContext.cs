@@ -11,7 +11,12 @@ internal sealed class TemporarySettingsContext : IDisposable
         "TempoCue.Tests",
         Guid.NewGuid().ToString("N"));
 
-    public AppSettingsService Service => new(Path.Combine(_directory, "settings.json"));
+    public TemporarySettingsContext() => Directory.CreateDirectory(_directory);
+
+    /// <summary>Путь файла настроек: тесты повреждённых значений пишут его напрямую.</summary>
+    public string SettingsPath => Path.Combine(_directory, "settings.json");
+
+    public AppSettingsService Service => new(SettingsPath);
 
     public void Dispose()
     {

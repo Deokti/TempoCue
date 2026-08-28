@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using TempoCue.App.Localization;
 using TempoCue.App.Settings;
 using TempoCue.Overlay;
@@ -25,6 +25,11 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
     private OverlayUserSettings _savedOverlaySettings;
     private bool _overlaySetupWasOpened;
     private bool _isApplyingDraft;
+    private MinimapRecognizerChoice _minimapRecognizer;
+    private readonly MinimapRecognizerChoice _initialMinimapRecognizer;
+    private int _minimapRecognitionThreads;
+    private readonly int _initialMinimapRecognitionThreads;
+    private readonly IApplicationRestarter? _restarter;
     private bool _isDisposed;
 
     public SettingsViewModel(
@@ -32,13 +37,30 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
         AppSettingsService settings,
         Action showOverlayPreview,
         OverlaySettingsState? overlaySettings = null,
-        IOverlaySetupSession? overlaySetupSession = null)
+        IOverlaySetupSession? overlaySetupSession = null,
+        CaptureDiagnosticsViewModel? captureDiagnostics = null,
+        IApplicationRestarter? restarter = null)
     {
         _localization = localization;
         _settings = settings;
+        _restarter = restarter;
         _showOverlayPreview = showOverlayPreview ?? throw new ArgumentNullException(nameof(showOverlayPreview));
         _overlaySettings = overlaySettings ?? new OverlaySettingsState(settings.Load().Overlay);
         _overlaySetupSession = overlaySetupSession;
+        CaptureDiagnostics = captureDiagnostics;
+        var storedSettings = settings.Load();
+        MinimapRecognizerOptions = MinimapRecognizerOptionViewModel.Create(localization);
+        // Действующее значение, а не сохранённое: пока человек не выбирал,
+        // в списке должно стоять то, что приложение применяет на самом деле.
+        _initialMinimapRecognizer = storedSettings.EffectiveMinimapRecognizer;
+        _minimapRecognizer = _initialMinimapRecognizer;
+        MinimapRecognitionThreadOptions =
+            MinimapRecognitionThreadOptionViewModel.CreateForCurrentMachine(localization);
+        _initialMinimapRecognitionThreads = MinimapRecognitionThreadOptions
+            .Any(option => option.Threads == storedSettings.MinimapRecognitionThreads)
+            ? storedSettings.MinimapRecognitionThreads
+            : MinimapRecognitionThreadOptionViewModel.AutomaticThreads;
+        _minimapRecognitionThreads = _initialMinimapRecognitionThreads;
         _selectedLanguageCode = localization.CurrentLanguageCode;
         var overlay = _overlaySettings.Current;
         _isOverlayEnabled = overlay.IsEnabled;
@@ -64,6 +86,79 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
     ];
 
     public IReadOnlyList<int> OverlayWidths { get; } = [300, 340, 400];
+
+    public CaptureDiagnosticsViewModel? CaptureDiagnostics { get; }
+
+    /// <summary>
+    /// Каким распознавателем разбирать миникарту. Сохраняется сразу, применяется
+    /// при следующем запуске.
+    /// </summary>
+    public MinimapRecognizerChoice MinimapRecognizer
+    {
+        get => _minimapRecognizer;
+        set
+        {
+            if (!SetProperty(ref _minimapRecognizer, value))
+            {
+                return;
+            }
+
+            _settings.SaveMinimapRecognizer(value);
+            OnPropertyChanged(nameof(HasExperimentalRecognizerRestartNotice));
+            OnPropertyChanged(nameof(CanRestartToApply));
+        }
+    }
+
+    /// <summary>Варианты распознавателя.</summary>
+    public IReadOnlyList<MinimapRecognizerOptionViewModel> MinimapRecognizerOptions { get; }
+
+    /// <summary>Показывает напоминание о перезапуске только после фактической смены.</summary>
+    public bool HasExperimentalRecognizerRestartNotice =>
+        _minimapRecognizer != _initialMinimapRecognizer;
+
+    /// <summary>
+    /// Есть ли настройка, ждущая перезапуска, и есть ли кому его выполнить.
+    /// Без перезапускателя кнопка не показывается вовсе: обещать действие,
+    /// которое некому сделать, хуже, чем не обещать.
+    /// </summary>
+    public bool CanRestartToApply =>
+        _restarter is not null
+        && (HasExperimentalRecognizerRestartNotice || HasRecognitionThreadsRestartNotice);
+
+    /// <summary>
+    /// Перезапускает приложение, чтобы новая настройка вступила в силу. Сами
+    /// настройки уже сохранены — перезапуск ничего не теряет.
+    /// </summary>
+    public void RestartToApply() => _restarter?.Restart();
+
+    /// <summary>Варианты числа потоков, доступные на этой машине.</summary>
+    public IReadOnlyList<MinimapRecognitionThreadOptionViewModel> MinimapRecognitionThreadOptions
+    {
+        get;
+    }
+
+    /// <summary>
+    /// Сколько областей кадра сравнивается одновременно. Ноль — выбрать по машине.
+    /// На результат распознавания не влияет: меняется только время разбора кадра.
+    /// </summary>
+    public int MinimapRecognitionThreads
+    {
+        get => _minimapRecognitionThreads;
+        set
+        {
+            if (!SetProperty(ref _minimapRecognitionThreads, value))
+            {
+                return;
+            }
+
+            _settings.SaveMinimapRecognitionThreads(value);
+            OnPropertyChanged(nameof(HasRecognitionThreadsRestartNotice));
+            OnPropertyChanged(nameof(CanRestartToApply));
+        }
+    }
+
+    public bool HasRecognitionThreadsRestartNotice =>
+        _minimapRecognitionThreads != _initialMinimapRecognitionThreads;
 
     public bool IsOverlayEnabled
     {
@@ -254,7 +349,18 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
         }
 
         _isDisposed = true;
+        CaptureDiagnostics?.Dispose();
         _localization.PropertyChanged -= Localization_PropertyChanged;
+        foreach (var option in MinimapRecognitionThreadOptions)
+        {
+            option.Dispose();
+        }
+
+        foreach (var option in MinimapRecognizerOptions)
+        {
+            option.Dispose();
+        }
+
         if (_overlaySetupSession is not null)
         {
             _overlaySetupSession.Dismissed -= OverlaySetupSession_Dismissed;

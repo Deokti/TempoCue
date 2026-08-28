@@ -59,6 +59,14 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
+            <Style x:Key="MapVisionRulesTab" TargetType="Button" BasedOn="{StaticResource MapContentTab}">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsVisionRulesSection}" Value="True">
+                        <Setter Property="Foreground" Value="#F4F7FB" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
             <Style x:Key="MapPersistentTipsTab" TargetType="Button" BasedOn="{StaticResource MapContentTab}">
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding IsPersistentTipsSection}" Value="True">
@@ -131,13 +139,19 @@
                     BorderThickness="1"
                     CornerRadius="12"
                     Padding="4"
-                    Margin="0,0,0,16"
-                    HorizontalAlignment="Left">
-                <StackPanel Orientation="Horizontal">
+                    Margin="0,0,0,16">
+                <!-- Перенос строк, а не горизонтальная прокрутка: четыре русские
+                     подписи со счётчиками не помещаются в узком окне, а скрытый
+                     скролл выглядит как обрезанный ряд. -->
+                <WrapPanel Orientation="Horizontal">
                     <Button x:Name="MapObjectsTabButton"
                             Content="{Binding ObjectsTabLabel}"
                             Style="{StaticResource MapObjectsTab}"
                             Click="MapObjectsTabButton_Click" />
+                    <Button x:Name="MapVisionRulesTabButton"
+                            Content="{Binding VisionRulesTabLabel}"
+                            Style="{StaticResource MapVisionRulesTab}"
+                            Click="MapVisionRulesTabButton_Click" />
                     <Button x:Name="MapTimedRemindersTabButton"
                             Content="{Binding TimedRemindersTabLabel}"
                             Style="{StaticResource MapTimedRemindersTab}"
@@ -146,7 +160,7 @@
                             Content="{Binding PersistentTipsTabLabel}"
                             Style="{StaticResource MapPersistentTipsTab}"
                             Click="MapPersistentTipsTabButton_Click" />
-                </StackPanel>
+                </WrapPanel>
             </Border>
 
             <!-- Содержимое правил объектов скрывается целиком при переходе к подсказкам. -->
@@ -473,6 +487,19 @@
                 </StackPanel>
             </Border>
             </StackPanel>
+
+            <views:MapControlVisionRulesView x:Name="MapControlVisionRulesPage">
+                <views:MapControlVisionRulesView.Style>
+                    <Style TargetType="views:MapControlVisionRulesView">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsVisionRulesSection}" Value="True">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </views:MapControlVisionRulesView.Style>
+            </views:MapControlVisionRulesView>
 
             <views:MapControlTimedRemindersView x:Name="MapControlTimedRemindersPage">
                 <views:MapControlTimedRemindersView.Style>

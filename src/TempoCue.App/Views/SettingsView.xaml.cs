@@ -1,4 +1,4 @@
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using TempoCue.App.ViewModels;
 
 namespace TempoCue.App.Views;
@@ -27,6 +27,13 @@ public partial class SettingsView : UserControl
         }
     }
 
+    private void RestartToApplyButton_Click(object sender, System.Windows.RoutedEventArgs e)
+    {
+        if (DataContext is SettingsViewModel viewModel)
+        {
+            viewModel.RestartToApply();
+        }
+    }
     private void ResetOverlaySettingsButton_Click(object sender, System.Windows.RoutedEventArgs e)
     {
         if (DataContext is SettingsViewModel viewModel)
@@ -34,4 +41,5 @@ public partial class SettingsView : UserControl
             viewModel.ResetOverlaySettings();
         }
     }
+
 }

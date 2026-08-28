@@ -14,12 +14,16 @@ public sealed class LiveClientDataClient : IMatchSnapshotSource, IDisposable
     public static readonly Uri AllGameDataEndpoint =
         new("https://127.0.0.1:2999/liveclientdata/allgamedata");
 
+    public static readonly Uri ActivePlayerNameEndpoint =
+        new("https://127.0.0.1:2999/liveclientdata/activeplayername");
+
     private static readonly JsonSerializerOptions ReadOptions = new(JsonSerializerDefaults.Web);
 
     private readonly HttpClient _httpClient;
     private readonly bool _ownsHttpClient;
     private readonly Func<bool> _isGameProcessRunning;
     private readonly bool _checkGameProcessBeforeRequest;
+    private string? _cachedActivePlayerName;
 
     /// <summary>Создаёт клиент с настройками для локального HTTPS endpoint League.</summary>
     public LiveClientDataClient()
@@ -92,7 +96,10 @@ public sealed class LiveClientDataClient : IMatchSnapshotSource, IDisposable
             .ConfigureAwait(false)
             ?? throw new InvalidDataException("Riot API вернул пустой JSON активного матча.");
 
-        var match = LiveClientDataMapper.Map(data);
+        var activePlayerName = await ResolveActivePlayerNameAsync(
+            data,
+            cancellationToken).ConfigureAwait(false);
+        var match = LiveClientDataMapper.Map(data, activePlayerName);
         var events = LiveClientDataMapper.MapEvents(data);
 
         return new MatchSnapshot(match, events, DateTimeOffset.UtcNow);
@@ -113,6 +120,7 @@ public sealed class LiveClientDataClient : IMatchSnapshotSource, IDisposable
             // проверка не создаёт HTTPS-запросы с таймаутом во время простоя приложения.
             if (_checkGameProcessBeforeRequest && !_isGameProcessRunning())
             {
+                Volatile.Write(ref _cachedActivePlayerName, null);
                 return MatchSnapshotReadResult.NoActiveMatch();
             }
 
@@ -183,6 +191,46 @@ public sealed class LiveClientDataClient : IMatchSnapshotSource, IDisposable
         _isGameProcessRunning()
             ? MatchSnapshotReadResult.GameLoading()
             : MatchSnapshotReadResult.NoActiveMatch();
+
+    private async Task<string?> ResolveActivePlayerNameAsync(
+        LiveClientAllGameDataDto data,
+        CancellationToken cancellationToken)
+    {
+        if (LiveClientDataMapper.TryResolveActivePlayerId(data, null, out _))
+        {
+            return null;
+        }
+
+        var cachedName = Volatile.Read(ref _cachedActivePlayerName);
+        if (LiveClientDataMapper.TryResolveActivePlayerId(data, cachedName, out _))
+        {
+            return cachedName;
+        }
+
+        using var response = await _httpClient
+            .GetAsync(
+                ActivePlayerNameEndpoint,
+                HttpCompletionOption.ResponseHeadersRead,
+                cancellationToken)
+            .ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+
+        await using var contentStream = await response.Content
+            .ReadAsStreamAsync(cancellationToken)
+            .ConfigureAwait(false);
+        var activePlayerName = await JsonSerializer.DeserializeAsync<string>(
+            contentStream,
+            ReadOptions,
+            cancellationToken).ConfigureAwait(false);
+        if (string.IsNullOrWhiteSpace(activePlayerName))
+        {
+            throw new InvalidDataException(
+                "Riot API не вернул имя активного игрока.");
+        }
+
+        Volatile.Write(ref _cachedActivePlayerName, activePlayerName);
+        return activePlayerName;
+    }
 
     private static HttpClient CreateHttpClient()
     {

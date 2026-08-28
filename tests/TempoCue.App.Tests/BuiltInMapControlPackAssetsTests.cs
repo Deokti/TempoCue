@@ -1,5 +1,6 @@
-using System.IO;
+﻿using System.IO;
 using TempoCue.Coaching;
+using TempoCue.Core;
 
 namespace TempoCue.App.Tests;
 
@@ -22,16 +23,46 @@ public sealed class BuiltInMapControlPackAssetsTests
             })
             .ToArray();
 
-        Assert.Equal(8, packs.Length);
-        Assert.Equal(8, packs.Select(static pack => pack.Id).Distinct(
+        // Восемь наборов про нейтральные объекты и пять про наблюдение за
+        // соперниками (ADR 0016).
+        Assert.Equal(13, packs.Length);
+        Assert.Equal(13, packs.Select(static pack => pack.Id).Distinct(
             StringComparer.OrdinalIgnoreCase).Count());
         Assert.All(packs, static pack =>
         {
             Assert.Equal("TempoCue", pack.Author);
             Assert.Equal("ru_RU", pack.ContentLanguage);
             Assert.NotEmpty(pack.Rules.Concat<object>(pack.TimedReminders)
-                .Concat(pack.PersistentTips));
+                .Concat(pack.PersistentTips)
+                .Concat(pack.VisionRules));
         });
+
+        // Наблюдение поставляется на появление лесника и на пропажу каждой из
+        // четырёх остальных ролей. Остальные восемь наборов про объекты и правил
+        // наблюдения не содержат.
+        var visionPacks = packs.Where(static pack => pack.VisionRules.Count > 0).ToArray();
+        Assert.Equal(5, visionPacks.Length);
+        Assert.Single(visionPacks, static pack => pack.VisionRules.Any(
+            static rule => rule.Position is PlayerPosition.Jungle
+                && rule.Transition is MapVisionTransition.Appeared));
+        foreach (var position in new[]
+                 {
+                     PlayerPosition.Top,
+                     PlayerPosition.Middle,
+                     PlayerPosition.Bottom,
+                     PlayerPosition.Support
+                 })
+        {
+            Assert.Single(visionPacks, pack => pack.VisionRules.Any(
+                rule => rule.Position == position
+                    && rule.Transition is MapVisionTransition.Disappeared));
+        }
+
+        // Каждое правило наблюдения подставляет имя чемпиона: без метки совет
+        // говорил бы «кто-то пропал», а игроку нужно знать кто.
+        Assert.All(
+            visionPacks.SelectMany(static pack => pack.VisionRules),
+            static rule => Assert.Contains("{champion}", rule.Message, StringComparison.Ordinal));
         var dragons = Assert.Single(packs, static pack =>
             pack.Id.EndsWith("dragons.ru", StringComparison.Ordinal));
         var voidGrubs = Assert.Single(packs, static pack =>

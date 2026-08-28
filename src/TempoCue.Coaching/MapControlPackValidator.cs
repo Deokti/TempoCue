@@ -1,4 +1,4 @@
-namespace TempoCue.Coaching;
+﻿namespace TempoCue.Coaching;
 
 /// <summary>Проверяет переносимый набор контроля карты на границе системы.</summary>
 public static class MapControlPackValidator
@@ -52,11 +52,13 @@ public static class MapControlPackValidator
         ValidateApplicability(pack.Applicability);
 
         if (pack.Rules.Count == 0
+            && pack.VisionRules.Count == 0
             && pack.TimedReminders.Count == 0
             && pack.PersistentTips.Count == 0)
         {
             throw new InvalidDataException(
-                "Map Control Pack must contain at least one objective rule, timed reminder or persistent tip.");
+                "Map Control Pack must contain at least one objective rule, vision rule, "
+                + "timed reminder or persistent tip.");
         }
 
         if (!MapObjectiveTimingCatalog.TryGetForPatch(pack.Patch, out var timingSet)
@@ -70,6 +72,9 @@ public static class MapControlPackValidator
         CoachPackValidation.EnsureUniqueIds(
             pack.Rules.Select(static rule => rule.Id),
             "map reminder rule");
+        CoachPackValidation.EnsureUniqueIds(
+            pack.VisionRules.Select(static rule => rule.Id),
+            "map vision rule");
         CoachPackValidation.EnsureUniqueIds(
             pack.TimedReminders.Select(static reminder => reminder.Id),
             "map timed reminder");
@@ -88,6 +93,11 @@ public static class MapControlPackValidator
             }
 
             MapObjectiveReminderRuleValidator.Validate(rule, timing);
+        }
+
+        foreach (var rule in pack.VisionRules)
+        {
+            MapVisionRuleValidator.Validate(rule);
         }
 
         foreach (var tip in pack.PersistentTips)

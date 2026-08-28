@@ -1,0 +1,43 @@
+﻿{
+  "schemaVersion": 1,
+  "packType": "mapControl",
+  "id": "tempocue.map-control.enemy-adc.ru",
+  "name": "Вражеский стрелок: пропал из вида",
+  "patch": "16.16",
+  "description": "Уведомление в тот момент, когда вражеский стрелок пропал из поля зрения. Он редко уходит с линии, поэтому его пропажа заметнее прочих.",
+  "author": "TempoCue",
+  "contentLanguage": "ru_RU",
+  "verifiedOn": "2026-08-27",
+  "source": {
+    "kind": "personalExperience",
+    "title": "Наблюдение за миникартой средствами TempoCue",
+    "url": "",
+    "author": "TempoCue",
+    "permission": "notRequired"
+  },
+  "applicability": {
+    "roles": [
+      "top",
+      "jungle",
+      "mid",
+      "adc",
+      "support"
+    ],
+    "teamSide": "any"
+  },
+  "rules": [],
+  "visionRules": [
+    {
+      "id": "enemy-adc-disappeared",
+      "position": "bottom",
+      "transition": "disappeared",
+      "priority": "caution",
+      "message": "{champion} больше не виден на миникарте. Проверьте реку и подходы к дракону.",
+      "whyNow": "Стрелок уходит с линии редко, и обычно ради объекта или размена.",
+      "nextGoal": "Оцените, не пора ли отойти или забрать что-то на своей стороне.",
+      "isEnabled": true
+    }
+  ],
+  "timedReminders": [],
+  "persistentTips": []
+}

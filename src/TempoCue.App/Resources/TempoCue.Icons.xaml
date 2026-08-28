@@ -42,6 +42,51 @@
         <Setter Property="Stroke" Value="{StaticResource State.Caution}"/>
     </Style>
 
+    <!--
+        Мастер-знак приложения. Собран из трёх частей, а не одной Path, потому
+        что у него два цвета и залитый узел: шкала уходит в служебный тон, а
+        акцент остаётся только на отметке — знак означает то же, что и продукт.
+
+        Узел залит намеренно. Контурное кольцо оставляет внутри слишком мало
+        места, и отверстие затягивается сглаживанием в мутное пятно.
+
+        Обводка 2.84, а не 1.5 как у остальных значков набора: те стоят в рядах
+        и списках, где важна ровность строя, а этот — мастер-знак рядом с жирным
+        заголовком, и на общей толщине он выглядел бледной царапиной.
+
+        Число подобрано под размер отрисовки: 2.84 на сетке 20 при 22 пикселях
+        дают те же 3.1 пикселя линии, что и 2.4 при 26. Уменьшать знак, не
+        поднимая обводку, нельзя — вместе с масштабом худеют и линии.
+    -->
+    <DrawingImage x:Key="Brand.Mark">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Прозрачный квадрат держит границы сетки 20x20: без него
+                     каждая часть масштабировалась бы по своим габаритам. -->
+                <GeometryDrawing Brush="Transparent"
+                                 Geometry="M 0,0 L 20,0 L 20,20 L 0,20 Z" />
+                <GeometryDrawing Geometry="M 3,6 L 17,6">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#91A4BD"
+                             Thickness="2.84"
+                             StartLineCap="Round"
+                             EndLineCap="Round" />
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Geometry="M 10,6 L 10,16">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#4FAAE8"
+                             Thickness="2.84"
+                             StartLineCap="Round"
+                             EndLineCap="Round" />
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#4FAAE8"
+                                 Geometry="M 13.43,6 A 3.43,3.43 0 1 1 6.57,6 A 3.43,3.43 0 1 1 13.43,6 Z" />
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
     <StreamGeometry x:Key="Icon.NavHome">M 4.5,3 L 7.5,3 A 1.5,1.5 0 0 1 9,4.5 L 9,7.5 A 1.5,1.5 0 0 1 7.5,9 L 4.5,9 A 1.5,1.5 0 0 1 3,7.5 L 3,4.5 A 1.5,1.5 0 0 1 4.5,3 Z M 12.5,3 L 15.5,3 A 1.5,1.5 0 0 1 17,4.5 L 17,7.5 A 1.5,1.5 0 0 1 15.5,9 L 12.5,9 A 1.5,1.5 0 0 1 11,7.5 L 11,4.5 A 1.5,1.5 0 0 1 12.5,3 Z M 4.5,11 L 7.5,11 A 1.5,1.5 0 0 1 9,12.5 L 9,15.5 A 1.5,1.5 0 0 1 7.5,17 L 4.5,17 A 1.5,1.5 0 0 1 3,15.5 L 3,12.5 A 1.5,1.5 0 0 1 4.5,11 Z M 12.5,11 L 15.5,11 A 1.5,1.5 0 0 1 17,12.5 L 17,15.5 A 1.5,1.5 0 0 1 15.5,17 L 12.5,17 A 1.5,1.5 0 0 1 11,15.5 L 11,12.5 A 1.5,1.5 0 0 1 12.5,11 Z</StreamGeometry>
     <StreamGeometry x:Key="Icon.NavMatch">M 3,10 A 7,7 0 1 1 17,10 A 7,7 0 1 1 3,10 Z M 7.8,10 A 2.2,2.2 0 1 1 12.2,10 A 2.2,2.2 0 1 1 7.8,10 Z</StreamGeometry>
     <StreamGeometry x:Key="Icon.NavCoaching">M 3,10 A 7,7 0 1 1 17,10 A 7,7 0 1 1 3,10 Z M 10,3 L 10,17 M 3,10 L 17,10</StreamGeometry>
@@ -58,7 +103,9 @@
     <StreamGeometry x:Key="Icon.StateRefresh">M 16.4,10 A 6.4,6.4 0 1 1 10,3.6 L 13.4,3.6 M 13.4,3.6 L 13.4,6.4</StreamGeometry>
     <StreamGeometry x:Key="Icon.MarkFact">M 6,4 L 14,4 A 2,2 0 0 1 16,6 L 16,14 A 2,2 0 0 1 14,16 L 6,16 A 2,2 0 0 1 4,14 L 4,6 A 2,2 0 0 1 6,4 Z</StreamGeometry>
     <StreamGeometry x:Key="Icon.MarkAssumption">M 4,10 A 6,6 0 1 1 16,10 A 6,6 0 1 1 4,10 Z</StreamGeometry>
-    <StreamGeometry x:Key="Icon.MarkCoach">M 10,3.6 L 16.4,10 L 10,16.4 L 3.6,10 Z</StreamGeometry>
+    <!-- Знак T-Cue: шкала времени и отметка на ней. Контурная версия — для
+         крупных декоративных мест; в заголовке окна стоит двухтоновая Brand.Mark. -->
+    <StreamGeometry x:Key="Icon.MarkCoach">M 3,6 L 17,6 M 10,6 L 10,16 M 12,6 A 2,2 0 1 1 8,6 A 2,2 0 1 1 12,6 Z</StreamGeometry>
     <StreamGeometry x:Key="Icon.MarkExperiment">M 7,3.5 L 13,3.5 M 8.2,3.5 L 8.2,9 L 5.4,15 L 14.6,15 L 11.8,9 L 11.8,3.5 M 6.6,12 L 13.4,12</StreamGeometry>
     <StreamGeometry x:Key="Icon.ActPlus">M 10,4 L 10,16 M 4,10 L 16,10</StreamGeometry>
     <StreamGeometry x:Key="Icon.ActImport">M 10,3.6 L 10,12.4 M 6.6,9 L 10,12.4 L 13.4,9 M 4,16.4 L 16,16.4</StreamGeometry>

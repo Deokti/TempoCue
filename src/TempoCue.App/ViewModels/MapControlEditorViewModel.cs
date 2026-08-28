@@ -11,7 +11,8 @@ public sealed class MapControlEditorViewModel : EditorWizardViewModel
     public MapControlEditorViewModel(
         LocalizationService localization,
         IGamePatchCatalog gamePatchCatalog,
-        SaveMapControlPackUseCase saveMapControlPack)
+        SaveMapControlPackUseCase saveMapControlPack,
+        Action<TempoCue.Overlay.OverlayNotification>? showOverlayPreview = null)
         : base(localization, totalSteps: 5)
     {
         MainInformation = new MapControlMainInformationViewModel(
@@ -20,7 +21,7 @@ public sealed class MapControlEditorViewModel : EditorWizardViewModel
             localization);
         Scope = new MapControlScopeViewModel(localization);
         Content = new MapControlContentViewModel(localization);
-        Verification = new MapControlVerificationViewModel(localization);
+        Verification = new MapControlVerificationViewModel(localization, showOverlayPreview);
         Save = new MapControlSaveViewModel(localization, saveMapControlPack);
         MainInformation.PropertyChanged += MainInformation_PropertyChanged;
         Scope.PropertyChanged += Scope_PropertyChanged;

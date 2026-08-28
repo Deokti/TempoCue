@@ -13,6 +13,10 @@
 #define AppName "TempoCue"
 #define AppExeName "TempoCue.App.exe"
 
+#ifndef SourceDir
+  #error Параметр SourceDir обязателен. Запускайте сборку через scripts/build-release.ps1.
+#endif
+
 [Setup]
 AppId={{60F1BEEC-86C5-4C5D-AF3F-BF2C11AB6BEB}
 AppName={#AppName}
@@ -31,6 +35,9 @@ WizardStyle=modern
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 UninstallDisplayIcon={app}\{#AppExeName}
+; Значок самого файла установки. Без него Windows показывает стандартную
+; иконку Inno Setup — первое, что видит человек, оказывается чужим.
+SetupIconFile={#SourceDir}\src\TempoCue.App\Assets\Brand\AppIcon.ico
 CloseApplications=yes
 RestartApplications=no
 UsePreviousAppDir=yes
