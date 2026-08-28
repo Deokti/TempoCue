@@ -331,24 +331,46 @@
                                                FontWeight="SemiBold"
                                                TextWrapping="Wrap"
                                                Margin="0,9,0,0" />
-                                    <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Content.Card.WhyNow}"
-                                               Foreground="#7F93AF"
-                                               FontSize="{StaticResource Typography.FontSize.Caption}"
-                                               Margin="0,9,0,0" />
-                                    <TextBlock Text="{Binding WhyNow}"
-                                               Foreground="#C8D5E5"
-                                               FontSize="{StaticResource Typography.FontSize.Body}"
-                                               TextWrapping="Wrap"
-                                               Margin="0,3,0,0" />
-                                    <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Content.Card.Preparation}"
-                                               Foreground="#7F93AF"
-                                               FontSize="{StaticResource Typography.FontSize.Caption}"
-                                               Margin="0,9,0,0" />
-                                    <TextBlock Text="{Binding NextGoal}"
-                                               Foreground="#C8D5E5"
-                                               FontSize="{StaticResource Typography.FontSize.Body}"
-                                               TextWrapping="Wrap"
-                                               Margin="0,3,0,0" />
+                                    <StackPanel Margin="0,9,0,0">
+                                        <StackPanel.Style>
+                                            <Style TargetType="StackPanel">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding HasWhyNow}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </StackPanel.Style>
+                                        <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Content.Card.WhyNow}"
+                                                   Foreground="#7F93AF"
+                                                   FontSize="{StaticResource Typography.FontSize.Caption}" />
+                                        <TextBlock Text="{Binding WhyNow}"
+                                                   Foreground="#C8D5E5"
+                                                   FontSize="{StaticResource Typography.FontSize.Body}"
+                                                   TextWrapping="Wrap"
+                                                   Margin="0,3,0,0" />
+                                    </StackPanel>
+                                    <StackPanel Margin="0,9,0,0">
+                                        <StackPanel.Style>
+                                            <Style TargetType="StackPanel">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding HasNextGoal}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </StackPanel.Style>
+                                        <TextBlock Text="{localization:Loc Coaching.MapControlEditor.Content.Vision.NextGoal.Card}"
+                                                   Foreground="#7F93AF"
+                                                   FontSize="{StaticResource Typography.FontSize.Caption}" />
+                                        <TextBlock Text="{Binding NextGoal}"
+                                                   Foreground="#C8D5E5"
+                                                   FontSize="{StaticResource Typography.FontSize.Body}"
+                                                   TextWrapping="Wrap"
+                                                   Margin="0,3,0,0" />
+                                    </StackPanel>
                                     <Grid Margin="0,12,0,0">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />

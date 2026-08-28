@@ -29,12 +29,22 @@ internal static class MapVisionNotificationFactory
         return new OverlayNotification(
             $"map-awareness:{rule.Id}:{idSuffix ?? championName}",
             localization.Get("Overlay.MapAwareness.Status"),
-            championName,
+            // Главной фразой стоит само событие: «Треш пропал из вида». Одного
+            // имени чемпиона мало — игрок видит, о ком речь, но не видит, что
+            // случилось, а текст правила пишет автор и назвать событие не обязан.
+            localization.Format(
+                ToEventKey(rule.Transition),
+                championName),
             rule.Message,
             localization.Get("Overlay.MapAwareness.Dismiss"),
             ToTone(rule.Priority),
             badge: localization.Get(ToPositionKey(rule.Position)));
     }
+
+    private static string ToEventKey(MapVisionTransition transition) =>
+        transition == MapVisionTransition.Appeared
+            ? "Overlay.MapAwareness.Event.Appeared"
+            : "Overlay.MapAwareness.Event.Disappeared";
 
     private static OverlayNotificationTone ToTone(MapObjectiveReminderPriority priority) =>
         priority switch

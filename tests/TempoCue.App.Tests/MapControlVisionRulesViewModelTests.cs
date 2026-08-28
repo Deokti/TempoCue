@@ -24,22 +24,24 @@ public sealed class MapControlVisionRulesViewModelTests
     }
 
     [Fact]
-    public void Editor_RequiresAllThreeTexts()
+    public void Editor_RequiresOnlyTheAdviceItself()
     {
         var rules = CreateRules();
         rules.BeginAdd();
-        rules.Editor.Message = "Вражеский мидер пропал из вида.";
-        rules.Editor.WhyNow = "Решение принимается так, будто он на месте.";
 
-        // «Следующая цель» обязательна, в отличие от напоминаний по времени:
-        // проверка набора требует её у каждого правила наблюдения.
         Assert.False(rules.Editor.CanSave);
-        Assert.False(rules.SaveEditor());
 
-        rules.Editor.NextGoal = "Отойдите под обзор, пока он не найдётся.";
+        rules.Editor.Message = "Вражеский мидер пропал из вида.";
 
+        // «Почему сейчас» и «следующая цель» необязательны: в оверлей они не
+        // попадают вовсе, и требовать их значило бы заставлять автора писать
+        // текст, которого игрок в бою не увидит.
         Assert.True(rules.Editor.CanSave);
         Assert.True(rules.SaveEditor());
+
+        var saved = Assert.Single(rules.Snapshot);
+        Assert.Equal(string.Empty, saved.WhyNow);
+        Assert.Equal(string.Empty, saved.NextGoal);
     }
 
     [Fact]
@@ -147,7 +149,6 @@ public sealed class MapControlVisionRulesViewModelTests
         rules.Editor.SelectedTransition = transition;
         rules.Editor.Message = "Соперник изменил видимость на карте.";
         rules.Editor.WhyNow = "Это самая скоропортящаяся информация в игре.";
-        rules.Editor.NextGoal = "Решите, что делать с этим окном.";
         Assert.True(rules.SaveEditor());
     }
 }

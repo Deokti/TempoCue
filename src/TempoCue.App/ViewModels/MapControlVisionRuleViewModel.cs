@@ -44,6 +44,10 @@ public sealed class MapControlVisionRuleViewModel : ObservableObject
 
     public string NextGoal => _rule.NextGoal;
 
+    public bool HasWhyNow => !string.IsNullOrWhiteSpace(WhyNow);
+
+    public bool HasNextGoal => !string.IsNullOrWhiteSpace(NextGoal);
+
     public bool IsEnabled => _rule.IsEnabled;
 
     internal MapVisionRule Rule => _rule;

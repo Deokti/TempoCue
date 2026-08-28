@@ -34,12 +34,11 @@ public static class MapVisionRuleValidator
                 $"Vision rule '{rule.Id}' references an unsupported priority.");
         }
 
-        // Текст обязателен: правило без сообщения показало бы игроку пустое
-        // уведомление, а «почему сейчас» и «что дальше» — то, ради чего наборы
-        // и заведены вместо простых галочек.
+        // Обязателен только совет: без него игрок увидел бы пустое уведомление.
+        // «Почему сейчас» и «что дальше» необязательны — в оверлей они не
+        // попадают вовсе и живут в карточке набора, а требовать текст, которого
+        // игрок в бою не увидит, значит заставлять автора писать в стол.
         RequireText(rule.Message, rule.Id, "message");
-        RequireText(rule.WhyNow, rule.Id, "whyNow");
-        RequireText(rule.NextGoal, rule.Id, "nextGoal");
     }
 
     private static void RequireText(string value, string ruleId, string field)

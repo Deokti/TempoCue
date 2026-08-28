@@ -350,8 +350,6 @@ public sealed class MapControlEditorViewModelTests
         editor.Content.VisionRules.Editor.SelectedPosition = PlayerPosition.Top;
         editor.Content.VisionRules.Editor.SelectedTransition = MapVisionTransition.Appeared;
         editor.Content.VisionRules.Editor.Message = "Второе правило той же пары.";
-        editor.Content.VisionRules.Editor.WhyNow = "Оно никогда не покажется.";
-        editor.Content.VisionRules.Editor.NextGoal = "Проверка обязана это назвать.";
         Assert.True(editor.Content.VisionRules.SaveEditor());
         Assert.True(editor.MoveNext());
 
@@ -376,7 +374,6 @@ public sealed class MapControlEditorViewModelTests
         editor.SelectedTransition = transition;
         editor.Message = "Соперник изменил видимость на карте.";
         editor.WhyNow = "Это самая скоропортящаяся информация в игре.";
-        editor.NextGoal = "Решите, что делать с этим окном.";
         Assert.True(content.VisionRules.SaveEditor());
     }
 

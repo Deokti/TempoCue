@@ -17,13 +17,13 @@ public sealed class ActiveMatchMapAwarenessCoordinatorTests
         ParticipantVisibilityTransitionKind.Appeared,
         "map-awareness:jungle-appeared:enemy-jungle",
         OverlayNotificationTone.Danger,
-        "Amumu")]
+        "Amumu появился на карте")]
     [InlineData(
         "enemy-mid",
         ParticipantVisibilityTransitionKind.Disappeared,
         "map-awareness:mid-disappeared:enemy-mid",
         OverlayNotificationTone.Caution,
-        "Anivia")]
+        "Anivia пропал из вида")]
     public void TransitionAvailable_ShowsNotificationFromTheMatchedRule(
         string participantId,
         ParticipantVisibilityTransitionKind kind,
@@ -59,6 +59,8 @@ public sealed class ActiveMatchMapAwarenessCoordinatorTests
         var notification = Assert.Single(presenter.Notifications);
         Assert.Equal(expectedKey, notification.Key);
         Assert.Equal(expectedTone, notification.Tone);
+        // Главная фраза называет событие, а не только чемпиона: одного имени
+        // мало, чтобы понять, что случилось.
         Assert.Equal(expectedPhrase, notification.Phrase);
         Assert.Equal(OverlayNotificationPurpose.Operational, notification.Purpose);
         Assert.Equal(OverlayInteractionMode.Game, presenter.InteractionMode);

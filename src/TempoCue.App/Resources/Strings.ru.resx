@@ -892,6 +892,9 @@
   <data name="Overlay.Matchup.PersistentTip.Status" xml:space="preserve"><value>Подсказка по матчапу</value></data>
   <data name="Overlay.MapControl.Status" xml:space="preserve"><value>Контроль карты</value></data>
   <data name="Overlay.MapAwareness.Status" xml:space="preserve"><value>Контроль карты</value></data>
+  <data name="Overlay.MapAwareness.Event.Appeared" xml:space="preserve"><value>{0} появился на карте</value></data>
+  <data name="Overlay.MapAwareness.Event.Disappeared" xml:space="preserve"><value>{0} пропал из вида</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.NextGoal.Card" xml:space="preserve"><value>Что сделать дальше</value></data>
   <data name="Overlay.MapAwareness.Dismiss" xml:space="preserve"><value>Скрыть предупреждение</value></data>
   <data name="Overlay.MapControl.PersistentTip.Status" xml:space="preserve"><value>Подсказка по карте</value></data>
   <data name="Overlay.MapControl.Dismiss" xml:space="preserve"><value>Скрыть напоминание</value></data>
