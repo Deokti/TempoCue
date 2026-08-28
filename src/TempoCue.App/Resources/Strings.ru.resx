@@ -904,6 +904,16 @@
   <data name="Coaching.MapControlEditor.Content.Tab.Objects" xml:space="preserve"><value>Объекты · {0}</value></data>
   <data name="Coaching.MapControlEditor.Content.Tab.Timed" xml:space="preserve"><value>Напоминания по времени · {0}</value></data>
   <data name="Coaching.MapControlEditor.Content.Tab.Persistent" xml:space="preserve"><value>Постоянные подсказки · {0}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Tab.Vision" xml:space="preserve"><value>Наблюдение {0}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Position.Top" xml:space="preserve"><value>Топ</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Position.Jungle" xml:space="preserve"><value>Лес</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Position.Middle" xml:space="preserve"><value>Мид</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Position.Bottom" xml:space="preserve"><value>Стрелок</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Position.Support" xml:space="preserve"><value>Поддержка</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Transition.Appeared" xml:space="preserve"><value>появился на карте</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Transition.Disappeared" xml:space="preserve"><value>пропал из вида</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Editor.Progress" xml:space="preserve"><value>Правило {0} из {1}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Preview" xml:space="preserve"><value>Сработает, когда наблюдение зафиксирует: {0} — {1}</value></data>
   <data name="Coaching.MapControlEditor.Content.CatalogTitle" xml:space="preserve"><value>TempoCue знает расписание объектов</value></data>
   <data name="Coaching.MapControlEditor.Content.CatalogUnavailable" xml:space="preserve"><value>Выберите поддерживаемый игровой патч на первом шаге.</value></data>
   <data name="Coaching.MapControlEditor.Content.CatalogCurrentPatch" xml:space="preserve"><value>Тайминги проверены для патча {0}. Вы выбираете только момент и текст напоминания.</value></data>

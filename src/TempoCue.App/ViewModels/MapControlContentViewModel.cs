@@ -16,9 +16,11 @@ public sealed class MapControlContentViewModel : ObservableObject
     {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         ObjectiveRules = new MapControlObjectiveRulesViewModel(localization);
+        VisionRules = new MapControlVisionRulesViewModel(localization);
         TimedReminders = new MapControlTimedRemindersViewModel(localization);
         PersistentTips = new MapControlPersistentTipsViewModel(localization);
         ObjectiveRules.PropertyChanged += ObjectiveRules_PropertyChanged;
+        VisionRules.PropertyChanged += VisionRules_PropertyChanged;
         TimedReminders.PropertyChanged += TimedReminders_PropertyChanged;
         PersistentTips.PropertyChanged += PersistentTips_PropertyChanged;
     }
@@ -29,12 +31,7 @@ public sealed class MapControlContentViewModel : ObservableObject
 
     public MapControlPersistentTipsViewModel PersistentTips { get; }
 
-    /// <summary>
-    /// Правила наблюдения набора. Редактор их пока не показывает и не меняет,
-    /// но обязан пронести через себя нетронутыми: без этого правка копии набора
-    /// про лесника молча стирала бы единственное, ради чего набор существует.
-    /// </summary>
-    public IReadOnlyList<MapVisionRule> VisionRules { get; private set; } = [];
+    public MapControlVisionRulesViewModel VisionRules { get; }
 
     // Совместимые свойства сохраняют существующие binding и сценарии редактора.
     public ReadOnlyObservableCollection<MapControlObjectiveRuleViewModel> Rules =>
@@ -57,6 +54,7 @@ public sealed class MapControlContentViewModel : ObservableObject
             if (SetProperty(ref _section, value))
             {
                 OnPropertyChanged(nameof(IsObjectsSection));
+                OnPropertyChanged(nameof(IsVisionRulesSection));
                 OnPropertyChanged(nameof(IsTimedRemindersSection));
                 OnPropertyChanged(nameof(IsPersistentTipsSection));
             }
@@ -64,6 +62,8 @@ public sealed class MapControlContentViewModel : ObservableObject
     }
 
     public bool IsObjectsSection => Section == MapControlContentSection.Objects;
+
+    public bool IsVisionRulesSection => Section == MapControlContentSection.VisionRules;
 
     public bool IsTimedRemindersSection => Section == MapControlContentSection.TimedReminders;
 
@@ -84,12 +84,17 @@ public sealed class MapControlContentViewModel : ObservableObject
     public bool IsComplete =>
         HasContent
         && ObjectiveRules.IsComplete
+        && VisionRules.IsComplete
         && TimedReminders.IsComplete
         && PersistentTips.IsComplete;
 
     public string ObjectsTabLabel => _localization.Format(
         "Coaching.MapControlEditor.Content.Tab.Objects",
         RuleCount);
+
+    public string VisionRulesTabLabel => _localization.Format(
+        "Coaching.MapControlEditor.Content.Tab.Vision",
+        VisionRules.Count);
 
     public string TimedRemindersTabLabel => _localization.Format(
         "Coaching.MapControlEditor.Content.Tab.Timed",
@@ -137,6 +142,12 @@ public sealed class MapControlContentViewModel : ObservableObject
         Section = MapControlContentSection.Objects;
     }
 
+    public void ShowVisionRules()
+    {
+        CloseObjectivePicker();
+        Section = MapControlContentSection.VisionRules;
+    }
+
     public void ShowPersistentTips()
     {
         CloseObjectivePicker();
@@ -153,9 +164,9 @@ public sealed class MapControlContentViewModel : ObservableObject
     {
         ObjectiveRules.BeginNew();
         Section = MapControlContentSection.Objects;
+        VisionRules.BeginNew();
         TimedReminders.BeginNew();
         PersistentTips.BeginNew();
-        VisionRules = [];
         NotifyObjectiveRuleBindings();
     }
 
@@ -163,9 +174,9 @@ public sealed class MapControlContentViewModel : ObservableObject
     {
         ArgumentNullException.ThrowIfNull(pack);
         ObjectiveRules.Load(pack.Rules);
+        VisionRules.Load(pack.VisionRules);
         TimedReminders.Load(pack.TimedReminders);
         PersistentTips.Load(pack.PersistentTips);
-        VisionRules = pack.VisionRules;
         Section = MapControlContentSection.Objects;
         NotifyObjectiveRuleBindings();
         OnPropertyChanged(nameof(HasContent));
@@ -175,9 +186,11 @@ public sealed class MapControlContentViewModel : ObservableObject
     public void UpdateLanguage()
     {
         ObjectiveRules.UpdateLanguage();
+        VisionRules.UpdateLanguage();
         TimedReminders.UpdateLanguage();
         PersistentTips.UpdateLanguage();
         OnPropertyChanged(nameof(ObjectsTabLabel));
+        OnPropertyChanged(nameof(VisionRulesTabLabel));
         OnPropertyChanged(nameof(TimedRemindersTabLabel));
         OnPropertyChanged(nameof(PersistentTipsTabLabel));
         NotifyObjectiveRuleBindings();
@@ -221,6 +234,21 @@ public sealed class MapControlContentViewModel : ObservableObject
         }
 
         if (e.PropertyName == nameof(MapControlPersistentTipsViewModel.IsComplete))
+        {
+            OnPropertyChanged(nameof(IsComplete));
+        }
+    }
+
+    private void VisionRules_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MapControlVisionRulesViewModel.Count))
+        {
+            OnPropertyChanged(nameof(VisionRulesTabLabel));
+            OnPropertyChanged(nameof(HasContent));
+            OnPropertyChanged(nameof(IsComplete));
+        }
+
+        if (e.PropertyName == nameof(MapControlVisionRulesViewModel.IsComplete))
         {
             OnPropertyChanged(nameof(IsComplete));
         }

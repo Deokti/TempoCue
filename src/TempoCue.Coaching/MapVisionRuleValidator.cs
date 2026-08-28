@@ -1,7 +1,7 @@
 ﻿namespace TempoCue.Coaching;
 
 /// <summary>Проверяет правило уведомления по наблюдению на миникарте.</summary>
-internal static class MapVisionRuleValidator
+public static class MapVisionRuleValidator
 {
     public static void Validate(MapVisionRule rule)
     {

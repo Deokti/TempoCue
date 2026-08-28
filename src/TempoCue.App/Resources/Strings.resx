@@ -894,6 +894,16 @@
   <data name="Coaching.MapControlEditor.Content.Tab.Objects" xml:space="preserve"><value>Objectives · {0}</value></data>
   <data name="Coaching.MapControlEditor.Content.Tab.Timed" xml:space="preserve"><value>Timed reminders · {0}</value></data>
   <data name="Coaching.MapControlEditor.Content.Tab.Persistent" xml:space="preserve"><value>Persistent tips · {0}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Tab.Vision" xml:space="preserve"><value>Observation {0}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Position.Top" xml:space="preserve"><value>Top</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Position.Jungle" xml:space="preserve"><value>Jungle</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Position.Middle" xml:space="preserve"><value>Mid</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Position.Bottom" xml:space="preserve"><value>ADC</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Position.Support" xml:space="preserve"><value>Support</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Transition.Appeared" xml:space="preserve"><value>appeared on the map</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Transition.Disappeared" xml:space="preserve"><value>went out of sight</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Editor.Progress" xml:space="preserve"><value>Rule {0} of {1}</value></data>
+  <data name="Coaching.MapControlEditor.Content.Vision.Preview" xml:space="preserve"><value>Fires when observation records: {0} — {1}</value></data>
   <data name="Coaching.MapControlEditor.Content.CatalogTitle" xml:space="preserve"><value>TempoCue knows the objective schedule</value></data>
   <data name="Coaching.MapControlEditor.Content.CatalogUnavailable" xml:space="preserve"><value>Select a supported game patch on step one.</value></data>
   <data name="Coaching.MapControlEditor.Content.CatalogCurrentPatch" xml:space="preserve"><value>Timings are verified for patch {0}. You only choose when and what TempoCue should remind you about.</value></data>

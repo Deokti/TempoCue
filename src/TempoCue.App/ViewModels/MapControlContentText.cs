@@ -16,6 +16,36 @@ internal static class MapControlContentText
             _ => throw new ArgumentOutOfRangeException(nameof(objective), objective, null)
         });
 
+    public static string VisionPositionName(
+        PlayerPosition position,
+        LocalizationService localization) =>
+        localization.Get(position switch
+        {
+            PlayerPosition.Top => "Coaching.MapControlEditor.Content.Vision.Position.Top",
+            PlayerPosition.Jungle => "Coaching.MapControlEditor.Content.Vision.Position.Jungle",
+            PlayerPosition.Middle => "Coaching.MapControlEditor.Content.Vision.Position.Middle",
+            PlayerPosition.Bottom => "Coaching.MapControlEditor.Content.Vision.Position.Bottom",
+            PlayerPosition.Support => "Coaching.MapControlEditor.Content.Vision.Position.Support",
+            _ => throw new ArgumentOutOfRangeException(nameof(position), position, null)
+        });
+
+    public static string VisionTransitionName(
+        MapVisionTransition transition,
+        LocalizationService localization) =>
+        localization.Get(transition switch
+        {
+            MapVisionTransition.Appeared => "Coaching.MapControlEditor.Content.Vision.Transition.Appeared",
+            MapVisionTransition.Disappeared => "Coaching.MapControlEditor.Content.Vision.Transition.Disappeared",
+            _ => throw new ArgumentOutOfRangeException(nameof(transition), transition, null)
+        });
+
+    /// <summary>Подпись пары условия: «Мид · пропал из вида».</summary>
+    public static string VisionPair(
+        PlayerPosition position,
+        MapVisionTransition transition,
+        LocalizationService localization) =>
+        $"{VisionPositionName(position, localization)} · {VisionTransitionName(transition, localization)}";
+
     public static string PriorityName(
         MapObjectiveReminderPriority priority,
         LocalizationService localization) =>
