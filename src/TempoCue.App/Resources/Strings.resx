@@ -869,7 +869,7 @@
   <data name="Settings.Recognition.Threads.RestartNotice" xml:space="preserve"><value>The choice applies after TempoCue restarts.</value></data>
   <data name="Settings.Overlay.Preview.Button" xml:space="preserve"><value>Show next notification</value></data>
   <data name="Settings.Overlay.Preview.Warning.Label" xml:space="preserve"><value>Caution</value></data>
-  <data name="Settings.Overlay.Preview.Warning.Title" xml:space="preserve"><value>An opponent has left their lane</value></data>
+  <data name="Settings.Overlay.Preview.Warning.Title" xml:space="preserve"><value>An opponent is out of sight</value></data>
   <data name="Settings.Overlay.Preview.Warning.Message" xml:space="preserve"><value>First notification · top slot</value></data>
   <data name="Settings.Overlay.Preview.Information.Label" xml:space="preserve"><value>Event</value></data>
   <data name="Settings.Overlay.Preview.Information.Title" xml:space="preserve"><value>Dragon spawns in 30 seconds</value></data>
@@ -966,9 +966,9 @@
   <data name="Coaching.MapControlEditor.Content.Timed.Message" xml:space="preserve"><value>Main advice (the player sees it first)</value></data>
   <data name="Coaching.MapControlEditor.Content.Timed.WhyNow" xml:space="preserve"><value>Why now (short explanation)</value></data>
   <data name="Coaching.MapControlEditor.Content.Timed.NextGoal" xml:space="preserve"><value>What to prepare for the objective (optional)</value></data>
-  <data name="Coaching.MapControlEditor.Content.Timed.Future.Title" xml:space="preserve"><value>Available after mini-map analysis</value></data>
-  <data name="Coaching.MapControlEditor.Content.Timed.Future.Description" xml:space="preserve"><value>The first version does not analyze the mini-map image, so these conditions cannot be selected yet.</value></data>
-  <data name="Coaching.MapControlEditor.Content.Timed.Future.Items" xml:space="preserve"><value>Enemy jungler spotted · Opponent missing from lane · Enemy ward placed · Team grouped at an objective</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Future.Title" xml:space="preserve"><value>Map observation rules</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Future.Description" xml:space="preserve"><value>TempoCue already reads the minimap and notices when an opponent appears or goes out of sight — two ready-made packs ship with it. Authoring such rules yourself is not possible yet; they will arrive as a separate section of this step.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Future.Items" xml:space="preserve"><value>Opponent appeared on the map · Opponent went out of sight</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.ListTitle" xml:space="preserve"><value>Persistent tips</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.Description" xml:space="preserve"><value>Tips remain available in pack details and the overlay shows one on an eligible level-up. Urgent objective and timed reminders take priority.</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.Add" xml:space="preserve"><value>+ Add tip</value></data>

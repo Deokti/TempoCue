@@ -879,7 +879,7 @@
   <data name="Settings.Recognition.Threads.RestartNotice" xml:space="preserve"><value>Выбор применяется после перезапуска TempoCue.</value></data>
   <data name="Settings.Overlay.Preview.Button" xml:space="preserve"><value>Показать следующее уведомление</value></data>
   <data name="Settings.Overlay.Preview.Warning.Label" xml:space="preserve"><value>Осторожно</value></data>
-  <data name="Settings.Overlay.Preview.Warning.Title" xml:space="preserve"><value>Соперник пропал с линии</value></data>
+  <data name="Settings.Overlay.Preview.Warning.Title" xml:space="preserve"><value>Соперник пропал из вида</value></data>
   <data name="Settings.Overlay.Preview.Warning.Message" xml:space="preserve"><value>Первое уведомление · верхний слот</value></data>
   <data name="Settings.Overlay.Preview.Information.Label" xml:space="preserve"><value>Событие</value></data>
   <data name="Settings.Overlay.Preview.Information.Title" xml:space="preserve"><value>Дракон появится через 30 секунд</value></data>
@@ -976,9 +976,9 @@
   <data name="Coaching.MapControlEditor.Content.Timed.Message" xml:space="preserve"><value>Главный совет (его игрок видит первым)</value></data>
   <data name="Coaching.MapControlEditor.Content.Timed.WhyNow" xml:space="preserve"><value>Почему сейчас (короткое объяснение)</value></data>
   <data name="Coaching.MapControlEditor.Content.Timed.NextGoal" xml:space="preserve"><value>Что подготовить к объекту (необязательно)</value></data>
-  <data name="Coaching.MapControlEditor.Content.Timed.Future.Title" xml:space="preserve"><value>Появится после анализа мини-карты</value></data>
-  <data name="Coaching.MapControlEditor.Content.Timed.Future.Description" xml:space="preserve"><value>Первая версия не анализирует изображение мини-карты, поэтому такие условия пока нельзя выбрать.</value></data>
-  <data name="Coaching.MapControlEditor.Content.Timed.Future.Items" xml:space="preserve"><value>Вражеский лесник замечен · Противник пропал с линии · Поставлен вражеский вард · Команда собралась у объекта</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Future.Title" xml:space="preserve"><value>Правила наблюдения за картой</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Future.Description" xml:space="preserve"><value>TempoCue уже разбирает миникарту и умеет замечать появление и исчезновение соперника — это два готовых набора. Создавать такие правила самому пока нельзя, они появятся отдельным разделом этого шага.</value></data>
+  <data name="Coaching.MapControlEditor.Content.Timed.Future.Items" xml:space="preserve"><value>Соперник появился на карте · Соперник пропал из вида</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.ListTitle" xml:space="preserve"><value>Постоянные подсказки</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.Description" xml:space="preserve"><value>Подсказки доступны в деталях набора и по одной показываются оверлеем при подходящем повышении уровня. Срочные напоминания объектов и времени имеют приоритет.</value></data>
   <data name="Coaching.MapControlEditor.Content.Persistent.Add" xml:space="preserve"><value>+ Добавить подсказку</value></data>
