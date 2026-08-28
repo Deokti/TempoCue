@@ -290,7 +290,6 @@
   <data name="Coaching.MapControl.Library.Card.Details" xml:space="preserve"><value>{0} · {1}</value></data>
   <data name="Coaching.MapControl.Library.Author.You" xml:space="preserve"><value>you</value></data>
   <data name="Coaching.MapControl.Library.Role.Selected" xml:space="preserve"><value>only {0}</value></data>
-  <data name="Coaching.MapControl.Library.OpenUnavailable" xml:space="preserve"><value>Pack details will be available in the next iteration.</value></data>
   <data name="Coaching.Library.Matchup" xml:space="preserve"><value>{0} vs {1}</value></data>
   <data name="Coaching.Library.Card.Details" xml:space="preserve"><value>{0} · {1}</value></data>
   <data name="Coaching.Library.State.Enabled" xml:space="preserve"><value>Enabled</value></data>
@@ -313,7 +312,6 @@
   <data name="Coaching.Library.Language.Unknown" xml:space="preserve"><value>Language not specified</value></data>
   <data name="Coaching.Library.Patch" xml:space="preserve"><value>Patch {0}</value></data>
   <data name="Coaching.Library.Open" xml:space="preserve"><value>Open</value></data>
-  <data name="Coaching.Library.Open.Planned" xml:space="preserve"><value>The pack details screen will be added in the next iteration.</value></data>
   <data name="Coaching.Library.LoadFailed" xml:space="preserve"><value>Could not read locally saved advice packs.</value></data>
   <data name="Coaching.Library.Empty.Matchups" xml:space="preserve"><value>No matchups found</value></data>
   <data name="Coaching.Library.Empty.SearchHint" xml:space="preserve"><value>Clear the search or create a new advice pack.</value></data>

@@ -298,7 +298,6 @@
   <data name="Coaching.MapControl.Library.Card.Details" xml:space="preserve"><value>{0} · {1}</value></data>
   <data name="Coaching.MapControl.Library.Author.You" xml:space="preserve"><value>вы</value></data>
   <data name="Coaching.MapControl.Library.Role.Selected" xml:space="preserve"><value>только {0}</value></data>
-  <data name="Coaching.MapControl.Library.OpenUnavailable" xml:space="preserve"><value>Просмотр набора появится в следующей итерации.</value></data>
   <data name="Coaching.Library.Matchup" xml:space="preserve"><value>{0} против {1}</value></data>
   <data name="Coaching.Library.Card.Details" xml:space="preserve"><value>{0} · {1}</value></data>
   <data name="Coaching.Library.State.Enabled" xml:space="preserve"><value>Включён</value></data>
@@ -321,7 +320,6 @@
   <data name="Coaching.Library.Language.Unknown" xml:space="preserve"><value>Язык не указан</value></data>
   <data name="Coaching.Library.Patch" xml:space="preserve"><value>Патч {0}</value></data>
   <data name="Coaching.Library.Open" xml:space="preserve"><value>Открыть</value></data>
-  <data name="Coaching.Library.Open.Planned" xml:space="preserve"><value>Экран подробностей набора появится в следующей итерации.</value></data>
   <data name="Coaching.Library.LoadFailed" xml:space="preserve"><value>Не удалось прочитать локально сохранённые наборы советов.</value></data>
   <data name="Coaching.Library.Empty.Matchups" xml:space="preserve"><value>Матчапы не найдены</value></data>
   <data name="Coaching.Library.Empty.SearchHint" xml:space="preserve"><value>Очистите поиск или создайте новый набор советов.</value></data>
