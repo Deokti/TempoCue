@@ -1,5 +1,4 @@
 ﻿using TempoCue.Vision;
-using TempoCue.Vision.DeeperLeague;
 using TempoCue.Vision.OwnModel;
 
 namespace TempoCue.Tools.ReplayInspect;
@@ -19,7 +18,7 @@ namespace TempoCue.Tools.ReplayInspect;
 /// </summary>
 internal static class SequenceStability
 {
-    public static async Task<int> RunAsync(string sequencePath, string? modelDirectory)
+    public static async Task<int> RunAsync(string sequencePath)
     {
         if (!File.Exists(sequencePath))
         {
@@ -61,20 +60,6 @@ internal static class SequenceStability
         var runners = new List<(string Name, Func<MinimapReplaySample, IReadOnlyList<MinimapChampionMarkerCandidate>> Recognize)>();
         var ourRunner = new MinimapReplayRunner();
         runners.Add(("наш конвейер", sample => ourRunner.Run(sample).Actual.ChampionCandidates));
-
-        DeeperLeagueMinimapRecognizer? model = null;
-        if (modelDirectory is not null)
-        {
-            model = new DeeperLeagueMinimapRecognizer(
-                Path.Combine(modelDirectory, "best.onnx"),
-                Path.Combine(modelDirectory, "champMap.json"));
-            runners.Add(("DeeperLeague", sample => model.Recognize(
-                sample.BgraPixels.Span,
-                sample.ImageWidth,
-                sample.ImageHeight,
-                sample.ImageStride,
-                sample.ChampionReferences)));
-        }
 
         // Свою модель показываем всегда, когда веса лежат рядом: пункт 5
         // договора о приёмке — устойчивость между кадрами — единственный,
@@ -149,7 +134,6 @@ internal static class SequenceStability
         }
         finally
         {
-            model?.Dispose();
             ownModel?.Dispose();
         }
 

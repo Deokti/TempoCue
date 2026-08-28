@@ -1,5 +1,4 @@
 ﻿using TempoCue.Vision;
-using TempoCue.Vision.DeeperLeague;
 using TempoCue.Vision.OwnModel;
 
 namespace TempoCue.Tools.ReplayInspect;
@@ -14,7 +13,7 @@ namespace TempoCue.Tools.ReplayInspect;
 /// </summary>
 internal static class SequenceListing
 {
-    public static async Task<int> RunAsync(string sequencePath, string? modelDirectory)
+    public static async Task<int> RunAsync(string sequencePath)
     {
         if (!File.Exists(sequencePath))
         {
@@ -36,26 +35,6 @@ internal static class SequenceListing
             "наш конвейер",
             sequence,
             index => runner.Run(sequence.ToSample(index)).Actual.ChampionCandidates);
-
-        if (modelDirectory is not null)
-        {
-            using var model = new DeeperLeagueMinimapRecognizer(
-                Path.Combine(modelDirectory, "best.onnx"),
-                Path.Combine(modelDirectory, "champMap.json"));
-            PrintTable(
-                "DeeperLeague",
-                sequence,
-                index =>
-                {
-                    var sample = sequence.ToSample(index);
-                    return model.Recognize(
-                        sample.BgraPixels.Span,
-                        sample.ImageWidth,
-                        sample.ImageHeight,
-                        sample.ImageStride,
-                        sample.ChampionReferences);
-                });
-        }
 
         // Свою модель искать не просят: если веса лежат рядом, показываем её
         // всегда. Пункт 6 договора о приёмке — разброс положений — иначе

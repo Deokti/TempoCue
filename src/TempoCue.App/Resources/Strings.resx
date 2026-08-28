@@ -853,16 +853,9 @@
   <data name="Settings.Recognizer.OwnModel.Hint" xml:space="preserve">
     <value>Our own neural model. Confirms 64 of 67 on the test corpus with one or two false confirmations, about 8 ms per frame, and holds a moving champion on every frame. Knows every champion of the current patch.</value>
   </data>
-  <data name="Settings.Recognizer.DeeperLeague" xml:space="preserve">
-    <value>DeeperLeague model</value>
-  </data>
-  <data name="Settings.Recognizer.DeeperLeague.Hint" xml:space="preserve">
-    <value>Third-party model. Confirms 48 of 60 with five false confirmations and does not know champions released after patch 13.14.</value>
-  </data>
-  <data name="Settings.Experiment.Recognizer.Title" xml:space="preserve"><value>Experimental minimap recognition</value></data>
-  <data name="Settings.Experiment.Recognizer.Description" xml:space="preserve"><value>Uses a third-party neural model instead of the built-in recognizer. It finds overlapping and recalling champions more often, but may confirm base icons by mistake. Without the model files TempoCue keeps using the built-in recognizer.</value></data>
-  <data name="Settings.Experiment.Recognizer.UnsupportedChampions" xml:space="preserve"><value>The model was trained on patch 13.14. It does not know champions released after it: Briar, Hwei, Smolder, Aurora, Ambessa, Mel, Yunara, Zaahen, Locke. These have had their icon redrawn since then and may go untracked: Akshan, Jax, Leblanc, Rengar, Senna, Shyvana, Skarner, Syndra, Teemo, Viktor, XinZhao. Unrecognised participants are simply never reported; the model does not mistake them for someone else, and everyone else is tracked as usual.</value></data>
-  <data name="Settings.Experiment.Recognizer.RestartNotice" xml:space="preserve"><value>The choice applies after TempoCue restarts.</value></data>
+  <data name="Settings.Recognizer.Title" xml:space="preserve"><value>Minimap recognition</value></data>
+  <data name="Settings.Recognizer.Description" xml:space="preserve"><value>How TempoCue reads the minimap. The own model recognises more champions at a quarter of the frame cost; the built-in pipeline stays as a fallback. The choice applies after a restart.</value></data>
+  <data name="Settings.Recognizer.RestartNotice" xml:space="preserve"><value>The choice applies after TempoCue restarts.</value></data>
   <data name="Settings.Recognition.Threads.Title" xml:space="preserve"><value>Map recognition threads</value></data>
   <data name="Settings.Recognition.Threads.Description" xml:space="preserve"><value>How many parts of the map TempoCue compares at once. More threads mean a faster frame and earlier notifications, but less processor left for the game. Recognition accuracy is unaffected — only speed changes.</value></data>
   <data name="Settings.Recognition.Threads.Automatic" xml:space="preserve"><value>Automatic ({0})</value></data>

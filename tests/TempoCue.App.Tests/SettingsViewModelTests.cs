@@ -49,7 +49,6 @@ public sealed class SettingsViewModelTests
         // Умолчание приложения — своя модель; выбора человек ещё не делал.
         Assert.Equal(MinimapRecognizerChoice.OwnModel, viewModel.MinimapRecognizer);
         Assert.False(viewModel.HasExperimentalRecognizerRestartNotice);
-        Assert.False(viewModel.HasUnsupportedChampionsNotice);
 
         viewModel.MinimapRecognizer = MinimapRecognizerChoice.Default;
 
@@ -57,12 +56,6 @@ public sealed class SettingsViewModelTests
         // поэтому пользователю показывается напоминание о перезапуске.
         Assert.Equal(MinimapRecognizerChoice.Default, service.Load().MinimapRecognizer);
         Assert.True(viewModel.HasExperimentalRecognizerRestartNotice);
-        Assert.False(viewModel.HasUnsupportedChampionsNotice);
-
-        viewModel.MinimapRecognizer = MinimapRecognizerChoice.DeeperLeague;
-
-        // Предупреждение о неизвестных чемпионах относится только к чужой модели.
-        Assert.True(viewModel.HasUnsupportedChampionsNotice);
 
         viewModel.MinimapRecognizer = MinimapRecognizerChoice.OwnModel;
 

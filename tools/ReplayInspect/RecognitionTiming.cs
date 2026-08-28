@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using TempoCue.Vision;
-using TempoCue.Vision.DeeperLeague;
 
 namespace TempoCue.Tools.ReplayInspect;
 
@@ -15,27 +14,20 @@ internal static class RecognitionTiming
     private const int WarmupRuns = 2;
     private const int MeasuredRuns = 10;
 
-    public static async Task<int> RunAsync(string corpusDirectory, string? modelDirectory)
+    public static async Task<int> RunAsync(string corpusDirectory)
     {
         Console.WriteLine(
             $"OpenCV сообщает о {OpenCvSharp.Cv2.GetNumThreads()} собственных потоках " +
             $"при {Environment.ProcessorCount} логических процессорах.");
 
         var runner = new MinimapReplayRunner();
-        using var model = modelDirectory is null
-            ? null
-            : new DeeperLeagueMinimapRecognizer(
-                Path.Combine(modelDirectory, "best.onnx"),
-                Path.Combine(modelDirectory, "champMap.json"));
-
         var ourCold = new List<double>();
         var ourWarm = new List<double>();
-        var modelWarm = new List<double>();
 
         Console.WriteLine(
             $"Прогрев {WarmupRuns}, замер {MeasuredRuns} повторов на кадр.");
         Console.WriteLine();
-        Console.WriteLine("кадр                                   | наш холод | наш тепл | модель");
+        Console.WriteLine("кадр                                   | наш холод | наш тепл");
 
         foreach (var path in ReplaySampleFile.EnumerateCorpus(corpusDirectory))
         {
@@ -48,33 +40,16 @@ internal static class RecognitionTiming
             var warm = Measure(() => runner.Run(sample), MeasuredRuns);
             ourWarm.AddRange(warm);
 
-            var modelText = "—";
-            if (model is not null)
-            {
-                Measure(() => Recognize(model, sample), WarmupRuns);
-                var modelRuns = Measure(() => Recognize(model, sample), MeasuredRuns);
-                modelWarm.AddRange(modelRuns);
-                modelText = $"{Median(modelRuns):F1}";
-            }
-
             Console.WriteLine(
-                $"{ReplaySampleFile.Name(path),-38} | {cold[0],9:F1} | {Median(warm),8:F1} | {modelText,6}");
+                $"{ReplaySampleFile.Name(path),-38} | {cold[0],9:F1} | {Median(warm),8:F1}");
         }
 
         Console.WriteLine();
         Report("наш конвейер, первый кадр ростера", ourCold);
         Report("наш конвейер, установившийся", ourWarm);
-        if (modelWarm.Count > 0)
-        {
-            Report("модель DeeperLeague", modelWarm);
-        }
 
         Console.WriteLine();
         PrintAffordableRate("наш конвейер", ourWarm);
-        if (modelWarm.Count > 0)
-        {
-            PrintAffordableRate("модель DeeperLeague", modelWarm);
-        }
 
         await PrintScalingAsync(corpusDirectory);
         return 0;
@@ -137,16 +112,6 @@ internal static class RecognitionTiming
 
         OpenCvSharp.Cv2.SetNumThreads(openCvThreads);
     }
-
-    private static void Recognize(
-        DeeperLeagueMinimapRecognizer model,
-        MinimapReplaySample sample) =>
-        model.Recognize(
-            sample.BgraPixels.Span,
-            sample.ImageWidth,
-            sample.ImageHeight,
-            sample.ImageStride,
-            sample.ChampionReferences);
 
     private static double[] Measure(Action action, int runs)
     {

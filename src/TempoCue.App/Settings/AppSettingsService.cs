@@ -94,24 +94,20 @@ public sealed class AppSettingsService
     }
 
     /// <summary>
-    /// Переносит выбор из прежней галочки. Выбора нет, а галочка стоит — значит
-    /// человек включал стороннюю модель, и это его выбор, а не умолчание.
+    /// Приводит сохранённый выбор к существующему варианту.
     /// </summary>
     /// <remarks>
-    /// Порядок важен: перенос идёт до подстановки умолчания. Иначе смена
-    /// умолчания приложения затёрла бы выбор, сделанный прежней галочкой.
+    /// Выбор хранится числом, и System.Text.Json не проверяет, есть ли такое
+    /// значение в перечислении. В файлах уже лежит двойка — удалённая сторонняя
+    /// модель DeeperLeague, — и её надо прочитать как «выбора нет», то есть
+    /// применить умолчание приложения. Прежняя галочка «экспериментальное
+    /// распознавание» указывала на ту же удалённую модель и теперь не значит
+    /// ничего: поле остаётся в старых файлах и просто не читается.
     /// </remarks>
-    private static MinimapRecognizerChoice? Migrate(AppSettings settings)
-    {
-        if (settings.MinimapRecognizer is { } chosen)
-        {
-            return chosen;
-        }
-
-        return settings.UseExperimentalMinimapRecognizer
-            ? MinimapRecognizerChoice.DeeperLeague
+    private static MinimapRecognizerChoice? Migrate(AppSettings settings) =>
+        settings.MinimapRecognizer is { } chosen && Enum.IsDefined(chosen)
+            ? chosen
             : null;
-    }
 
     /// <summary>
     /// Сохраняет выбор распознавателя миникарты. Он применяется при следующем
@@ -126,13 +122,7 @@ public sealed class AppSettingsService
         }
 
         var current = Load();
-        // Прежняя галочка гасится: иначе перенос при следующей загрузке снова
-        // подставил бы стороннюю модель поверх нового выбора.
-        Save(current with
-        {
-            MinimapRecognizer = choice,
-            UseExperimentalMinimapRecognizer = false
-        });
+        Save(current with { MinimapRecognizer = choice });
     }
 
     /// <summary>

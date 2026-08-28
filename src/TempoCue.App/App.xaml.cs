@@ -11,7 +11,6 @@ using TempoCue.Core;
 using TempoCue.Overlay;
 using TempoCue.Riot;
 using TempoCue.Vision;
-using TempoCue.Vision.DeeperLeague;
 using TempoCue.Vision.OwnModel;
 
 namespace TempoCue.App;
@@ -393,11 +392,7 @@ public partial class App : System.Windows.Application
             return BuiltInAnalyzer(threads);
         }
 
-        var modelDirectory = choice switch
-        {
-            MinimapRecognizerChoice.OwnModel => OwnModelFrameAnalyzer.FindModelDirectory(),
-            _ => DeeperLeagueFrameAnalyzer.FindModelDirectory()
-        };
+        var modelDirectory = OwnModelFrameAnalyzer.FindModelDirectory();
         if (modelDirectory is null)
         {
             Debug.WriteLine(
@@ -407,12 +402,7 @@ public partial class App : System.Windows.Application
 
         try
         {
-            return choice switch
-            {
-                MinimapRecognizerChoice.OwnModel =>
-                    new OwnModelFrameAnalyzer(modelDirectory, threads),
-                _ => new DeeperLeagueFrameAnalyzer(modelDirectory, threads)
-            };
+            return new OwnModelFrameAnalyzer(modelDirectory, threads);
         }
         catch (Exception exception)
         {

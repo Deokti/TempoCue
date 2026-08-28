@@ -25,10 +25,10 @@ try
             await CorpusStatistics.PrintReferenceBaselinesAsync(args[1]),
         "--margin" when args.Length == 2 =>
             await CorpusStatistics.PrintNegativeMarginsAsync(args[1]),
-        "--sequence" when args.Length is 2 or 3 =>
-            await SequenceListing.RunAsync(args[1], args.Length == 3 ? args[2] : null),
-        "--stability" when args.Length is 2 or 3 =>
-            await SequenceStability.RunAsync(args[1], args.Length == 3 ? args[2] : null),
+        "--sequence" when args.Length == 2 =>
+            await SequenceListing.RunAsync(args[1]),
+        "--stability" when args.Length == 2 =>
+            await SequenceStability.RunAsync(args[1]),
         "--visibility" when args.Length == 2 =>
             await VisibilityRules.RunAsync(args[1]),
         "--scale-sweep" when args.Length == 2 =>
@@ -42,23 +42,10 @@ try
                 args[1],
                 args.Length > 2 ? int.Parse(args[2]) : 10,
                 args.Length > 3 ? int.Parse(args[3]) : 8),
-        "--timing" when args.Length is 2 or 3 =>
-            await RecognitionTiming.RunAsync(args[1], args.Length == 3 ? args[2] : null),
-        "--compare" when args.Length == 2 =>
-            await DeeperLeagueComparison.RunAsync(args[1]),
+        "--timing" when args.Length == 2 =>
+            await RecognitionTiming.RunAsync(args[1]),
         "--own-model" when args.Length == 2 =>
             await OwnModelComparison.RunAsync(args[1]),
-        "--model" when args.Length >= 2 =>
-            await DeeperLeagueComparison.RunOnFramesAsync(args.Skip(1)),
-        "--icons" when args.Length == 3 =>
-            await ChampionIconComparison.RunAsync(args[1], args[2]),
-        "--icon-recognition" when args.Length == 3 =>
-            await ChampionIconComparison.RunRecognitionAsync(args[1], args[2]),
-        "--model-raw" when args.Length >= 2 =>
-            await DeeperLeagueComparison.RunOnFramesAsync(
-                args.Skip(1),
-                minimumConfidence: 0.10,
-                rejectStaticObjects: false),
         _ when args[0].StartsWith("--", StringComparison.Ordinal) =>
             Fail($"Неизвестный или неполный режим: {args[0]}"),
         _ => await FrameInspector.PrintRecognitionAsync(args)
@@ -107,7 +94,7 @@ static void PrintUsage()
           ReplayInspect --margin <каталог корпуса>
               запас лучшего балла над отрицательными эталонами
 
-          ReplayInspect --stability <запись.tempocue-sequence> [<каталог модели>]
+          ReplayInspect --stability <запись.tempocue-sequence>
               устойчивость между кадрами: на какой доле кадров участник
               подтверждён, пока он виден всю запись
 
@@ -118,13 +105,10 @@ static void PrintUsage()
           ReplayInspect --soak <кадр> [минут] [кадр/с]
               долгий прогон одного кадра: растёт ли стоимость или память со временем
 
-          ReplayInspect --timing <каталог корпуса> [<каталог модели>]
-              стоимость одного кадра в установившемся режиме и частота, которую
-              эта стоимость позволяет; каталог модели необязателен
-
-          ReplayInspect --compare <каталог корпуса>
-              сравнение основного распознавателя и модели DeeperLeague на одной
-              разметке; требует models/deeperleague с best.onnx и champMap.json
+          ReplayInspect --timing <каталог корпуса>
+              стоимость одного кадра штатного конвейера в установившемся режиме
+              и частота, которую эта стоимость позволяет; сравнение со своей
+              моделью даёт --own-model
 
           ReplayInspect --own-model <каталог корпуса>
               сравнение основного распознавателя и своей модели на одной

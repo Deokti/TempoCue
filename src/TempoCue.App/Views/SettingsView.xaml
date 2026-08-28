@@ -228,11 +228,11 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <StackPanel>
-                            <TextBlock Text="{localization:Loc Settings.Experiment.Recognizer.Title}"
+                            <TextBlock Text="{localization:Loc Settings.Recognizer.Title}"
                                        Foreground="#F2F6FF"
                                        FontSize="16"
                                        FontWeight="SemiBold" />
-                            <TextBlock Text="{localization:Loc Settings.Experiment.Recognizer.Description}"
+                            <TextBlock Text="{localization:Loc Settings.Recognizer.Description}"
                                        Style="{StaticResource SettingsCaption}"
                                        TextWrapping="Wrap"
                                        LineHeight="18"
@@ -263,30 +263,6 @@
                             </ComboBox.ItemContainerStyle>
                         </ComboBox>
                     </Grid>
-                    <!-- Список неподдерживаемых чемпионов виден только у сторонней
-                         модели: её ростер остановился на патче 13.14. -->
-                    <Border Background="#16233A"
-                            CornerRadius="8"
-                            Padding="12,10"
-                            Margin="0,12,0,0">
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding HasUnsupportedChampionsNotice}"
-                                                 Value="True">
-                                        <Setter Property="Visibility" Value="Visible" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
-                        <TextBlock Text="{localization:Loc Settings.Experiment.Recognizer.UnsupportedChampions}"
-                                   Foreground="#9FB2CC"
-                                   FontSize="13"
-                                   TextWrapping="Wrap"
-                                   LineHeight="18" />
-                    </Border>
-
                     <Grid Margin="0,10,0,0">
                         <Grid.Style>
                             <Style TargetType="Grid">
@@ -303,7 +279,7 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="{localization:Loc Settings.Experiment.Recognizer.RestartNotice}"
+                        <TextBlock Text="{localization:Loc Settings.Recognizer.RestartNotice}"
                                    Foreground="#FFC955"
                                    FontSize="13"
                                    TextWrapping="Wrap"

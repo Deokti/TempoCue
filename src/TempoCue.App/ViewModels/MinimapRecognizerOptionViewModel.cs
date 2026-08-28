@@ -28,30 +28,19 @@ public sealed class MinimapRecognizerOptionViewModel : ObservableObject, IDispos
 
     public MinimapRecognizerChoice Choice { get; }
 
-    public string DisplayName => _localization.Get(Choice switch
-    {
-        MinimapRecognizerChoice.OwnModel => "Settings.Recognizer.OwnModel",
-        MinimapRecognizerChoice.DeeperLeague => "Settings.Recognizer.DeeperLeague",
-        _ => "Settings.Recognizer.Default"
-    });
+    public string DisplayName => _localization.Get(
+        Choice is MinimapRecognizerChoice.OwnModel
+            ? "Settings.Recognizer.OwnModel"
+            : "Settings.Recognizer.Default");
 
     /// <summary>
     /// Чего ждать от этого выбора. Числа берутся из приёмки по корпусу и стоят
-    /// в подсказке нарочно: без них выбор между тремя строчками ничем не подкреплён.
+    /// в подсказке нарочно: без них выбор между двумя строчками ничем не подкреплён.
     /// </summary>
-    public string HintText => _localization.Get(Choice switch
-    {
-        MinimapRecognizerChoice.OwnModel => "Settings.Recognizer.OwnModel.Hint",
-        MinimapRecognizerChoice.DeeperLeague => "Settings.Recognizer.DeeperLeague.Hint",
-        _ => "Settings.Recognizer.Default.Hint"
-    });
-
-    /// <summary>
-    /// Знает ли распознаватель всех чемпионов. У сторонней модели ростер патча
-    /// 13.14, и вышедших позже она не знает вовсе; предупреждение показывается
-    /// только для неё.
-    /// </summary>
-    public bool HasUnsupportedChampions => Choice is MinimapRecognizerChoice.DeeperLeague;
+    public string HintText => _localization.Get(
+        Choice is MinimapRecognizerChoice.OwnModel
+            ? "Settings.Recognizer.OwnModel.Hint"
+            : "Settings.Recognizer.Default.Hint");
 
     public static IReadOnlyList<MinimapRecognizerOptionViewModel> Create(
         LocalizationService localization)

@@ -74,7 +74,27 @@ public sealed class AppSettingsServiceTests
     }
 
     [Fact]
-    public void MinimapRecognizer_KeepsChoiceMadeByTheOldCheckbox()
+    public void MinimapRecognizer_ForgetsTheChoiceOfARemovedRecognizer()
+    {
+        using var context = new TemporarySettingsContext();
+        File.WriteAllText(
+            context.SettingsPath,
+            """{ "language": "en-US", "minimapRecognizer": 2 }""");
+
+        var settings = context.Service.Load();
+
+        // Двойка — удалённая сторонняя модель DeeperLeague. Выбор исчезнувшего
+        // варианта читается как «выбора нет»; остальные настройки при этом целы,
+        // а не сброшены целиком.
+        Assert.Null(settings.MinimapRecognizer);
+        Assert.Equal(
+            AppSettings.DefaultMinimapRecognizer,
+            settings.EffectiveMinimapRecognizer);
+        Assert.Equal("en-US", settings.Language);
+    }
+
+    [Fact]
+    public void MinimapRecognizer_IgnoresTheOldExperimentalCheckbox()
     {
         using var context = new TemporarySettingsContext();
         File.WriteAllText(
@@ -83,10 +103,10 @@ public sealed class AppSettingsServiceTests
 
         var settings = context.Service.Load();
 
-        // Человек включал стороннюю модель галочкой. Смена умолчания приложения
-        // не имеет права затереть этот выбор.
+        // Галочка означала стороннюю модель, которой больше нет. Ничего
+        // осмысленного она теперь не выражает — применяется умолчание.
         Assert.Equal(
-            MinimapRecognizerChoice.DeeperLeague,
+            AppSettings.DefaultMinimapRecognizer,
             settings.EffectiveMinimapRecognizer);
     }
 

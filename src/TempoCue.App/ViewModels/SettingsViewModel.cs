@@ -105,7 +105,6 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
 
             _settings.SaveMinimapRecognizer(value);
             OnPropertyChanged(nameof(HasExperimentalRecognizerRestartNotice));
-            OnPropertyChanged(nameof(HasUnsupportedChampionsNotice));
             OnPropertyChanged(nameof(CanRestartToApply));
         }
     }
@@ -131,13 +130,6 @@ public sealed class SettingsViewModel : ObservableObject, IDisposable
     /// настройки уже сохранены — перезапуск ничего не теряет.
     /// </summary>
     public void RestartToApply() => _restarter?.Restart();
-
-    /// <summary>
-    /// Предупреждение о неизвестных чемпионах: у сторонней модели ростер патча
-    /// 13.14. Своей модели и штатного конвейера это не касается.
-    /// </summary>
-    public bool HasUnsupportedChampionsNotice =>
-        _minimapRecognizer is MinimapRecognizerChoice.DeeperLeague;
 
     /// <summary>Варианты числа потоков, доступные на этой машине.</summary>
     public IReadOnlyList<MinimapRecognitionThreadOptionViewModel> MinimapRecognitionThreadOptions

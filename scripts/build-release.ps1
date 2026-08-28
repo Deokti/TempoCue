@@ -2,12 +2,6 @@
 param(
     [string] $InnoCompilerPath,
 
-    # Веса сторонней модели обучены через Ultralytics с лицензией AGPL-3.0.
-    # Выпуск, который куда-то передаётся, — это распространение, поэтому по
-    # умолчанию веса в него не попадают. Ключ нужен только для сборки, которая
-    # останется на своих машинах.
-    [switch] $IncludeExperimentalModel,
-
     # Только переносимый ZIP, без установщика. Нужен для проверочных сборок
     # на своей машине: установщику требуется Inno Setup, а проверить сборку
     # перед игрой хочется и без него.
@@ -60,8 +54,7 @@ dotnet publish $applicationProject `
     --self-contained true `
     --no-restore `
     --output $publishDirectory `
-    -p:PublishProfile=$publishProfile `
-    "-p:IncludeExperimentalModel=$($IncludeExperimentalModel.IsPresent.ToString().ToLowerInvariant())"
+    -p:PublishProfile=$publishProfile
 if ($LASTEXITCODE -ne 0) {
     throw 'Application publish failed.'
 }
