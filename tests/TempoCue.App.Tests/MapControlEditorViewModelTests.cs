@@ -2,6 +2,7 @@ using TempoCue.App.Localization;
 using TempoCue.App.ViewModels;
 using TempoCue.Application;
 using TempoCue.Coaching;
+using TempoCue.Core;
 
 namespace TempoCue.App.Tests;
 
@@ -206,6 +207,66 @@ public sealed class MapControlEditorViewModelTests
         Assert.True(editor.NavigateToStep(5));
         Assert.True(await editor.Save.SaveAsync(LocalCoachPackState.Enabled));
         Assert.Equal(pack.Id, store.SavedPack?.Id);
+    }
+
+    [Fact]
+    public async Task LoadPackWithVisionRules_KeepsThemThroughSave()
+    {
+        var store = new TestMapControlPackStore();
+        var editor = CreateEditor(store);
+        var pack = TestMapControlPackFactory.Create("map-control.vision-test") with
+        {
+            VisionRules =
+            [
+                new MapVisionRule(
+                    "enemy-jungler-appeared",
+                    PlayerPosition.Jungle,
+                    MapVisionTransition.Appeared,
+                    MapObjectiveReminderPriority.Important,
+                    "Вражеский лесник виден на карте.",
+                    "Положение лесника — самая скоропортящаяся информация.",
+                    "Реши, даёт ли это окно.")
+            ]
+        };
+
+        await editor.LoadAsync(pack, LocalCoachPackState.Enabled, createCopy: false);
+        Assert.True(editor.NavigateToStep(5));
+        Assert.True(await editor.Save.SaveAsync(LocalCoachPackState.Enabled));
+
+        // Редактор правил наблюдения ещё не показывает, но обязан пронести их
+        // через себя: иначе правка копии набора про лесника молча стирала бы
+        // единственное, ради чего набор существует.
+        var saved = Assert.Single(store.SavedPack!.VisionRules);
+        Assert.Equal("enemy-jungler-appeared", saved.Id);
+        Assert.Equal(PlayerPosition.Jungle, saved.Position);
+    }
+
+    [Fact]
+    public async Task PackOfVisionRulesAlone_IsNotTreatedAsEmpty()
+    {
+        var editor = CreateEditor();
+        var pack = TestMapControlPackFactory.Create("map-control.vision-only") with
+        {
+            Rules = [],
+            VisionRules =
+            [
+                new MapVisionRule(
+                    "enemy-mid-disappeared",
+                    PlayerPosition.Middle,
+                    MapVisionTransition.Disappeared,
+                    MapObjectiveReminderPriority.Caution,
+                    "Вражеский мидер пропал из вида.",
+                    "Опасность создаёт незамеченный уход.",
+                    "Отойдите под обзор, пока он не найдётся.")
+            ]
+        };
+
+        await editor.LoadAsync(pack, LocalCoachPackState.Enabled, createCopy: false);
+
+        // Оба встроенных набора наблюдения устроены именно так: ни одного
+        // правила по объектам, ни одного напоминания — и это не пустой набор.
+        Assert.True(editor.Content.HasContent);
+        Assert.True(editor.CanNavigateToStep5);
     }
 
     private static void CompleteMainInformation(MapControlEditorViewModel editor)

@@ -29,6 +29,13 @@ public sealed class MapControlContentViewModel : ObservableObject
 
     public MapControlPersistentTipsViewModel PersistentTips { get; }
 
+    /// <summary>
+    /// Правила наблюдения набора. Редактор их пока не показывает и не меняет,
+    /// но обязан пронести через себя нетронутыми: без этого правка копии набора
+    /// про лесника молча стирала бы единственное, ради чего набор существует.
+    /// </summary>
+    public IReadOnlyList<MapVisionRule> VisionRules { get; private set; } = [];
+
     // Совместимые свойства сохраняют существующие binding и сценарии редактора.
     public ReadOnlyObservableCollection<MapControlObjectiveRuleViewModel> Rules =>
         ObjectiveRules.Rules;
@@ -69,7 +76,10 @@ public sealed class MapControlContentViewModel : ObservableObject
     public bool HasContent =>
         HasRules
         || TimedReminders.Count > 0
-        || PersistentTips.Count > 0;
+        || PersistentTips.Count > 0
+        // Набор из одних правил наблюдения — обычный набор, а не пустой: оба
+        // встроенных набора наблюдения устроены именно так.
+        || VisionRules.Count > 0;
 
     public bool IsComplete =>
         HasContent
@@ -145,6 +155,7 @@ public sealed class MapControlContentViewModel : ObservableObject
         Section = MapControlContentSection.Objects;
         TimedReminders.BeginNew();
         PersistentTips.BeginNew();
+        VisionRules = [];
         NotifyObjectiveRuleBindings();
     }
 
@@ -154,6 +165,7 @@ public sealed class MapControlContentViewModel : ObservableObject
         ObjectiveRules.Load(pack.Rules);
         TimedReminders.Load(pack.TimedReminders);
         PersistentTips.Load(pack.PersistentTips);
+        VisionRules = pack.VisionRules;
         Section = MapControlContentSection.Objects;
         NotifyObjectiveRuleBindings();
         OnPropertyChanged(nameof(HasContent));
