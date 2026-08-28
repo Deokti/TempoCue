@@ -110,6 +110,8 @@
   <data name="Nav.BackHome" xml:space="preserve"><value>← Home</value></data>
   <data name="Nav.Collapse" xml:space="preserve"><value>Collapse menu</value></data>
   <data name="Settings.Title" xml:space="preserve"><value>Settings</value></data>
+  <data name="Settings.Legal.Title" xml:space="preserve"><value>Legal</value></data>
+  <data name="Settings.Legal.Riot" xml:space="preserve"><value>TempoCue is not endorsed by Riot Games and does not reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games and all associated properties are trademarks or registered trademarks of Riot Games, Inc.</value></data>
   <data name="Settings.Subtitle" xml:space="preserve"><value>All data is processed locally. Nothing is sent outside.</value></data>
   <data name="Settings.Language.Section" xml:space="preserve"><value>Language</value></data>
   <data name="Settings.Language.Label" xml:space="preserve"><value>Interface language</value></data>

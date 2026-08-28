@@ -584,6 +584,32 @@
                     </Grid>
                 </StackPanel>
             </Border>
+            <!--
+                Правовая оговорка Riot обязана быть в самом продукте и на видном
+                месте — этого требует политика для сторонних приложений. Текст
+                менять нельзя: он задан Riot дословно.
+            -->
+            <Border Background="#101827"
+                    BorderBrush="#263750"
+                    BorderThickness="1"
+                    CornerRadius="12"
+                    Padding="16"
+                    Margin="0,14,0,0">
+                <StackPanel>
+                    <TextBlock Text="{localization:Loc Settings.Legal.Title}"
+                               Foreground="#91A4BD"
+                               FontSize="{StaticResource Typography.FontSize.Body}"
+                               FontWeight="SemiBold" />
+                    <TextBlock x:Name="RiotLegalDisclaimerTextBlock"
+                               Text="{localization:Loc Settings.Legal.Riot}"
+                               Foreground="#7F93AF"
+                               FontSize="{StaticResource Typography.FontSize.Caption}"
+                               TextWrapping="Wrap"
+                               LineHeight="18"
+                               Margin="0,8,0,0" />
+                </StackPanel>
+            </Border>
+
             <Border Height="24" />
         </StackPanel>
     </ScrollViewer>
