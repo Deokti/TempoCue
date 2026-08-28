@@ -914,8 +914,6 @@
   <data name="Coaching.MapControlEditor.Content.Vision.Blind.Title" xml:space="preserve"><value>What observation cannot see</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.Blind.Description" xml:space="preserve"><value>Observation only knows whether an opponent is visible on the map. This information will not appear in it.</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.Blind.Items" xml:space="preserve"><value>Enemy wards · Groupings and formations · Exact position under an enemy tower</value></data>
-  <data name="Coaching.MapControlEditor.Content.Vision.MoveUp" xml:space="preserve"><value>Up</value></data>
-  <data name="Coaching.MapControlEditor.Content.Vision.MoveDown" xml:space="preserve"><value>Down</value></data>
   <data name="Coaching.MapControlEditor.Content.CatalogTitle" xml:space="preserve"><value>TempoCue knows the objective schedule</value></data>
   <data name="Coaching.MapControlEditor.Content.CatalogUnavailable" xml:space="preserve"><value>Select a supported game patch on step one.</value></data>
   <data name="Coaching.MapControlEditor.Content.CatalogCurrentPatch" xml:space="preserve"><value>Timings are verified for patch {0}. You only choose when and what TempoCue should remind you about.</value></data>

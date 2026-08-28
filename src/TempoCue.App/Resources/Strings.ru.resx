@@ -924,8 +924,6 @@
   <data name="Coaching.MapControlEditor.Content.Vision.Blind.Title" xml:space="preserve"><value>Что наблюдение не видит</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.Blind.Description" xml:space="preserve"><value>Наблюдение знает только видимость соперника на карте. Этих сведений в нём не появится.</value></data>
   <data name="Coaching.MapControlEditor.Content.Vision.Blind.Items" xml:space="preserve"><value>Чужие варды · Скопления и построения команды · Точное положение под чужой башней</value></data>
-  <data name="Coaching.MapControlEditor.Content.Vision.MoveUp" xml:space="preserve"><value>Выше</value></data>
-  <data name="Coaching.MapControlEditor.Content.Vision.MoveDown" xml:space="preserve"><value>Ниже</value></data>
   <data name="Coaching.MapControlEditor.Content.CatalogTitle" xml:space="preserve"><value>TempoCue знает расписание объектов</value></data>
   <data name="Coaching.MapControlEditor.Content.CatalogUnavailable" xml:space="preserve"><value>Выберите поддерживаемый игровой патч на первом шаге.</value></data>
   <data name="Coaching.MapControlEditor.Content.CatalogCurrentPatch" xml:space="preserve"><value>Тайминги проверены для патча {0}. Вы выбираете только момент и текст напоминания.</value></data>
