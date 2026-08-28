@@ -53,12 +53,13 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
-                        <!-- 26 px, а не 20: знак занимает лишь половину высоты
+                        <!-- 22 px, а не 20: знак занимает лишь половину высоты
                              своей сетки, поэтому в родном размере он выглядит
-                             мельче, чем стоящий рядом жирный заголовок. -->
+                             мельче, чем стоящий рядом жирный заголовок. Выше 22
+                             он перерастает заглавные буквы и начинает выбиваться. -->
                         <Image Source="{StaticResource Brand.Mark}"
-                               Width="26"
-                               Height="26"
+                               Width="22"
+                               Height="22"
                                VerticalAlignment="Center" />
                         <TextBlock Text="TEMPOCUE"
                                    Foreground="#DCEAF7"

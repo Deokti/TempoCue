@@ -50,9 +50,13 @@
         Узел залит намеренно. Контурное кольцо оставляет внутри слишком мало
         места, и отверстие затягивается сглаживанием в мутное пятно.
 
-        Обводка 2.4, а не 1.5 как у остальных значков набора: те стоят в рядах
+        Обводка 2.84, а не 1.5 как у остальных значков набора: те стоят в рядах
         и списках, где важна ровность строя, а этот — мастер-знак рядом с жирным
         заголовком, и на общей толщине он выглядел бледной царапиной.
+
+        Число подобрано под размер отрисовки: 2.84 на сетке 20 при 22 пикселях
+        дают те же 3.1 пикселя линии, что и 2.4 при 26. Уменьшать знак, не
+        поднимая обводку, нельзя — вместе с масштабом худеют и линии.
     -->
     <DrawingImage x:Key="Brand.Mark">
         <DrawingImage.Drawing>
@@ -64,7 +68,7 @@
                 <GeometryDrawing Geometry="M 3,6 L 17,6">
                     <GeometryDrawing.Pen>
                         <Pen Brush="#91A4BD"
-                             Thickness="2.4"
+                             Thickness="2.84"
                              StartLineCap="Round"
                              EndLineCap="Round" />
                     </GeometryDrawing.Pen>
@@ -72,13 +76,13 @@
                 <GeometryDrawing Geometry="M 10,6 L 10,16">
                     <GeometryDrawing.Pen>
                         <Pen Brush="#4FAAE8"
-                             Thickness="2.4"
+                             Thickness="2.84"
                              StartLineCap="Round"
                              EndLineCap="Round" />
                     </GeometryDrawing.Pen>
                 </GeometryDrawing>
                 <GeometryDrawing Brush="#4FAAE8"
-                                 Geometry="M 12.9,6 A 2.9,2.9 0 1 1 7.1,6 A 2.9,2.9 0 1 1 12.9,6 Z" />
+                                 Geometry="M 13.43,6 A 3.43,3.43 0 1 1 6.57,6 A 3.43,3.43 0 1 1 13.43,6 Z" />
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
