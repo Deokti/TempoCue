@@ -48,11 +48,39 @@
 
 ## Запуск
 
+Запустить приложение:
+
 ```powershell
-dotnet restore
-dotnet test
 dotnet run --project src/TempoCue.App
 ```
+
+Одной команды достаточно: она сама восстановит зависимости и пересоберёт то, что
+изменилось. Матч для запуска не нужен — без игры приложение открывается и ждёт,
+просто экран текущего матча остаётся пустым.
+
+Запустить как у пользователя — собранной сборкой, без пересборки при старте:
+
+```powershell
+dotnet run --project src/TempoCue.App -c Release
+```
+
+Собрать переносимый архив, чтобы проверить сборку перед игрой:
+
+```powershell
+.\scripts\build-release.ps1 -SkipInstaller
+```
+
+Готовое приложение окажется в `artifacts/release/<версия>/publish/TempoCue.App.exe`.
+Ключ `-SkipInstaller` пропускает установщик: ему нужен Inno Setup 6, а для проверки
+своей сборки он не требуется.
+
+Прогнать тесты:
+
+```powershell
+dotnet test
+```
+
+Нужен .NET SDK версии из `global.json` и Windows 10 сборки 19041 или новее.
 
 ## Структура
 
