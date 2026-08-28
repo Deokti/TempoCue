@@ -209,7 +209,8 @@ public partial class App : System.Windows.Application
         var mapControlEditorViewModel = new MapControlEditorViewModel(
             LocalizationService.Instance,
             _gamePatchCatalog,
-            saveMapControlPack);
+            saveMapControlPack,
+            ShowMapVisionPreview);
         _coachingViewModel = new CoachingViewModel(
             LocalizationService.Instance,
             coachingLibraryViewModel,
@@ -313,6 +314,23 @@ public partial class App : System.Windows.Application
         }
 
         return packs;
+    }
+
+    /// <summary>
+    /// Показывает уведомление правила наблюдения из редактора — тем же оверлеем,
+    /// которым оно придёт в матче. Автор видит его целиком, не заходя в игру.
+    /// </summary>
+    private void ShowMapVisionPreview(OverlayNotification notification)
+    {
+        if (_overlayPresenter is null)
+        {
+            return;
+        }
+
+        // Настройки оверлея presenter уже держит: они применяются при запуске и
+        // заново при каждом изменении.
+        _overlayPresenter.SetInteractionMode(OverlayInteractionMode.Setup);
+        _overlayPresenter.ShowPreview([notification]);
     }
 
     private void ShowOverlayPreview()

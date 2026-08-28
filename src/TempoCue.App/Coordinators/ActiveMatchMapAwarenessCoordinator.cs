@@ -2,6 +2,7 @@
 using TempoCue.Coaching;
 using TempoCue.Core;
 using TempoCue.App.Settings;
+using TempoCue.App.ViewModels;
 using TempoCue.Application;
 using TempoCue.Overlay;
 
@@ -74,38 +75,13 @@ public sealed class ActiveMatchMapAwarenessCoordinator : IDisposable
     }
 
     /// <summary>
-    /// Уведомление по сработавшему правилу. Текст принадлежит набору, а не
-    /// приложению: локализованными остаются только оформление окна и название
-    /// роли — то, что относится к самому TempoCue, а не к содержанию совета.
+    /// Уведомление по сработавшему правилу. Собирается той же фабрикой, что и
+    /// предпросмотр в редакторе: автор обязан видеть ровно то, что увидит игрок.
     /// </summary>
-    private OverlayNotification CreateNotification(MapAwarenessSignal signal)
-    {
-        var rule = signal.Rule;
-        return new OverlayNotification(
-            $"map-awareness:{rule.Id}:{signal.ParticipantId}",
-            _localization.Get("Overlay.MapAwareness.Status"),
+    private OverlayNotification CreateNotification(MapAwarenessSignal signal) =>
+        MapVisionNotificationFactory.Create(
+            signal.Rule,
             signal.ChampionName,
-            rule.Message,
-            _localization.Get("Overlay.MapAwareness.Dismiss"),
-            ToTone(rule.Priority),
-            badge: _localization.Get(ToPositionKey(rule.Position)));
-    }
-
-    private static OverlayNotificationTone ToTone(MapObjectiveReminderPriority priority) =>
-        priority switch
-        {
-            MapObjectiveReminderPriority.Important => OverlayNotificationTone.Danger,
-            MapObjectiveReminderPriority.Caution => OverlayNotificationTone.Caution,
-            _ => OverlayNotificationTone.Coach
-        };
-
-    private static string ToPositionKey(PlayerPosition position) => position switch
-    {
-        PlayerPosition.Top => "Position.Top",
-        PlayerPosition.Jungle => "Position.Jungle",
-        PlayerPosition.Middle => "Position.Middle",
-        PlayerPosition.Bottom => "Position.Bottom",
-        PlayerPosition.Support => "Position.Support",
-        _ => "Position.Unknown"
-    };
+            _localization,
+            signal.ParticipantId);
 }

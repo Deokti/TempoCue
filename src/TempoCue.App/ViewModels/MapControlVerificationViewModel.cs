@@ -2,6 +2,7 @@ using TempoCue.App.Localization;
 using TempoCue.Application;
 using TempoCue.Coaching;
 using TempoCue.Core;
+using TempoCue.Overlay;
 
 namespace TempoCue.App.ViewModels;
 
@@ -10,6 +11,7 @@ public sealed class MapControlVerificationViewModel : ObservableObject
 {
     private static readonly TimeSpan MinimumTimelineDuration = TimeSpan.FromMinutes(30);
     private readonly LocalizationService _localization;
+    private readonly Action<OverlayNotification>? _showPreview;
     private MapControlMainInformationViewModel? _mainInformation;
     private MapControlScopeViewModel? _scope;
     private MapControlContentViewModel? _content;
@@ -20,13 +22,15 @@ public sealed class MapControlVerificationViewModel : ObservableObject
     private string _catalogPatch = string.Empty;
     private PlayerPosition _checkPosition = PlayerPosition.Jungle;
     private MapVisionTransition _checkTransition = MapVisionTransition.Appeared;
-    private bool _areRolesReported = true;
     private string _rolesSummary = string.Empty;
     private string _teamSideSummary = string.Empty;
 
-    public MapControlVerificationViewModel(LocalizationService localization)
+    public MapControlVerificationViewModel(
+        LocalizationService localization,
+        Action<OverlayNotification>? showPreview = null)
     {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        _showPreview = showPreview;
     }
 
     public IReadOnlyList<MapControlVerificationIssueViewModel> Issues
@@ -92,7 +96,7 @@ public sealed class MapControlVerificationViewModel : ObservableObject
         {
             if (SetProperty(ref _checkPosition, value))
             {
-                OnPropertyChanged(nameof(CheckResult));
+                NotifyCheckChanged();
             }
         }
     }
@@ -104,52 +108,66 @@ public sealed class MapControlVerificationViewModel : ObservableObject
         {
             if (SetProperty(ref _checkTransition, value))
             {
-                OnPropertyChanged(nameof(CheckResult));
+                NotifyCheckChanged();
             }
         }
     }
 
     /// <summary>
-    /// Сообщил ли Riot роли соперников. Выключенное состояние — не выдумка, а
-    /// обычное дело: роль приходит из Live Client Data, и без неё ни одно
-    /// правило наблюдения не сработает.
+    /// Правило, которое ответит на разыгранное наблюдение. Сопоставление берётся
+    /// из той же политики, что работает в матче: два одинаковых сопоставления в
+    /// разных местах рано или поздно разойдутся, и предпросмотр начнёт врать.
     /// </summary>
-    public bool AreRolesReported
+    public MapVisionRule? CheckedRule => MapAwarenessSignalPolicy.FindRule(
+        _content?.VisionRules.Snapshot ?? [],
+        CheckPosition,
+        CheckTransition);
+
+    public bool CanShowCheckedNotification => CheckedRule is not null && _showPreview is not null;
+
+    /// <summary>
+    /// Что случится при разыгранном наблюдении. Пару без правила проверка
+    /// называет прямо: событие произойдёт, но набор на него не ответит.
+    /// </summary>
+    public string CheckResult => CheckedRule is null
+        ? _localization.Get("Coaching.MapControlEditor.Verification.Check.NoRule")
+        : _localization.Get("Coaching.MapControlEditor.Verification.Check.Ready");
+
+    /// <summary>
+    /// Показывает уведомление так, как его увидит игрок. Имя чемпиона подставится
+    /// в матче, здесь на его месте стоит подпись роли.
+    /// </summary>
+    public void ShowCheckedNotification()
     {
-        get => _areRolesReported;
-        set
+        if (CheckedRule is not { } rule || _showPreview is null)
         {
-            if (SetProperty(ref _areRolesReported, value))
-            {
-                OnPropertyChanged(nameof(CheckResult));
-            }
+            return;
         }
+
+        _showPreview(MapVisionNotificationFactory.Create(
+            rule,
+            ExampleChampionName(rule.Position),
+            _localization,
+            idSuffix: "verification"));
     }
 
     /// <summary>
-    /// Что случится при разыгранном наблюдении. Сопоставление берётся из той же
-    /// политики, что работает в матче: два одинаковых сопоставления в разных
-    /// местах рано или поздно разойдутся, и предпросмотр начнёт врать.
+    /// Имя чемпиона для примера. В матче заголовком уведомления стоит именно
+    /// имя — «Ли Син», а не «соперник», — и предпросмотр обязан выглядеть так же,
+    /// иначе он показывает не то, что увидит игрок.
+    ///
+    /// Имена подобраны по ролям и лежат в ресурсах: в русском наборе они русские,
+    /// как в русском клиенте игры.
     /// </summary>
-    public string CheckResult
-    {
-        get
+    private string ExampleChampionName(PlayerPosition position) =>
+        _localization.Get(position switch
         {
-            if (!AreRolesReported)
-            {
-                return _localization.Get(
-                    "Coaching.MapControlEditor.Verification.Check.NoRoles");
-            }
-
-            var rule = MapAwarenessSignalPolicy.FindRule(
-                _content?.VisionRules.Snapshot ?? [],
-                CheckPosition,
-                CheckTransition);
-            return rule is null
-                ? _localization.Get("Coaching.MapControlEditor.Verification.Check.NoRule")
-                : rule.Message;
-        }
-    }
+            PlayerPosition.Top => "Coaching.MapControlEditor.Verification.Check.Champion.Top",
+            PlayerPosition.Jungle => "Coaching.MapControlEditor.Verification.Check.Champion.Jungle",
+            PlayerPosition.Middle => "Coaching.MapControlEditor.Verification.Check.Champion.Middle",
+            PlayerPosition.Bottom => "Coaching.MapControlEditor.Verification.Check.Champion.Bottom",
+            _ => "Coaching.MapControlEditor.Verification.Check.Champion.Support"
+        });
 
     public bool CanContinue => ErrorCount == 0;
 
@@ -367,6 +385,13 @@ public sealed class MapControlVerificationViewModel : ObservableObject
         return markers;
     }
 
+    private void NotifyCheckChanged()
+    {
+        OnPropertyChanged(nameof(CheckedRule));
+        OnPropertyChanged(nameof(CheckResult));
+        OnPropertyChanged(nameof(CanShowCheckedNotification));
+    }
+
     private MapControlVerificationIssueViewModel CreateIssue(
         MapControlVerificationIssueSeverity severity,
         string resourceKey) =>
@@ -397,7 +422,7 @@ public sealed class MapControlVerificationViewModel : ObservableObject
         OnPropertyChanged(nameof(HasVisionCheck));
         OnPropertyChanged(nameof(CheckPositionOptions));
         OnPropertyChanged(nameof(CheckTransitionOptions));
-        OnPropertyChanged(nameof(CheckResult));
+        NotifyCheckChanged();
         OnPropertyChanged(nameof(TimedReminderCount));
         OnPropertyChanged(nameof(PersistentTipCount));
     }

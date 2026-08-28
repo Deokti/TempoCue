@@ -324,18 +324,17 @@ public sealed class MapControlEditorViewModelTests
         verification.CheckTransition = MapVisionTransition.Appeared;
 
         Assert.True(verification.HasVisionCheck);
-        Assert.Equal("Соперник изменил видимость на карте.", verification.CheckResult);
+        Assert.NotNull(verification.CheckedRule);
+        Assert.Equal(
+            "Соперник изменил видимость на карте.",
+            verification.CheckedRule!.Message);
 
         // Та же роль, но другое событие — правила нет, и проверка обязана это
-        // сказать, а не промолчать.
+        // сказать, а не промолчать. Показывать тогда нечего.
         verification.CheckTransition = MapVisionTransition.Disappeared;
+        Assert.Null(verification.CheckedRule);
         Assert.Contains("правила нет", verification.CheckResult, StringComparison.Ordinal);
-
-        // Без ролей от Riot не сработает ни одно правило наблюдения. Это не
-        // выдумка, а обычное состояние Live Client Data.
-        verification.CheckTransition = MapVisionTransition.Appeared;
-        verification.AreRolesReported = false;
-        Assert.Contains("Без ролей", verification.CheckResult, StringComparison.Ordinal);
+        Assert.False(verification.CanShowCheckedNotification);
     }
 
     [Fact]
@@ -363,7 +362,7 @@ public sealed class MapControlEditorViewModelTests
         // правило пары. Иначе автор поверил бы, что работает второе.
         Assert.Equal(
             "Соперник изменил видимость на карте.",
-            editor.Verification.CheckResult);
+            editor.Verification.CheckedRule!.Message);
     }
 
     private static void AddVisionRule(

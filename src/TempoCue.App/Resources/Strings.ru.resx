@@ -1031,10 +1031,15 @@
   <data name="Coaching.MapControlEditor.Verification.Summary.Timed" xml:space="preserve"><value>Напоминания по времени</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Vision" xml:space="preserve"><value>Правила наблюдения</value></data>
   <data name="Coaching.MapControlEditor.Verification.Check.Title" xml:space="preserve"><value>Проверка наблюдения</value></data>
-  <data name="Coaching.MapControlEditor.Verification.Check.Description" xml:space="preserve"><value>Разыграйте наблюдение и посмотрите, какое правило сработает. Матч для этого не нужен.</value></data>
-  <data name="Coaching.MapControlEditor.Verification.Check.Roles" xml:space="preserve"><value>Riot сообщил роли соперников</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Description" xml:space="preserve"><value>Разыграйте наблюдение и посмотрите уведомление таким, каким его увидит игрок. Матч для этого не нужен.</value></data>
   <data name="Coaching.MapControlEditor.Verification.Check.NoRule" xml:space="preserve"><value>Для этой пары правила нет: событие произойдёт, но набор на него не ответит.</value></data>
-  <data name="Coaching.MapControlEditor.Verification.Check.NoRoles" xml:space="preserve"><value>Без ролей от Riot не сработает ни одно правило наблюдения: приложение не угадывает, кто из пятерых мидер.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Ready" xml:space="preserve"><value>Правило найдено — покажите уведомление, чтобы увидеть его целиком.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Show" xml:space="preserve"><value>Показать уведомление</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Champion.Top" xml:space="preserve"><value>Дариус</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Champion.Jungle" xml:space="preserve"><value>Ли Син</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Champion.Middle" xml:space="preserve"><value>Ари</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Champion.Bottom" xml:space="preserve"><value>Джинкс</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Champion.Support" xml:space="preserve"><value>Треш</value></data>
   <data name="Coaching.MapControlEditor.Verification.Issue.DuplicateVisionPairs" xml:space="preserve"><value>Одна пара «роль и событие» описана дважды: {0}. Сработает только первое правило — остальные не покажутся никогда.</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Persistent" xml:space="preserve"><value>Постоянные подсказки</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Patch" xml:space="preserve"><value>Патч каталога</value></data>

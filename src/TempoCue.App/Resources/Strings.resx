@@ -1021,10 +1021,15 @@
   <data name="Coaching.MapControlEditor.Verification.Summary.Timed" xml:space="preserve"><value>Timed reminders</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Vision" xml:space="preserve"><value>Observation rules</value></data>
   <data name="Coaching.MapControlEditor.Verification.Check.Title" xml:space="preserve"><value>Observation check</value></data>
-  <data name="Coaching.MapControlEditor.Verification.Check.Description" xml:space="preserve"><value>Play out an observation and see which rule fires. No match required.</value></data>
-  <data name="Coaching.MapControlEditor.Verification.Check.Roles" xml:space="preserve"><value>Riot reported the opponent roles</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Description" xml:space="preserve"><value>Play out an observation and see the notification exactly as the player will. No match required.</value></data>
   <data name="Coaching.MapControlEditor.Verification.Check.NoRule" xml:space="preserve"><value>No rule for this pair: the event happens, but the pack does not answer it.</value></data>
-  <data name="Coaching.MapControlEditor.Verification.Check.NoRoles" xml:space="preserve"><value>Without roles from Riot no observation rule fires: the app does not guess which of the five is the mid laner.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Ready" xml:space="preserve"><value>A rule matches — show the notification to see it in full.</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Show" xml:space="preserve"><value>Show the notification</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Champion.Top" xml:space="preserve"><value>Darius</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Champion.Jungle" xml:space="preserve"><value>Lee Sin</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Champion.Middle" xml:space="preserve"><value>Ahri</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Champion.Bottom" xml:space="preserve"><value>Jinx</value></data>
+  <data name="Coaching.MapControlEditor.Verification.Check.Champion.Support" xml:space="preserve"><value>Thresh</value></data>
   <data name="Coaching.MapControlEditor.Verification.Issue.DuplicateVisionPairs" xml:space="preserve"><value>One role and event pair is described twice: {0}. Only the first rule fires — the rest never appear.</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Persistent" xml:space="preserve"><value>Persistent tips</value></data>
   <data name="Coaching.MapControlEditor.Verification.Summary.Patch" xml:space="preserve"><value>Catalog patch</value></data>
