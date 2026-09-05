@@ -13,6 +13,31 @@ namespace TempoCue.App.Tests;
 public sealed class CaptureDiagnosticsViewModelTests
 {
     [Fact]
+    public void EnablingRefresh_ImmediatelyProjectsTheLatestSnapshot()
+    {
+        WpfTestHost.Run(() =>
+        {
+            var session = new TestWindowCaptureSession();
+            using var viewModel = new CaptureDiagnosticsViewModel(
+                session,
+                isSupported: true,
+                LocalizationService.Instance);
+            session.SetSnapshot(TestCaptureDiagnosticsSnapshot.Create(
+                state: CaptureSessionState.Capturing));
+
+            viewModel.SetRefreshEnabled(true);
+
+            Assert.True(viewModel.IsCapturing);
+            viewModel.SetRefreshEnabled(false);
+            session.SetSnapshot(TestCaptureDiagnosticsSnapshot.Create(
+                state: CaptureSessionState.Stopped));
+            viewModel.SetRefreshEnabled(true);
+
+            Assert.Equal(CaptureSessionState.Stopped, viewModel.State);
+        });
+    }
+
+    [Fact]
     public void StateHint_ExplainsThatObservationIsSwitchedOffByThePlayer()
     {
         WpfTestHost.Run(() =>

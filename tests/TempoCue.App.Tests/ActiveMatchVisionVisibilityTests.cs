@@ -10,6 +10,31 @@ namespace TempoCue.App.Tests;
 public sealed class ActiveMatchVisionVisibilityTests
 {
     [Fact]
+    public async Task NewMatch_DoesNotReuseLastSeenGameTimeForTheSameParticipant()
+    {
+        var monitor = new TestActiveMatchMonitor();
+        var sink = new ActiveMatchVisionTestSupport.RecordingChampionReferenceSink();
+        var observations = new ActiveMatchVisionTestSupport.TestObservationSource();
+        using var coordinator = CreateCoordinator(monitor, sink, observations);
+        monitor.Publish(ActiveMatchVisionTestSupport.CreateUpdate());
+        await sink.WaitForReferencesAsync(2);
+        var capturedAt = new DateTimeOffset(2026, 8, 21, 10, 0, 0, TimeSpan.Zero);
+        observations.Publish(capturedAt, CreateEnemyAniviaCandidate());
+        observations.Publish(capturedAt.AddMilliseconds(250), CreateEnemyAniviaCandidate());
+        Assert.Equal(TimeSpan.FromSeconds(120), FindEnemy(coordinator).LastSeenGameTime);
+
+        monitor.Publish(new ActiveMatchUpdate(MatchSnapshotReadStatus.NoActiveMatch, null, null));
+        Assert.Empty(coordinator.DiagnosticsSnapshot.Participants);
+        monitor.Publish(ActiveMatchVisionTestSupport.CreateUpdate());
+
+        var participant = FindEnemy(coordinator);
+        Assert.Equal(ChampionPortraitReferenceStatus.Ready, participant.ReferenceStatus);
+        Assert.Equal(ParticipantVisibilityStatus.Unknown, participant.VisibilityStatus);
+        Assert.Null(participant.LastSeenGameTime);
+        Assert.Null(participant.LastSeenAt);
+    }
+
+    [Fact]
     public async Task ConsecutiveObservations_ConfirmParticipantAndPreservePosition()
     {
         var monitor = new TestActiveMatchMonitor();

@@ -72,7 +72,6 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
             Interval = RefreshInterval
         };
         _refreshTimer.Tick += RefreshTimer_Tick;
-        _refreshTimer.Start();
     }
 
     public bool IsSupported { get; }
@@ -523,6 +522,24 @@ public sealed class CaptureDiagnosticsViewModel : ObservableObject, IDisposable
         UpdateMinimapPreviewImage();
         UpdateParticipantStatuses();
         NotifyDiagnosticsChanged();
+    }
+
+    internal void SetRefreshEnabled(bool isEnabled)
+    {
+        if (_isDisposed)
+        {
+            return;
+        }
+
+        if (isEnabled)
+        {
+            Refresh();
+            _refreshTimer.Start();
+        }
+        else
+        {
+            _refreshTimer.Stop();
+        }
     }
 
     public void Dispose()

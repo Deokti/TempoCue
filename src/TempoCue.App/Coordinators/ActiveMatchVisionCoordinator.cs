@@ -274,6 +274,7 @@ internal sealed class ActiveMatchVisionCoordinator :
                     StringComparer.OrdinalIgnoreCase);
                 _visibilityTracker.Reset();
                 _transitionDetector.Reset();
+                _lastSeenGameTimes.Clear();
                 _visibilityStates = new Dictionary<string, ParticipantVisibilitySnapshot>(
                     StringComparer.OrdinalIgnoreCase);
                 _lastObservationReceivedAt = null;

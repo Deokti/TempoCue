@@ -88,6 +88,38 @@ public sealed class MinimapRecognitionWorkerTests
     }
 
     [Fact]
+    public async Task SuppliedAnalyzer_IsDisposedWithoutReceivingFrames()
+    {
+        var analyzer = new CountingAnalyzer();
+        var worker = new MinimapRecognitionWorker(analyzer, static _ => { });
+
+        await worker.DisposeAsync();
+        await worker.DisposeAsync();
+
+        Assert.True(analyzer.IsDisposed);
+        Assert.Equal(1, analyzer.DisposeCount);
+    }
+
+    [Fact]
+    public async Task FactoryAnalyzer_IsDisposedAfterProcessingFrames()
+    {
+        var analyzer = new CountingAnalyzer();
+        var completed = new TaskCompletionSource(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+        await using (var worker = new MinimapRecognitionWorker(
+            () => analyzer,
+            _ => completed.TrySetResult()))
+        {
+            Assert.True(worker.TrySubmit(CreatePreview(1), [], 1));
+            await completed.Task.WaitAsync(TimeSpan.FromSeconds(5));
+            Assert.False(analyzer.IsDisposed);
+        }
+
+        Assert.True(analyzer.IsDisposed);
+        Assert.Equal(1, analyzer.DisposeCount);
+    }
+
+    [Fact]
     public async Task Analyzer_IsDisposedOnlyWhenItWasCreated()
     {
         var analyzer = new CountingAnalyzer();
@@ -156,6 +188,8 @@ public sealed class MinimapRecognitionWorkerTests
     {
         public bool IsDisposed { get; private set; }
 
+        public int DisposeCount { get; private set; }
+
         public MinimapFrameAnalysis Analyze(
             ReadOnlyMemory<byte> pixels,
             int width,
@@ -164,6 +198,10 @@ public sealed class MinimapRecognitionWorkerTests
             IReadOnlyList<MinimapChampionReference> championReferences) =>
             new([], 0, [], 0);
 
-        public void Dispose() => IsDisposed = true;
+        public void Dispose()
+        {
+            IsDisposed = true;
+            DisposeCount++;
+        }
     }
 }

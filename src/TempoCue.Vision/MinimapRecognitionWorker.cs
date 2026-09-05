@@ -16,8 +16,8 @@ internal sealed class MinimapRecognitionWorker : IAsyncDisposable
     private readonly Task _processingTask;
 
     /// <summary>
-    /// Создаётся при первом кадре, а не при запуске приложения. Читается и
-    /// пишется только в <see cref="ProcessAsync"/> — читатель у очереди один.
+    /// Фабрика создаёт распознаватель при первом кадре. Готовый экземпляр
+    /// принадлежит worker сразу, даже если до остановки не поступило кадров.
     /// </summary>
     private IMinimapFrameAnalyzer? _analyzer;
     private int _disposeState;
@@ -36,6 +36,7 @@ internal sealed class MinimapRecognitionWorker : IAsyncDisposable
                 : () => analyzer,
             completed)
     {
+        _analyzer = analyzer;
     }
 
     /// <param name="analyzerFactory">

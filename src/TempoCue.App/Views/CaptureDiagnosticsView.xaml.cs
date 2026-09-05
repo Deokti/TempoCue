@@ -10,6 +10,28 @@ public partial class CaptureDiagnosticsView : UserControl
     public CaptureDiagnosticsView()
     {
         InitializeComponent();
+        Loaded += (_, _) => UpdateRefreshState();
+        Unloaded += (_, _) => SetRefreshEnabled(false);
+        IsVisibleChanged += (_, _) => UpdateRefreshState();
+        DataContextChanged += (_, e) =>
+        {
+            if (e.OldValue is SettingsViewModel previous)
+            {
+                previous.CaptureDiagnostics?.SetRefreshEnabled(false);
+            }
+
+            UpdateRefreshState();
+        };
+    }
+
+    private void UpdateRefreshState() => SetRefreshEnabled(IsLoaded && IsVisible);
+
+    private void SetRefreshEnabled(bool isEnabled)
+    {
+        if (DataContext is SettingsViewModel viewModel)
+        {
+            viewModel.CaptureDiagnostics?.SetRefreshEnabled(isEnabled);
+        }
     }
 
     private async void SelectCaptureWindowButton_Click(

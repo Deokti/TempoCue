@@ -48,7 +48,6 @@ public sealed class OwnModelMinimapRecognizer : IDisposable
     private readonly InferenceSession _identity;
     private readonly string _detectorInput;
     private readonly string _identityInput;
-    private readonly byte[] _canonicalFrame;
     private readonly DenseTensor<byte> _frameTensor;
     private readonly int _mapSide;
     private bool _isDisposed;
@@ -63,15 +62,24 @@ public sealed class OwnModelMinimapRecognizer : IDisposable
         ArgumentException.ThrowIfNullOrWhiteSpace(modelDirectory);
         _setup = OwnModelSetup.Load(Path.Combine(modelDirectory, OwnModelFrameAnalyzer.SetupFileName));
 
+        _mapSide = _setup.FrameSide / _setup.Stride;
+        _frameTensor = new DenseTensor<byte>([1, _setup.FrameSide, _setup.FrameSide, BytesPerPixel]);
+
         var threads = maximumDegreeOfParallelism ?? DefaultInferenceThreads;
         _detector = OpenSession(Path.Combine(modelDirectory, _setup.DetectorFile), threads);
-        _identity = OpenSession(Path.Combine(modelDirectory, _setup.IdentityFile), threads);
-        _detectorInput = _detector.InputMetadata.Keys.First();
-        _identityInput = _identity.InputMetadata.Keys.First();
-
-        _mapSide = _setup.FrameSide / _setup.Stride;
-        _canonicalFrame = new byte[_setup.FrameSide * _setup.FrameSide * BytesPerPixel];
-        _frameTensor = new DenseTensor<byte>([1, _setup.FrameSide, _setup.FrameSide, BytesPerPixel]);
+        try
+        {
+            _identity = OpenSession(Path.Combine(modelDirectory, _setup.IdentityFile), threads);
+            _detectorInput = _detector.InputMetadata.Keys.First();
+            _identityInput = _identity.InputMetadata.Keys.First();
+        }
+        catch
+        {
+            // После ошибки конструктора владелец не получит объект и не вызовет Dispose.
+            _identity?.Dispose();
+            _detector.Dispose();
+            throw;
+        }
     }
 
     public OwnModelSetup Setup => _setup;
@@ -142,11 +150,10 @@ public sealed class OwnModelMinimapRecognizer : IDisposable
             width,
             height,
             stride,
-            _canonicalFrame,
+            _frameTensor.Buffer.Span,
             _setup.FrameSide,
             _setup.FrameSide,
             _setup.FrameSide * BytesPerPixel);
-        _canonicalFrame.CopyTo(_frameTensor.Buffer.Span);
     }
 
     /// <summary>Карта центров → вершины в канонических пикселях, от уверенных к слабым.</summary>
@@ -279,7 +286,7 @@ public sealed class OwnModelMinimapRecognizer : IDisposable
             for (var row = 0; row < side; row++)
             {
                 var source = (((place.Top + row) * _setup.FrameSide) + place.Left) * BytesPerPixel;
-                _canonicalFrame.AsSpan(source, rowBytes)
+                _frameTensor.Buffer.Span.Slice(source, rowBytes)
                     .CopyTo(destination.Slice(((index * side) + row) * rowBytes, rowBytes));
             }
         }
